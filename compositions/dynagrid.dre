@@ -1,0 +1,222 @@
+<composition>
+	<classes>
+		<class name="connectorpoint" extends="view" bordercolor="rgba(200,200,255,255)" bgcolor="rgba(85,85,128,255)" cornerradius="10,10,0,0" width="20" height="20" borderwidth="2">
+			<attribute name="bgcolor" motion="linear" duration="0.1"/>
+			<attribute name="bordercolor" motion="linear" duration="0.1"/>
+			<attribute name="connectiontype" type="string" value="string"/>	
+			<handler event="mouseover">
+				this.bgcolor=vec4("rgba(200,200,255,255)")
+			</handler>
+			<handler event="mouseout">
+				this.bgcolor=vec4(0.3, 0.3, 0.5, 1.0);
+			</handler>
+		</class>
+		<class name="inconnectorpoint" extends="view" bordercolor="rgba(200,200,255,255)" bgcolor="rgba(85,85,128,255)" cornerradius="0,0,10,10" width="20" height="20" borderwidth="2">
+			<attribute name="bgcolor" motion="linear" duration="0.1"/>
+			<attribute name="bordercolor" motion="linear" duration="0.1"/>
+			<attribute name="connectiontype" type="string" value="string"/>	
+			<handler event="mouseover">
+				this.bgcolor=vec4("rgba(200,200,255,255)")
+			</handler>
+			<handler event="mouseout">
+				this.bgcolor=vec4(0.3, 0.3, 0.5, 1.0)
+			</handler>
+		</class>
+		<class name="flowblock" extends="view" width="150"  height="100" cornerradius="16,16,16,16" borderwidth="2" bgcolor="rgba(255,255,255,150)" bordercolor="rgba(200,200,255,255)">
+
+			<attribute name="bgcolor" motion="linear" duration="0.1"/>
+			<attribute name="bordercolor" motion="linear" duration="0.1"/>
+			<attribute name="cornerradius" motion="linear" duration="0.1"/>
+
+			<method name="bg.bgcolorfn" args="tex,	dist" >
+				var vig = 0.7 + 0.3 * (sin(tex.y * PI) * sin(tex.x * PI))
+				var c = 1.0 - noise.cell3v(vec3(gl_FragCoord.x * 0.14, gl_FragCoord.y * 0.14, time)).x;
+				vig = (c * 0.2 + 0.8) * vig;
+				var fgcolor = vec4(0.2, 0.0, 0.5, bgcolor.a);
+				return  palette.dither(mix(fgcolor, bgcolor, vig));
+			</method>
+
+			<handler event="init">
+				this.normalbgcolor = this.bgcolor;
+				this.normalbordercolor = this.bordercolor;
+				this.normalcornerradius = this.cornerradius;
+			</handler>
+
+			<handler event="mouseover">
+				this.bgcolor=vec4("rgba(255,255,255,230)");
+				this.bordercolor=vec4("rgba(200,200,255,255)")
+				this.cornerradius  = vec4(0);
+			</handler>
+
+			<handler event="mouseout">
+				this.bgcolor=this.normalbgcolor;
+				this.bordercolor=this.normalbordercolor;
+				this.cornerradius = this.normalcornerradius;
+			</handler>
+
+			<attribute name="dragging" type="boolean" value="false"/>
+			
+			<handler event="mousedown">
+				this.dragging = true;
+				this.grabx = this.x - this.screen.mouse.x;
+				this.graby = this.y - this.screen.mouse.y;
+				//this.emit('mousemove')
+			</handler>
+			
+			<handler event="mouseup">	
+				this.dragging = false;
+			</handler>
+			
+			<handler event="mousemove">
+				if (this.dragging === true){
+					//console.log(this.screen.mouse.move)
+					this.x = this.screen.mouse.x + this.grabx;
+					this.y = this.screen.mouse.y + this.graby;
+					//this.lastx = this.mousemove.x;
+					//this.lasty = this.mousemove.y;
+				}
+			</handler>	
+			
+			<attribute name="label" type="string" value=""/>
+			
+			<text text="${this.parent.label}" color="rgb(40,40,40)" fontsize="25" y="56" x="26"></text>
+			
+			<view name="connectors" bgcolor="blue"width="40" x="130">	
+				<connectorpoint x="0" y="15"/>
+			</view>
+			
+			<view name="connectors" bgcolor="blue"width="40" x="0">
+				<inconnectorpoint x="0" y="15"/>
+				<inconnectorpoint x="0" y="40"/>
+				<inconnectorpoint x="0" y="65"/>
+			</view>
+		</class>
+		
+		<class name="dynagridblock"  bgcolor="red" extends="view" width="150" height="150" >
+			<handler event="mouseover">
+				this.bg._hover = 0;
+				this.bg.hoverin = 1;
+				this.bg.hover = 1;
+			</handler>
+			<handler event="mouseout">
+				this.bg.hoverin = 0;
+				this.bg.hover = 0;
+			</handler>
+			<attribute name='bg.hoverin' type='float' value='0.'/>
+			<attribute name='bg.hover' type='float' motion='outbounce' duration='.6' value='0.'/>
+			<method name='bg.bgcolorfn' args='pos, dist'> // this is a shader
+				var aspect = texture.size.y/texture.size.x
+				var center = (1. - aspect) *.5 
+				var sam = vec2(pos.x * aspect + center, pos.y)
+				var anim = 0.
+				var mul = 1.
+				if(hover>0.){
+					var dir = sam - vec2(.5)
+					var fade = hover+1.//1.-cos(hover*PI2)*.5+.5
+					mul = mix(1.,fade * (1.-length(dir)), hover)
+					anim = hover*8.
+					if(hoverin>0.){
+						sam = (sam-vec2(.5)) * (hover*.5+.5) + vec2(.5)
+					}				 
+				}
+				var col = texture.sample(sam)
+				var vdist = (-dist)*.04
+				if(sam.x < 0. || sam.x > 1.){
+					col.a = abs(sin(dist*.5 - time )+cos( sam.y*64.+time+anim )) * vdist
+				}
+				col.rgb *= mul
+				return col
+			</method>
+		</class>
+		
+		<class name="gridcontainer" extends="view" >
+			<attribute name="sorting" type="string" value="normal"/>
+			<attribute name="spacing" type="float" value="1" />
+			<attribute name="spacingy" type="float" value="1" />
+			<require name='data' src='$compositions/dynagrid/top_movies.json'/>
+			<attribute name="offset" type="float" value="0" />
+			<!--attribute name="xsizecalc" type="float" value="${this.parent.xsize + this.parent.spacing}" />
+			<handler event="xsizecalc">
+			</handler-->
+			<attribute name="ysize" type="float" value="100" />
+			<method name='render'>
+				var res = data.searchResponse.results
+				var out = []
+				for(var i = 0; i < 40; i++){
+					var imgs = res[i + parseInt((1 - this.offset) * (res.length-40))].movie.images
+					if(imgs)
+					out.push(dynagridblock({
+						x:(i%5)*160*this.spacing*0.1, 
+						y:floor(i/5)*160*this.spacingy*0.1, 
+						bgimage: imgs[imgs.length - 1].url
+					}))
+				}
+				return out
+			</method>
+		</class>
+	</classes>
+	<screens>
+		<screen name="browser" bgcolor="rgba(220,220,235,255)">
+			<method name='calleme'>
+				console.log("CALLED!")
+			</method>
+			<attribute name='sld1' type='float' value='${this.flow.b2.sld1.value}'/>
+			<attribute name='sld2' type='float' value='${this.flow.b1.sld2.value}'/>
+			<attribute name='sld3' type='float' value='${this.flow.b2.sld2.value}'/>
+
+			<view bg.sld="${this.flow.ysize.value}" bgcolor="transparent" width="1920"  height="1080" cornerradius="0">
+				<gridcontainer
+					spacing="${this.parent.parent.flow.b2.sld1.value *20}"
+					spacingy="${this.parent.parent.flow.b2.sld2.value *20}"
+					offset="${this.parent.parent.flow.b1.sld2.value}" >					
+				</gridcontainer>
+			</view>
+
+			<view name="flow" x="100" y="100"cornerradius="20" bgcolor="rgba(40,40,40,250)" width="1000"  height="700" clipping="true" >
+				<method name="bg.bgcolorfn" args="tex,	dist" >
+					var vig = 0.2 + 0.8 * (sin(tex.y * PI) * sin(tex.x * PI))
+					var c = 1.0-noise.cell3v(vec3(gl_FragCoord.x * 0.114, gl_FragCoord.y * 0.114, time * 0.8124)).x;
+					vig = (c*0.5 + 0.8) * vig;
+					var fgcolor = vec4(0.3, 0.3, 0.3, bgcolor.a);
+					return  palette.dither(mix(fgcolor, bgcolor, 1-vig));
+				</method>
+
+				<text text="Composition: MovieGrid" color="black" fontsize="300" y="636" x="16"></text>
+
+				<spline x="${this.parent.b1.x + 150}" y="${this.parent.b1.y+25}" bgcolor="#f97" position="absolute" p1="100,0" p2="${vec2(this.parent.b2.x-this.parent.b1.x-250, this.parent.b2.y-this.parent.b1.y)}" p3="${vec2(this.parent.b2.x-this.parent.b1.x-150, this.parent.b2.y-this.parent.b1.y)}"  linewidth="11" linecolor="rgba(190,190,255,255)"></spline>
+
+				<spline x="${this.parent.b2.x + 150}" y="${this.parent.b2.y+25}" bgcolor="#9f7" position="absolute" p1="100,0" p2="${vec2(this.parent.b3.x-this.parent.b2.x-250, this.parent.b3.y-this.parent.b2.y)}" p3="${vec2(this.parent.b3.x-this.parent.b2.x-150, this.parent.b3.y-this.parent.b2.y)}"  linewidth="11" linecolor="rgba(190,190,255,255)"></spline>
+
+				<spline x="${this.parent.b5.x + 150}" y="${this.parent.b5.y+25}" bgcolor="#f97" position="absolute" p1="100,0" p2="${vec2(this.parent.b1.x-this.parent.b5.x-250, this.parent.b1.y-this.parent.b5.y)}" p3="${vec2(this.parent.b1.x-this.parent.b5.x-150, this.parent.b1.y-this.parent.b5.y)}"  linewidth="11" linecolor="rgba(190,190,255,255)"></spline>
+
+				<spline x="${this.parent.b5.x + 150}" y="${this.parent.b5.y+25}" bgcolor="#f97" position="absolute" p1="100,0" p2="${vec2(this.parent.b4.x-this.parent.b5.x-250, this.parent.b4.y-this.parent.b5.y)}" p3="${vec2(this.parent.b4.x-this.parent.b5.x-150, this.parent.b4.y-this.parent.b5.y)}"  linewidth="11" linecolor="rgba(190,190,255,255)"></spline>
+
+				<flowblock name="b1" x="250" y="280" label="Movies" height="150">
+					<text text="search offset" color="black" fontsize="20" y="105" x="10" ></text>			
+					<slider width="20" height="130" name="sld2" x="65" y="60" rotation="-90"/>				
+				</flowblock>
+
+				<flowblock name="b2" x="500" y="255"  label="Dynagrid" height="200">
+					<text text="X spacing" color="black" fontsize="20" y="105" x="30" ></text>
+					<slider width="20" height="130" name="sld1" x="65" y="60" rotation="90"/>
+					<text text="Y spacing" color="black" fontsize="20" y="155" x="30" ></text>
+					<slider width="20" height="130" name="sld2" x="65" y="110" rotation="90"/>
+				</flowblock>
+
+				<flowblock name="b3" x="780" y="200"  label="Browser"></flowblock>
+				<flowblock name="b4" x="450" y="80" label="Phone"></flowblock>
+				<flowblock name="b5" x="20" y="180" label="Slider"></flowblock>
+			</view>
+		</screen>
+
+		<screen name="grid" bgcolor="rgba(220,220,235,255)">	
+			<view  bg.sld="${this.flow.ysize.value}" bgcolor="transparent" width="1000"  height="1000" x="0" >
+				<gridcontainer
+					spacing="${this.teem.screens.browser[0].sld1 *20}"
+					spacingy= "${this.teem.screens.browser[0].sld3 *20}"
+					offset="${this.teem.screens.browser[0].sld2}" >
+				</gridcontainer>
+			</view>
+		</screen> 
+	</screens>
+</composition>
