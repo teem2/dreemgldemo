@@ -3,15 +3,14 @@
 define.class(function(require, exports, self){
 	var Texture = exports
 
-	self.atConstructor = function(type, w, h){
+	this.atConstructor = function(type, w, h){
 		this.type = type
 		this.size = vec2(w, h)
 	}
 
-	self.ratio = 1
-	self.device = null
-	self.isTexture = true
-	self.frame_buf = null
+	this.ratio = 1
+	this.isTexture = true
+	this.frame_buf = null
 
 	exports.fromImage = function(img){
 		var tex = new Texture('rgba', img.width, img.height)
@@ -72,11 +71,11 @@ define.class(function(require, exports, self){
 	}
 	gen_api(exports)
 
-	self.size = vec2(0, 0)
+	this.size = vec2(0, 0)
 
 	// well lets do it like this.
-	self.sample2 = function(x, y){ return sample(vec2(x, y)) }
-	self.sample = function(v){
+	this.sample2 = function(x, y){ return sample(vec2(x, y)) }
+	this.sample = function(v){
 		return texture2D(this, v, {
 			MIN_FILTER: 'LINEAR',
 			MAG_FILTER: 'LINEAR',
@@ -85,8 +84,8 @@ define.class(function(require, exports, self){
 		})
 	}
 
-	self.flipped2 = function(x,y){ return flipped(vec2(x,y)) }
-	self.flipped = function(v){
+	this.flipped2 = function(x,y){ return flipped(vec2(x,y)) }
+	this.flipped = function(v){
 		return texture2D(this, vec2(v.x, 1. - v.y), {
 			MIN_FILTER: 'LINEAR',
 			MAG_FILTER: 'LINEAR',
@@ -95,8 +94,8 @@ define.class(function(require, exports, self){
 		})
 	}
 	
-	self.point2 = function(x, y){ return point(vec2(x, y)) }
-	self.point = function(v){
+	this.point2 = function(x, y){ return point(vec2(x, y)) }
+	this.point = function(v){
 		return texture2D(this, vec2(v.x, v.y), {
 			MIN_FILTER: 'NEAREST',
 			MAG_FILTER: 'NEAREST',
@@ -105,8 +104,8 @@ define.class(function(require, exports, self){
 		})
 	}
 	
-	self.point_flipped2 = function(x, y){ return point_flipped(vec2(x, y)) }
-	self.point_flipped = function(v){
+	this.point_flipped2 = function(x, y){ return point_flipped(vec2(x, y)) }
+	this.point_flipped = function(v){
 		return texture2D(this, vec2(v.x, 1. - v.y), {
 			MIN_FILTER: 'NEAREST',
 			MAG_FILTER: 'NEAREST',
@@ -115,7 +114,7 @@ define.class(function(require, exports, self){
 		})
 	}
 
-	self.createGLTexture = function(gl, texid, texinfo){
+	this.createGLTexture = function(gl, texid, texinfo){
 		var samplerid = texinfo.samplerid
 
 		if(this.image && this.image[samplerid]){
@@ -159,7 +158,7 @@ define.class(function(require, exports, self){
 		return gltex
 	}
 
-	self.updateGLTexture = function(gl, gltex){
+	this.updateGLTexture = function(gl, gltex){
 		if(this.array){
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.size[0], this.size[1], 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(this.data)) 
 		}
@@ -171,8 +170,8 @@ define.class(function(require, exports, self){
 
 
 	// remote nesting syntax
-	self.allocRenderTarget = function(device){
-		var gl = device.gl
+	this.allocRenderTarget = function(gldevice){
+		var gl = gldevice.gl
 
 		var width = this.size[0], height = this.size[1]
 

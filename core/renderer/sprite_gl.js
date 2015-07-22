@@ -8,48 +8,48 @@ define.class('./sprite_base', function (require, exports, self) {
 	var GLTexture = require('$gl/gltexture')
 	var GLText = require('$gl/gltext')
 	var Sprite = self
-	self.dump = 1
+	this.dump = 1
 
 	exports.interfaceguid = 1
 
-	self.dirty = true
+	this.dirty = true
 
-	self.clipping =
-	self.bordercolor =
-	self.bgcolor =
-	self.cornerradius =
-	self.borderwidth =
-	self.height =
-	self.width =
-	self.opacity = function(){
+	this.clipping =
+	this.bordercolor =
+	this.bgcolor =
+	this.cornerradius =
+	this.borderwidth =
+	this.height =
+	this.width =
+	this.opacity = function(){
 		this.setDirty(true)
 	}
 
-	self.plaincolor = function(pos, dist){
+	this.plaincolor = function(pos, dist){
 		return bgcolor
 	}
 
 	exports.nest('Bg', GLShader.extend(function(exports, self){
-		self.texture = new GLTexture()
+		this.texture = new GLTexture()
 
-		self.mesh = vec2.quad(0, 0, 1, 0, 0, 1, 1, 1)
-		self.tex = vec2.quad(0, 0, 1, 0, 0, 1, 1, 1)
+		this.mesh = vec2.quad(0, 0, 1, 0, 0, 1, 1, 1)
+		this.tex = vec2.quad(0, 0, 1, 0, 0, 1, 1, 1)
 	
-		self.bgcolor = vec4(1)
+		this.bgcolor = vec4(1)
 		
-		self.bordercolor = vec4(0, 0, 0, 0)
-		self.borderwidth = 0.0,
+		this.bordercolor = vec4(0, 0, 0, 0)
+		this.borderwidth = 0.0,
 		
-		self.width = 0.0
-		self.radius = vec4(4, 14, 4, 14)
-		//self.dump = 1
-		self.height = 0
-		self.matrix = mat4.identity()
-		self.opacity = 0.0;
-		self.time = 0.1
+		this.width = 0.0
+		this.radius = vec4(4, 14, 4, 14)
+		//this.dump = 1
+		this.height = 0
+		this.matrix = mat4.identity()
+		this.opacity = 0.0;
+		this.time = 0.1
 
-		self.bgcolorfn = Sprite.plaincolor 
-		self.color = function(){
+		this.bgcolorfn = Sprite.plaincolor 
+		this.color = function(){
 			var dist = shape.roundedrectdistance(sized, width, height, radius.r, radius.a, radius.g, radius.b)
 			//dump = dist*0.01
 			//dist += noise.s2d(mesh*32)*5
@@ -75,7 +75,7 @@ define.class('./sprite_base', function (require, exports, self) {
 			bgcolor = vec4(pal.pal2(ns) + 0.5*(vec3(1.)*sin(-8*time + (length(mesh-.5)-.01*ns+ .001*noise.snoise3(x*1, y*1, 0.1*time))*2400)),1.)
 			*/
 			/*
-		self.color = function(){
+		this.color = function(){
 			var xs = 18.
 			var ys = 16.
 			var x = mesh.x*xs+0.1*time
@@ -85,22 +85,22 @@ define.class('./sprite_base', function (require, exports, self) {
 			return	pal.pal3(ns) + 0.5*(vec3(1.)*sin(-8*time + (length(mesh-.5)-.01*ns+ .001*noise.snoise3(x*1, y*1, 0.1*time))*2400))
 		}*/
 
-		self.color_blend = 'src_alpha * src_color + (1-src_alpha) * dst_color'
-			//self.color_blend = 'src_alpha * src_color + dst_color'
-		self.position = function(){
+		this.color_blend = 'src_alpha * src_color + (1-src_alpha) * dst_color'
+			//this.color_blend = 'src_alpha * src_color + dst_color'
+		this.position = function(){
 			sized = vec2(mesh.x * width, mesh.y * height)
 			return vec4(sized.x, sized.y, 0, 1) * matrix
 		}
 	}))
 	
 	exports.nest('Fg', GLText.extend(function(exports, self){
-		self.no_guid = 1
+		this.no_guid = 1
 	}))
 	
 	/*
-	self.TexturedShader = exports.Shader.extend(function(exports,self){
-		self.texture = GLTexture.rgba(),
-		self.color = function(){
+	this.TexturedShader = exports.Shader.extend(function(exports,self){
+		this.texture = GLTexture.rgba(),
+		this.color = function(){
 			var dist = shape.roundedrectdistance(sized, width, height, radius.r, radius.a, radius.g, radius.b);
 			
 			var clamped = 1.0 - (clamp(dist, -0.5, 0.5) + 0.5);
@@ -118,7 +118,7 @@ define.class('./sprite_base', function (require, exports, self) {
 		}
 	})*/
 		
-	self.enableTextureCache = function(enabled){
+	this.enableTextureCache = function(enabled){
 		if (enabled == false){
 			if(this.texturecache != false){
 				// destroy texturecache
@@ -136,7 +136,7 @@ define.class('./sprite_base', function (require, exports, self) {
 		}
 	}
 
-	self.getInvertedMatrix = function(){
+	this.getInvertedMatrix = function(){
 		if (this.matrixdirty){
 			this.recomputeMatrix();
 			this.orientation.worldmatrix = mat4.mul(this.orientation.matrix, this.parent.orientation.worldmatrix);
@@ -148,7 +148,7 @@ define.class('./sprite_base', function (require, exports, self) {
 		return this.orientation.invertedworldmatrix;
 	}
 	
-	self.recomputeMatrix = function(){
+	this.recomputeMatrix = function(){
 		
 		var o = this.orientation;
 		if (this.layout) {
@@ -178,7 +178,7 @@ define.class('./sprite_base', function (require, exports, self) {
 		this.matrixdirty = false;
 	}
 
-	self.init = function (obj){
+	this.init = function (obj){
 		
 		this.orientation = {
 			rotation : vec3(0, 0, 0), // (or {0,0,0} for 3d rotation)
@@ -262,9 +262,9 @@ define.class('./sprite_base', function (require, exports, self) {
 		this.recomputeMatrix();
 	}
 
-	self.renderQuad = function (texture, boundingrect) {}
+	this.renderQuad = function (texture, boundingrect) {}
 
-	self.drawStencil = function (renderstate) {
+	this.drawStencil = function (renderstate) {
 		this.bg.matrix = renderstate.matrix;
 		if (this.layout){
 				this.bg.width = this.layout.width? this.layout.width:this.width;
@@ -277,7 +277,7 @@ define.class('./sprite_base', function (require, exports, self) {
 		this.bg.draw();
 	}
 	
-	self.drawContent = function (renderstate) {
+	this.drawContent = function (renderstate) {
 		//mat4.debug(this.orientation.matrix);
 		if (this.texturecache == false || this.texturecache == true && this.dirty) {
 			
@@ -314,9 +314,9 @@ define.class('./sprite_base', function (require, exports, self) {
 			bg._radius = this._cornerradius
 
 			if(renderstate.drawmode === 2){
-				var type = bg.drawDebug()
+				var type = bg.drawDebug(this.screen.device)
 				if(type) renderstate.debugtypes.push(type)
-				fg.drawDebug()
+				fg.drawDebug(this.screen.device)
 			}
 			else if (renderstate.drawmode === 1) {			
 				if (this.hasListeners('click') || this.hasListeners('mousedown') || this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| this.hasListeners('mouseup') || this.hasListeners('mousemove') ||this.hasListeners('scroll')){
@@ -329,16 +329,14 @@ define.class('./sprite_base', function (require, exports, self) {
 				var g = ((this.effectiveguid>>8) &255) / 255.0
 				var b = ((this.effectiveguid>>16) &255) / 255.0
 				bg._guid = vec4(r,g,b,1.0);					
-				bg.drawGuid()
+				bg.drawGuid(this.screen.device)
 			}
 			else{
 				bg.time = (this.screen.time%100000)*0.001
 				fg.time = (this.screen.time%100000)*0.001
 
-				bg.draw()
-				fg.draw()
-				//console.log(bg)
-
+				bg.draw(this.screen.device)
+				fg.draw(this.screen.device)
 			}
 		} 
 		else {
@@ -349,11 +347,11 @@ define.class('./sprite_base', function (require, exports, self) {
 		return rect.intersects(this.boundingrect, renderstate.boundingrect);
 	}
 	
-	self.layoutChanged = function() {
+	this.layoutChanged = function() {
 		return true;
 	}
 	
-	self.draw = function (renderstate) {
+	this.draw = function (renderstate) {
 		if (this.atDraw) this.atDraw()
 
 		if (this.visible) {
@@ -393,11 +391,11 @@ define.class('./sprite_base', function (require, exports, self) {
 		//this.screen.device.redraw()
 	}
 
-	self.render = function(){
+	this.render = function(){
 	}
 
-	self.spawn = function (parent) {}
+	this.spawn = function (parent) {}
 
-	self.hideProperty(Object.keys(self))
+	this.hideProperty(Object.keys(self))
 
 })

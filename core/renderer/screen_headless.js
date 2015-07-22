@@ -2,12 +2,12 @@
 
 define.class('./screen_base', function(require, exports, self){
 
-	self.atConstructor = function(){
+	this.atConstructor = function(){
 	}
 
-	self.render = function(){
+	this.render = function(){
 	}
 
-	self.spawn = function(parent){
+	this.spawn = function(parent){
 	}
 })

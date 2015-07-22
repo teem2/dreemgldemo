@@ -9,7 +9,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 	var onejsparser = new OneJSParser()
 	onejsparser.parser_cache = {}
 
-	self.newState = function(context, varyings, uniforms){
+	this.newState = function(context, varyings, uniforms){
 		return {
 			depth: '', 
 			basename: '',
@@ -31,13 +31,13 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 	}
 
 	// returns a gl type
-	self.getType = function(infer, state){
+	this.getType = function(infer, state){
 		// OK so, mesh doesnt get typed here but in glshader
 		if(infer.fn_t === 'attribute') infer = infer.array.struct
 		return gltypes.getType(infer)
 	}
 
-	self.resolveContext = function(node, context, name, outname, basename, state){
+	this.resolveContext = function(node, context, name, outname, basename, state){
 		// uniform
 		if(name === 'super'){
 			node.infer = {fn_t:'object', object:Object.getPrototypeOf(context)}
@@ -111,12 +111,12 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		}
 	}
 
-	self.This = function(node, parent, state){
+	this.This = function(node, parent, state){
 		node.infer = {fn_t:'object', object:state.context}
 		return state.basename
 	}
 
-	self.Id = function(node, parent, state){
+	this.Id = function(node, parent, state){
 		// lets resolve ourself
 		var name = node.name
 
@@ -177,7 +177,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		}
 	}
 
-	self.Key = function(node, parent, state){
+	this.Key = function(node, parent, state){
 		// lets expand the object
 		var obj = this.expand(node.object, node, state)
 		//$$(obj, node.object.infer.id)
@@ -217,7 +217,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		return (obj?obj + '.':'') + key
 	}
 
-	self.Index = function(node, parent, state){
+	this.Index = function(node, parent, state){
 		// ok doing an index. lets look it up
 		var obj = this.expand(node.object, node, state)
 		if(!node.index){ // we are an [] attribute
@@ -226,14 +226,14 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		return obj + '[' + this.expand(node.index, node, state) + ']'
 	}
 
-	self.texture2DSampler = {
+	this.texture2DSampler = {
 		MIN_FILTER: 'LINEAR',
 		MAG_FILTER: 'LINEAR',
 		WRAP_S: 'CLAMP_TO_EDGE',
 		WRAP_T: 'CLAMP_TO_EDGE'
 	}
 
-	self.texture2DShorten = {
+	this.texture2DShorten = {
 		MIN_FILTER:'I',
 		MAG_FILTER:'A',
 		WRAP_S:'S',
@@ -250,7 +250,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 	}
 
 	// custom handle function
-	self.macro_texture2D = function(node, parent, state){
+	this.macro_texture2D = function(node, parent, state){
 		// lets build the args
 		// the first argument is the texture object
 		var args = node.args
@@ -309,7 +309,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		return 'texture2D('+final_name+','+this.expand(args[1], node, state)+')'
 	}
 
-	self.macro_typeof = function(node, parent, state){
+	this.macro_typeof = function(node, parent, state){
 		var arg0 = node.args[0]
 		this.expand(arg0, node, state)
 		node.infer = {
@@ -319,7 +319,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		return node.infer.ret.id
 	}
 
-	self.Call = function(node, parent, state){
+	this.Call = function(node, parent, state){
 		var fn = this.expand(node.fn, node, state)
 		var type = node.fn.infer
 		if(!type) throw new Error('Cannot infer type for call on '+fn)
@@ -405,7 +405,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		// if its a function we need to start inlining it
 	}
 
-	self.Var = function(node, parent, state){
+	this.Var = function(node, parent, state){
 		// ok we have to define our local vars on scope
 		var defs = node.defs
 		var ret = ''
@@ -422,7 +422,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		return ret
 	}
 
-	self.Binary = function(node, parent, state){
+	this.Binary = function(node, parent, state){
 		var left = this.expand(node.left, node, state)
 		var right = this.expand(node.right, node, state)
 
@@ -510,7 +510,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		return left + this.space + node.op + this.space + right
 	}
 
-	self.Condition = function(node, parent, state){
+	this.Condition = function(node, parent, state){
 		
 		var ret = baseclass.prototype.Condition.call(this, node, parent, state)
 
@@ -524,7 +524,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		return ret
 	}
 
-	self.Assign = function(node, parent, state){
+	this.Assign = function(node, parent, state){
 		// ok we run our lhs in varying mode
 		var right = this.expand(node.right, node, state)
 		var lstate = Object.create(state)
@@ -544,14 +544,14 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		return left + this.space + node.op + this.space + right
 	}
 
-	self.Logic = function(node, parent, state){
+	this.Logic = function(node, parent, state){
 		// return type boolean
 		var ret = baseclass.prototype.Logic.call(this, node, parent, state)
 		node.infer = boolean
 		return ret
 	}
 
-	self.Return = function(node, parent, state){
+	this.Return = function(node, parent, state){
 		var ret = 'return'
 
 		if(node.arg){
@@ -568,7 +568,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		return ret
 	}
 
-	self.Function = function(node, parent, state){
+	this.Function = function(node, parent, state){
 		var ret = state.call.name + '('
 		var args = state.call.args
 		var params = node.params
@@ -595,7 +595,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		return ret
 	}
 
-	self.Def = function(node, parent, state){
+	this.Def = function(node, parent, state){
 		// lets not resolve our Id
 		if(node.id.type !== 'Id') throw new Error('Def unsupported')
 		var ret = node.id.name
@@ -609,7 +609,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		return ret
 	}
 
-	self.Value = function(node, parent, state){
+	this.Value = function(node, parent, state){
 		// check if our parent is a call
 		var floatcast
 		if(parent && parent.type === 'Call' && parent.fn.infer && parent.fn.infer.fn_t === 'constructor' && parent.infer.primary === float32){
@@ -646,22 +646,22 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 	}
 
 	// illegal tags
-	self.ForIn = function(){ throw new Error('Cannot use for in in shader') }
-	self.ForOf = function(){ throw new Error('Cannot use for of in shader') }
-	self.Struct = function(){ throw new Error('Cannot use struct in shader') }
-	self.Comprehension = function(){ throw new Error('Cannot use comprehension in shader') }
-	self.ThisCall = function(){ throw new Error('Cannot use thiscall in shader') }
-	self.Template = function(){ throw new Error('Cannot use template in shader') }
-	self.Throw = function(){ throw new Error('Cannot use throw in shader') }
-	self.Try = function(){ throw new Error('Cannot use try in shader') }
-	self.Enum = function(){ throw new Error('Cannot use enum in shader') }
-	self.Define = function(){ throw new Error('Cannot use define in shader') }
-	self.New = function(){ throw new Error('Cannot use new in shader') }
-	self.Nest = function(){ throw new Error('Cannot use nest in shader') }
-	self.Class = function(){ throw new Error('Cannot use class in shader') }
-	self.Quote = function(){ throw new Error('Cannot use quote in shader') }
-	self.Rest = function(){ throw new Error('Cannot use rest in shader') }
-	self.Then = function(){ throw new Error('Cannot use then in shader') }
-	self.Debugger = function(){ throw new Error('Cannot use debugger in shader') }
-	self.With = function(){ throw new Error('Cannot use with in shader') }
+	this.ForIn = function(){ throw new Error('Cannot use for in in shader') }
+	this.ForOf = function(){ throw new Error('Cannot use for of in shader') }
+	this.Struct = function(){ throw new Error('Cannot use struct in shader') }
+	this.Comprehension = function(){ throw new Error('Cannot use comprehension in shader') }
+	this.ThisCall = function(){ throw new Error('Cannot use thiscall in shader') }
+	this.Template = function(){ throw new Error('Cannot use template in shader') }
+	this.Throw = function(){ throw new Error('Cannot use throw in shader') }
+	this.Try = function(){ throw new Error('Cannot use try in shader') }
+	this.Enum = function(){ throw new Error('Cannot use enum in shader') }
+	this.Define = function(){ throw new Error('Cannot use define in shader') }
+	this.New = function(){ throw new Error('Cannot use new in shader') }
+	this.Nest = function(){ throw new Error('Cannot use nest in shader') }
+	this.Class = function(){ throw new Error('Cannot use class in shader') }
+	this.Quote = function(){ throw new Error('Cannot use quote in shader') }
+	this.Rest = function(){ throw new Error('Cannot use rest in shader') }
+	this.Then = function(){ throw new Error('Cannot use then in shader') }
+	this.Debugger = function(){ throw new Error('Cannot use debugger in shader') }
+	this.With = function(){ throw new Error('Cannot use with in shader') }
 })

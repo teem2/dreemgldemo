@@ -732,7 +732,7 @@
 				chunk[key] = PrevConstruct.chunked_type[key]
 			}
 
-			body(InheritStruct, array, chunk)
+			body.call(array, InheritStruct, array, chunk)
 			return InheritStruct
 		}
 

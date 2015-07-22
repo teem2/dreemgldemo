@@ -2,7 +2,7 @@
 
 define.class(function(require, exports, self){
 	
-	self.pushClip = function( sprite){
+	this.pushClip = function( sprite){
 		
 		var previousdepth = this.clipStack.length;
 		this.clipStack.push(sprite.boundingrect);		
@@ -14,13 +14,13 @@ define.class(function(require, exports, self){
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
 	}
 	
-	self.translate = function(x,y){
+	this.translate = function(x,y){
 		var m2 = mat4.T(x,y,0);
 	//	this.matrix = mat4.mul(this.matrix, m2);
 		this.matrix = mat4.mul(m2, this.matrix);
 	}
 	
-	self.stopClipSetup = function(sprite){
+	this.stopClipSetup = function(sprite){
 		var gl = this.device.gl;
 		var depth = this.clipStack.length
 
@@ -29,7 +29,7 @@ define.class(function(require, exports, self){
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);	
 	}
 	
-	self.popClip = function( sprite) {
+	this.popClip = function( sprite) {
 		
 		this.clipStack.pop();
 		var previousdepth = this.clipStack.length;
@@ -48,7 +48,7 @@ define.class(function(require, exports, self){
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);			
 	}
 
-	self.setup = function(device, viewportwidth, viewportheight){
+	this.setup = function(device, viewportwidth, viewportheight){
 		this.device = device;
 		this.clipStack = [];
 		this.device.gl.enable(this.device.gl.SCISSOR_TEST);

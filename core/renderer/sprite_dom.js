@@ -2,10 +2,10 @@
 // Sprite class
 
 define.class('./sprite_base', function(require, exports, self){x
-	self.atConstructor = function(){
+	this.atConstructor = function(){
 	}
 
-	self.render = function(){
+	this.render = function(){
 		this.x
 		this.y
 		this.width
@@ -13,7 +13,7 @@ define.class('./sprite_base', function(require, exports, self){x
 		this.rotation
 	}
 
-	self.spawn = function(parent){
+	this.spawn = function(parent){
 		this.dom_node = document.createElement('div')
 		this.dom_node.style.backgroundColor = this.bgcolor
 		this.dom_node.style.position = 'absolute'

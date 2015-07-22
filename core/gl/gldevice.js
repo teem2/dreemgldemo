@@ -5,21 +5,17 @@ define.class(function(require, exports, self){
 	var Shader = require('$gl/glshader')
 	var Texture = require('$gl/gltexture')
 
-	self.frame = 
-	self.main_frame = Texture.rgb_depth_stencil()
+	this.frame = 
+	this.main_frame = Texture.rgb_depth_stencil()
 	
 	
-	self.atConstructor = function(){
+	this.atConstructor = function(){
 		this.extensions = {}
 		this.shadercache = {}
 		
 		this.animFrame = function(time){
 			this.anim_req = false
-			Shader.prototype.device = this
-			Texture.prototype.device = this
 			this.atRedraw(time)
-			Shader.prototype.device = null
-			Texture.prototype.device = null
 		}.bind(this)
 	
 		if(!this.parent) this.parent = document.body
@@ -75,7 +71,7 @@ define.class(function(require, exports, self){
 		}.bind(this),0)
 	}
 
-	self.clear = function(r, g, b, a){
+	this.clear = function(r, g, b, a){
 		if(arguments.length === 1){
 			a = r.length === 4? r[3]: 1, b = r[2], g = r[1], r = r[0]
 		}
@@ -84,22 +80,22 @@ define.class(function(require, exports, self){
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT|this.gl.DEPTH_BUFFER_BIT|this.gl.STENCIL_BUFFER_BIT)
 	}
 
-	self.atRedraw = function(time){}
-	self.atResize = function(callback){}
+	this.atRedraw = function(time){}
+	this.atResize = function(callback){}
 
-	self.getExtension = function(name){
+	this.getExtension = function(name){
 		var ext = this.extensions[name]
 		if(ext) return ext
 		return this.extensions[name] = this.gl.getExtension(name)
 	}
 
-	self.redraw = function(){
+	this.redraw = function(){
 		if(this.anim_req) return
 		this.anim_req = true
 		window.requestAnimationFrame(this.animFrame)
 	}
 
-	self.setTargetFrame = function(frame){
+	this.setTargetFrame = function(frame){
 		if(!frame) frame = this.main_frame
 		this.frame = frame
 		this.size = vec2(frame.size[0]/frame.ratio, frame.size[1]/frame.ratio)

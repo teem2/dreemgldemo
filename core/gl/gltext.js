@@ -6,71 +6,71 @@ define.class('$gl/glshader', function(require, exports, self){
 	var fontParser = require('$parsers/fontparser')
 
 	// our font blob
-	self.font = fontParser(require('$fonts/code_font2_ascii.glf'))
+	this.font = fontParser(require('$fonts/code_font2_ascii.glf'))
 
-	//self.has_guid = false
+	//this.has_guid = false
 
 	// initial pixel and vertex shaders
-	self.matrix = mat4.identity();
-	self.position = "glyphy_mesh()"
-	self.textcolor = vec4(0.9, 0.9, 0.9, 1);
-	self.color = "glyphy_pixel()"//" * textcolor"
+	this.matrix = mat4.identity();
+	this.position = "glyphy_mesh()"
+	this.textcolor = vec4(0.9, 0.9, 0.9, 1);
+	this.color = "glyphy_pixel()"//" * textcolor"
 
 	// lets define a custom struct and subclass the array
-	self.text = define.struct({
+	this.text = define.struct({
 		pos:vec2,
 		tex:vec2,
 		tag:vec4,
 	}).extend(function(exports, self){
-		self.start_x = 0
-		self.start_y = null
-		self.text_x = 0
-		self.text_y = 0
-		self.add_x = 0
-		self.add_y = 0
+		this.start_x = 0
+		this.start_y = null
+		this.text_x = 0
+		this.text_y = 0
+		this.add_x = 0
+		this.add_y = 0
 
-		self.font_size = 10
-		self.line_spacing = 1.3
-		self.italic_ness = 0
+		this.font_size = 10
+		this.line_spacing = 1.3
+		this.italic_ness = 0
 		// defines the line 
-		self.cursor_spacing = 1.3
-		self.cursor_sink = 0.32
+		this.cursor_spacing = 1.3
+		this.cursor_sink = 0.32
 		
-		self.boldness = 0
-		self.scaling = 0
-		self.distance = 0
-		self.gamma_adjust = vec3(1.2)
-		self.outline = false
-		self.debug = false
-		self.contrast = 1.4
-		self.outline_thickness = 4//:device.ratio
+		this.boldness = 0
+		this.scaling = 0
+		this.distance = 0
+		this.gamma_adjust = vec3(1.2)
+		this.outline = false
+		this.debug = false
+		this.contrast = 1.4
+		this.outline_thickness = 4//:device.ratio
 		
-		self.subpixel_off = 1.0115
-		self.subpixel_distance = 3.
+		this.subpixel_off = 1.0115
+		this.subpixel_distance = 3.
 		
-		self.bgcolor = vec3('black')
-		self.fgcolor = vec4('white')
+		this.bgcolor = vec3('black')
+		this.fgcolor = vec4('white')
 		
-		self.__defineGetter__('line_height', function(){
+		this.__defineGetter__('line_height', function(){
 			return this.font_size * this.line_spacing
 		})
 		
-		self.__defineGetter__('min_y', function(){
+		this.__defineGetter__('min_y', function(){
 			return this.font_size * this.line_spacing
 		})
 		
-		self.__defineGetter__('block_y', function(){
+		this.__defineGetter__('block_y', function(){
 			return this.add_y - this.line_height + this.cursor_sink * this.font_size
 		})
 		
-		self.clear = function(){
+		this.clear = function(){
 			this.text_w = 0
 			this.text_h = 0
 			this.add_x = this.start_x
 			this.add_y = this.start_y === null? this.min_y:0
 		}
 
-		self.addGlyph = function(info, unicode){
+		this.addGlyph = function(info, unicode){
 			var x1 = this.add_x + this.font_size * info.min_x
 			var x2 = this.add_x + this.font_size * info.max_x
 			var y1 = this.add_y - this.font_size * info.min_y
@@ -99,7 +99,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		}
 
 		// lets add some strings
-		self.add = function(string, x, y){
+		this.add = function(string, x, y){
 			if(x !== undefined) this.add_x = x 
 			if(y !== undefined) this.add_y = y 
 			var length = string.length
@@ -118,18 +118,18 @@ define.class('$gl/glshader', function(require, exports, self){
 			if(this.add_y > this.text_h) this.text_h = this.add_y	
 		}
 
-		self.__defineGetter__('char_count', function(){
+		this.__defineGetter__('char_count', function(){
 			return this.quadLength()
 		})
 	})
 
 	// for type information
-	self.mesh = self.text.array()
-	self.mesh.font = self.font
-	self.font.texture = GLTexture.fromArray(self.font.tex_array, self.font.tex_geom[0], self.font.tex_geom[1])
+	this.mesh = this.text.array()
+	this.mesh.font = this.font
+	this.font.texture = GLTexture.fromArray(this.font.tex_array, this.font.tex_geom[0], this.font.tex_geom[1])
 
 	// this thing makes a new text array buffer
-	self.newText = function(font, length){
+	this.newText = function(font, length){
 		var buf = this.text.array() 
 		// load the font
 		// check if the font has a loaded texture
@@ -137,9 +137,9 @@ define.class('$gl/glshader', function(require, exports, self){
 		return buf
 	}
 
-	self.subpixel = false
+	this.subpixel = false
 
-	self.atConstructor = function(){
+	this.atConstructor = function(){
 		// lets check 
 		if(this.font instanceof ArrayBuffer) this.font = fontParser(this.font)
 		
@@ -161,30 +161,30 @@ define.class('$gl/glshader', function(require, exports, self){
 		}
 	}
 
-	self.glyphy_mesh_sdf = function(){
+	this.glyphy_mesh_sdf = function(){
 		return mesh.pos * matrix
 	}
 
 	// glyphy shader library
-	self.GLYPHY_INFINITY = '1e9'
-	self.GLYPHY_EPSILON = '1e-5'
-	self.GLYPHY_MAX_NUM_ENDPOINTS = '32'
+	this.GLYPHY_INFINITY = '1e9'
+	this.GLYPHY_EPSILON = '1e-5'
+	this.GLYPHY_MAX_NUM_ENDPOINTS = '32'
 	
-	self.paint = function(p, dpx, dpy, m){
+	this.paint = function(p, dpx, dpy, m){
 		if(mesh.tag.x == 32.) discard
 		return vec4(-1.)
 	}
 
-	self.style = function(pos){
+	this.style = function(pos){
 	}
 
-	self.glyphy_arc_t = define.struct({
+	this.glyphy_arc_t = define.struct({
 		p0:vec2,
 		p1:vec2,
 		d:float
 	},'glyphy_arc_t')
 
-	self.glyphy_arc_endpoint_t = define.struct({
+	this.glyphy_arc_endpoint_t = define.struct({
 		/* Second arc endpoint */
 		p:vec2,
 		/* Infinity if this endpoint does not form an arc with the previous
@@ -193,7 +193,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		d:float
 	},'glyphy_arc_endpoint_t')
 
-	self.glyphy_arc_list_t = define.struct({
+	this.glyphy_arc_list_t = define.struct({
 		/* Number of endpoints in the list.
 		 * Will be zero if we're far away inside or outside, in which case side is set.
 		 * Will be -1 if this arc-list encodes a single line, in which case line_* are set. */
@@ -210,39 +210,39 @@ define.class('$gl/glshader', function(require, exports, self){
 		line_distance:float /* From nominal glyph center */
 	},'glyphy_arc_list_t')
 
-	self.glyphy_isinf = function(v){
+	this.glyphy_isinf = function(v){
 		return abs(v) >= GLYPHY_INFINITY * .5
 	}
 
-	self.glyphy_iszero = function(v){
+	this.glyphy_iszero = function(v){
 		return abs(v) <= GLYPHY_EPSILON * 2.
 	}
 
-	self.glyphy_ortho = function(v){
+	this.glyphy_ortho = function(v){
 		return vec2(-v.y, v.x)
 	}
 
-	self.glyphy_float_to_byte = function(v){
+	this.glyphy_float_to_byte = function(v){
 		return int(v *(256. - GLYPHY_EPSILON))
 	}
 
-	self.glyphy_vec4_to_bytes = function(v){
+	this.glyphy_vec4_to_bytes = function(v){
 		return ivec4(v *(256. - GLYPHY_EPSILON))
 	}
 
-	self.glyphy_float_to_two_nimbles = function(v){
+	this.glyphy_float_to_two_nimbles = function(v){
 		var f = glyphy_float_to_byte(v)
 		return ivec2(f / 16, int(mod(float(f), 16.)))
 	}
 
 	/* returns tan(2 * atan(d)) */
-	self.glyphy_tan2atan = function( d){
+	this.glyphy_tan2atan = function( d){
 		var a = (2. * d)
 		var b = (1. - d * d)
 		return a/b
 	}
 
-	self.glyphy_arc_endpoint_decode = function(v, nominal_size){
+	this.glyphy_arc_endpoint_decode = function(v, nominal_size){
 		var p =(vec2(glyphy_float_to_two_nimbles(v.a)) + v.gb) / 16.
 		var d = v.r
 		if(d == 0.) d = GLYPHY_INFINITY
@@ -251,18 +251,18 @@ define.class('$gl/glshader', function(require, exports, self){
 		return glyphy_arc_endpoint_t(p * vec2(nominal_size), d)
 	}
 
-	self.glyphy_arc_center = function(a){
+	this.glyphy_arc_center = function(a){
 		return mix(a.p0, a.p1, .5) +
 		 glyphy_ortho(a.p1 - a.p0) /(2. * glyphy_tan2atan(a.d))
 	}
 
-	self.glyphy_arc_wedge_contains = function(a, p){
+	this.glyphy_arc_wedge_contains = function(a, p){
 		var d2 = glyphy_tan2atan(a.d)
 		return dot(p - a.p0,(a.p1 - a.p0) * mat2(1,  d2, -d2, 1)) >= 0. &&
 		 dot(p - a.p1,(a.p1 - a.p0) * mat2(1, -d2,  d2, 1)) <= 0.
 	}
 
-	self.glyphy_arc_wedge_signed_dist_shallow = function(a, p){
+	this.glyphy_arc_wedge_signed_dist_shallow = function(a, p){
 		var v = normalize(a.p1 - a.p0)
 		
 		var line_d = dot(p - a.p0, glyphy_ortho(v))// * .1abs on sin(time.sec+p.x)
@@ -286,13 +286,13 @@ define.class('$gl/glshader', function(require, exports, self){
 		return line_d + r
 	}
 
-	self.glyphy_arc_wedge_signed_dist = function(a, p){
+	this.glyphy_arc_wedge_signed_dist = function(a, p){
 		if(abs(a.d) <= .03) return glyphy_arc_wedge_signed_dist_shallow(a, p)
 		var c = glyphy_arc_center(a)
 		return sign(a.d) * (distance(a.p0, c) - distance(p, c))
 	}
 
-	self.glyphy_arc_extended_dist = function(a, p){
+	this.glyphy_arc_extended_dist = function(a, p){
 		/* Note: this doesn't handle points inside the wedge. */
 		var m = mix(a.p0, a.p1, .5)
 		var d2 = glyphy_tan2atan(a.d)
@@ -302,12 +302,12 @@ define.class('$gl/glshader', function(require, exports, self){
 			return dot(p - a.p1, normalize((a.p1 - a.p0) * mat2(-d2, -1, +1, -d2)))
 	}
 
-	self.glyphy_arc_list_offset = function(p, nominal_size){
+	this.glyphy_arc_list_offset = function(p, nominal_size){
 		var cell = ivec2(clamp(floor(p), vec2(0.,0.), vec2(nominal_size - 1)))
 		return cell.y * nominal_size.x + cell.x
 	}
 
-	self.glyphy_arc_list_decode = function(v, nominal_size){
+	this.glyphy_arc_list_decode = function(v, nominal_size){
 		
 		var l = glyphy_arc_list_t()
 		var iv = glyphy_vec4_to_bytes(v)
@@ -335,17 +335,17 @@ define.class('$gl/glshader', function(require, exports, self){
 		return l
 	}
 
-	self.glyphy_antialias = function(d){
+	this.glyphy_antialias = function(d){
 		return smoothstep(-.75, +.75, d)
 	}
 
-	self.glyphy_arc_list = function(p, nominal_size, _atlas_pos){
+	this.glyphy_arc_list = function(p, nominal_size, _atlas_pos){
 		var cell_offset = glyphy_arc_list_offset(p, nominal_size)
 		var arc_list_data = glyphy_atlas_lookup(cell_offset, _atlas_pos)
 		return glyphy_arc_list_decode(arc_list_data, nominal_size)
 	}
 
-	self.glyphy_sdf = function(p, nominal_size, _atlas_pos){
+	this.glyphy_sdf = function(p, nominal_size, _atlas_pos){
 
 		var arc_list = glyphy_arc_list(p, nominal_size, _atlas_pos)
 
@@ -428,7 +428,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		return min_dist * side
 	}
 
-	self.glyphy_point_dist = function(p, nominal_size, _atlas_pos){
+	this.glyphy_point_dist = function(p, nominal_size, _atlas_pos){
 		var arc_list = glyphy_arc_list(p, nominal_size, _atlas_pos)
 
 		var side = float(arc_list.side)
@@ -450,7 +450,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		return min_dist
 	}
 
-	self.glyph_vertex_transcode = function(v){
+	this.glyph_vertex_transcode = function(v){
 	  var g = ivec2 (v)
 	  var corner = ivec2 (mod (v, 2.))
 	  g /= 2
@@ -458,16 +458,16 @@ define.class('$gl/glshader', function(require, exports, self){
 	  return vec4(corner * nominal_size, g * 4)
 	}
 
-	self.glyphy_sdf_encode = function(value){
+	this.glyphy_sdf_encode = function(value){
 		var enc = .75-.25*value
 		return vec4(enc,enc,enc,1.)
 	}
 
-	self.glyphy_sdf_decode = function(value){
+	this.glyphy_sdf_decode = function(value){
 		return ((.75-value.r)*4.) 
 	}
 
-	self.glyphy_sdf_generate = function(){
+	this.glyphy_sdf_generate = function(){
 		var glyph = glyph_vertex_transcode(glyphy_coords)
 		var nominal_size = (ivec2(mod(glyph.zw, 256.)) + 2) / 4
 		var atlas_pos = ivec2(glyph.zw) / 256
@@ -476,7 +476,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		return glyphy_sdf_encode(glyphy_sdf(p, nominal_size, atlas_pos))
 	}
 
-	self.glyphy_sdf_draw_subpixel_3tap = function(){
+	this.glyphy_sdf_draw_subpixel_3tap = function(){
 
 		var pos = mesh.tex
 		/* isotropic antialiasing */
@@ -521,7 +521,7 @@ define.class('$gl/glshader', function(require, exports, self){
 	}
 
 	// draw subpixel antialiased using SDF texture
-	self.glyphy_sdf_draw_subpixel_5tap = function(){
+	this.glyphy_sdf_draw_subpixel_5tap = function(){
 
 		var pos = mesh.tex
 		/* isotropic antialiasing */
@@ -573,7 +573,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		return vec4(mix(mesh.bgcolor, mesh.fgcolor, alpha), max_alpha)
 	}
 	// draw using SDF texture
-	self.glyphy_sdf_draw = function(){
+	this.glyphy_sdf_draw = function(){
 		var pos = mesh.tex
 		/* isotropic antialiasing */
 		var dpdx = dFdx(pos) // this should mark it pixel and redo the function with a new highmark
@@ -610,7 +610,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		return vec4(mesh.fgcolor.rgb, alpha3) 
 	}
 
-	self.glyphy_atlas_lookup = function(offset, _atlas_pos){
+	this.glyphy_atlas_lookup = function(offset, _atlas_pos){
 		var pos = (vec2(_atlas_pos.xy * mesh.font.item_geom +
 			ivec2(mod(float(offset), mesh.font.item_geom_f.x), offset / mesh.font.item_geom.x)) +
 			vec2(.5, .5)) / mesh.font.tex_geom_f
@@ -622,15 +622,15 @@ define.class('$gl/glshader', function(require, exports, self){
 			WRAP_T: 'CLAMP_TO_EDGE'
 		})
 	}
-	self.glyphy_mesh = 
-	self.glyphy_mesh_atlas = function(){
+	this.glyphy_mesh = 
+	this.glyphy_mesh_atlas = function(){
 		glyph = glyph_vertex_transcode(mesh.tex)
 		return mesh.pos * matrix
 	}
 	// draw using atlas
-	self.time = 0
-	self.glyphy_pixel = 
-	self.glyphy_atlas_draw = function(){
+	this.time = 0
+	this.glyphy_pixel = 
+	this.glyphy_atlas_draw = function(){
 		//'trace'
 		var nominal_size = (ivec2(mod(glyph.zw, 256.)) + 2) / 4
 		var atlas_pos = ivec2(glyph.zw) / 256

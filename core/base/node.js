@@ -466,7 +466,7 @@ define.class(function(require, constructor){
 		return this.screen.startMotion(this, key, value)
 	}
 
-	this.deepPropsEqual = function(other){
+	this.constructorPropsEqual = function(other){
 		var str = ''
 		var my_prop = this.constructor_props
 		var other_prop = other.constructor_props
@@ -479,7 +479,7 @@ define.class(function(require, constructor){
 				if(arg1.toString() !== arg2.toString()) return false
 			}
 			else if(typeof arg1 === 'object'){
-				console.log("TODO DIFFING")
+				console.log("TODO add object diffing")
 			}
 			else if(arg1 !== arg2) return false
 		}
@@ -491,7 +491,7 @@ define.class(function(require, constructor){
 		if(!other) return this
 		// check if we changed class
 		if(define.classHash(this.constructor) === define.classHash(other.constructor) && 
-			this.deepPropsEqual(other)){
+			this.constructorPropsEqual(other)){
 			return other
 		}
 

@@ -6,12 +6,12 @@ define.class('$renderer/sprite_base', function(require, exports, self){
 	exports.nest('Bg', node.extend())
 	exports.nest('Fg', node.extend())
 
-	self.atConstructor = function(){
+	this.atConstructor = function(){
 	}
 
-	self.render = function(){
+	this.render = function(){
 	}
 
-	self.spawn = function(parent){
+	this.spawn = function(parent){
 	}
 })

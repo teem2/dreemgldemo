@@ -3,11 +3,11 @@
 define.class('$base/nodeworker', function(require, exports, self){
 	var AnimTrack = require('$animation/animtrack')
 
-	self.init = function(){
+	this.init = function(){
 		this.anims = {}
 	}
 
-	self.startMotion = function(obj, key, value){
+	this.startMotion = function(obj, key, value){
 		var config = obj.getAttributeConfig(key)
 		var first = obj['_' + key]
 		var trk = new AnimTrack(config, obj, key, first, value)
@@ -17,7 +17,7 @@ define.class('$base/nodeworker', function(require, exports, self){
 		return true
 	}
 
-	self.doAnimation = function(time){
+	this.doAnimation = function(time){
 		var hasanim = false
 		for(var key in this.anims){
 			var anim = this.anims[key]
@@ -38,35 +38,35 @@ define.class('$base/nodeworker', function(require, exports, self){
 		return hasanim
 	}
 
-	self.hideProperty(Object.keys(self))
+	this.hideProperty(Object.keys(self))
 
-	self.attribute("bgcolor", {type:vec4, value: vec4(0,0,0.1,1)});
-	self.attribute("width" , {type:float, value:1});
-	self.attribute("height" , {type:float, value: 1});
+	this.attribute("bgcolor", {type:vec4, value: vec4(0,0,0.1,1)});
+	this.attribute("width" , {type:float, value:1});
+	this.attribute("height" , {type:float, value: 1});
 
-	self.attribute("margin", {type: vec4, value: vec4(0,0,0,0)});
-	self.attribute("marginleft,", {storage:'margin', index:0})
-	self.attribute("margintop", {storage:'margin', index:1})
-	self.attribute("marginright", {storage:'margin', index:2})
-	self.attribute("marginbottom", {storage:'margin', index:3})
+	this.attribute("margin", {type: vec4, value: vec4(0,0,0,0)});
+	this.attribute("marginleft,", {storage:'margin', index:0})
+	this.attribute("margintop", {storage:'margin', index:1})
+	this.attribute("marginright", {storage:'margin', index:2})
+	this.attribute("marginbottom", {storage:'margin', index:3})
 
-	self.attribute("padding", {type: vec4, value: vec4(0,0,0,0)});
-	self.attribute("paddingleft,", {storage:'padding', index:0})
-	self.attribute("paddingtop", {storage:'padding', index:1})
-	self.attribute("paddingright", {storage:'padding', index:2})
-	self.attribute("paddingbottom", {storage:'padding', index:3})
+	this.attribute("padding", {type: vec4, value: vec4(0,0,0,0)});
+	this.attribute("paddingleft,", {storage:'padding', index:0})
+	this.attribute("paddingtop", {storage:'padding', index:1})
+	this.attribute("paddingright", {storage:'padding', index:2})
+	this.attribute("paddingbottom", {storage:'padding', index:3})
 
-	self.attribute("borderwidth", {type: vec4, value: vec4(0,0,0,0)});
-	self.attribute("borderleftwidth,", {storage:'borderwidth', index:0})
-	self.attribute("bordertopwidth", {storage:'borderwidth', index:1})
-	self.attribute("borderrightwidth", {storage:'borderwidth', index:2})
-	self.attribute("borderbottomwidth", {storage:'borderwidth', index:3})
+	this.attribute("borderwidth", {type: vec4, value: vec4(0,0,0,0)});
+	this.attribute("borderleftwidth,", {storage:'borderwidth', index:0})
+	this.attribute("bordertopwidth", {storage:'borderwidth', index:1})
+	this.attribute("borderrightwidth", {storage:'borderwidth', index:2})
+	this.attribute("borderbottomwidth", {storage:'borderwidth', index:3})
 
-	self.attribute("flexDirection", {type: String, value: "row"});	//'column', 'row'
-	self.attribute("justifyContent", {type:String, value: "flex-start"}) //	'flex-start', 'center', 'flex-end', 'space-between', 'space-around'
-	self.attribute("alignItems", {type:String, value:"flex-start"});  // 	'flex-start', 'center', 'flex-end', 'stretch'
-	self.attribute("alignSelf", {type:String, value:"flex-start"});  // 	'flex-start', 'center', 'flex-end', 'stretch'
-	self.attribute("flex", {type: float, value: NaN});
-	self.attribute("flexWrap", {type: String, value: ""});	//'wrap', 'nowrap'
-	self.attribute("position", {type: String, value: "relative" });	//'relative', 'absolute'	
+	this.attribute("flexDirection", {type: String, value: "row"});	//'column', 'row'
+	this.attribute("justifyContent", {type:String, value: "flex-start"}) //	'flex-start', 'center', 'flex-end', 'space-between', 'space-around'
+	this.attribute("alignItems", {type:String, value:"flex-start"});  // 	'flex-start', 'center', 'flex-end', 'stretch'
+	this.attribute("alignSelf", {type:String, value:"flex-start"});  // 	'flex-start', 'center', 'flex-end', 'stretch'
+	this.attribute("flex", {type: float, value: NaN});
+	this.attribute("flexWrap", {type: String, value: ""});	//'wrap', 'nowrap'
+	this.attribute("position", {type: String, value: "relative" });	//'relative', 'absolute'	
 })

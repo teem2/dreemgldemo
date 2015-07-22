@@ -12,7 +12,7 @@ define(function(require, exports, module){
 
 		var width = 2048
 		var height = 2048
-		var margin = 8./width
+		var margin = 8. / width
 
 		var glyphs = font.glyphs
 		var left = -1  + 0.03

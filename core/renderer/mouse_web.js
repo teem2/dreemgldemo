@@ -2,28 +2,28 @@
 // Mouse class
 
 define.class('$base/node', function (require, exports, self){
-	self.event('move')
-	self.attribute('x', {type:float})
-	self.attribute('y', {type:float})
-	self.attribute('isdown', {type:int})
-	self.attribute('left', {type:int})
-	self.attribute('middle', {type:int})
-	self.attribute('right', {type:int})
-	self.attribute('click', {type:Object})
-	self.attribute('dblclick', {type:Object})
-	self.attribute('clicker', {type:int})
-	self.attribute('leftdown', {type:int})
-	self.attribute('leftup', {type:int})
-	self.attribute('rightdown', {type:int})
-	self.attribute('rightup', {type:int})
+	this.event('move')
+	this.attribute('x', {type:float})
+	this.attribute('y', {type:float})
+	this.attribute('isdown', {type:int})
+	this.attribute('left', {type:int})
+	this.attribute('middle', {type:int})
+	this.attribute('right', {type:int})
+	this.attribute('click', {type:Object})
+	this.attribute('dblclick', {type:Object})
+	this.attribute('clicker', {type:int})
+	this.attribute('leftdown', {type:int})
+	this.attribute('leftup', {type:int})
+	this.attribute('rightdown', {type:int})
+	this.attribute('rightup', {type:int})
 	
-	self.ratio = 0
+	this.ratio = 0
 
-	self.activedown = 0;
+	this.activedown = 0;
 		
-	self.clickspeed = 350
+	this.clickspeed = 350
 
-	self.atConstructor = function(){
+	this.atConstructor = function(){
 		x = 0
 		y = 0
 		if(this.ratio == 0) this.ratio = window.devicePixelRatio
