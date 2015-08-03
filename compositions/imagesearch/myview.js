@@ -1,8 +1,6 @@
 define.browser(function(require, view){
-	this.render = function(){return[
-
-		view({x:10,y:10,w:100,h:100})
-
-		]
+	// this is a class, so use it like normal js codeflow
+	this.bg.bgcolorfn = function(pos, tex){
+		return mix('white','blue',abs(sin(8*mesh.y+time)))
 	}
 })
