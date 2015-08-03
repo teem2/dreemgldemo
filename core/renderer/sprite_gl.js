@@ -335,6 +335,9 @@ define.class('./sprite_base', function (require, exports, self) {
 
 				bg.draw(this.screen.device)
 				fg.draw(this.screen.device)
+
+				// lets check if we have a reference on time
+				if(bg.shader && bg.shader.unilocs.time) this.screen.device.redraw()
 			}
 		} 
 		else {
