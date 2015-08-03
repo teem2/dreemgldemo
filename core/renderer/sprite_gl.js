@@ -6,7 +6,6 @@ define.class('./sprite_base', function (require, exports, self) {
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')
 	var GLText = require('$gl/gltext')
-	var DOMWrapper = require('$gl/domwrapper')
 
 	var Sprite = self
 	this.dump = 1
