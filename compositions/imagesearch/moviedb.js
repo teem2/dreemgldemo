@@ -6,7 +6,7 @@ define.nodejs(function(require, server){
 		 
 	}
 
-	this.search = function(string){
+	this.search3 = function(string){
 		// lets do a query
 	}
 })

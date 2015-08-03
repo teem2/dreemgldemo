@@ -9,7 +9,7 @@ define.class('./sprite_gl', function(require, exports, self){
 	this.attribute('color', {type:vec4, value: vec4(1,1,1,1)});
 	
 	exports.nest('Fg', GLText.extend(function(exports, self){}))
-	
+	//this.fg.dump =1 
 	this.text = function(){
 		this.dirty = true;
 	}

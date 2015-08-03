@@ -1,4 +1,3 @@
-
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Sprite class
 
@@ -7,6 +6,8 @@ define.class('./sprite_base', function (require, exports, self) {
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')
 	var GLText = require('$gl/gltext')
+	var DOMWrapper = require('$gl/domwrapper')
+
 	var Sprite = self
 	this.dump = 1
 
@@ -57,36 +58,15 @@ define.class('./sprite_base', function (require, exports, self) {
 			if(borderwidth < 0.001) return bgcolor
 			var clamped = 1.0 - (clamp(dist, -0.5, 0.5) + 0.5)
 			if (clamped == 0.) discard
-			var b = clamp(-dist - (borderwidth-0.5), 0., 1.)
-			var precol = mix(bordercolor, bgcolor, b);
+			var b = clamp(- dist - (borderwidth - 0.5), 0., 1.)
+			var precol = mix(bordercolor, bgcolor, b)
 			var col =  precol //pal.dither(precol);
 			col.a *= clamped * opacity
 			return col
 		}
 
-		//var distfact = pow((1.0- 0.8*clamp(1.+dist*0.06,0.,1.)),0.4);
-		/*
-			var xs = 18.
-			var ys = 16.
-			var x = mesh.x*xs+0.1*time
-			var y = mesh.y*ys
-			//dbg = mesh.xy
-			var ns = noise.snoise3(x, y, 0.1*time)
-			bgcolor = vec4(pal.pal2(ns) + 0.5*(vec3(1.)*sin(-8*time + (length(mesh-.5)-.01*ns+ .001*noise.snoise3(x*1, y*1, 0.1*time))*2400)),1.)
-			*/
-			/*
-		this.color = function(){
-			var xs = 18.
-			var ys = 16.
-			var x = mesh.x*xs+0.1*time
-			var y = mesh.y*ys
-			dbg = mesh.xy
-			var ns = noise.snoise3(x, y, 0.1*time)
-			return	pal.pal3(ns) + 0.5*(vec3(1.)*sin(-8*time + (length(mesh-.5)-.01*ns+ .001*noise.snoise3(x*1, y*1, 0.1*time))*2400))
-		}*/
-
-		this.color_blend = 'src_alpha * src_color + (1-src_alpha) * dst_color'
-			//this.color_blend = 'src_alpha * src_color + dst_color'
+		this.color_blend = 'src_alpha * src_color + (1 - src_alpha) * dst_color'
+		//this.color_blend = 'src_alpha * src_color + dst_color'
 		this.position = function(){
 			sized = vec2(mesh.x * width, mesh.y * height)
 			return vec4(sized.x, sized.y, 0, 1) * matrix
@@ -96,28 +76,7 @@ define.class('./sprite_base', function (require, exports, self) {
 	exports.nest('Fg', GLText.extend(function(exports, self){
 		this.no_guid = 1
 	}))
-	
-	/*
-	this.TexturedShader = exports.Shader.extend(function(exports,self){
-		this.texture = GLTexture.rgba(),
-		this.color = function(){
-			var dist = shape.roundedrectdistance(sized, width, height, radius.r, radius.a, radius.g, radius.b);
-			
-			var clamped = 1.0 - (clamp(dist, -0.5, 0.5) + 0.5);
-			if (clamped == 0.) discard;
-			
-			var b = clamp(-dist-borderwidth,0.,1.);
-			//var distfact = pow((1.0- 0.8*clamp(1.+dist*0.06,0.,1.)),0.4);
-			var precol = mix(bordercolor,bgcolor* texture.sample(tex), b);
-		//	precol.xyz *= distfact;
-			var col =  pal.dither(precol);
-		//	var col = precol;
-			//col.xyz *= ;
-			col.a *= clamped;
-			return col;
-		}
-	})*/
-		
+
 	this.enableTextureCache = function(enabled){
 		if (enabled == false){
 			if(this.texturecache != false){
@@ -129,7 +88,7 @@ define.class('./sprite_base', function (require, exports, self) {
 		else{
 			if(this.texturecache == false){ // only build if it doesn't already have a texture cache
 				this.texturecache = {
-					textureID : 0
+					textureID: 0
 				};
 				this.setDirty(true)
 			}
@@ -246,29 +205,29 @@ define.class('./sprite_base', function (require, exports, self) {
 		//this.shader = new this.Shader()
 		//this.textureshader = new this.TexturedShader()
 		this.boundingrect = rect(0, 0, 0, 0);
-		
-		this.onsrc = function(value){
-			return
-			if (value && value.length > 0) {
-				require.async('$root' + this.src).then(function(texture){				
-					this.textureshader.texture = GLTexture.fromImage(texture);
-					this.textureloaded = true;
-					this.logdirty = true;
-					this.dirty = true;
-				}.bind(this));
-			}
-		}
 	
 		this.recomputeMatrix();
+
+		if(!this.mode && this.parent) this.mode = this.parent.mode
+
+		if(this.mode === undefined || this.mode === 'GL'){
+			this.drawContent = this.drawContentGL
+		}
+		else if(this.mode === 'DOM'){
+			this.drawContent = this.drawContentDOM
+		}
+		else if(this.mode === 'Dali'){
+			this.drawContent = this.drawContentDali
+		}
 	}
 
-	this.renderQuad = function (texture, boundingrect) {}
+	this.renderQuad = function(texture, boundingrect) {}
 
 	this.drawStencil = function (renderstate) {
 		this.bg.matrix = renderstate.matrix;
 		if (this.layout){
-				this.bg.width = this.layout.width? this.layout.width:this.width;
-				this.bg.height = this.layout.height? this.layout.height:this.height;
+			this.bg.width = this.layout.width? this.layout.width:this.width;
+			this.bg.height = this.layout.height? this.layout.height:this.height;
 		}
 		else{
 			this.bg.width = this.width;
@@ -277,9 +236,53 @@ define.class('./sprite_base', function (require, exports, self) {
 		this.bg.draw();
 	}
 	
-	this.drawContent = function (renderstate) {
+	this.drawContentDOM = function(renderstate){
+		
+		if (this.matrixdirty) this.recomputeMatrix()
+		// lets check if we have a div
+
+		var dom = this.dom
+		if(!dom){
+			dom = this.dom = document.createElement(this.tag || 'div')
+			var parent = this.parent === this.screen? this.parent.device.canvas.parentNode: this.parent.dom
+			parent.appendChild(this.dom)
+		}
+
+		if(this.layout){
+			dom.style.width = this.layout.width? this.layout.width: this._width
+			dom.style.height = this.layout.height? this.layout.height: this._height
+		}
+		else{
+			//console.log(this.layout.width);
+			dom.style.width = this._width
+			dom.style.height = this._height
+		}
+		dom.style.left = this._pos[0]
+		dom.style.top = this._pos[1]
+		dom.style.position = 'absolute' 
+		dom.style.display = 'block'
+
+		if(this.src) dom.src = this.src
+
+		var bg = this._bgcolor
+		if(bg){
+			dom.style.backgroundColor = 'rgba('+parseInt(255*bg[0])+','+parseInt(255*bg[1])+','+parseInt(255*bg[2])+','+parseInt(255*bg[3])+')'
+		}
+		// we have to append it to our parent
+	}
+
+	// called by diffing
+	this.atDestroy = function(){
+		if(this.div) this.div.parentNode.removeChild(this.div)
+	}
+
+	this.drawContentDali = function(renderstate){
+
+	}
+
+	this.drawContentGL = function(renderstate){
 		//mat4.debug(this.orientation.matrix);
-		if (this.texturecache == false || this.texturecache == true && this.dirty) {
+		if (this.texturecache == false || this.texturecache == true && this.dirty){
 			
 			var bg = this.bg
 			var fg = this.fg
@@ -288,10 +291,7 @@ define.class('./sprite_base', function (require, exports, self) {
 			if (this.matrixdirty) this.recomputeMatrix()
 			fg._matrix = bg._matrix = renderstate.matrix
 
-			if (this.layout) {
-				//window.dbgthing = this
-				//console.log(this.layout);
-				//	console.log(this.layout.width);
+			if(this.layout){
 				this.bg._width = this.layout.width? this.layout.width: this._width
 				this.bg._height = this.layout.height? this.layout.height: this._height
 			}
@@ -304,8 +304,7 @@ define.class('./sprite_base', function (require, exports, self) {
 			bg._borderwidth = this._borderwidth[0]
 			//console.log(this.effectiveopacity);
 			fg._alpha = bg._alpha = this.effectiveopacity
-
-			fg._opacity = bg._opacity = this.effectiveopacity;
+			fg._opacity = bg._opacity = this.effectiveopacity
 
 			fg._fgcolor = this._fgcolor
 			bg._bgcolor = this._bgcolor
@@ -318,22 +317,22 @@ define.class('./sprite_base', function (require, exports, self) {
 				if(type) renderstate.debugtypes.push(type)
 				fg.drawDebug(this.screen.device)
 			}
-			else if (renderstate.drawmode === 1) {			
+			else if(renderstate.drawmode === 1){
 				if (this.hasListeners('click') || this.hasListeners('mousedown') || this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| this.hasListeners('mouseup') || this.hasListeners('mousemove') ||this.hasListeners('scroll')){
 					this.effectiveguid = this.interfaceguid;
-				}	
+				}
 				else{
 					this.effectiveguid = this.parent.effectiveguid;
 				}
 				var r = ((this.effectiveguid &255)) / 255.0
 				var g = ((this.effectiveguid>>8) &255) / 255.0
 				var b = ((this.effectiveguid>>16) &255) / 255.0
-				bg._guid = vec4(r,g,b,1.0);					
+				bg._guid = vec4(r, g, b, 1.0)
 				bg.drawGuid(this.screen.device)
 			}
 			else{
-				bg.time = (this.screen.time%100000)*0.001
-				fg.time = (this.screen.time%100000)*0.001
+				bg.time = (this.screen.time%100000) * 0.001
+				fg.time = (this.screen.time%100000) * 0.001
 
 				bg.draw(this.screen.device)
 				fg.draw(this.screen.device)
@@ -347,14 +346,18 @@ define.class('./sprite_base', function (require, exports, self) {
 		return rect.intersects(this.boundingrect, renderstate.boundingrect);
 	}
 	
-	this.layoutChanged = function() {
+	this.drawContent = this.drawContentGL
+
+	this.hideContent = this.hideContentDOM
+
+	this.layoutChanged = function(){
 		return true;
 	}
 	
-	this.draw = function (renderstate) {
+	this.draw = function(renderstate){
 		if (this.atDraw) this.atDraw()
 
-		if (this.visible) {
+		if (this.visible){
 			if (this.dirty != false || this.layoutChanged()) {
 				this.orientation.rotation[2] = this._rotation * 6.283 / 360;
 				this.recomputeMatrix();
@@ -364,6 +367,7 @@ define.class('./sprite_base', function (require, exports, self) {
 					this.effectiveopacity *= this.parent.effectiveopacity;
 				}
 			}
+
 			var prevmatrix = mat4.copy(renderstate.matrix);
 			this.orientation.worldmatrix = mat4.mul(this.orientation.matrix, renderstate.matrix);
 			renderstate.matrix = mat4.copy(this.orientation.worldmatrix);
@@ -376,6 +380,7 @@ define.class('./sprite_base', function (require, exports, self) {
 			var onscreen = this.drawContent(renderstate); // should check against bounds?
 			if (actuallyclipping)
 				renderstate.stopClipSetup();
+
 			if ((actuallyclipping && onscreen) || actuallyclipping == false) {
 				if (this.children) for (var i = 0; i < this.children.length; i++) {
 					var child = this.children[i]
@@ -388,6 +393,7 @@ define.class('./sprite_base', function (require, exports, self) {
 
 			renderstate.matrix = prevmatrix;
 		}
+		else this.hideContent()
 		//this.screen.device.redraw()
 	}
 

@@ -12,25 +12,6 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 	var BusClient = require('$rpc/busclient')
 	var Mouse = require('$renderer/mouse_$rendermode')
 
-	self.doDiff = function(prev, next, name){
-		if(!prev) return next
-		if(define.classHash(prev.constructor) !== define.classHash(next.constructor)){ // lets replace it with the new one
-			return next
-		}
-		else{ // lets diff the children
-			// lets iterate the new, checking if the old has a different hash.
-			var next_children = next.children
-			var prev_children = prev.children
-			if(next_children) for(var i = 0; i < next_children.length; i++){
-				// lets check define.classHash
-				next_children[i] = this.doDiff(prev_children[i], next_children[i], name+'child['+i+']')
-			}
-			prev.children = next_children
-		}
-		console.log(name)
-		return prev
-	}
-
 	self.doRender = function(previous){
 
 		// alright so, what we need to do is 
@@ -48,7 +29,6 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 			//this.screen = this.doDiff(previous.screen, this.screen, 'screen')
 			//console.log(this.screen === previous.screen)
 		}
-
 
 		var wireinits = []
 		renderer.connectWires(this.screen, wireinits)
@@ -151,7 +131,9 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		define.teemClient = this
 
 		if(previous){
+			
 			this.reload = (previous.reload||0)+1
+			console.log("Reload " + this.reload)
 		}
 
 		// how come this one doesnt get patched up?

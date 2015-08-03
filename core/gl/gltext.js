@@ -87,6 +87,7 @@ define.class('$gl/glshader', function(require, exports, self){
 			else{
 				var gx = ((info.atlas_x<<6) | info.nominal_w)<<1
 				var gy = ((info.atlas_y<<6) | info.nominal_h)<<1
+				
 				this.pushQuad(
 					x1, y1, gx, gy, unicode, 0, 0, 0,
 					x2, y1, gx|1, gy, unicode, 0, 0, 0,
@@ -643,10 +644,6 @@ define.class('$gl/glshader', function(require, exports, self){
 
 		mesh.distance = glyphy_sdf(pos, nominal_size, atlas_pos) //+ noise.noise3d(vec3(glyph.x, glyph.y, time))*0.6
 		mesh.scaling = m
-
-		if(mesh.tag.x == 67.){
-			mesh.fgcolor = 'blue'
-		}
 
 		//return mix(vec4(0.),'green',1.-mesh.distance)
 		//mesh.outline = true

@@ -1133,6 +1133,7 @@
 							// fetch all modules dependent on this class, and all dependent on those
 							// and cause them to reinitialize
 							function wipe_module(name){
+								console.log("Reloading "+define.fileName(name))
 								for(var key in define.factory){
 									var deps = define.factory[key].deps
 									if(key !== name && define.module[key] && deps && deps.indexOf(name) !== -1){

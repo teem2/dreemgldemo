@@ -215,7 +215,7 @@ define.class(function(require, constructor){
 		var on_key = 'on' + key
 		var listen_key = '_listen_' + key
 
-		if(value !== undefined) this['_' + key] =  value
+		if(value !== undefined) this['_' + key] = value
 
 		var proto = this
 		var stack
@@ -257,7 +257,6 @@ define.class(function(require, constructor){
 	this.setAttribute = function(key, value){
 		this[key] = value
 	}
-
 
 	this.attribute = function(key, config){
 		// lets create an attribute
@@ -304,14 +303,14 @@ define.class(function(require, constructor){
 					store = this[storage_key]
 				}
 				var config = this[config_key]
-				if(config.motion  && this.startMotion(key, value)) return
+				if(config.motion && this.startMotion(key, value)) return
 
 				this[value_key] = store[config.index] = value
 
 				this.emit(config.storage, store)
 
 				if(this.atAttributeSet !== undefined) this.atAttributeSet(key, value)
-				if(on_key in this || listen_key in this)  this.emit(key, value)
+				if(on_key in this || listen_key in this) this.emit(key, value)
 			}
 
 			this.addListener(config.storage, function(value){
@@ -489,21 +488,24 @@ define.class(function(require, constructor){
 	// lets diff ourselves and children
 	this.diff = function(other){
 		if(!other) return this
-		// check if we changed class
-		if(define.classHash(this.constructor) === define.classHash(other.constructor) && 
-			this.constructorPropsEqual(other)){
-			return other
-		}
 
-		// otherwise we diff the children
+		// diff children set
 		var my_children = this.children
 		var other_children = other.children
-		if(!my_children) return this
 
-		for(var i = 0; i < my_children.length; i++){
+		if(my_children) for(var i = 0; i < my_children.length; i++){
 			my_children[i] = my_children[i].diff(other_children[i])
 		}
 
+		// check if we changed class
+		if(define.classHash(this.constructor) === define.classHash(other.constructor) && 
+			this.constructorPropsEqual(other)){
+			other.children = my_children
+			if(this.atDestroy) this.atDestroy()
+			return other
+		}
+
+		if(other.atDestroy) other.atDestroy()
 		return this		
 	}
 

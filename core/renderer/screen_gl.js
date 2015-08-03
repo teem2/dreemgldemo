@@ -15,7 +15,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 	this.dirty = true
  
-	this.atConstructor = function () {}
+	this.atConstructor = function(){}
 
 	this.render = function(){
 		//console.log("render");
@@ -33,7 +33,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		document.title = value
 	}
 
-	this.drawDebug = function () {
+	this.drawDebug = function(){
 		this.renderstate.setup(this.device, 2, 2);
 		this.renderstate.translate(-this.screen.mouse.x + 1, this.device.size[1] - (this.screen.mouse.y) - 1);
 		this.renderstate.drawmode = 2;
@@ -47,40 +47,40 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.device.gl.readPixels(1 * this.device.ratio, 1 * this.device.ratio, 1, 1, this.device.gl.RGBA, this.device.gl.UNSIGNED_BYTE, this.buf);
 		// lets decode the types
 		var type = this.renderstate.debugtypes[0]
-			if (type) {
-				if (this.buf[0] == 127 && this.buf[1] == 127 && this.buf[2] == 127) {
-					this.logDebug('no debug')
-				} else {
-					if (type == 'int') {
-						var i = this.buf[2] < 128 ? -this.buf[0] : this.buf[0]// + this.buf[1]*255
-							if (this.buf[1])
-								i += this.buf[1] * 256
-								this.logDebug(i)
-					}
-					if (type == 'float') {
-						var i = this.buf[2] < 128 ? -this.buf[0] / 255 : this.buf[0] / 255 // + this.buf[1]*255
-							if (this.buf[1])
-								i += this.buf[1]
-								this.logDebug(i)
-					}
-					if (type == 'vec2') {
-						this.logDebug('(' + this.buf[0] / 255 + ',' + this.buf[1] / 255 + ')')
-					}
-					if (type == 'ivec2') {
-						this.logDebug('(' + this.buf[0] + ',' + this.buf[1] + ')')
-					}
-					if (type == 'vec3') {
-						this.logDebug('(' + this.buf[0] / 255 + ',' + this.buf[1] / 255 + ',' + this.buf[2] / 255 + ')')
-					}
-					if (type == 'ivec3') {
-						this.logDebug('(' + this.buf[0] + ',' + this.buf[1] + ',' + this.buf[2] + ')')
-					}
+		if (type) {
+			if (this.buf[0] == 127 && this.buf[1] == 127 && this.buf[2] == 127) {
+				this.logDebug('no debug')
+			} 
+			else {
+				if (type == 'int') {
+					var i = this.buf[2] < 128 ? -this.buf[0] : this.buf[0]// + this.buf[1]*255
+						if (this.buf[1])
+							i += this.buf[1] * 256
+							this.logDebug(i)
+				}
+				if (type == 'float') {
+					var i = this.buf[2] < 128 ? -this.buf[0] / 255 : this.buf[0] / 255 // + this.buf[1]*255
+						if (this.buf[1])
+							i += this.buf[1]
+							this.logDebug(i)
+				}
+				if (type == 'vec2') {
+					this.logDebug('(' + this.buf[0] / 255 + ',' + this.buf[1] / 255 + ')')
+				}
+				if (type == 'ivec2') {
+					this.logDebug('(' + this.buf[0] + ',' + this.buf[1] + ')')
+				}
+				if (type == 'vec3') {
+					this.logDebug('(' + this.buf[0] / 255 + ',' + this.buf[1] / 255 + ',' + this.buf[2] / 255 + ')')
+				}
+				if (type == 'ivec3') {
+					this.logDebug('(' + this.buf[0] + ',' + this.buf[1] + ',' + this.buf[2] + ')')
 				}
 			}
-			//console.log(id)
+		}
 	}
 
-	this.drawGuid = function () {
+	this.drawGuid = function(){
 		this.renderstate.setup(this.device, 2, 2);
 		this.renderstate.translate(-this.screen.mouse.x + 1, this.device.size[1] - (this.screen.mouse.y) - 1);
 		this.renderstate.drawmode = 1;
@@ -93,7 +93,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 	}
 
-	this.readGuid = function () {
+	this.readGuid = function(){
 		//return
 		//return
 		this.device.gl.readPixels(1 * this.device.ratio, 1 * this.device.ratio, 1, 1, this.device.gl.RGBA, this.device.gl.UNSIGNED_BYTE, this.buf);
@@ -107,7 +107,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.setguid(id);
 	}
 
-	this.setguid = function (id) {
+	this.setguid = function(id){
 		
 		var screenw = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
 		var screenh = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
@@ -145,7 +145,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 	}
 
-	this.drawColor = function () {
+	this.drawColor = function(){
 		this.renderstate.setup(this.device);
 		this.orientation = {};
 		
@@ -156,12 +156,12 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.device.clear(this.bgcolor)
 		this.device.gl.clearStencil(0);
 		//this.device.clear(this.device.gl.STENCIL_BUFFER_BIT);
-		for (var i = 0; i < this.children.length; i++) {
+		for (var i = 0; i < this.children.length; i++){
 			this.children[i].draw(this.renderstate)
 		}
 	}
 
-	this.readGuidTimeout = function () {
+	this.readGuidTimeout = function(){
 		var dt = Date.now()
 		this.device.setTargetFrame(this.pic_tex)
 		this.readGuid()
@@ -214,8 +214,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		var delta = Date.now()
 		this.time = Date.now()
 		
-		//this.performLayout();
-		
 		this.last_time = time
 	
 		if (this.debug === true) {
@@ -247,23 +245,24 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.setDirty = function(value){
-		if (this.dirty === false && value === true && this.device !== undefined) {
+		if (this.dirty === false && value === true && this.device !== undefined){
 			this.dirty = true
 			this.device.redraw();
 		}
 	}
 
-	this.onmoved = function (value) {
-		if (value === true && this.device !== undefined) {
+	this.onmoved = function(value){
+		if (value === true && this.device !== undefined){
 			this.device.redraw();
 		}
 		return value;
 	}
 
-	this.click = function () {
+	this.click = function(){
 		if (this.screen.lastmouseguid > 0) {
-			if (this.uieventdebug)
+			if (this.uieventdebug){
 				console.log(" clicked: " + this.screen.guidmap[this.screen.lastmouseguid].constructor.name);
+			}
 			this.screen.guidmap[this.screen.lastmouseguid].emit('click')
 		}
 	}
@@ -297,8 +296,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			}
 		}.bind(this)
 
-		this.mouse.atIsdown = function () {
-			if (this.mouse.isdown === 1) {
+		this.mouse.atIsdown = function(){
+			if (this.mouse.isdown === 1){
 				if (this.mousecapture === false) {
 					this.mousecapture = this.lastmouseguid;
 					this.mousecapturecount = 1;
