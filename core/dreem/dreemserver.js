@@ -57,7 +57,7 @@ define.class(function(require, exports, self){
 			if(!args['-nodreem'] && file.indexOf('dreem.js') !== -1){
 				return this.broadcast({type:'delay'})
 			}
-			file = file.slice(define.expandVariables(define.$root).length)
+			file = file.slice(define.expandVariables(define.$root).length).replace(/\\/g, "/")
 			// ok lets rip off our 
 			this.broadcast({
 				type:'filechange',
