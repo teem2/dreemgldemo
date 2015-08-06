@@ -3,6 +3,6 @@ define.browser(function(require, view){
 	this.bg.bgcolorfn = function(pos, tex){
 		//dbg = mesh.y
 		//dbg = vec2(0.5,0.1)
-		return mix('red', 'blue', abs(sin(8 * mesh.y + time)))
+		return mix('whi', 'blue', abs(sin(8 * mesh.y + time)))
 	}
 })

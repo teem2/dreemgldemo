@@ -20,7 +20,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 			screen:this.screen
 		}
 
-		// copy keyboard and mouse objects
+		// copy keyboard and mouse objects from previous
 		if(!previous){
 			this.mouse = globals.mouse = new Mouse()
 			this.keyboard = globals.keyboard = new Keyboard()
@@ -32,12 +32,12 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 			globals.mouse.removeAllListeners()
 		}
 
-		// alright so, what we need to do is 
+		// render our screen
 		renderer.render(this.screen, null, globals, function rerender(what){
 			
 		}.bind(this))
 		
-		// okay! lets call diff on a childnode
+		// diff it
 		if(previous){
 			this.screen = this.screen.diff(previous.screen, globals)
 		}
