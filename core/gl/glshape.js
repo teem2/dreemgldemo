@@ -217,4 +217,63 @@ define(function (require, exports) {
 	exports.opI = function(d1, d2) {
 		return max(d1, d2);
 	}
+
+
+	exports.union = function(d1, d2){
+		return min(d1, d2)
+	}
+
+	exports.intersect = function(d1, d2){
+		return max(d1,d2)
+	}
+
+	exports.subtract = function(d1, d2){
+		return max(-d1,d2)
+	}
+
+	exports.circle = function(p, x, y, radius){
+		return distance(p,vec2(x,y)) - radius
+	}
+
+	exports.box = function(p, left, top, width, height){
+		var xy = vec2(left, top)
+		var hwh = vec2(.5*width, .5*height)
+		var d = abs(p - xy-hwh) - hwh
+		return min(max(d.x,d.y),0.) + length(max(d,0.))
+	}
+
+	exports.roundbox = function(p, left, top, width, height, radius){
+		var rad2 = vec2(radius,radius)
+		var hwh = vec2(.5*width, .5*height)
+		var xy = vec2(left, top)
+		return length(max(abs(p - xy - hwh) - (hwh - 2. * rad2), 0.)) - 2. * radius
+	}
+
+	exports.line = function(p, left, top, right, bottom, radius){
+		var a = vec2(left, top)
+		var b = vec2(right, bottom)
+		var pa = p - a, ba = b - a
+		var h = clamp(dot(pa,ba)/dot(ba,ba), 0., 1.)
+		return length(pa - ba * h) - radius
+	}
+
+	exports.drawField = function(coord, field, color){
+		var edge = length(vec2(length(dFdx(coord)), length(dFdy(coord)))) * SQRT_1_2
+		return vec4(color, smoothstep(-edge, edge, field))
+	}
+
+	exports.smoothpoly = function(a, b, k){
+	    var h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 )
+	    return mix( b, a, h ) - k*h*(1.0-h)
+	}
+
+	exports.smoothpow = function(a, b, k){
+	    a = pow( a, k ); b = pow( b, k )
+	    return pow( (a*b)/(a+b), 1.0/k )
+	}
+
+	exports.smoothexp = function(a, b, k){
+	    var res = exp( -k*a ) + exp( -k*b )
+	    return -log( res )/k
+	}
 })

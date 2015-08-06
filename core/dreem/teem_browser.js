@@ -11,23 +11,35 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 	var renderer = require('$renderer/renderer')
 	var BusClient = require('$rpc/busclient')
 	var Mouse = require('$renderer/mouse_$rendermode')
+	var Keyboard = require('$renderer/keyboard_$rendermode')
 
 	self.doRender = function(previous){
+		
+		var globals = {
+			teem:this, 
+			screen:this.screen
+		}
+
+		// copy keyboard and mouse objects
+		if(!previous){
+			this.mouse = globals.mouse = new Mouse()
+			this.keyboard = globals.keyboard = new Keyboard()
+		}
+		else{
+			this.mouse = globals.mouse = previous.mouse
+			this.keyboard = globals.keyboard = previous.keyboard
+			globals.keyboard.removeAllListeners()
+			globals.mouse.removeAllListeners()
+		}
 
 		// alright so, what we need to do is 
-		renderer.render(this.screen, null, {teem:this, screen:this.screen}, function rerender(what){
+		renderer.render(this.screen, null, globals, function rerender(what){
 			
 		}.bind(this))
 		
-		// lets go and render the screen
-		this.screen.mouse = new Mouse()
-
 		// okay! lets call diff on a childnode
-
 		if(previous){
-			this.screen = this.screen.diff(previous.screen)
-			//this.screen = this.doDiff(previous.screen, this.screen, 'screen')
-			//console.log(this.screen === previous.screen)
+			this.screen = this.screen.diff(previous.screen, globals)
 		}
 
 		var wireinits = []

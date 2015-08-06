@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Sprite class
 
-define.class('./sprite_base', function (require, exports, self) {
+define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')
@@ -135,7 +135,7 @@ define.class('./sprite_base', function (require, exports, self) {
 		//this.orientation.worldmatrix = mat4.mul(this.orientation.matrix,this.parent.orientation.worldmatrix );
 		this.matrixdirty = false;
 	}
-
+	
 	this.init = function (obj){
 		
 		this.orientation = {
@@ -197,9 +197,6 @@ define.class('./sprite_base', function (require, exports, self) {
 				this.bg.texture = GLTexture.fromImage(result)
 			}.bind(this))
 		}
-
-		this.fg.screen = this.screen
-		this.bg.screen = this.screen
 
 		//this.shader = new this.Shader()
 		//this.textureshader = new this.TexturedShader()
@@ -272,7 +269,7 @@ define.class('./sprite_base', function (require, exports, self) {
 
 	// called by diffing
 	this.atDestroy = function(){
-		if(this.div) this.div.parentNode.removeChild(this.div)
+		if(this.dom) this.dom.parentNode.removeChild(this.dom)
 	}
 
 	this.drawContentDali = function(renderstate){
@@ -311,6 +308,9 @@ define.class('./sprite_base', function (require, exports, self) {
 			bg._bordercolor = this._bordercolor
 			bg._radius = this._cornerradius
 
+			fg.screen = this.screen
+			bg.screen = this.screen
+
 			if(renderstate.drawmode === 2){
 				var type = bg.drawDebug(this.screen.device)
 				if(type) renderstate.debugtypes.push(type)
@@ -330,14 +330,19 @@ define.class('./sprite_base', function (require, exports, self) {
 				bg.drawGuid(this.screen.device)
 			}
 			else{
-				bg.time = (this.screen.time%100000) * 0.001
-				fg.time = (this.screen.time%100000) * 0.001
+				bg.time = this.screen.time
+				fg.time = this.screen.time
 
 				bg.draw(this.screen.device)
 				fg.draw(this.screen.device)
 
 				// lets check if we have a reference on time
-				if(bg.shader && bg.shader.unilocs.time) this.screen.device.redraw()
+				if(bg.shader && bg.shader.unilocs.time || 
+					fg.shader && fg.shader.unilocs.time){
+					//console.log(this.teem.reload)
+					//console.log("REDRAW", this.screen.time)
+					this.screen.device.redraw()
+				}
 			}
 		} 
 		else {

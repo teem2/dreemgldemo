@@ -247,11 +247,36 @@ define.class(function(require, constructor){
 		this[listen_key].push(cb)
 	}
 
+	this.removeListener = function(key, cb){
+		var listen_key = '_listen_' + key
+		if(!this.hasOwnProperty(listen_key)) return
+		var cbs = this[listen_key]
+		if(cbs){
+			if(cb){
+				var idx = cbs.indexOf(cb)
+				if(idx !== -1) cbs.splice(idx,1)
+			}
+			else{
+				cbs.length = 0
+			}
+		}
+	}
+
 	this.hasListeners = function(key){
 		var listen_key = '_listen_' + key
 		var on_key = 'on' + key
 		if(on_key in this || listen_key in this) return true
 		return false
+	}
+
+	this.removeAllListeners = function(){
+		var keys = Object.keys(this)
+		for(var i = 0; i < keys.length; i++){
+			var key = keys[i]
+			if(key.indexOf('_listen_') === 0){
+				this[key] = undefined
+			}
+		}
 	}
 
 	this.setAttribute = function(key, value){
@@ -486,22 +511,31 @@ define.class(function(require, constructor){
 	}
 
 	// lets diff ourselves and children
-	this.diff = function(other){
+	this.diff = function(other, globals){
 		if(!other) return this
 
 		// diff children set
 		var my_children = this.children
 		var other_children = other.children
 
-		if(my_children) for(var i = 0; i < my_children.length; i++){
-			my_children[i] = my_children[i].diff(other_children[i])
+		// diff my children
+		var i = 0
+		if(my_children) for(; i < my_children.length; i++){
+			my_children[i] = my_children[i].diff(other_children[i], globals)
+		}
+		// clear out whatever is left
+		if(other_children) for(; i < other_children.length; i++){
+			var child = other_children[i]
+			if(child.atDestroy) child.atDestroy()
 		}
 
 		// check if we changed class
-		if(define.classHash(this.constructor) === define.classHash(other.constructor) && 
-			this.constructorPropsEqual(other)){
+		if(define.classHash(this.constructor) === define.classHash(other.constructor) && this.constructorPropsEqual(other)){
 			other.children = my_children
 			if(this.atDestroy) this.atDestroy()
+			if(globals) for(var key in globals){
+				other[key] = globals[key]
+			}
 			return other
 		}
 

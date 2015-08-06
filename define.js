@@ -33,6 +33,7 @@
 	define.$debug = '$core/debug'
 	define.$dreem = '$core/dreem'
 	define.$gl = '$core/gl'
+	define.$edit = '$core/edit'
 	define.$parsers = '$core/parsers'
 	define.$renderer = '$core/renderer'
 	define.$rpc = '$core/rpc'
@@ -361,7 +362,9 @@
 		}
 		else{
 			if(module){
-				module.exports = Constructor
+				if(body && body.mixin) module.exports = Constructor.prototype
+				else module.exports = Constructor
+				
 				Object.defineProperty(Constructor, 'module', {value:module})
 				Object.defineProperty(Constructor, 'classname', {
 					value: define.fileBase(module.filename).replace(/\./g,'_')
@@ -423,6 +426,12 @@
 			if(arg in define.builtinClassArgs) throw new Error('Cannot use builtin arg ' + arg + ' in render class, use a normal class please')
 		}
 		define.class(body)
+	}
+
+	define.mixin = function(body, body2){
+		if(typeof body2 === 'function') body = body2
+		body.mixin = true
+		define.class.apply(define, arguments)
 	}
 
 	// class module support
@@ -831,6 +840,12 @@
 		// |/   | 
 		// 23---5
 
+		// lets return a single slot
+		self.getQuad = function(pos){
+			// can we return a Float32Array on one of the quad corners?
+			console.log('implement getquad')
+		}
+
 		self.lengthQuad = function(){
 			if(this.length % 6) throw new Error('Non aligned quad size')
 			return this.length / 6
@@ -1122,6 +1137,7 @@
 					// and either patch up classes or
 					// do a full reload.
 					// so. lets first figure out if its a class.
+					console.clear()
 					var old_module = define.module[msg.file]
 					define.reload_id++
 					if(old_module && typeof old_module.exports === 'function'){
@@ -1133,7 +1149,7 @@
 							// fetch all modules dependent on this class, and all dependent on those
 							// and cause them to reinitialize
 							function wipe_module(name){
-								console.log("Reloading "+define.fileName(name))
+								//console.log("Reloading "+define.fileName(name))
 								for(var key in define.factory){
 									var deps = define.factory[key].deps
 									if(key !== name && define.module[key] && deps && deps.indexOf(name) !== -1){

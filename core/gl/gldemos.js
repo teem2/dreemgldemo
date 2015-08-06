@@ -12,6 +12,6 @@ define(function(require, exports){
 		var x = pos.x*xs+0.1*time
 		var y = pos.y*ys
 		var ns = noise.snoise3(x, y, 0.1*time)
-		return	pal.pal0(ns) + 0.5*(vec3(1.)*sin(-8*time + (length(pos-.5)-.01*ns+ .001*noise.snoise3(x*10, y*10, 0.1*time))*2400))
+		return	pal.pal0(ns) + 0.5*(vec4(1.)*sin(-8*time + (length(pos-.5)-.01*ns+ .001*noise.snoise3(x*10, y*10, 0.1*time))*2400))
 	}
 })

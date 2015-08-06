@@ -7,7 +7,7 @@ define.class(function(require, exports){
 	
 	exports.defineGlobals = function(object, globals){
 		for(var key in globals){
-			Object.defineProperty(object, key, {value:globals[key]})
+			Object.defineProperty(object, key, {writable:true, value:globals[key]})
 		}
 	}
 

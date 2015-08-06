@@ -82,7 +82,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 	this.drawGuid = function(){
 		this.renderstate.setup(this.device, 2, 2);
-		this.renderstate.translate(-this.screen.mouse.x + 1, this.device.size[1] - (this.screen.mouse.y) - 1);
+		this.renderstate.translate(- this.screen.mouse.x + 1, this.device.size[1] - (this.screen.mouse.y) - 1);
 		this.renderstate.drawmode = 1;
 
 		this.device.clear(vec4(0, 0, 0, 1))
@@ -113,7 +113,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		var screenh = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
 		
 		this.screen.mouse.glx = (this.screen.mouse.x/(screenw/2))-1;
-		this.screen.mouse.gly=  -(this.screen.mouse.y/(screenh/2)-1);
+		this.screen.mouse.gly = -(this.screen.mouse.y/(screenh/2)-1);
 				
 		//var R = vec2.mul_mat4_t(vec2(this.screen.mouse.glx, this.screen.mouse.gly), this.invertedworldmatrix);
 
@@ -211,9 +211,9 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.draw = function (time) {
 		this.draw_calls = 0
 		var anim = this.doAnimation(time)
-		var delta = Date.now()
-		this.time = Date.now()
-		
+//		var delta = Date.now()
+		this.time = time// Date.now()
+	//	console.log(this.time)		
 		this.last_time = time
 	
 		if (this.debug === true) {
@@ -267,9 +267,9 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 	}
 
-	this.diff = function(other){
+	this.diff = function(other, globals){
 		// if we diff well get a complete new one..
-		baseclass.prototype.diff.call(this, other)
+		baseclass.prototype.diff.call(this, other, globals)
 		// alright now lets copy over the settings
 		this._init = 1
 
@@ -277,14 +277,17 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.debug_tex = other.debug_tex
 		this.device = other.device
 		this.buf = other.buf
+		this.mouse = other.mouse
+		this.keyboard = other.keyboard
 
 		this.initVars()
-		this.bindCalls()
+
+		this.bindInputs()
 		return this
 	}
 
-	this.bindCalls = function(){
-		this.mouse.atMove = function () {
+	this.bindInputs = function(){
+		this.mouse.move = function () {
 			if (this.mousecapture){
 				this.setguid (this.lastmouseguid);
 			}
@@ -296,7 +299,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			}
 		}.bind(this)
 
-		this.mouse.atIsdown = function(){
+		this.mouse.isdown = function(){
 			if (this.mouse.isdown === 1){
 				if (this.mousecapture === false) {
 					this.mousecapture = this.lastmouseguid;
@@ -320,7 +323,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			}
 		}.bind(this)
 
-		this.mouse.atClick = function () {
+		this.mouse.click = function () {
 			this.click();
 		}.bind(this)
 
@@ -349,6 +352,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 		this.initVars()
 
-		this.bindCalls()
+		this.bindInputs()
 	}
 })

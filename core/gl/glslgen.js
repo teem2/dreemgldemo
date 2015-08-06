@@ -173,6 +173,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 			throw new Error('Id cannot be resolved: "'+name +'", but exists on the current context (set to undefined)')
 		}
 		else {
+			console.log(node)
 			throw new Error('Id cannot be resolved '+name)
 		}
 	}

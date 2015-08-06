@@ -26,6 +26,8 @@ define.class('$gl/glshader', function(require, exports, self){
 		this.start_y = null
 		this.text_x = 0
 		this.text_y = 0
+		this.shift_x = 0
+		this.shift_y = 0
 		this.add_x = 0
 		this.add_y = 0
 
@@ -122,6 +124,10 @@ define.class('$gl/glshader', function(require, exports, self){
 		this.__defineGetter__('char_count', function(){
 			return this.quadLength()
 		})
+
+		this.charCodeAt = function(pos){
+			return this.array[pos*6 + 5]
+		}
 	})
 
 	// for type information
@@ -163,7 +169,13 @@ define.class('$gl/glshader', function(require, exports, self){
 	}
 
 	this.glyphy_mesh_sdf = function(){
-		return mesh.pos * matrix
+		return (mesh.pos+vec2(mesh.shift_x,mesh.shift_y)) * matrix 
+	}
+
+	this.glyphy_mesh = 
+	this.glyphy_mesh_atlas = function(){
+		glyph = glyph_vertex_transcode(mesh.tex)
+		return (mesh.pos+vec2(mesh.shift_x,mesh.shift_y)) * matrix
 	}
 
 	// glyphy shader library
@@ -623,11 +635,7 @@ define.class('$gl/glshader', function(require, exports, self){
 			WRAP_T: 'CLAMP_TO_EDGE'
 		})
 	}
-	this.glyphy_mesh = 
-	this.glyphy_mesh_atlas = function(){
-		glyph = glyph_vertex_transcode(mesh.tex)
-		return mesh.pos * matrix
-	}
+
 	// draw using atlas
 	this.time = 0
 	this.glyphy_pixel = 

@@ -3,7 +3,7 @@
 
 define.class('./sprite_gl', function(require, exports, self){	
 	var GLText = require('$gl/gltext')
-	
+
 	this.attribute('text', {type:String, value: "HELLO" })
 	this.attribute('fontsize', {type:float, value: 18});
 	this.attribute('color', {type:vec4, value: vec4(1,1,1,1)});
@@ -11,6 +11,7 @@ define.class('./sprite_gl', function(require, exports, self){
 	exports.nest('Fg', GLText.extend(function(exports, self){}))
 	//this.fg.dump =1 
 	this.text = function(){
+
 		this.dirty = true;
 	}
 
@@ -23,6 +24,7 @@ define.class('./sprite_gl', function(require, exports, self){
 			textbuf.add(this.text)
 			//this.fg.textcolor = this.color;
 			this.fg.mesh = textbuf
+			console.log(textbuf)
 		}
 	}
 })

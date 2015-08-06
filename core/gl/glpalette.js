@@ -2,41 +2,41 @@
 
 define(function (require, exports) {
 	exports.pal0 = function(t){
-		return mix(vec3(0),vec3(1), t)
+		return vec4(mix(vec3(0),vec3(1), t),1.)
 	}
 	exports.pal1 = 
 	exports.rainbow = function(t){
-		return pal(t, vec3(.5),vec3(.5),vec3(1),vec3(0,0.33,0.67))
+		return vec4(pal(t, vec3(.5),vec3(.5),vec3(1),vec3(0,0.33,0.67)),1.)
 	}
 
 	exports.pal2 =
 	exports.hotcool = function(t){
-		return pal(t, vec3(.5),vec3(.5),vec3(1),vec3(0,0.1,0.2))
+		return vec4(pal(t, vec3(.5),vec3(.5),vec3(1),vec3(0,0.1,0.2)),1.)
 	}
 
 	exports.pal3 = 
 	exports.pinkblue = function(t){
-		return pal(t, vec3(.5),vec3(.5),vec3(1),vec3(0.3,0.2,0.2))
+		return vec4(pal(t, vec3(.5),vec3(.5),vec3(1),vec3(0.3,0.2,0.2)),1.)
 	}
 
 	exports.pal4 = 
 	exports.greenish = function(t){
-		return pal(t, vec3(.5),vec3(.5),vec3(1.,1.,.5),vec3(0.8,0.9,0.3))
+		return vec4(pal(t, vec3(.5),vec3(.5),vec3(1.,1.,.5),vec3(0.8,0.9,0.3)),1.)
 	}
 
 	exports.pal5 = 
 	exports.dipper = function(t){
-		return pal(t, vec3(.5),vec3(.5),vec3(1.,0.7,.4),vec3(0,0.15,0.20))
+		return vec4(pal(t, vec3(.5),vec3(.5),vec3(1.,0.7,.4),vec3(0,0.15,0.20)),1.)
 	}
 
 	exports.pal6 = 
 	exports.purply = function(t){
-		return pal(t, vec3(.5),vec3(.5),vec3(2.,1.0,0.),vec3(0.5,0.2,0.25))
+		return vec4(pal(t, vec3(.5),vec3(.5),vec3(2.,1.0,0.),vec3(0.5,0.2,0.25)),1.)
 	}
 
 	exports.pal7 = 
 	exports.reddish = function(t){
-		return pal(t, vec3(.8,.5,.4),vec3(.2,.4,.2),vec3(2.,1.0,1.0),vec3(0.,0.25,0.25))
+		return vec4(pal(t, vec3(.8,.5,.4),vec3(.2,.4,.2),vec3(2.,1.0,1.0),vec3(0.,0.25,0.25)),1.)
 	}
 
 	exports.pal = function (t, a, b, c, d) {
