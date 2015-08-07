@@ -218,7 +218,6 @@ define.class('$base/node', function(require, exports, self){
 				// ok so we need to look up split[0] on context
 				var name = loc.name = split[0]
 				var geom = context[name]
-				
 				var last = geom.struct
 				var offset = 0
 				for(var i = 1; i < split.length; i++){					
@@ -227,6 +226,7 @@ define.class('$base/node', function(require, exports, self){
 					offset += info.offset
 					last = info.type
 				}
+				if(!last) throw new Error('Cannot find attribute ' + key)
 				loc.slots = last.slots
 				loc.offset = offset
 			}

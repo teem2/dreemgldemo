@@ -122,11 +122,85 @@ define.class('$gl/glshader', function(require, exports, self){
 		}
 
 		this.__defineGetter__('char_count', function(){
-			return this.quadLength()
+			return this.lengthQuad()
 		})
 
-		this.charCodeAt = function(pos){
-			return this.array[pos*6 + 5]
+		// get the character coordinates
+		this.charCoords = function(off){
+			var info = this.font.glyphs[this.charCodeAt(off)]
+			var coords = {
+				x: this.array[off*6*8 + 0] - this.font_size * info.min_x,
+				y: this.array[off*6*8 + 1] - this.font_size * info.min_y,
+				w: info.advance * this.font_size,
+				h: this.line_height
+			}
+			return coords
+		}
+
+		this.offsetFromPos = function(x, y){
+			var height = this.line_height
+
+			if(y < 0) return -2
+
+			for(var len = this.lengthQuad(), o = len - 1; o >= 0; o--){
+
+				var char_code = this.charCodeAt(o)
+				var info = this.font.glyphs[char_code]
+
+				var y2 = this.array[o*6*8 + 1] + this.font_size * info.min_y + this.font_size * this.cursor_sink
+				var y1 = y2 - this.line_height
+
+				if(y>=y1 && y<=y2){
+					var hx = (this.array[o*6*8 + 0] + this.array[o*6*8 + 0 + 8])/2
+					
+					var tl_x = this.array[o*6*8 + 0]
+					var tr_x = this.array[o*6*8 + 0 + 8]
+					if(this.charCodeAt(o-1) == 10 && x< tl_x){
+						return o 
+					}
+					if(x >= tl_x && x <= hx){
+						return o
+					}
+					if(o == 0 && x < tl_x){
+						return -1 // to the left
+					}
+					if(o == len - 1 && x > tr_x){
+						if(char_code ==10) return o
+						return -4 // to the right of self
+					}
+					if(x > hx){
+						if(char_code == 10) return o
+						return o + 1
+					}
+				}
+				if(y>y2){
+					//console.log(y, y2, '#'+serializeText()+'#')
+					return -3 // below self
+				}
+			}
+			return -2 // above self
+		}
+
+		this.cursorRect = function(off){
+			var coords = this.charCoords(off)
+			coords.y -= coords.h - this.font_size * this.cursor_sink
+			return coords
+		}
+
+		this.charCodeAt = function(off){
+			return this.array[off*6*8 + 4]
+		}
+
+		this.serializeText = function(start, end){
+			var str = ''
+			for(var i = start; i < end; i++){
+				str += String.fromCharCode(this.charCodeAt(i))
+			}
+			return str
+		}
+
+		this.insertText = function(off, text){
+			
 		}
 	})
 

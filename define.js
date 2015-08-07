@@ -42,6 +42,7 @@
 
 	define.local_classes = {}
 
+	define.partial_reload = false
 	define.reload_id = 0
 
 	// copy configuration onto define
@@ -852,6 +853,7 @@
 		}
 
 		self.setQuad = function(index){
+			this.clean = false
 			var arglen = arguments.length - 1
 			var slots = this.slots
 			if(arglen !== slots * 4) throw new Error('Please use individual components to set a quad')
@@ -870,6 +872,7 @@
 		}
 
 		self.pushQuad = function(){
+			this.clean = false
 			var slots = this.slots
 			if(arguments.length !== slots * 4) throw new Error('Please use individual components to set a quad for '+slots)
 			var off = this.length * slots
@@ -1140,7 +1143,7 @@
 					console.clear()
 					var old_module = define.module[msg.file]
 					define.reload_id++
-					if(old_module && typeof old_module.exports === 'function'){
+					if(define.partial_reload && old_module && typeof old_module.exports === 'function'){
 						// lets wipe the old module
 						define.module[msg.file] = define.factory[msg.file] = undefined
 

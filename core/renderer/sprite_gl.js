@@ -276,6 +276,21 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 	}
 
+	this.doDraw = function(renderstate){
+		this.bg.time = this.screen.time
+		this.fg.time = this.screen.time
+
+		this.bg.draw(this.screen.device)
+		this.fg.draw(this.screen.device)
+
+		// lets check if we have a reference on time
+		if(this.bg.shader && this.bg.shader.unilocs.time || 
+			this.fg.shader && this.fg.shader.unilocs.time){
+			this.screen.device.redraw()
+		}
+
+	}
+
 	this.drawContentGL = function(renderstate){
 		//mat4.debug(this.orientation.matrix);
 		if (this.texturecache == false || this.texturecache == true && this.dirty){
@@ -330,19 +345,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				bg.drawGuid(this.screen.device)
 			}
 			else{
-				bg.time = this.screen.time
-				fg.time = this.screen.time
-
-				bg.draw(this.screen.device)
-				fg.draw(this.screen.device)
-
-				// lets check if we have a reference on time
-				if(bg.shader && bg.shader.unilocs.time || 
-					fg.shader && fg.shader.unilocs.time){
-					//console.log(this.teem.reload)
-					//console.log("REDRAW", this.screen.time)
-					this.screen.device.redraw()
-				}
+				this.doDraw(renderstate)
 			}
 		} 
 		else {
@@ -402,6 +405,11 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		}
 		else this.hideContent()
 		//this.screen.device.redraw()
+	}
+
+	// give it keyboard focus
+	this.focus = function(){
+		this.screen.setFocus(this)
 	}
 
 	this.render = function(){

@@ -20,10 +20,10 @@ define.class(function(require){
 	})
 
 	Object.defineProperty(this, 'hi', {
-		get:function(){ 
+		get: function(){ 
 			return this.end > this.start? this.end: this.start 
 		},
-		set:function(v){
+		set: function(v){
 			if(this.end > this.start) this.end = v
 			else this.start = v
 		}
@@ -40,14 +40,14 @@ define.class(function(require){
 		if(this.end < 0) this.end = 0
 		if(!only_end) this.start = this.end
 		// 
-		this.max = textbuf.cursorRect(this.end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	this.moveRight = function(only_end){
 		this.end = this.end + 1
 		if(this.end > this.textbuf.char_count) this.end = this.textbuf.char_count
 		if(!only_end) this.start = this.end
-		this.max = this.textbuf.cursorRect(end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	this.moveUp = function(only_end, lines){
@@ -228,7 +228,7 @@ define.class(function(require){
 		if(text.length){
 			var len =  this.textbuf.insertText(this.lo, text)
 			this.cursorset.delta += len
-			editor.addUndoDelete(this.lo, this.lo + len)
+			this.editor.addUndoDelete(this.lo, this.lo + len)
 		}	
 		this.editor.forkRedo()
 		this.start = this.end = this.lo + text.length + cdelta

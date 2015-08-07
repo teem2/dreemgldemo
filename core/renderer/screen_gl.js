@@ -35,7 +35,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 	this.drawDebug = function(){
 		this.renderstate.setup(this.device, 2, 2);
-		this.renderstate.translate(-this.screen.mouse.x + 1, this.device.size[1] - (this.screen.mouse.y) - 1);
+		this.renderstate.translate(-this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
 		this.renderstate.drawmode = 2;
 		this.renderstate.debugtypes = []
 		this.device.clear(vec4(0.5, 0.5, 0.5, 1))
@@ -82,7 +82,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 	this.drawGuid = function(){
 		this.renderstate.setup(this.device, 2, 2);
-		this.renderstate.translate(- this.screen.mouse.x + 1, this.device.size[1] - (this.screen.mouse.y) - 1);
+		this.renderstate.translate(- this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
 		this.renderstate.drawmode = 1;
 
 		this.device.clear(vec4(0, 0, 0, 1))
@@ -100,8 +100,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		var id = this.buf[0] + (this.buf[1] << 8) + (this.buf[2] << 16);
 		this.lastidundermouse = id;
 
-		if (this.screen.mousecapture !== false) {
-			id = this.screen.mousecapture;
+		if (this.mousecapture !== false) {
+			id = this.mousecapture;
 		}
 
 		this.setguid(id);
@@ -112,36 +112,36 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		var screenw = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
 		var screenh = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
 		
-		this.screen.mouse.glx = (this.screen.mouse.x/(screenw/2))-1;
-		this.screen.mouse.gly = -(this.screen.mouse.y/(screenh/2)-1);
+		this.mouse.glx = (this.mouse.x/(screenw/2))-1;
+		this.mouse.gly = -(this.mouse.y/(screenh/2)-1);
 				
-		//var R = vec2.mul_mat4_t(vec2(this.screen.mouse.glx, this.screen.mouse.gly), this.invertedworldmatrix);
+		//var R = vec2.mul_mat4_t(vec2(this.mouse.glx, this.mouse.gly), this.invertedworldmatrix);
 
-		if(id != this.screen.lastmouseguid || this.screen.mouse.x != this.lastx || this.screen.mouse.y != this.lasty){
-			this.lastx = this.screen.mouse.x
-			this.lasty = this.screen.mouse.y
+		if(id != this.lastmouseguid || this.mouse.x != this.lastx || this.mouse.y != this.lasty){
+			this.lastx = this.mouse.x
+			this.lasty = this.mouse.y
 			
-			if(this.screen.guidmap[id].hasListeners('mousemove')){
-				var M = this.screen.guidmap[id].getInvertedMatrix()
-				var R = vec2.mul_mat4_t(vec2(this.screen.mouse.glx, this.screen.mouse.gly), M)
+			if(this.guidmap[id].hasListeners('mousemove')){
+				var M = this.guidmap[id].getInvertedMatrix()
+				var R = vec2.mul_mat4_t(vec2(this.mouse.glx, this.mouse.gly), M)
 	
-				this.screen.guidmap[id].emit('mousemove', vec2(R[0], R[1]))
+				this.guidmap[id].emit('mousemove', vec2(R[0], R[1]))
 			}
 		}
 
-		if(id != this.screen.lastmouseguid){
+		if(id != this.lastmouseguid){
 
-			this.screen.guidmap[this.screen.lastmouseguid].emit('mouseout')
+			this.guidmap[this.lastmouseguid].emit('mouseout')
 
 			if (this.uieventdebug){
-				$$("mouseout: " + this.screen.guidmap[this.screen.lastmouseguid].constructor.name + "(" + this.screen.lastmouseguid + ")")
+				$$("mouseout: " + this.guidmap[this.lastmouseguid].constructor.name + "(" + this.lastmouseguid + ")")
 			}
 			if (this.uieventdebug){
-				$$("mouseenter: " + this.screen.guidmap[id].constructor.name + "(" + id + ")")
+				$$("mouseenter: " + this.guidmap[id].constructor.name + "(" + id + ")")
 			}
 
-			this.screen.guidmap[id].emit('mouseover')
-			this.screen.lastmouseguid = id
+			this.guidmap[id].emit('mouseover')
+			this.lastmouseguid = id
 		}
 	}
 
@@ -259,11 +259,11 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.click = function(){
-		if (this.screen.lastmouseguid > 0) {
+		if (this.lastmouseguid > 0) {
 			if (this.uieventdebug){
-				console.log(" clicked: " + this.screen.guidmap[this.screen.lastmouseguid].constructor.name);
+				console.log(" clicked: " + this.guidmap[this.lastmouseguid].constructor.name);
 			}
-			this.screen.guidmap[this.screen.lastmouseguid].emit('click')
+			this.guidmap[this.lastmouseguid].emit('click')
 		}
 	}
 
@@ -286,16 +286,34 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		return this
 	}
 
+	this.setFocus = function(object){
+		this.focus_object = object
+	}
+
 	this.bindInputs = function(){
+
+		this.keyboard.down = function(v){
+			if(!this.focus_object) return
+			this.focus_object.emit('keydown', v)
+		}.bind(this)
+
+		this.keyboard.up = function(v){
+			if(!this.focus_object) return
+			this.focus_object.emit('keyup', v)
+		}.bind(this)
+
+		this.keyboard.press = function(v){
+			// lets reroute it to the element that has focus
+			if(!this.focus_object) return
+			this.focus_object.emit('keypress', v)
+		}.bind(this)
+
 		this.mouse.move = function () {
 			if (this.mousecapture){
 				this.setguid (this.lastmouseguid);
 			}
 			else{
 				this.moved = true;
-				//setTimeout(function(){
-					//this.device.animFrame(0)
-				//},0)////.bind(this),0)
 			}
 		}.bind(this)
 
