@@ -50,7 +50,7 @@ define.class(function(require){
 		this.list = []
 		for(var i = 0; i < inp.length; i += 2){
 			var cur = this.newCursor()
-			list.push(cur)
+			this.list.push(cur)
 			cur.start = inp[i]
 			cur.end = inp[i+1]
 		} 

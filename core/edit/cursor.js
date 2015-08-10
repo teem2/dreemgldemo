@@ -1,5 +1,7 @@
 define.class(function(require){
 
+	var parse = new (require('$parsers/onejsparser'))()
+
 	this.atConstructor = function(cursorset, editor, textbuf){
 		this.cursorset = cursorset
 		this.editor = editor
@@ -182,13 +184,13 @@ define.class(function(require){
 		this.start += this.cursorset.delta
 		this.end += this.cursorset.delta
 
-		if(this.editor.stripNextOnBackspace(this.lo - 1)){
+		if(this.editor.stripNextOnBackspace && this.editor.stripNextOnBackspace(this.lo - 1)){
 			hi++
 		}
 
 		var t
-		if(parse.isNonNewlineWhiteSpace(layer.charCodeAt(this.lo - 1))){
-			while(t = parse.isNonNewlineWhiteSpace(layer.charCodeAt(this.lo - 1))){
+		if(parse.isNonNewlineWhiteSpace(this.textbuf.charCodeAt(this.lo - 1))){
+			while(t = parse.isNonNewlineWhiteSpace(this.textbuf.charCodeAt(this.lo - 1))){
 				this.lo = this.lo - 1
 				if(t == 2) break
 			}

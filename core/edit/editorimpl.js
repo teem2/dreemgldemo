@@ -2,7 +2,7 @@ define.mixin(function(require){
 
 	var CursorSet = require('$edit/cursorset')
 	var Cursor = require('./cursor')
-	var parse = require('$parsers/onejsparser')
+	var parse = new (require('$parsers/onejsparser'))()
 
 	this.addUndoInsert = function(start, end, stack){
 		if(!stack) stack = this.undo_stack
@@ -247,14 +247,14 @@ define.mixin(function(require){
 	// alright so. undo. 
 	this.keyZCtrl =
 	this.keyZCmd = function(){
-		this.undoRedo(undo_stack, redo_stack)
+		this.undoRedo(this.undo_stack, this.redo_stack)
 		//change = Change.undoRedo
 		//doCursor()
 	}
 
 	this.keyYCtrl =
 	this.keyYCmd = function(){
-		this.undoRedo(redo_stack, undo_stack)
+		this.undoRedo(this.redo_stack, this.undo_stack)
 		//change = Change.undoRedo
 		//doCursor()
 	}

@@ -1,7 +1,10 @@
 define.browser(function(require, screen, view, edit, text, myview){
 	this.render = function(){return[
-		myview({w:800,h:600})
-		,edit({x:0,y:0,w:300,h:80,fontsize:60, text:'MyValue'})
+		myview({w:1920,h:1080})
+		,edit({x:100,y:0,w:300,h:80,fontsize:60, text:'MyValue'})
+		//,edit({x:100,y:30,w:300,h:80,fontsize:60, text:'MyValue'})
+
+			//view({x:0,y:0,w:100,h:100}))
 		/*,view({
 			bordercolor:'blue', borderwidth:10, cornerradius:30, y:20, x:10, w:300, h:200,
 			'bg.color': function(){

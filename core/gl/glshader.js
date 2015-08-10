@@ -16,14 +16,6 @@ define.class('$base/node', function(require, exports, self){
 	this.shape = require('$gl/glshape')
 	this.math = require('$gl/glmath')
 	this.demos = require('$gl/gldemos')
-	// we can use singletons of these stateless classes
-	var onejsparser = new OneJSParser()
-	onejsparser.parser_cache = {}
-	var glslgen = new GLSLGen()
-
-	this.atConstructor = function(obj){
-		if(obj) for(var key in obj) this[key] = obj[key]
-	}
 
 	this.RAD = '1'
 	this.DEG = '0.017453292519943295'
@@ -36,6 +28,15 @@ define.class('$base/node', function(require, exports, self){
 	this.LOG10E = '0.4342944819032518'
 	this.SQRT_1_2 = '0.70710678118654757'
 	this.SQRT2 = '1.4142135623730951'
+
+	// we can use singletons of these stateless classes
+	var onejsparser = new OneJSParser()
+	onejsparser.parser_cache = {}
+	var glslgen = new GLSLGen()
+
+	this.atConstructor = function(obj){
+		if(obj) for(var key in obj) this[key] = obj[key]
+	}
 
 	this.extensions = ''
 	// put extensions as setters to not have to scan for them

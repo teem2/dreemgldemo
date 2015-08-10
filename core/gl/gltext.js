@@ -108,7 +108,8 @@ define.class('$gl/glshader', function(require, exports, self){
 			var length = string.length
 			// alright lets convert some text babeh!
 			for(var i = 0; i < length; i++){
-				var unicode = string.charCodeAt(i)
+	
+				var unicode = string.struct? string.array[i*4]: string.charCodeAt(i)
 				var info = this.font.glyphs[unicode]
 				if(!info) info = this.font.glyphs[32]
 				// lets add some vertices
@@ -182,6 +183,14 @@ define.class('$gl/glshader', function(require, exports, self){
 		}
 
 		this.cursorRect = function(off){
+			if(off >= this.lengthQuad()){
+				return {
+					x:this.add_x,
+					y:this.add_y,
+					w:0,
+					h:this.line_height
+				}
+			}
 			var coords = this.charCoords(off)
 			coords.y -= coords.h - this.font_size * this.cursor_sink
 			return coords
@@ -199,8 +208,40 @@ define.class('$gl/glshader', function(require, exports, self){
 			return str
 		}
 
+		this.serializeTags = function(start, end){
+			// lets serialize the tags array
+			var out = vec4.array(end - start)
+			for(var i = start; i < end; i++){
+				out.push(
+					this.array[i*6*8 + 4],
+					this.array[i*6*8 + 5],
+					this.array[i*6*8 + 6],
+					this.array[i*6*8 + 7])
+			}
+			return out
+		}
+
 		this.insertText = function(off, text){
-			
+			// ok lets pull in the 'rest' as string
+			var str = this.serializeText(off, this.lengthQuad())
+			// lets set the length and start adding
+			var rect = this.cursorRect(off)
+			this.add_x = rect.x
+			this.add_y = 0
+			this.length = off * 6
+			this.add(text)
+			this.add(str)
+			return text.length
+		}
+
+		this.removeText = function(off, end){
+			var str = this.serializeText(end, this.lengthQuad())
+			var rect = this.cursorRect(off)
+			this.add_x = rect.x
+			this.add_y = 0
+			this.length = off * 6
+			this.add(str)
+			return str.length
 		}
 	})
 
@@ -443,7 +484,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		} 
 		if(arc_list.num_endpoints == -1) {
 			/* single-line */
-			var angle = arc_list.line_angle 
+			var angle = arc_list.line_angle //+ 90.*time
 			var n = vec2(cos(angle), sin(angle))
 			return dot(p -(vec2(nominal_size) * .5), n) - arc_list.line_distance
 		}
