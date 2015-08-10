@@ -107,8 +107,13 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.setguid(id);
 	}
 
+	this.remapMouse = function(node){
+		var M = node.getInvertedMatrix()
+		var R = vec2.mul_mat4_t(vec2(this.mouse.glx, this.mouse.gly), M)
+		return R
+	}
+
 	this.setguid = function(id){
-		
 		var screenw = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
 		var screenh = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
 		
@@ -121,11 +126,9 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.lastx = this.mouse.x
 			this.lasty = this.mouse.y
 			
-			if(this.guidmap[id].hasListeners('mousemove')){
-				var M = this.guidmap[id].getInvertedMatrix()
-				var R = vec2.mul_mat4_t(vec2(this.mouse.glx, this.mouse.gly), M)
-	
-				this.guidmap[id].emit('mousemove', vec2(R[0], R[1]))
+			var overnode = this.guidmap[id]
+			if(overnode.hasListeners('mousemove')){
+				overnode.emit('mousemove', this.remapMouse(overnode))
 			}
 		}
 
@@ -318,36 +321,40 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.focus_object.emit('keypress', v)
 		}.bind(this)
 
+		this.keyboard.paste = function(v){
+			// lets reroute it to the element that has focus
+			if(!this.focus_object) return
+			this.focus_object.emit('keypaste', v)
+		}.bind(this)
+
 		this.mouse.move = function () {
 			if (this.mousecapture){
 				this.setguid (this.lastmouseguid);
 			}
 			else{
 				this.moved = true;
+				this.screen.device.redraw()
 			}
 		}.bind(this)
 
-		this.mouse.isdown = function(){
-			if (this.mouse.isdown === 1){
-				if (this.mousecapture === false) {
-					this.mousecapture = this.lastmouseguid;
-					this.mousecapturecount = 1;
-				} 
-				else {
-					this.mousecapturecount++;
-				}
-
-				this.guidmap[this.lastmouseguid].emit('mousedown')
+		this.mouse.leftdown = function(){
+			if (this.mousecapture === false) {
+				this.mousecapture = this.lastmouseguid;
+				this.mousecapturecount = 1;
 			} 
 			else {
-				if (this.mouse.isdown === 0) {
-					this.mousecapturecount--;
-					this.guidmap[this.lastmouseguid].emit('mouseup')
-					if (this.mousecapturecount === 0) {
-						this.mousecapture = false;
-						this.setguid(this.lastidundermouse);
-					}
-				}
+				this.mousecapturecount++;
+			}
+			var overnode = this.guidmap[this.lastmouseguid]
+			overnode.emit('mouseleftdown', this.remapMouse(overnode))
+		}.bind(this)
+
+		this.mouse.leftup = function(){ 
+			this.mousecapturecount--;
+			this.guidmap[this.lastmouseguid].emit('mouseleftup')
+			if (this.mousecapturecount === 0) {
+				this.mousecapture = false;
+				this.setguid(this.lastidundermouse);
 			}
 		}.bind(this)
 

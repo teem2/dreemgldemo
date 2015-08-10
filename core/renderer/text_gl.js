@@ -11,7 +11,6 @@ define.class('./sprite_gl', function(require, exports, self){
 	exports.nest('Fg', GLText.extend(function(exports, self){}))
 	//this.fg.dump =1 
 	this.text = function(){
-
 		this.dirty = true;
 	}
 
@@ -22,10 +21,10 @@ define.class('./sprite_gl', function(require, exports, self){
 			textbuf.font_size = this.fontsize;
 			textbuf.add_y = textbuf.line_height;
 			textbuf.fgcolor = this.color
+			textbuf.start_y = textbuf.line_height
 			textbuf.add(this.text)
 			//this.fg.textcolor = this.color;
 			this.fg.mesh = textbuf
-			console.log(textbuf)
 		}
 	}
 })

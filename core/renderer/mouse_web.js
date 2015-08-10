@@ -55,8 +55,8 @@ define.class('$base/node', function (require, exports, self){
 			else click_count = 1
 			this.last_click = now
 
-			this.clicker = this.click_count
-			
+			this.clicker = click_count
+
 			this.x = e.pageX// / this.ratio//* window.devicePixelRatio
 			this.y = e.pageY// / this.ratio//* window.devicePixelRatio
 

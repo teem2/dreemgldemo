@@ -81,6 +81,8 @@ define.class(function(require){
 			}
 			else i++
 		}
+		// lets communicate the position of our first cursor
+		
 	}
 	
 	this.markDelta = function(){
