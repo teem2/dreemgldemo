@@ -494,7 +494,9 @@ define.class(function(require, constructor){
 		var str = ''
 		var my_prop = this.constructor_props
 		var other_prop = other.constructor_props
-
+		if(!my_prop && other_prop) return false
+		if(!other_prop && my_prop) return false
+		if(!other_prop && !my_prop) return true
 		for(var key in my_prop){
 			var arg1 = my_prop[key]
 			var arg2 = other_prop[key]
@@ -519,14 +521,16 @@ define.class(function(require, constructor){
 		var other_children = other.children
 
 		// diff my children
-		var i = 0
-		if(my_children) for(; i < my_children.length; i++){
-			my_children[i] = my_children[i].diff(other_children[i], globals)
-		}
-		// clear out whatever is left
-		if(other_children) for(; i < other_children.length; i++){
-			var child = other_children[i]
-			if(child.atDestroy) child.atDestroy()
+		if(other_children){
+			var i = 0
+			if(my_children) for(; i < my_children.length; i++){
+				my_children[i] = my_children[i].diff(other_children[i], globals)
+			}
+			// clear out whatever is left
+			if(other_children) for(; i < other_children.length; i++){
+				var child = other_children[i]
+				if(child.atDestroy) child.atDestroy()
+			}
 		}
 
 		// check if we changed class

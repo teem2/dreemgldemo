@@ -55,19 +55,19 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.attribute("maxheight", {storage:'maxsize', index:1})
 
 	this.attribute("margin", {type: vec4, value: vec4(0,0,0,0)})
-	this.attribute("marginleft,", {storage:'margin', index:0})
+	this.attribute("marginleft", {storage:'margin', index:0})
 	this.attribute("margintop", {storage:'margin', index:1})
 	this.attribute("marginright", {storage:'margin', index:2})
 	this.attribute("marginbottom", {storage:'margin', index:3})
 
 	this.attribute("padding", {type: vec4, value: vec4(0,0,0,0)})
-	this.attribute("paddingleft,", {storage:'padding', index:0})
+	this.attribute("paddingleft", {storage:'padding', index:0})
 	this.attribute("paddingtop", {storage:'padding', index:1})
 	this.attribute("paddingright", {storage:'padding', index:2})
 	this.attribute("paddingbottom", {storage:'padding', index:3})
 
 	this.attribute("borderwidth", {type: vec4, value: vec4(0,0,0,0)});
-	this.attribute("borderleftwidth,", {storage:'borderwidth', index:0})
+	this.attribute("borderleftwidth", {storage:'borderwidth', index:0})
 	this.attribute("bordertopwidth", {storage:'borderwidth', index:1})
 	this.attribute("borderrightwidth", {storage:'borderwidth', index:2})
 	this.attribute("borderbottomwidth", {storage:'borderwidth', index:3})
