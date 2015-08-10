@@ -10,12 +10,11 @@ define(function(require, exports){
 	exports.kali2d = function(pos, steps, space){
 
 		var v = pos
-		var m = 0.0
-		for(var i = 0; i < 40; i ++){
+		for(var i = 0; i < 130; i ++){
 			if(i > int(steps)) break
 			v = abs(v)
-			m = v.x * v.x + v.y * v.y
-			v = v / m + space
+
+			v = v / (v.x * v.x + v.y * v.y) + space
 		}			
 		return v
 	}
@@ -26,7 +25,7 @@ define(function(require, exports){
 		var dx = 0.01*sin(0.01*time)
 		var dy = -0.01*sin(0.01*time)
 		mypos = math.rotate2d(mypos,0.1*time)
-		var kali1 =  kali2d(mypos+vec2(0.0001*time), 35, vec2(-0.8280193310201044,-0.858019331020104-dx))
+		var kali1 =  kali2d(mypos+vec2(0.0001*time), 30, vec2(-0.8280193310201044,-0.858019331020104-dx))
 		//var kali2 =  kali2d(mypos+vec2(0.0001*time), 40, vec2(-0.8280193310201044,-0.858019331020104-dy))
 		//var c1 =vec4(d.y, 0. ,sin(0.1*time)*6*kali2.y, 1.)
 		var c1 = pal.pal2(kali1.y+dt)
