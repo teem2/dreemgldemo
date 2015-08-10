@@ -6,7 +6,7 @@ define.browser(function(require, screen, view, edit, text, myview, treeview){
 				treeview({})
 
 		)
-		,view({position: "relative", flex:0.34, width: 100,  flexdirection: "row", bgcolor: "darkgray"},
+		,view({position: "relative", flex:0.34, width: 100,  flexdirection: "row", bgcolor: "darkgray"}
 			,edit({x:100,y:0,w:300,h:80,fontsize:60, 
 			'bg.color':function(){
 				return vec4(0.4)
