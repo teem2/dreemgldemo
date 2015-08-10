@@ -33,12 +33,12 @@ define.class(function(sprite, text, view){
 
 		// collapsible subbox: 
 		// recursive treeitmes
-		var res = view({margin: 2, flexdirection:"column", bgcolor: "#304030" , tag:"treeitem container"}, text({ text:'- ' + node.name, margin: 2, height: 30,width: 100 , tag: "item label", bgcolor: "transparent" }));
+		var res = view({ flexdirection:"column", margin: 0, padding: 0, bgcolor: "#304030" , tag:"treeitem container"}, text({ text:'- ' + node.name, margin: 0, height: 30,width: 100 , tag: "item label", bgcolor: "transparent" }));
 		
 		
 		
 		if (node.children && node.children.length > 0) {	
-			var container = view({  bgcolor: "teal" , flexdirection: "column", margin: 5, padding: 5, tag: "subitem container"});
+			var container = view({  bgcolor: "teal" , flexdirection: "column", margin:vec4(10,0,0,0), paddingleft: 15, tag: "subitem container"});
 			res.children.push(container);
 			container.children = [];
 			

@@ -127,8 +127,11 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.lasty = this.mouse.y
 			
 			var overnode = this.guidmap[id]
-			if(overnode.hasListeners('mousemove')){
-				overnode.emit('mousemove', this.remapMouse(overnode))
+			if (overnode.hasListeners)
+			{
+				if(overnode.hasListeners('mousemove')){
+					overnode.emit('mousemove', this.remapMouse(overnode))
+				}
 			}
 		}
 
