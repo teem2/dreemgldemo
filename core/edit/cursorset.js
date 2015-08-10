@@ -50,7 +50,7 @@ define.class(function(require){
 		this.list = []
 		for(var i = 0; i < inp.length; i += 2){
 			var cur = this.newCursor()
-			list.push(cur)
+			this.list.push(cur)
 			cur.start = inp[i]
 			cur.end = inp[i+1]
 		} 
@@ -124,29 +124,32 @@ define.class(function(require){
 	}
 
 	this.update = function(){
-		if(this.pending) return
-		this.pending = 1
-		setImmediate(function(){
-			this.pending = 0
-			
-			// lets remove all cursors
-			this.editor.clearMarkers()
-			this.editor.clearCursors()
-			// fuse the cursor list
-			if(this.fusing) this.fuse()
-			// draw it into geometry buffers 
-			for(var i = 0; i < this.list.length; i++){
-				var cursor = this.list[i]
-				if(cursor.start != cursor.end){
-					this.editor.addMarkers(cursor.start, cursor.end)
-				}
-				this.editor.addCursor(cursor.end)
+		if(this.updating) return
+		this.updating = 1
+		if(this.editor.screen) this.editor.screen.device.redraw()
+	}
+
+	this.updateCursors = function(){
+		if(!this.updating) return
+		this.updating = 0
+		
+		// lets remove all cursors
+		this.editor.clearMarkers()
+		this.editor.clearCursors()
+		// fuse the cursor list
+		if(this.fusing) this.fuse()
+		// draw it into geometry buffers 
+		for(var i = 0; i < this.list.length; i++){
+			var cursor = this.list[i]
+			if(cursor.start != cursor.end){
+				this.editor.addMarkers(cursor.start, cursor.end)
 			}
-		}.bind(this))
+			this.editor.addCursor(cursor.end)
+		}
 	}
 
 	this.rectSelect = function(x1, y1, x2, y2, clone){
-		if(y2<y1){
+		if(y2 < y1){
 			var t = y1
 			y1 = y2
 			y2 = t

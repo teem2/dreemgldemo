@@ -28,6 +28,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		else{
 			this.mouse = globals.mouse = previous.mouse
 			this.keyboard = globals.keyboard = previous.keyboard
+			// this isnt exactly right.
 			globals.keyboard.removeAllListeners()
 			globals.mouse.removeAllListeners()
 		}

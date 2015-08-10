@@ -6,6 +6,8 @@ define.class('$base/node', function (require, exports, self){
 	this.event('up')
 	this.event('down')
 	this.event('press')
+	this.event('paste')
+	this.event('cut')
 
 	this.toKey = { // slap a usable name on keys
 		8:'backspace',9:'tab',13:'enter',16:'shift',17:'ctrl',18:'alt',
@@ -119,7 +121,29 @@ define.class('$base/node', function (require, exports, self){
 				value: String.fromCharCode(code),
 				char: code
 			}
+			this.emit('press', msg)
 			e.preventDefault()
 		}.bind(this))
+
+
+		this.clipboard = document.createElement('textarea')
+		this.clipboard.style.width = '0px'
+		this.clipboard.style.height = '0px'
+		this.clipboard.style.position = 'absolute'
+		this.clipboard.style.zIndex = -10000000
+		document.body.appendChild(this.clipboard)
+
+		this.clipboard.onpaste = function(e){
+			var text = e.clipboardData.getData('text/plain')
+			this.emit('paste', text)
+		}.bind(this)
+
+		this.clipboard.focus()
+
+		this.cut = function(v){
+			this.clipboard.value = v
+			this.clipboard.select()
+			this.clipboard.focus()
+		}
 	}
 })

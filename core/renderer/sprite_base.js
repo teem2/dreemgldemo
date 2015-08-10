@@ -91,6 +91,9 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.event("mousemove")
 	this.event("mouseup")
 	this.event("scroll")
+	this.event("keyup")
+	this.event("keydown")
+	this.event("keypress")
 	
 	this.attribute("clipping", {type:boolean, value:false})
 

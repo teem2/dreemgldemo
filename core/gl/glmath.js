@@ -3,6 +3,18 @@
 // MIT License. 
 
 define(function(require, exports){
+	this.RAD = '1'
+	this.DEG = '0.017453292519943295'
+	this.PI = '3.141592653589793'
+	this.PI2 = '6.283185307179586'
+	this.E = '2.718281828459045'
+	this.LN2 = '0.6931471805599453'
+	this.LN10 = '2.302585092994046'
+	this.LOG2E = '1.4426950408889634'
+	this.LOG10E = '0.4342944819032518'
+	this.SQRT_1_2 = '0.70710678118654757'
+	this.SQRT2 = '1.4142135623730951'
+
 	exports.rotate2d = function(v, angle){
 		var cosa = cos(angle)
 		var sina = sin(angle)

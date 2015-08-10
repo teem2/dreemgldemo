@@ -42,6 +42,7 @@
 
 	define.local_classes = {}
 
+	define.partial_reload = true
 	define.reload_id = 0
 
 	// copy configuration onto define
@@ -479,7 +480,16 @@
 			define(moduleFactory)
 		}
 	}
-	
+
+	define.arraySplat = function(out, outoff, inp, inpoff, depth){
+		for(var i = inpoff, len = inp.length; i < len; i++){
+			var item = inp[i]
+			if(typeof item == 'number') out[outoff++] = item
+			else outoff = define.arraySplat(out, outoff, item, 0, depth++)
+		}
+		return outoff
+	}
+
 	define.struct = function(def, id){
 
 		function getStructArrayType(type){
@@ -502,16 +512,6 @@
 			var size = 0
 			for(var key in def) if(typeof def[key] !== 'string') size += getStructSize(def[key].def)
 			return size
-		}
-
-		function structInit(out, outoff, inp, inpoff, depth){
-			for(var i = inpoff, len = inp.length; i < len; i++){
-				var item = inp[i]
-				if(typeof item == 'number') out[outoff++] = item
-				else outoff = structInit(out, outoff, item, 0, depth++)
-			}
-			if(depth === 0 && outoff !== mysize) throw new Error('Cannot initialize '+Struct.id+' with '+outoff+'parameters')
-			return outoff
 		}
 
 		var myprim = getStructArrayType({def:def})
@@ -569,7 +569,7 @@
 					MyStruct.fromString.apply(out, arguments)
 					return out
 				}
-				structInit(out, 0, arguments, 0, 0)
+				define.arraySplat(out, 0, arguments, 0, 0)
 				return out
 			}
 			if(define.debug && id){ // give the thing a name we can read
@@ -598,7 +598,6 @@
 				o[i] = src[i]
 			}
 		}
-
 
 		Struct.keyInfo = function(key){
 			var type = this.def[key]
@@ -704,7 +703,7 @@
 					for(var i = 0; i < init_array.length; i++) obj.array[i] = init_array[i]
 					obj.length = length
 				}
-				else length = parseInt(structInit(this.array, 0, init_array, 0, 1) / mysize)
+				else length = parseInt(define.arraySplat(this.array, 0, init_array, 0, 1) / mysize)
 			}
 			return obj
 		}
@@ -779,7 +778,7 @@
 			var len = arguments.length - 1, base = index * this.slots
 			this.clean = false
 			if(len === this.slots) for(var i = 0; i < len; i++) this.array[base + i] = arguments[i + 1]
-			else structInit(this.array, base, arguments, 1)
+			else define.arraySplat(this.array, base, arguments, 1)
 			return this
 		}
 
@@ -790,7 +789,7 @@
 			var base = (this.length -1) * this.slots
 			var len = arguments.length
 			if(len === this.slots) for(var i = 0; i < len;i++) this.array[base + i] = arguments[i]
-			else structInit(this.array, base, arguments, 0)
+			else define.arraySplat(this.array, base, arguments, 0)
 		}
 
 		// triangle strip
@@ -852,6 +851,7 @@
 		}
 
 		self.setQuad = function(index){
+			this.clean = false
 			var arglen = arguments.length - 1
 			var slots = this.slots
 			if(arglen !== slots * 4) throw new Error('Please use individual components to set a quad')
@@ -870,6 +870,7 @@
 		}
 
 		self.pushQuad = function(){
+			this.clean = false
 			var slots = this.slots
 			if(arguments.length !== slots * 4) throw new Error('Please use individual components to set a quad for '+slots)
 			var off = this.length * slots
@@ -1140,7 +1141,7 @@
 					console.clear()
 					var old_module = define.module[msg.file]
 					define.reload_id++
-					if(old_module && typeof old_module.exports === 'function'){
+					if(define.partial_reload && old_module && typeof old_module.exports === 'function'){
 						// lets wipe the old module
 						define.module[msg.file] = define.factory[msg.file] = undefined
 

@@ -1,5 +1,7 @@
 define.class(function(require){
 
+	var parse = new (require('$parsers/onejsparser'))()
+
 	this.atConstructor = function(cursorset, editor, textbuf){
 		this.cursorset = cursorset
 		this.editor = editor
@@ -20,10 +22,10 @@ define.class(function(require){
 	})
 
 	Object.defineProperty(this, 'hi', {
-		get:function(){ 
+		get: function(){ 
 			return this.end > this.start? this.end: this.start 
 		},
-		set:function(v){
+		set: function(v){
 			if(this.end > this.start) this.end = v
 			else this.start = v
 		}
@@ -40,14 +42,14 @@ define.class(function(require){
 		if(this.end < 0) this.end = 0
 		if(!only_end) this.start = this.end
 		// 
-		this.max = textbuf.cursorRect(this.end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	this.moveRight = function(only_end){
 		this.end = this.end + 1
 		if(this.end > this.textbuf.char_count) this.end = this.textbuf.char_count
 		if(!only_end) this.start = this.end
-		this.max = this.textbuf.cursorRect(end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	this.moveUp = function(only_end, lines){
@@ -182,13 +184,13 @@ define.class(function(require){
 		this.start += this.cursorset.delta
 		this.end += this.cursorset.delta
 
-		if(this.editor.stripNextOnBackspace(this.lo - 1)){
+		if(this.editor.stripNextOnBackspace && this.editor.stripNextOnBackspace(this.lo - 1)){
 			hi++
 		}
 
 		var t
-		if(parse.isNonNewlineWhiteSpace(layer.charCodeAt(this.lo - 1))){
-			while(t = parse.isNonNewlineWhiteSpace(layer.charCodeAt(this.lo - 1))){
+		if(parse.isNonNewlineWhiteSpace(this.textbuf.charCodeAt(this.lo - 1))){
+			while(t = parse.isNonNewlineWhiteSpace(this.textbuf.charCodeAt(this.lo - 1))){
 				this.lo = this.lo - 1
 				if(t == 2) break
 			}
@@ -228,7 +230,7 @@ define.class(function(require){
 		if(text.length){
 			var len =  this.textbuf.insertText(this.lo, text)
 			this.cursorset.delta += len
-			editor.addUndoDelete(this.lo, this.lo + len)
+			this.editor.addUndoDelete(this.lo, this.lo + len)
 		}	
 		this.editor.forkRedo()
 		this.start = this.end = this.lo + text.length + cdelta

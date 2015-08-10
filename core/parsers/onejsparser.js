@@ -502,6 +502,7 @@ define.class(function(require, exports, self){
 
 	// Test whether a given character code starts an identifier.
 
+	exports.isIdentifierStart = 
 	self.isIdentifierStart = function(code) {
 		if (code < 65) return code === 36 || code === 35 
 		if (code < 91) return true
@@ -511,7 +512,7 @@ define.class(function(require, exports, self){
 	}
 
 	// Test whether a given character is part of an identifier.
-
+	exports.isIdentifierChar = 
 	self.isIdentifierChar = function(code) {
 		if (code < 48) return code === 36 || code === 35
 		if (code < 58) return true
@@ -523,16 +524,19 @@ define.class(function(require, exports, self){
 		return code >= 0xaa && this.nonASCIIidentifier.test(String.fromCharCode(code))
 	}
 
+	exports.isNewLine =
 	self.isNewLine = function(code){
 		return this.newline.test(String.fromCharCode(code))
 	}
 
+	exports.isNonNewlineWhiteSpace =
 	self.isNonNewlineWhiteSpace = function(code) {
 		if(code == 32) return true
 		if(code == 9) return true
 		return code >= 0xaa && this.nonASCIIwhitespace.test(String.fromCharCode(code))
 	}
 
+	exports.isWhiteSpace =
 	self.isWhiteSpace = function(code) {
 		if(code == 32) return true
 		if(code == 9) return true

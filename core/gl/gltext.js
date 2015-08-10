@@ -108,7 +108,8 @@ define.class('$gl/glshader', function(require, exports, self){
 			var length = string.length
 			// alright lets convert some text babeh!
 			for(var i = 0; i < length; i++){
-				var unicode = string.charCodeAt(i)
+	
+				var unicode = string.struct? string.array[i*4]: string.charCodeAt(i)
 				var info = this.font.glyphs[unicode]
 				if(!info) info = this.font.glyphs[32]
 				// lets add some vertices
@@ -122,11 +123,125 @@ define.class('$gl/glshader', function(require, exports, self){
 		}
 
 		this.__defineGetter__('char_count', function(){
-			return this.quadLength()
+			return this.lengthQuad()
 		})
 
-		this.charCodeAt = function(pos){
-			return this.array[pos*6 + 5]
+		// get the character coordinates
+		this.charCoords = function(off){
+			var info = this.font.glyphs[this.charCodeAt(off)]
+			var coords = {
+				x: this.array[off*6*8 + 0] - this.font_size * info.min_x,
+				y: this.array[off*6*8 + 1] - this.font_size * info.min_y,
+				w: info.advance * this.font_size,
+				h: this.line_height
+			}
+			return coords
+		}
+
+		this.offsetFromPos = function(x, y){
+			var height = this.line_height
+
+			if(y < 0) return -2
+
+			for(var len = this.lengthQuad(), o = len - 1; o >= 0; o--){
+
+				var char_code = this.charCodeAt(o)
+				var info = this.font.glyphs[char_code]
+
+				var y2 = this.array[o*6*8 + 1] + this.font_size * info.min_y + this.font_size * this.cursor_sink
+				var y1 = y2 - this.line_height
+
+				if(y>=y1 && y<=y2){
+					var hx = (this.array[o*6*8 + 0] + this.array[o*6*8 + 0 + 8])/2
+					
+					var tl_x = this.array[o*6*8 + 0]
+					var tr_x = this.array[o*6*8 + 0 + 8]
+					if(this.charCodeAt(o-1) == 10 && x< tl_x){
+						return o 
+					}
+					if(x >= tl_x && x <= hx){
+						return o
+					}
+					if(o == 0 && x < tl_x){
+						return -1 // to the left
+					}
+					if(o == len - 1 && x > tr_x){
+						if(char_code ==10) return o
+						return -4 // to the right of self
+					}
+					if(x > hx){
+						if(char_code == 10) return o
+						return o + 1
+					}
+				}
+				if(y>y2){
+					//console.log(y, y2, '#'+serializeText()+'#')
+					return -3 // below self
+				}
+			}
+			return -2 // above self
+		}
+
+		this.cursorRect = function(off){
+			if(off >= this.lengthQuad()){
+				return {
+					x:this.add_x,
+					y:this.add_y,
+					w:0,
+					h:this.line_height
+				}
+			}
+			var coords = this.charCoords(off)
+			coords.y -= coords.h - this.font_size * this.cursor_sink
+			return coords
+		}
+
+		this.charCodeAt = function(off){
+			return this.array[off*6*8 + 4]
+		}
+
+		this.serializeText = function(start, end){
+			var str = ''
+			for(var i = start; i < end; i++){
+				str += String.fromCharCode(this.charCodeAt(i))
+			}
+			return str
+		}
+
+		this.serializeTags = function(start, end){
+			// lets serialize the tags array
+			var out = vec4.array(end - start)
+			for(var i = start; i < end; i++){
+				out.push(
+					this.array[i*6*8 + 4],
+					this.array[i*6*8 + 5],
+					this.array[i*6*8 + 6],
+					this.array[i*6*8 + 7])
+			}
+			return out
+		}
+
+		this.insertText = function(off, text){
+			// ok lets pull in the 'rest' as string
+			var str = this.serializeText(off, this.lengthQuad())
+			// lets set the length and start adding
+			var rect = this.cursorRect(off)
+			this.add_x = rect.x
+			this.add_y = 0
+			this.length = off * 6
+			this.add(text)
+			this.add(str)
+			return text.length
+		}
+
+		this.removeText = function(off, end){
+			var str = this.serializeText(end, this.lengthQuad())
+			var rect = this.cursorRect(off)
+			this.add_x = rect.x
+			this.add_y = 0
+			this.length = off * 6
+			this.add(str)
+			return str.length
 		}
 	})
 
@@ -369,7 +484,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		} 
 		if(arc_list.num_endpoints == -1) {
 			/* single-line */
-			var angle = arc_list.line_angle 
+			var angle = arc_list.line_angle //+ 90.*time
 			var n = vec2(cos(angle), sin(angle))
 			return dot(p -(vec2(nominal_size) * .5), n) - arc_list.line_distance
 		}

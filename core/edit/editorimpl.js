@@ -2,7 +2,7 @@ define.mixin(function(require){
 
 	var CursorSet = require('$edit/cursorset')
 	var Cursor = require('./cursor')
-	var parse = require('$parsers/onejsparser')
+	var parse = new (require('$parsers/onejsparser'))()
 
 	this.addUndoInsert = function(start, end, stack){
 		if(!stack) stack = this.undo_stack
@@ -45,7 +45,7 @@ define.mixin(function(require){
 
 	this.forkRedo = function(){
 		if(this.undo_stack.length){
-			this.undo_stack[undo_stack.length - 1].redo = redo_stack
+			this.undo_stack[this.undo_stack.length - 1].redo = this.redo_stack
 		}
 		this.redo_stack = []
 	}
@@ -134,9 +134,9 @@ define.mixin(function(require){
 		this.cursors = new CursorSet(this, this.textbuf)
 		this.undo_stack = []
 		this.redo_stack = []
-		this.undo_group = 0
-
-		this.cursors.moveDown(1, 0)
+		this.undo_group = 0	
+		this.cursors.update()
+		//this.cursors.moveDown(0, 0)
 	}
 
 	this.clipPaste = function(v){
@@ -145,25 +145,25 @@ define.mixin(function(require){
 		//change = Change.clipboard
 	}
 
-	this.keyPress = function(v){
+	this.keypress = function(v){
 		this.undo_group++
 		this.cursors.insert(v.value)
 		//change = Change.keyPress		
 	}
 
-	this.keyDown = function(v){
-		this.clipboard.focus()
+	this.keydown = function(v){
+		this.keyboard.clipboard.focus()
 		var name = 'key' + v.name[0].toUpperCase() + v.name.slice(1)
 		this.undo_group++
 
-		if(this.key.leftmeta || this.key.rightmeta) name += 'Cmd'
-		if(this.key.ctrl) name += 'Ctrl'
-		if(this.key.alt) name += 'Alt'
+		if(this.keyboard.leftmeta || this.keyboard.rightmeta) name += 'Cmd'
+		if(this.keyboard.ctrl) name += 'Ctrl'
+		if(this.keyboard.alt) name += 'Alt'
 
 		if(this[name]) this[name](v)
-		else if(this.key.alt){
+		else if(this.keyboard.alt){
 			name = v.name
-			if(this.key.shift) name = '_'+name
+			if(this.keyboard.shift) name = '_' + name
 			var trans = utfmap[name]
 			if(typeof trans == 'number'){ // we have to do a 2 step unicode
 				console.log('2 step unicode not implemented')
@@ -177,21 +177,19 @@ define.mixin(function(require){
 
 	this.mouseLeftDown = function(v){
 		//console.log(mouse.clicker)
-		var mouse = this.screen.mouse
-		var key = this.screen.key
 
-		if(key.alt){
-			var startx = mouse.x
-			var starty = mouse.y
+		if(this.keyboard.alt){
+			var startx = this.mouse.x
+			var starty = this.mouse.y
 			var clone
-			if(key.leftmeta || key.rightmeta) clone = this.cursors.list
+			if(this.keyboard.leftmeta || this.keyboard.rightmeta) clone = this.cursors.list
 			else clone = []
 
 			this.cursors.rectSelect(startx, starty, startx, starty, clone)
 			this.cursors.fusing = false
 			
 			this.mouseCapture(function(){
-					this.cursors.rectSelect(startx, starty, mouse.x, mouse.y, clone)
+					this.cursors.rectSelect(startx, starty, this.mouse.x, this.mouse.y, clone)
 				}.bind(this),
 				function(){
 					this.cursors.fusing = true
@@ -202,23 +200,23 @@ define.mixin(function(require){
 			)
 			
 		}
-		else if(this.key.leftmeta || this.key.rightmeta){
+		else if(this.keyboard.leftmeta || this.keyboard.rightmeta){
 			var cursor = this.cursors.add()
 			// in that case what we need to 
 			this.cursors.fusing = false
-			this.cursor.moveTo(mouse.x, mouse.y)
+			this.cursor.moveTo(this.mouse.x, this.mouse.y)
 			// lets make it select the word 
 
-			if(mouse.clicker == 2) cursor.selectWord()
-			else if(mouse.clicker == 3){
+			if(this.mouse.clicker == 2) cursor.selectWord()
+			else if(this.mouse.clicker == 3){
 				cursor.selectLine()
-				mouse.resetClicker()
+				this.mouse.resetClicker()
 			}
 
 			this.cursors.update()
 			this.mouseCapture(function(){
 				// move
-				cursor.moveTo(mouse.x, mouse.y, true)
+				cursor.moveTo(this.mouse.x, this.mouse.y, true)
 				this.cursors.update()
 			}.bind(this), function(){
 				this.cursors.fusing = true
@@ -230,16 +228,16 @@ define.mixin(function(require){
 		else{
 			// in that case what we need to 
 			this.cursors.fusing = true
-			this.cursors.moveTo(mouse.x, mouse.y)
+			this.cursors.moveTo(this.mouse.x, this.mouse.y)
 
-			if(mouse.clicker == 2) cursors.selectWord()
-			else if(mouse.clicker == 3){
+			if(this.mouse.clicker == 2) cursors.selectWord()
+			else if(this.mouse.clicker == 3){
 				cursors.selectLine()
-				mouse.resetClicker()
+				this.mouse.resetClicker()
 			}
 
 			this.mouseCapture(function(){
-				cursors.moveTo(mouse.x, mouse.y, true)
+				cursors.moveTo(this.mouse.x, this.mouse.y, true)
 			}.bind(this), function(){
 				selectionToClipboard()
 			}.bind(this))
@@ -249,14 +247,14 @@ define.mixin(function(require){
 	// alright so. undo. 
 	this.keyZCtrl =
 	this.keyZCmd = function(){
-		this.undoRedo(undo_stack, redo_stack)
+		this.undoRedo(this.undo_stack, this.redo_stack)
 		//change = Change.undoRedo
 		//doCursor()
 	}
 
 	this.keyYCtrl =
 	this.keyYCmd = function(){
-		this.undoRedo(redo_stack, undo_stack)
+		this.undoRedo(this.redo_stack, this.undo_stack)
 		//change = Change.undoRedo
 		//doCursor()
 	}
@@ -324,55 +322,55 @@ define.mixin(function(require){
 
 	this.keyLeftArrowCtrl = 
 	this.keyLeftarrowAlt = function(){
-		this.cursors.moveLeftWord(this.screen.keyboard.shift)
+		this.cursors.moveLeftWord(this.keyboard.shift)
 		this.doCursor()
 	}
 	
 	this.keyRightArrowCtrl = 
 	this.keyRightarrowAlt = function(){
-		this.cursors.moveRightWord(this.screen.keyboard.shift)
+		this.cursors.moveRightWord(this.keyboard.shift)
 		this.doCursor()
 	}
 
 	this.keyLeftarrowCmd = function(){
-		this.cursors.moveLeftLine(this.screen.keyboard.shift)
+		this.cursors.moveLeftLine(this.keyboard.shift)
 		this.doCursor()
 	}
 
 	this.keyRightarrowCmd = function(){
-		this.cursors.moveRightLine(this.screen.keyboard.shift)
+		this.cursors.moveRightLine(this.keyboard.shift)
 		this.doCursor()
 	}
  
 	this.keyHome = 
 	this.keyUparrowCmd = function(){
-		this.cursors.moveTop(this.screen.keyboard.shift)
+		this.cursors.moveTop(this.keyboard.shift)
 		this.doCursor()
 	}
 
 	this.keyEnd = 
 	this.keyDownarrowCmd = function(){
-		this.cursors.moveBottom(this.screen.keyboard.shift)
+		this.cursors.moveBottom(this.keyboard.shift)
 		this.doCursor()
 	}
 
 	this.keyLeftarrow = function(){ 
-		this.cursors.moveLeft(this.screen.keyboard.shift)
+		this.cursors.moveLeft(this.keyboard.shift)
 		this.doCursor()
 	}
 
 	this.keyRightarrow = function(){
-		this.cursors.moveRight(this.screen.keyboard.shift)
+		this.cursors.moveRight(this.keyboard.shift)
 		this.doCursor()
 	}
 
 	this.keyUparrow = function(){
-		this.cursors.moveUp(this.screen.keyboard.shift)
+		this.cursors.moveUp(this.keyboard.shift)
 		this.doCursor()
 	}
 
 	this.keyDownarrow = function(){
-		this.cursors.moveDown(this.screen.keyboard.shift)
+		this.cursors.moveDown(this.keyboard.shift)
 		this.doCursor()
 	}
 })
