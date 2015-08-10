@@ -204,18 +204,17 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.pos = [0,0];
 		this.flexdirection = "column" ;
 
-		console.log("total size: " , this._width, this._height);
 		
 		this._top = 0;
 		this._left =0;
 		this._right = this._width;
 		this._bottom = this._height;
 		FlexLayout.fillNodes(this);
-		 this.dumpLayout(this, true);
+	//	 this.dumpLayout(this, true);
 
 		FlexLayout.computeLayout(this);
 		this.dumped = 1;	
-		 this.dumpLayout(this, false);
+	//	 this.dumpLayout(this, false);
 		// this.dumpStructure(this);
 	}
 

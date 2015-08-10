@@ -170,7 +170,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		}
 		
 		this.texturecache = function(){
-			console.log("setting texturecaching: ", this.texturecache);
+			//console.log("setting texturecaching: ", this.texturecache);
 			this.enableTextureCache(this.texturecache);
 		}
 		
