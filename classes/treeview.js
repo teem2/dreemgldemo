@@ -4,23 +4,24 @@
 define.class(function(sprite, text, view){
 
 	var testdata = {
-		name:'node0',
+		name:'node 0',
 		children:[
-				{name:'node1',	children:[
-						{name:'node1a'}
+				{name:'node 0-0',	children:[
+						{name:'node 0-0-0 '}
 					]},
-				{name:'node1',	children:[
-						{name:'node1a'}
+				{name:'node 0-1',	children:[
+						{name:'node 0-1-0'}
 					]},
-				{name:'node2' },
-				{name:'node1',	children:[
-						{name:'node1a'},
-						{name:'node1',	children:[
-							{name:'node1a',	children:[
-									{name:'node1a',	children:[
+				{name:'node 0-2' },
+				{name:'node 0-3',	children:[
+						{name:'node 0-3-0'},
+						{name:'node 0-3-1',	children:[
+							{name:'node 0-3-1-0',	children:[
+									{name:'node 0-3-1-0-0', children:[
 											{name:'node1a'}
 										]}
-								]},{name:'oddnode'}
+								]},
+								{name:'oddnode WTF IS WRONG WITH YOU'}
 							]}
 					]},
 			]}
@@ -33,18 +34,18 @@ define.class(function(sprite, text, view){
 
 		// collapsible subbox: 
 		// recursive treeitmes
-		var res = view({ flexdirection:"column", margin: 0, padding: 0, bgcolor: "#304030" , tag:"treeitem container"}, text({ text:'- ' + node.name, margin: 0, height: 30,width: 100 , tag: "item label", bgcolor: "transparent" }));
 		
+		var res = view({ flexdirection:"column", margin: 0, padding: 0, bgcolor: "#308030" , tag:"treeitem container"}, text({ text:'- ' + node.name, height: 20,width: 100 , tag: "item label", bgcolor: "transparent" }));
 		
 		
 		if (node.children && node.children.length > 0) {	
-			var container = view({  bgcolor: "teal" , flexdirection: "column", margin:vec4(10,0,0,0), paddingleft: 15, tag: "subitem container"});
+			var container = view({  bgcolor: "teal" , flexdirection: "column", paddingleft: 10, tag: "subitem container"});
 			res.children.push(container);
 			container.children = [];
 			
-			for (a in node.children) {
-				var subres = recur(node.children[a]);
-				container.children.push(subres);
+			for (var a in node.children) 
+			{				
+				container.children.push(recur(node.children[a]));
 			}
 		}
 
@@ -63,7 +64,7 @@ define.class(function(sprite, text, view){
 	this.render = function(){
 		// ok so how do we process the testdata
 		// lets make a textnode
-		var treeres = view({bgcolor: "blue", alignItems: "flex-start", flexdirection:"row", alignself: 'stretch', alignitems: 'stretch' },recur(testdata));;
+		var treeres = view({bgcolor: "blue", flexdirection:"column", flex: 1, alignself:"stretch"  },recur(testdata));;
 		
 		//viewtree(treeres,"");	
 		
