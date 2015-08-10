@@ -15,7 +15,7 @@ define.class('$gl/glshader', function(require, exports, self){
 	this.position = "glyphy_mesh()"
 	this.textcolor = vec4(0.9, 0.9, 0.9, 1);
 	this.color = "glyphy_pixel()"//" * textcolor"
-
+	this.fgcolor = vec4("blue");
 	// lets define a custom struct and subclass the array
 	this.text = define.struct({
 		pos:vec2,
@@ -802,6 +802,6 @@ define.class('$gl/glshader', function(require, exports, self){
 		//	alpha = pow(alpha, 1. / mesh.gamma_adjust.r)
 		}
 		
-		return vec4(mesh.fgcolor.rgb, alpha * mesh.fgcolor.a)
+		return vec4(fgcolor.rgb, alpha * fgcolor.a)
 	}
 })

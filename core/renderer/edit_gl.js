@@ -48,13 +48,15 @@ define.class('./sprite_gl', function(require, exports, self){
 
 		this.textbuf = this.fg.newText()
 		this.textbuf.font_size = this.fontsize;
-		this.textbuf.fgcolor = vec4('white')
+		//this.textbuf.fgcolor = vec4('white')
+		
 		this.textbuf.start_y = this.fontsize
 		this.textbuf.clear()
 		this.textbuf.add(this.text)
 
 		//console.log(this.textbuf.charCoords(0))
 		this.fg.mesh = this.textbuf
+		
 		this.cursor.mesh = this.cursor.cursorgeom.array()
 		this.markers.mesh = this.markers.markergeom.array()
 
@@ -84,7 +86,7 @@ define.class('./sprite_gl', function(require, exports, self){
 
 		this.cursor._matrix = this.bg._matrix
 		this.cursor.draw(this.screen.device)
-
+			
 		this.fg.draw(this.screen.device)
 	}
 
