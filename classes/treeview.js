@@ -17,7 +17,7 @@ define.class(function(sprite, text){
 
 	function recur(node, ox, oy){
 		var accum = 0
-		return text({x:ox, y:20 + oy * 20, text:'- ' + node.name},
+		return text({x:ox, y:20 + oy * 20, text:'- ' + node.name, position: "relative" },
 			node.children && node.children.map(function(value, i){ return recur(value, ox+10, accum++);})
 		)
 	}
