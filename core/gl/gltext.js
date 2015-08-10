@@ -72,7 +72,7 @@ define.class('$gl/glshader', function(require, exports, self){
 			this.add_y = this.start_y //=== null? this.min_y:0
 		}
 
-		this.addGlyph = function(info, unicode){
+		this.addGlyph = function(info, unicode, m1, m2, m3){
 			var x1 = this.add_x + this.font_size * info.min_x
 			var x2 = this.add_x + this.font_size * info.max_x
 			var y1 = this.add_y - this.font_size * info.min_y
@@ -91,10 +91,10 @@ define.class('$gl/glshader', function(require, exports, self){
 				var gy = ((info.atlas_y<<6) | info.nominal_h)<<1
 				
 				this.pushQuad(
-					x1, y1, gx, gy, unicode, 0, 0, 0,
-					x2, y1, gx|1, gy, unicode, 0, 0, 0,
-					x1 + italic, y2, gx, gy|1, unicode, 0, 0, 0,
-					x2 + italic, y2, gx|1, gy|1, unicode, 0, 0, 0
+					x1, y1, gx, gy, unicode, m1, m2, m3,
+					x2, y1, gx|1, gy, unicode, m1, m2, m3,
+					x1 + italic, y2, gx, gy|1, unicode, m1, m2, m3,
+					x2 + italic, y2, gx|1, gy|1, unicode, m1, m2, m3
 				)
 			}
 			this.add_x += info.advance * this.font_size
@@ -102,9 +102,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		}
 
 		// lets add some strings
-		this.add = function(string, x, y){
-			if(x !== undefined) this.add_x = x 
-			if(y !== undefined) this.add_y = y 
+		this.add = function(string, m1, m2, m3){
 			var length = string.length
 			// alright lets convert some text babeh!
 			for(var i = 0; i < length; i++){
@@ -113,7 +111,7 @@ define.class('$gl/glshader', function(require, exports, self){
 				var info = this.font.glyphs[unicode]
 				if(!info) info = this.font.glyphs[32]
 				// lets add some vertices
-				this.addGlyph(info, unicode)
+				this.addGlyph(info, unicode, m1, m2, m3)
 				if(unicode == 10){ // newline
 					this.add_x = this.start_x
 					this.add_y += this.font_size * this.line_spacing
