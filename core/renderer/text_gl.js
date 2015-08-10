@@ -20,6 +20,7 @@ define.class('./sprite_gl', function(require, exports, self){
 			this.rendered_text = this.text
 			var textbuf = this.fg.newText()
 			textbuf.font_size = this.fontsize;
+			textbuf.add_y = textbuf.line_height;
 			textbuf.fgcolor = this.color
 			textbuf.add(this.text)
 			//this.fg.textcolor = this.color;

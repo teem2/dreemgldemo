@@ -168,14 +168,15 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 	
 	this.dumped = 1;	
-	this.dumpLayout = function(node, depth){
+	this.dumpLayout = function(node, styleorlayout, depth){
 		if (this.dumped<=0) return;
 		if (!depth) depth = "";
 	//	if (depth === ""){
-		console.log(depth, node.constructor.name, node.layout);
+		
+		console.log(depth, node.constructor.name,styleorlayout?node.style: node.layout);
 //		}
 		for (var i = 0; i < node.children.length; i++) {
-			this.dumpLayout(node.children[i], depth + " " );
+			this.dumpLayout(node.children[i],styleorlayout, depth + " " );
 		}
 		if (depth ==="")  this.dumped --;
 	}
@@ -196,21 +197,30 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.performLayout = function(){
 		this._width = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
 		this._height = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
+		this.size = [this._width, this._height];
+		this.pos = [0,0];
+		this.flexdirection = "column" ;
+
+		console.log("total size: " , this._width, this._height);
 		
 		this._top = 0;
 		this._left =0;
 		this._right = this._width;
 		this._bottom = this._height;
-		
 		FlexLayout.fillNodes(this);
+		 this.dumpLayout(this, true);
+
 		FlexLayout.computeLayout(this);
-		// this.dumpLayout(this);
+		this.dumped = 1;	
+		 this.dumpLayout(this, false);
 		// this.dumpStructure(this);
 	}
 
 	this.draw = function (time) {
 		this.draw_calls = 0
 		var anim = this.doAnimation(time)
+		
+		this.performLayout();
 //		var delta = Date.now()
 		this.time = time// Date.now()
 	//	console.log(this.time)		
