@@ -78,7 +78,7 @@ define.mixin(function(require){
 	this.selectionToClipboard = function(){
 		// alright. so. we need to sort the cursors.
 		var str = this.cursors.serializeSelection()
-		//clipboard.value = str
+		this.keyboard.clipboard = str
 	}
 
 	this.scanLeftWord = function(pos){
@@ -139,7 +139,7 @@ define.mixin(function(require){
 		//this.cursors.moveDown(0, 0)
 	}
 
-	this.clipPaste = function(v){
+	this.keypaste = function(v){
 		this.undo_group++
 		this.cursors.insert(v)
 		//change = Change.clipboard
@@ -152,7 +152,7 @@ define.mixin(function(require){
 	}
 
 	this.keydown = function(v){
-		this.keyboard.clipboard.focus()
+		this.keyboard.textarea.focus()
 		var name = 'key' + v.name[0].toUpperCase() + v.name.slice(1)
 		this.undo_group++
 

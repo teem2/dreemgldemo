@@ -7,7 +7,6 @@ define.class('$base/node', function (require, exports, self){
 	this.event('down')
 	this.event('press')
 	this.event('paste')
-	this.event('cut')
 
 	this.toKey = { // slap a usable name on keys
 		8:'backspace',9:'tab',13:'enter',16:'shift',17:'ctrl',18:'alt',
@@ -126,24 +125,30 @@ define.class('$base/node', function (require, exports, self){
 		}.bind(this))
 
 
-		this.clipboard = document.createElement('textarea')
-		this.clipboard.style.width = '0px'
-		this.clipboard.style.height = '0px'
-		this.clipboard.style.position = 'absolute'
-		this.clipboard.style.zIndex = -10000000
-		document.body.appendChild(this.clipboard)
+		this.textarea = document.createElement('textarea')
+		this.textarea.style.width = '0px'
+		this.textarea.style.height = '0px'
+		this.textarea.style.position = 'absolute'
+		this.textarea.style.zIndex = -10000000
+		document.body.appendChild(this.textarea)
 
-		this.clipboard.onpaste = function(e){
+		this.textarea.onpaste = function(e){
 			var text = e.clipboardData.getData('text/plain')
+			this._clipboard = text
 			this.emit('paste', text)
 		}.bind(this)
 
-		this.clipboard.focus()
-
-		this.cut = function(v){
-			this.clipboard.value = v
-			this.clipboard.select()
-			this.clipboard.focus()
-		}
+		Object.defineProperty(this, 'clipboard', {
+			get:function(){
+				return this._clipboard
+			},
+			set:function(value){
+				this._clipboard = value
+				this.textarea.value = value
+				this.textarea.select()
+				this.textarea.focus()
+			}
+		})
+		this.textarea.focus()
 	}
 })

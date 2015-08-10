@@ -2,7 +2,10 @@ define.browser(function(require, screen, view, edit, text, myview, treeview){
 	this.render = function(){return[
 		myview({w:1920,h:1080})
 		,treeview({})
-		,edit({x:100,y:0,w:300,h:80,fontsize:60, text:'My\nMultiline\nValue'})
+		,edit({x:100,y:0,w:300,h:80,fontsize:60, 
+			'bg.color':function(){
+				return vec4(0.4)
+			},text:'Type\nHere\nMultiline'})
 		//,edit({x:100,y:30,w:300,h:80,fontsize:60, text:'MyValue'})
 
 			//view({x:0,y:0,w:100,h:100}))

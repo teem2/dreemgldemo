@@ -190,18 +190,20 @@ define.class(function(require){
 		this.start += this.cursorset.delta
 		this.end += this.cursorset.delta
 
-		if(this.editor.stripNextOnBackspace && this.editor.stripNextOnBackspace(this.lo - 1)){
-			hi++
-		}
+		if(this.editor.stripNextOnBackspace){
+			if(this.editor.stripNextOnBackspace(this.lo - 1)){
+				hi++
+			}
 
-		var t
-		if(parse.isNonNewlineWhiteSpace(this.textbuf.charCodeAt(this.lo - 1))){
-			while(t = parse.isNonNewlineWhiteSpace(this.textbuf.charCodeAt(this.lo - 1))){
-				this.lo = this.lo - 1
-				if(t == 2) break
+			var t
+			if(parse.isNonNewlineWhiteSpace(this.textbuf.charCodeAt(this.lo - 1))){
+				while(t = parse.isNonNewlineWhiteSpace(this.textbuf.charCodeAt(this.lo - 1))){
+					this.lo = this.lo - 1
+					if(t == 2) break
+				}
 			}
 		}
-
+		
 		if(this.lo == 0) return
 		this.editor.addUndoInsert(this.lo -1, this.hi)
 		this.textbuf.removeText(this.lo - 1, this.hi)

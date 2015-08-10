@@ -96,6 +96,7 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.event("keyup")
 	this.event("keydown")
 	this.event("keypress")
+	this.event("keypaste")
 	
 	this.attribute("clipping", {type:boolean, value:false})
 

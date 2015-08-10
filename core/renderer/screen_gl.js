@@ -311,6 +311,12 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.focus_object.emit('keypress', v)
 		}.bind(this)
 
+		this.keyboard.paste = function(v){
+			// lets reroute it to the element that has focus
+			if(!this.focus_object) return
+			this.focus_object.emit('keypaste', v)
+		}.bind(this)
+
 		this.mouse.move = function () {
 			if (this.mousecapture){
 				this.setguid (this.lastmouseguid);
