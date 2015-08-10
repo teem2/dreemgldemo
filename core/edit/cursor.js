@@ -54,23 +54,29 @@ define.class(function(require){
 
 	this.moveUp = function(only_end, lines){
 		if(!lines) lines = 1
-		var rect = this.textbuf.cursorRect(end)
+		var rect = this.textbuf.cursorRect(this.end)
 		//console.log(max, rect.y + .5*rect.h - lines * cursorset.text_layer.line_height)
 		//cursorset.text_layer.debugChunks()
 		this.end = this.textbuf.offsetFromPos(this.max, rect.y + .5*rect.h - lines * this.textbuf.line_height)
-		if(!only_end) start = end
+		if(this.end < 0) this.end = 0
+		if(!only_end) this.start = this.end
 	}
 
 	this.moveDown = function(only_end, lines){
 		if(!lines) lines = 1
 		var rect = this.textbuf.cursorRect(this.end)
 		this.end = this.textbuf.offsetFromPos(this.max, rect.y + .5*rect.h + lines * this.textbuf.line_height)
+		if(this.end < 0) this.end = this.textbuf.char_count
 		if(!only_end) this.start = this.end
 	}
 
 	this.moveTo = function(x, y, only_end){
 		var off = this.textbuf.offsetFromPos(x, y)
-		var change = end != off 
+		if(off<0){
+			if(off === -4 || off === -3) off = this.textbuf.lengthQuad()
+			else off = 0
+		}
+		var change = this.end != off 
 		this.end = off
 		if(!only_end) change = this.start != this.end || change, this.start = this.end
 		var r = this.textbuf.cursorRect(off)
@@ -82,7 +88,7 @@ define.class(function(require){
 		if(pos == this.end) this.end --
 		else this.end = pos
 		if(!only_end) this.start = this.end
-		this.max = this.textbuf.cursorRect(end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	this.moveRightWord = function(only_end){
@@ -90,32 +96,32 @@ define.class(function(require){
 		if(pos == this.end) this.end ++
 		else this.end = pos
 		if(!only_end) this.start = this.end
-		this.max = this.textbuf.cursorRect(end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	this.moveLeftLine = function(only_end){
 		// if we are a tab we scan to the right.
 		this.end = this.editor.scanLeftLine(this.end)
 		if(!only_end) this.start = this.end
-		this.max = this.textbuf.cursorRect(end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	this.moveRightLine = function(only_end){
 		this.end = this.editor.scanRightLine(this.end)
 		if(!only_end) this.start = this.end
-		this.max = this.textbuf.cursorRect(end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	this.moveTop = function(only_end){
 		this.end = 0
 		if(!only_end) this.start = this.end
-		this.max = this.textbuf.cursorRect(end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	this.moveBottom = function(only_end){
 		this.end = this.textbuf.char_count
 		if(!only_end) this.start = this.end
-		this.max = this.textbuf.cursorRect(end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	// we need to make a whole bunch of these things.
@@ -127,7 +133,7 @@ define.class(function(require){
 		this.start = this.end = from
 
 		this.editor.forkRedo()
-		this.max = this.textbuf.cursorRect(end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	this.deleteWord = function(){
@@ -179,7 +185,7 @@ define.class(function(require){
 	}
 
 	this.backspace = function(){
-		if(this.start != this.end) return deleteRange(this.lo, this.hi)
+		if(this.start != this.end) return this.deleteRange(this.lo, this.hi)
 
 		this.start += this.cursorset.delta
 		this.end += this.cursorset.delta
@@ -195,14 +201,6 @@ define.class(function(require){
 				if(t == 2) break
 			}
 		}
-		//else if(parse.isNonNewlineWhiteSpace(cursorset.text_layer.charCodeAt(lo - 2))){
-		//	var my_ch = cursorset.text_layer.charCodeAt(lo - 1)
-		//	var prev_ch = cursorset.text_layer.charCodeAt(lo - 3)
-
-		//	if( !parse.isIdentifierChar(my_ch) && !parse.isIdentifierChar(prev_ch) ){
-		//		lo = lo - 2
-		//	}
-		//}
 
 		if(this.lo == 0) return
 		this.editor.addUndoInsert(this.lo -1, this.hi)

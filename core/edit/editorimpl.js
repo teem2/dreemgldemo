@@ -175,36 +175,33 @@ define.mixin(function(require){
 		}
 	}
 
-	this.mouseLeftDown = function(v){
-		//console.log(mouse.clicker)
+	this.mouseleftup = function(){
+		this.cursors.fusing = true
+		this.cursors.update()
+		// we are done. serialize to clipboard
+		this.selectionToClipboard()	
+		this.onmousemove = function(){}
+	}
 
+	this.mouseleftdown = function(start){
+		//console.log(mouse.clicker)
 		if(this.keyboard.alt){
-			var startx = this.mouse.x
-			var starty = this.mouse.y
 			var clone
 			if(this.keyboard.leftmeta || this.keyboard.rightmeta) clone = this.cursors.list
 			else clone = []
 
-			this.cursors.rectSelect(startx, starty, startx, starty, clone)
+			this.cursors.rectSelect(start[0], start[1], start[0], start[1], clone)
 			this.cursors.fusing = false
-			
-			this.mouseCapture(function(){
-					this.cursors.rectSelect(startx, starty, this.mouse.x, this.mouse.y, clone)
-				}.bind(this),
-				function(){
-					this.cursors.fusing = true
-					this.cursors.update()
-					// we are done. serialize to clipboard
-					this.selectionToClipboard()	
-				}.bind(this)
-			)
-			
+
+			this.onmousemove = function(pos){
+				this.cursors.rectSelect(start[0], start[1], pos[0], pos[1], clone)
+			}			
 		}
 		else if(this.keyboard.leftmeta || this.keyboard.rightmeta){
-			var cursor = this.cursors.add()
+			var cursor = this.cursors.addCursor()
 			// in that case what we need to 
 			this.cursors.fusing = false
-			this.cursor.moveTo(this.mouse.x, this.mouse.y)
+			cursor.moveTo(start[0], start[1])
 			// lets make it select the word 
 
 			if(this.mouse.clicker == 2) cursor.selectWord()
@@ -214,33 +211,28 @@ define.mixin(function(require){
 			}
 
 			this.cursors.update()
-			this.mouseCapture(function(){
+
+			this.onmousemove = function(pos){
 				// move
-				cursor.moveTo(this.mouse.x, this.mouse.y, true)
+				cursor.moveTo(pos[0], pos[1], true)
 				this.cursors.update()
-			}.bind(this), function(){
-				this.cursors.fusing = true
-				this.cursors.update()
-				this.selectionToClipboard()
-			}.bind(this))
+			}
 		}
 		// normal selection
 		else{
 			// in that case what we need to 
 			this.cursors.fusing = true
-			this.cursors.moveTo(this.mouse.x, this.mouse.y)
+			this.cursors.moveTo(start[0], start[1])
 
 			if(this.mouse.clicker == 2) cursors.selectWord()
 			else if(this.mouse.clicker == 3){
-				cursors.selectLine()
+				this.cursors.selectLine()
 				this.mouse.resetClicker()
 			}
 
-			this.mouseCapture(function(){
-				cursors.moveTo(this.mouse.x, this.mouse.y, true)
-			}.bind(this), function(){
-				selectionToClipboard()
-			}.bind(this))
+			this.mousemove = function(pos){
+				this.cursors.moveTo(pos[0], pos[1], true)
+			}
 		}
 	}
 

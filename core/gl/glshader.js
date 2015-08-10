@@ -546,6 +546,9 @@ define.class('$base/node', function(require, exports, self){
 		var pix_state = glslgen.newState(this, vtx_state.varyings)
 
 		// support both immediate and expression color
+		if(this.color === undefined){
+			return
+		}
 		if(typeof this.color === 'object'){
 			if(this.color.length == 3) var pix_ast = {infer:vec3}
 			else var pix_ast = {infer:vec4}
@@ -1018,6 +1021,7 @@ define.class('$base/node', function(require, exports, self){
 
 	// lets draw ourselves
 	this.draw = function(gldevice, start, end){
+		if(this.color === undefined) return
 		if(!this.hasOwnProperty('shader') || !this.shader) this.compile(gldevice)
 		var gl = gldevice.gl
 		var len = this.useShader(gl, this.shader)
@@ -1026,6 +1030,7 @@ define.class('$base/node', function(require, exports, self){
 	}
 
 	this.drawGuid = function(gldevice, start, end){
+		if(this.color === undefined) return
 		if(!this.hasOwnProperty('shader') || !this.shader) this.compile(gldevice)
 		var gl = gldevice.gl
 		var len = this.useShader(gl, this.shader.guid)
@@ -1034,6 +1039,7 @@ define.class('$base/node', function(require, exports, self){
 	}
 
 	this.drawDebug = function(gldevice, start, end){
+		if(this.color === undefined) return
 		if(!this.hasOwnProperty('shader') || !this.shader) this.compile(gldevice)
 		if(!this.shader || !this.shader.debug) return
 		var gl = gldevice.gl

@@ -288,7 +288,10 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			this.fg.shader && this.fg.shader.unilocs.time){
 			this.screen.device.redraw()
 		}
+	}
 
+	this.doDrawGuid = function(renderstate){
+		this.bg.drawGuid(this.screen.device)
 	}
 
 	this.drawContentGL = function(renderstate){
@@ -332,7 +335,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				fg.drawDebug(this.screen.device)
 			}
 			else if(renderstate.drawmode === 1){
-				if (this.hasListeners('click') || this.hasListeners('mousedown') || this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| this.hasListeners('mouseup') || this.hasListeners('mousemove') ||this.hasListeners('scroll')){
+				if (this.hasListeners('click') || this.hasListeners('mouseleftdown') || this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| this.hasListeners('mouseup') || this.hasListeners('mousemove') ||this.hasListeners('scroll')){
 					this.effectiveguid = this.interfaceguid;
 				}
 				else{
@@ -342,7 +345,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				var g = ((this.effectiveguid>>8) &255) / 255.0
 				var b = ((this.effectiveguid>>16) &255) / 255.0
 				bg._guid = vec4(r, g, b, 1.0)
-				bg.drawGuid(this.screen.device)
+				this.doDrawGuid(renderstate)
 			}
 			else{
 				this.doDraw(renderstate)

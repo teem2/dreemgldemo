@@ -23,7 +23,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		tag:vec4,
 	}).extend(function(exports, self){
 		this.start_x = 0
-		this.start_y = null
+		this.start_y = 0
 		this.text_x = 0
 		this.text_y = 0
 		this.shift_x = 0
@@ -69,7 +69,7 @@ define.class('$gl/glshader', function(require, exports, self){
 			this.text_w = 0
 			this.text_h = 0
 			this.add_x = this.start_x
-			this.add_y = this.start_y === null? this.min_y:0
+			this.add_y = this.start_y //=== null? this.min_y:0
 		}
 
 		this.addGlyph = function(info, unicode){
@@ -128,14 +128,30 @@ define.class('$gl/glshader', function(require, exports, self){
 
 		// get the character coordinates
 		this.charCoords = function(off){
+			if(off >= this.lengthQuad()){
+				return {
+					x:this.add_x,
+					y:this.add_y, //- this.line_height +this.font_size * this.cursor_sink,
+					w:0,
+					h:this.line_height
+				}
+			}			
 			var info = this.font.glyphs[this.charCodeAt(off)]
 			var coords = {
 				x: this.array[off*6*8 + 0] - this.font_size * info.min_x,
-				y: this.array[off*6*8 + 1] - this.font_size * info.min_y,
+				y: this.array[off*6*8 + 1] + this.font_size * info.min_y,
 				w: info.advance * this.font_size,
 				h: this.line_height
 			}
 			return coords
+		}
+
+		this.char_tl_x = function(off){
+			return this.array[off * 6 * 8 + 0]
+		}
+
+		this.char_tr_x = function(off){
+			return this.array[off * 6 * 8 + 0 + 8]
 		}
 
 		this.offsetFromPos = function(x, y){
@@ -183,14 +199,6 @@ define.class('$gl/glshader', function(require, exports, self){
 		}
 
 		this.cursorRect = function(off){
-			if(off >= this.lengthQuad()){
-				return {
-					x:this.add_x,
-					y:this.add_y,
-					w:0,
-					h:this.line_height
-				}
-			}
 			var coords = this.charCoords(off)
 			coords.y -= coords.h - this.font_size * this.cursor_sink
 			return coords
@@ -225,9 +233,9 @@ define.class('$gl/glshader', function(require, exports, self){
 			// ok lets pull in the 'rest' as string
 			var str = this.serializeText(off, this.lengthQuad())
 			// lets set the length and start adding
-			var rect = this.cursorRect(off)
+			var rect = this.charCoords(off)
 			this.add_x = rect.x
-			this.add_y = 0
+			this.add_y = rect.y 
 			this.length = off * 6
 			this.add(text)
 			this.add(str)
@@ -236,9 +244,9 @@ define.class('$gl/glshader', function(require, exports, self){
 
 		this.removeText = function(off, end){
 			var str = this.serializeText(end, this.lengthQuad())
-			var rect = this.cursorRect(off)
+			var rect = this.charCoords(off)
 			this.add_x = rect.x
-			this.add_y = 0
+			this.add_y = rect.y
 			this.length = off * 6
 			this.add(str)
 			return str.length

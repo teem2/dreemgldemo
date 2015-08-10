@@ -85,11 +85,13 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.attribute('fgcolor', {type:vec4, value: vec4(1,1,1,1)});
 
 	this.event("click")
-	this.event("mousedown")
 	this.event("mouseout")
 	this.event("mouseover")
 	this.event("mousemove")
-	this.event("mouseup")
+	this.event("mouseleftdown")
+	this.event("mouseleftup")
+	this.event("mouserightdown")
+	this.event("mouserightup")
 	this.event("scroll")
 	this.event("keyup")
 	this.event("keydown")
