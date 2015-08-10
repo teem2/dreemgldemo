@@ -40,9 +40,6 @@ define.class('./sprite_gl', function(require, exports, self){
 	}
 
 	this.addCursor = function(start){
-		// lets add a cursor
-		// console.log(1)
-		// lets get the geometry of the cursor
 		this.cursor.mesh.addCursor(this.textbuf, start)
 		this.screen.device.redraw()
 	}
@@ -58,11 +55,7 @@ define.class('./sprite_gl', function(require, exports, self){
 
 		//console.log(this.textbuf.charCoords(0))
 		this.fg.mesh = this.textbuf
-
-		//this.fg.color = "";
 		this.cursor.mesh = this.cursor.cursorgeom.array()
-
-		//this.fg.color = "";
 		this.markers.mesh = this.markers.markergeom.array()
 
 		this.initEditImpl()

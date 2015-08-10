@@ -181,7 +181,7 @@ define.class(function(require){
 		this.textbuf.removeText(this.end, this.end + 1)
 		this.cursorset.delta -= 1
 		this.editor.forkRedo()
-		this.max = this.textbuf.cursorRect(end).x
+		this.max = this.textbuf.cursorRect(this.end).x
 	}
 
 	this.backspace = function(){

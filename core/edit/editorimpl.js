@@ -224,7 +224,7 @@ define.mixin(function(require){
 			this.cursors.fusing = true
 			this.cursors.moveTo(start[0], start[1])
 
-			if(this.mouse.clicker == 2) cursors.selectWord()
+			if(this.mouse.clicker == 2) this.cursors.selectWord()
 			else if(this.mouse.clicker == 3){
 				this.cursors.selectLine()
 				this.mouse.resetClicker()

@@ -1,7 +1,7 @@
 define.browser(function(require, screen, view, edit, text, myview, treeview){
 	this.render = function(){return[
 		myview({w:1920,h:1080})
-		,treeview({})
+		//,treeview({})
 		,edit({x:100,y:0,w:300,h:80,fontsize:60, 
 			'bg.color':function(){
 				return vec4(0.4)
