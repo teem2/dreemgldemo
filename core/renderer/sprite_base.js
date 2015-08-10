@@ -13,7 +13,7 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.attribute("left", {storage:'pos', index:0})
 	this.attribute("top", {storage:'pos', index:1})
 
-	this.attribute("size", {type:vec2, value:vec2(0,0)})
+	this.attribute("size", {type:vec2, value:vec2(NaN, NaN)})
 
 	function percentParser(key, value){
 		var special_key = 'percent_'+key
@@ -75,10 +75,10 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.attribute("flexdirection", {type: String, value: "row"});	//'column', 'row'
 	this.attribute("justifycontent", {type:String, value: ""}) //	'flex-start', 'center', 'flex-end', 'space-between', 'space-around'
 	this.attribute("alignitems", {type:String, value:"stretch"});  // 	'flex-start', 'center', 'flex-end', 'stretch'
-	this.attribute("alignself", {type:String, value:""});  // 	'flex-start', 'center', 'flex-end', 'stretch'
-	this.attribute("flex", {type: float, value: NaN});
-	this.attribute("flexwrap", {type: String, value: ""});	//'wrap', 'nowrap'
-	this.attribute("position", {type: String, value: "absolute" });	//'relative', 'absolute'
+	this.attribute("alignself", {type:String, value:"stretch"});  // 	'flex-start', 'center', 'flex-end', 'stretch'
+	this.attribute("flex", {type: float, value: undefined});
+	this.attribute("flexwrap", {type: String, value: "wrap"});	//'wrap', 'nowrap'
+	this.attribute("position", {type: String, value: "relative" });	//'relative', 'absolute'
 
 	this.attribute('text', {type:String, value: "" })
 	this.attribute('fontsize', {type:float, value: 12});

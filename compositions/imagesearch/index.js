@@ -4,7 +4,7 @@ define.class(function(teem, screens, moviedb, browser){
 		return [
 			moviedb(),
 			screens(
-				browser()
+				browser( {})
 			)
 		]
 	}
