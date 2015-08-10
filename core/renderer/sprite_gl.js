@@ -13,6 +13,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	exports.interfaceguid = 1
 
 	this.dirty = true
+	this.attribute("texturecache", {type:boolean, value:false})
 
 	this.clipping =
 	this.bordercolor =
@@ -21,6 +22,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.borderwidth =
 	this.height =
 	this.width =
+	this.texturecache = 
 	this.opacity = function(){
 		this.setDirty(true)
 	}
@@ -166,7 +168,12 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			this.setDirty(true)
 			this.matrixdirty = true
 		}
-
+		
+		this.texturecache = function(){
+			console.log("setting texturecaching: ", this.texturecache);
+			this.enableTextureCache(this.texturecache);
+		}
+		
 		this.emit('rotation')
 		this.emit('y')
 		this.emit('x')
