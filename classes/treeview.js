@@ -35,11 +35,11 @@ define.class(function(sprite, text, view){
 		// collapsible subbox: 
 		// recursive treeitmes
 		
-		var res = view({ flexdirection:"column", margin: 0, padding: 0, bgcolor: "#308030" , tag:"treeitem container"}, text({ text:'- ' + node.name, height: 20,width: 100 , tag: "item label", bgcolor: "transparent" }));
+		var res = view({ flexdirection:"column", margin: 0, padding: 0, bgcolor: "transparent" , tag:"treeitem container"}, text({ text:'- ' + node.name, height: 20,width: 100 , tag: "item label", bgcolor: "transparent" , fgcolor: "black"}));
 		
 		
 		if (node.children && node.children.length > 0) {	
-			var container = view({  bgcolor: "teal" , flexdirection: "column", paddingleft: 10, tag: "subitem container"});
+			var container = view({  bgcolor: "transparent" , flexdirection: "column", paddingleft: 10, tag: "subitem container"});
 			res.children.push(container);
 			container.children = [];
 			
@@ -64,7 +64,7 @@ define.class(function(sprite, text, view){
 	this.render = function(){
 		// ok so how do we process the testdata
 		// lets make a textnode
-		var treeres = view({bgcolor: "blue", flexdirection:"column", flex: 1, alignself:"stretch"  },recur(testdata));;
+		var treeres = view({bordercolor: "gray", cornerradius:0, borderwidth:2,padding: 4, bgcolor: "#e0e0e0", flexdirection:"column", flex: 1, alignself:"stretch"  },recur(testdata));;
 		
 		//viewtree(treeres,"");	
 		
