@@ -24,14 +24,16 @@ define.browser(function(require, screen, view, edit, text, myview, treeview, rul
 						text({fontsize: 26, text:"Visionary Studio 3016",bgcolor: "transparent" , margin: 5})
 					)
 					,foldcontainer({title:"Fancy buttons",marginbottom: 2},
-						view({ position:"relative", padding: 4, flexwrap:"wrap", alignitems: "flex-start", bgcolor: "transparent"}
+						view({ position:"relative", padding: 0, flexwrap:"wrap", flexdirection: "row", flex:1, alignitems: "flex-start", bgcolor: "transparent"}
 							,button({text:"I am a button"})
 							,button({text:"me too"})
 							,button({text:"so am I"})
 							,button({text:"me me me me!"}))
 					)
 					,foldcontainer({title:"Attributes", alignself: "stretch",marginbottom: 2}
-						,edit({fontsize:20, height: 100, width:100,position:"relative" , cursorcolor: "black", markercolor:"#9090f0", flex: 1.0,fgcolor: "black",'bg.color':function(){return vec4("#f0f0f0")} ,text:'another editbox'})
+						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"row" }
+							,edit({fontsize:20, height: 100, width:100,position:"relative" , cursorcolor: "black", markercolor:"#9090f0", flex: 1.0,fgcolor: "black",'bg.color':function(){return vec4("#f0f0f0")} ,text:'another editbox'})
+							)
 					)
 					
 				)

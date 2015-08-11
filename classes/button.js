@@ -5,9 +5,10 @@ define.class(function(sprite, text, view){
 	
 	this.attribute("text", {type: String, value: "button"});
 	this.attribute("labelcolor", {type: vec4, value: vec4("black")});
-	this.attribute("buttoncolor1", {type: vec4, value: vec4("#8080c0")});
-	this.attribute("buttoncolor2", {type: vec4, value: vec4("#3b5898")});
-	this.attribute("hovercolor1", {type: vec4, value: vec4("#b0b0d0")});
+	this.attribute("labelactivecolor", {type: vec4, value: vec4("white")});
+	this.attribute("buttoncolor1", {type: vec4, value: vec4("#9090b0")});
+	this.attribute("buttoncolor2", {type: vec4, value: vec4("#8080c0")});
+	this.attribute("hovercolor1", {type: vec4, value: vec4("#8080c0")});
 	this.attribute("hovercolor2", {type: vec4, value: vec4("#3b5898")});
 	this.attribute("pressedcolor1", {type: vec4, value: vec4("#3b5898")});
 	this.attribute("pressedcolor2", {type: vec4, value: vec4("#637aad")});
@@ -15,17 +16,17 @@ define.class(function(sprite, text, view){
 		
 	this.buttonfill = function(a,b){
 		
-		var fill = mix(col1, col2,  (a.y-0.2)/0.8);
+		var fill = mix(col1, col2,  (a.y)/0.8);
 				
-		if (a.y< 0.2) fill  = mix(col2, fill, a.y*5.)
-		if (a.x < 0.1) fill =  mix(col2, fill, a.x*10.)
-		if (a.x > 0.9) fill =  mix(col2, fill, 1.-(a.x-0.9)*10.)
+	//	if (a.y< 0.2) fill  = mix(col2, fill, a.y*5.)
+	//	if (a.x < 0.1) fill =  mix(col2, fill, a.x*10.)
+	//	if (a.x > 0.9) fill =  mix(col2, fill, 1.-(a.x-0.9)*10.)
 		return fill;
 	}
 	
 	this.bg.wobbleamount = 0.0;
 	this.padding = 8;
-	this.cornerradius = 8;
+	this.cornerradius = 3;
 	this.bg.bgcolorfn = this.buttonfill;
 	
 	this.bg.col1 = vec4("yellow");
@@ -61,19 +62,21 @@ define.class(function(sprite, text, view){
 	}
 	this.drawcount = 0;
 	this.atDraw = function(){
-		this.buttonres.fgcolor = this.labelcolor;
 		this.drawcount ++;
 	//	console.log("atdraw button", this.drawcount);
 		if (this.pressed > 0){
 			this.bg.col2 = this.pressedcolor2;
 			this.bg.col1 = this.pressedcolor1;
+			this.buttonres.fgcolor = this.labelactivecolor;		
 		}
 		else{
 			if (this.hovered > 0){
 				this.bg.col2 = this.hovercolor2;
 				this.bg.col1 = this.hovercolor1;
+				this.buttonres.fgcolor = this.labelactivecolor;
 			}
 			else{
+				this.buttonres.fgcolor = this.labelcolor;
 				this.bg.col2 = this.buttoncolor2;
 				this.bg.col1 = this.buttoncolor1;
 			}
