@@ -7,24 +7,21 @@ define.class(function(sprite, text, view){
 	this.position ="relative";
 	this.borderwidth = 1;
 	this.bordercolor = vec4("gray");
-	this.bgcolor = vec4("transparent");
+	
 	this.alignitems = "stretch";
 	
 	this.flexdirection = "column";
 	this.attribute("collapsed", {type: Boolean, value: false});
 	
-	this.attribute("buttoncolor1", {type: vec4, value: vec4("#9090b0")});
-	this.attribute("buttoncolor2", {type: vec4, value: vec4("#8080c0")});
-
-	
-	this.attribute("hovercolor1", {type: vec4, value: vec4("#8080c0")});
-	this.attribute("hovercolor2", {type: vec4, value: vec4("#3b5898")});
+	this.attribute("buttoncolor1", {type: vec4, value: vec4("#303060")});
+	this.attribute("buttoncolor2", {type: vec4, value: vec4("#303060")});	
+	this.attribute("hovercolor1", {type: vec4, value: vec4("#404080")});
+	this.attribute("hovercolor2", {type: vec4, value: vec4("#5050a0")});
 	this.attribute("pressedcolor1", {type: vec4, value: vec4("#3b5898")});
 	this.attribute("pressedcolor2", {type: vec4, value: vec4("#637aad")});
 	
 	this.toggle = function(){
 		this.collapsed = !this.collapsed;
-		console.log("foldcontainer: " , this.collapsed);
 	}
 	
 	
@@ -42,19 +39,51 @@ define.class(function(sprite, text, view){
 	
 	this.render = function(){
 		
-		this.bar = view({bgcolor: "#303060",position:"relative" , "bg.col2":vec4("yellow"), "bg.col1":vec4("yellow"), "bg.bgcolorfn": this.bggradient, padding: 6},[
+		this.bar = view({position:"relative" , "bg.col2":vec4("yellow"), "bg.col1":vec4("yellow"), "bg.bgcolorfn": this.bggradient, padding: 6},[
 			view({bgcolor: "red",width:16,  margin:4}),
 			text({fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })
 		]);
 		this.bar.pressed = 0;
 		this.bar.hovered = 0;
-		this.bar.mouseenter  = function()
-		{
+		
+		this.bar.mouseover  = function(){
+			this.hovered++;
+			this.setDirty(true);
 		}			
+		
+		this.bar.mouseout  = function(){
+			this.hovered--;
+			this.setDirty(true);
+		}			
+		
+		this.bar.mouseleftdown = function()
+		{
+			this.pressed++;
+			this.setDirty(true);
+		}
+		
+		this.bar.mouseleftup = function()
+		{
+			this.pressed--;
+			this.setDirty(true);
+		}
+
 		this.bar.atDraw = function()
 		{
-			this.bg.col1 = this.parent.hovercolor1;
-			this.bg.col2 = this.parent.hovercolor2;
+			if (this.hovered > 0){
+				if (this.pressed > 0){
+					this.bg.col1 = this.parent.pressedcolor1;
+					this.bg.col2 = this.parent.pressedcolor2;
+				}
+				else{
+					this.bg.col1 = this.parent.hovercolor1;
+					this.bg.col2 = this.parent.hovercolor2;
+				}
+			}
+			else{
+					this.bg.col1 = this.parent.buttoncolor1;
+					this.bg.col2 = this.parent.buttoncolor2;
+			}
 		}
 		
 		this.bar.click = function(){
