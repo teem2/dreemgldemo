@@ -310,12 +310,15 @@
 			}
 			else{
 				// lets make an fnname based on our callstack
-				var origin = new Error().stack.split(/\n/)[3].match(/\/([a-zA-Z0-9\.]+)\:(\d+)\:\d+\)/)
-				if(!origin || origin[1] === 'define.js'){
-					fnname = 'extend'
-					if(baseclass && baseclass.prototype.constructor) fnname += '_' + baseclass.prototype.constructor.name
+				if(body.name) fnname = body.name
+				else{
+					var origin = new Error().stack.split(/\n/)[3].match(/\/([a-zA-Z0-9\.]+)\:(\d+)\:\d+\)/)
+					if(!origin || origin[1] === 'define.js'){
+						fnname = 'extend'
+						if(baseclass && baseclass.prototype.constructor) fnname += '_' + baseclass.prototype.constructor.name
+					}
+					else fnname = origin[1].replace(/\.js/g,'').replace(/\./g,'_').replace(/\//g,'_') + '_' + origin[2]
 				}
-				else fnname = origin[1].replace(/\.js/g,'').replace(/\./g,'_').replace(/\//g,'_') + '_' + origin[2]
 			}
 			var code = 'return ' + MyConstructor.toString().replace(/MyConstructor/g, fnname)
 			var Constructor = new Function(code)()
@@ -342,6 +345,7 @@
 		}
 
 		Object.defineProperty(Constructor, 'extend', {value:function(body){
+
 			return define.makeClass(this, body, require)
 		}})
 
