@@ -19,7 +19,7 @@ define.class(function(require, constructor){
 	}
 
 	this.initFromConstructorArgs = function(args){
-		this.instance_children = []
+		if(!this.instance_children) this.instance_children = []
 		var off = 0
 		for(var i = 0; i < args.length; i++){
 			var arg = args[i]
