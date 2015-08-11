@@ -31,7 +31,9 @@ define.browser(function(require, screen, view, edit, text, myview, treeview, rul
 							,button({text:"me me me me!"}))
 					)
 					,foldcontainer({title:"Attributes", alignself: "stretch",marginbottom: 2}
-						,edit({fontsize:20, height: 100, width:100,position:"relative" , cursorcolor: "black", markercolor:"#9090f0", flex: 1.0,fgcolor: "black",'bg.color':function(){return vec4("#f0f0f0")} ,text:'another editbox'})
+						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"row" }
+							,edit({fontsize:20, height: 100, width:100,position:"relative" , cursorcolor: "black", markercolor:"#9090f0", flex: 1.0,fgcolor: "black",'bg.color':function(){return vec4("#f0f0f0")} ,text:'another editbox'})
+							)
 					)
 					
 				)
