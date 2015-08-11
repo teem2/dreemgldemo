@@ -151,6 +151,54 @@ define.mixin(function(require){
 		//change = Change.keyPress		
 	}
 
+	var utfmap = {
+		accent:1, _accent:'`',
+		num1:'¡', _num1:'⁄',
+		num2:'™', _num2:'€',
+		num3:'£', _num3:'‹',
+		num4:'¢',_num4:'›',
+		num5:'∞',_num5:'ﬁ',
+		num6:'§',_num6:'ﬂ',
+		num7:'¶',_num7:'‡',
+		num8:'•',_num8:'°',
+		num9:'ª',_num9:'·',
+		num0:'º',_num0:'‚',
+		equals:'≠',_equalt:'±',
+		q:'œ',_q:'Œ',
+		w:'∑',_w:'„',
+		e:2, _e:'´',
+		r:'®', _r:'‰',
+		t:'†',_t:'ˇ', y:'¥',
+		u:3, _u:'¨',
+		i:4, _i:'ˆ',
+		o:'ø', _o:'Ø',
+		p:'π', _p:'∏',
+		openbracket:'“', _openbracket:'”',
+		closebracket:'‘', _closebracket:'’',
+		backslash:'«', _backslash:'»',
+		a:'å',_a:'Å',
+		s:'ß',_s:'Í',
+		d:'∂',_d:'Î',
+		f:'ƒ',_f:'Ï',
+		g:'©',_g:'˝',
+		h:'˙',_h:'Ó',
+		j:'∆',_j:'Ô',
+		k:'˚',_k:'',
+		l:'¬',_l:'Ò',
+		semicolon:'…', _semicolon:'Ú',
+		singlequote:'æ', _singlequote:'Æ',
+		z:'Ω', _z:'¸',
+		x:'≈', _x:'˛',
+		c:'ç', _c:'Ç',
+		v:'√', _v:'◊',
+		b:'∫', _b:'ı',
+		n:5, _n:'˜',
+		m:'µ', _m:'Â',
+		comma:'≤', _comma:'¯',
+		period:'≥', _period:'˘',
+		slash:'÷', _slash:'¿'
+	}
+
 	this.keydown = function(v){
 		this.keyboard.textarea.focus()
 		var name = 'key' + v.name[0].toUpperCase() + v.name.slice(1)
