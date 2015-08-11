@@ -386,6 +386,10 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.click();
 		}.bind(this)
 
+		this.device.atResize = function(){
+			this.setDirty(true)
+		}.bind(this)
+
 		this.device.atRedraw = function (time) {
 			this.draw(time / 1000.)
 		}.bind(this)

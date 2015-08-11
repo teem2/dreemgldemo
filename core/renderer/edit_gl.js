@@ -45,7 +45,7 @@ define.class('./sprite_gl', function(require, exports, self){
 
 	this.addCursor = function(start){
 		this.cursor.mesh.addCursor(this.textbuf, start)
-		this.screen.device.redraw()
+		this.setDirty(true)
 	}
 
 	this.init = function(){

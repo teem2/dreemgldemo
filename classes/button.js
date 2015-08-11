@@ -64,7 +64,6 @@ define.class(function(sprite, text, view){
 		this.buttonres.fgcolor = this.labelcolor;
 		this.drawcount ++;
 	//	console.log("atdraw button", this.drawcount);
-		console.log('drawin', this.pressed)
 		if (this.pressed > 0){
 			this.bg.col2 = this.pressedcolor2;
 			this.bg.col1 = this.pressedcolor1;
