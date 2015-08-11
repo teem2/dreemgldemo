@@ -36,13 +36,21 @@ define.browser(function(require, screen, view, edit, text, myview, treeview, rul
 							)
 					)
 					,foldcontainer({title:"Split Test", alignself: "stretch",marginbottom: 2}				
-						,splitcontainer({},[
-						text({fontsize: 16, text:"A", bgcolor: "transparent" , margin: 2, marginleft:15})
-						,text({fontsize: 16, text:"B", bgcolor: "transparent" , margin: 2, marginleft:15})
-						,text({fontsize: 16, text:"C", bgcolor: "transparent" , margin: 2, marginleft:15})
-						,text({fontsize: 16, text:"D", bgcolor: "transparent" , margin: 2, marginleft:15})
+						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"column" }
+						,splitcontainer({vertical: false, margin: 4},[
+						text({fontsize: 26, text:"A", bgcolor: "transparent" , fgcolor:"black", margin: 2})
+						,text({fontsize: 26, text:"B", bgcolor: "transparent" ,fgcolor:"black", margin: 2})
+						,text({fontsize: 26, text:"C", bgcolor: "transparent" , fgcolor:"black",margin: 2})
+						,text({fontsize: 26, text:"D", bgcolor: "transparent" , fgcolor:"black",margin: 2})
 						]
 						)
+						,splitcontainer({vertical: true, margin: 4},[
+						text({fontsize: 26, text:"A", bgcolor: "transparent" , fgcolor:"black", margin: 2})
+						,text({fontsize: 26, text:"B", bgcolor: "transparent" ,fgcolor:"black", margin: 2})
+						,text({fontsize: 26, text:"C", bgcolor: "transparent" , fgcolor:"black",margin: 2})
+						,text({fontsize: 26, text:"D", bgcolor: "transparent" , fgcolor:"black",margin: 2})
+						]
+						))
 					)
 					
 				)
