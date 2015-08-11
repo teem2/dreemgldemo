@@ -15,11 +15,11 @@ define.class(function(require, constructor){
 	this._atConstructor = function(){
 		// store the args for future reference
 		var args = this.constructor_args = Array.prototype.slice.call(arguments)
+		this.instance_children = []
 		this.initFromConstructorArgs(args)
 	}
 
 	this.initFromConstructorArgs = function(args){
-		if(!this.instance_children) this.instance_children = []
 		var off = 0
 		for(var i = 0; i < args.length; i++){
 			var arg = args[i]
