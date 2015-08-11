@@ -4,7 +4,15 @@
 define.class(function(sprite, text, view){
 
 	this.title = "folding thing";
-
+	this.position ="relative";
+	this.borderwidth = 1;
+	this.bordercolor = vec4("gray");
+	this.bgcolor = vec4("transparent");
+	this.alignitems = "stretch";
+	
+	this.flexdirection = "column";
+	
+	
 	this.render = function(){
 		var childrenarray = [];
 		var childref = this.children;
@@ -16,15 +24,16 @@ define.class(function(sprite, text, view){
 		}
 		this.children = [];
 		
-		var result = view({position:"relative",borderwidth:1,bordercolor: "gray", bgcolor: "transparent", alignitems: "stretch",  flexdirection: "column", flex: 1},[
-			view({bgcolor: "#303060", height: 33,position:"relative" },[
-					text({fontsize: 18, text:this.title, width: 100, bgcolor: "transparent" , margin: 4})
-			]), 
-			view({bgcolor: "#202040", flex: 1, padding: 1,flexdirection: "column",position:"relative"} 
-				,view({bgcolor: "#404080", margin: 5,padding: 1, flex: 1},childrenarray) 
-			)
-		])
+		
+		var bar = view({bgcolor: "#303060",position:"relative" , padding: 6},[
+					view({bgcolor: "red",width:16,  margin:4}),
+					text({fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })
+			]);
+		var container = view({bgcolor: "#202040",  padding: 15,position:"relative"} ,childrenarray) 
 			
-		return result;
+		;
+		
+			
+		return [bar,container];
 	}
 });
