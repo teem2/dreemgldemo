@@ -56,8 +56,9 @@ define.class(function(require, constructor){
 				this.initFromConstructorArgs(arg)
 			}
 			else if(arg !== undefined && typeof arg === 'object'){
-				if(!this.children) this.children = []
+				if(!this.children) this.children = [], this.instance_children = []
 				this.children.push(arg)
+				this.instance_children.push(arg)
 				var name = arg.name || arg.constructor && arg.constructor.classname
 				if(name !== undefined && !(name in this)) this[name] = arg
 			}

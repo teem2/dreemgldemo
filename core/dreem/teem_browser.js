@@ -54,11 +54,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 				wireinits[i]()
 			}
 			what.setDirty(true)
-
 			this.screen.performLayout()
-			// lets redraw screen
-			this.screen.device.redraw()
-
 		}.bind(this))
 		
 		// diff it
