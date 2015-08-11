@@ -24,7 +24,7 @@ define.browser(function(require, screen, view, edit, text, myview, treeview, rul
 						text({fontsize: 26, text:"Visionary Studio 3016",bgcolor: "transparent" , margin: 5})
 					)
 					,foldcontainer({title:"Fancy buttons",marginbottom: 2},
-						view({ position:"relative",  flexwrap:"wrap", alignitems: "flex-start", bgcolor: "transparent"}
+						view({ position:"relative",  flexwrap:"wrap", alignitems: "stretch", bgcolor: "transparent"}
 							,button({text:"I am a b"})
 							,button({text:"me too"})
 							,button({text:"so am I"})

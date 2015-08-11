@@ -4,6 +4,7 @@
 define.class(function(sprite, text, view){
 	
 	this.attribute("text", {type: String, value: "button"});
+	this.attribute("fontsize", {type: float, value: 20});
 	this.attribute("labelcolor", {type: vec4, value: vec4("black")});
 	this.attribute("labelactivecolor", {type: vec4, value: vec4("white")});
 	this.attribute("buttoncolor1", {type: vec4, value: vec4("#9090b0")});
@@ -84,7 +85,7 @@ define.class(function(sprite, text, view){
 	}
 	this.render = function(){
 
-			this.buttonres =  text({rotation: 0, bgcolor:"transparent",fgcolor:"white", position: "relative", text: this.text.toUpperCase(), fontsize: 16})
+			this.buttonres =  text({rotation: 0, bgcolor:"transparent",fgcolor:"white", fontsize: this.fontsize, position: "relative", text: this.text.toUpperCase()})
 			
 			return this.buttonres;
 		}

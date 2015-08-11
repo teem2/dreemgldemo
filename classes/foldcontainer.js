@@ -21,54 +21,55 @@ define.class(function(sprite, text, view){
 	this.attribute("pressedcolor2", {type: vec4, value: vec4("#637aad")});
 	
 	this.toggle = function(){
-		this.collapsed = !this.collapsed;
+		this.collapsed = !this.collapsed;		
 	}
 	
 	
-	this.bggradient = function(a,b){
+	this.clickablebar = view.extend(function(){
+
+		this.bggradient = function(a,b){	
+			var fill = mix(col1, col2,  (a.y)/0.8);
+			return fill;
+		}
+		this.toggle = function(){console.log("nothing happens")}
+		this.attribute("title", {type:String});
+		this.position = "relative" ;
+		this.bg.col2 = vec4("yellow");
+		this.bg.col1 = vec4("yellow");
+		this.bg.bgcolorfn = this.bggradient;
+		this.padding = 6;
+			
+		this.render = function()
+		{			
+			return [view({bgcolor: "red",width:16,  margin:4}), text({fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })];
+		}
 		
-		var fill = mix(col1, col2,  (a.y)/0.8);
-				
-	//	if (a.y< 0.2) fill  = mix(col2, fill, a.y*5.)
-	//	if (a.x < 0.1) fill =  mix(col2, fill, a.x*10.)
-	//	if (a.x > 0.9) fill =  mix(col2, fill, 1.-(a.x-0.9)*10.)
-		return fill;
-	}
-	
-	
-	
-	this.render = function(){
+		this.pressed = 0;
+		this.hovered = 0;
 		
-		this.bar = view({position:"relative" , "bg.col2":vec4("yellow"), "bg.col1":vec4("yellow"), "bg.bgcolorfn": this.bggradient, padding: 6},[
-			view({bgcolor: "red",width:16,  margin:4}),
-			text({fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })
-		]);
-		this.bar.pressed = 0;
-		this.bar.hovered = 0;
-		
-		this.bar.mouseover  = function(){
+		this.mouseover  = function(){
 			this.hovered++;
 			this.setDirty(true);
 		}			
 		
-		this.bar.mouseout  = function(){
+		this.mouseout  = function(){
 			this.hovered--;
 			this.setDirty(true);
 		}			
 		
-		this.bar.mouseleftdown = function()
+		this.mouseleftdown = function()
 		{
 			this.pressed++;
 			this.setDirty(true);
 		}
 		
-		this.bar.mouseleftup = function()
+		this.mouseleftup = function()
 		{
 			this.pressed--;
 			this.setDirty(true);
 		}
 
-		this.bar.atDraw = function()
+		this.atDraw = function()
 		{
 			if (this.hovered > 0){
 				if (this.pressed > 0){
@@ -86,10 +87,14 @@ define.class(function(sprite, text, view){
 			}
 		}
 		
-		this.bar.click = function(){
-			this.toggle();
-		}.bind(this);
 			
+	});
+	
+	this.render = function(){
+		
+		this.bar = this.clickablebar({title: this.title});
+		
+		this.bar.click = this.toggle.bind(this);
 		var res = [this.bar];
 		if (this.collapsed == false) {
 			var childrenarray = [];
