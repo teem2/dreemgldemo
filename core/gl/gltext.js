@@ -64,6 +64,15 @@ define.class('$gl/glshader', function(require, exports, self){
 		this.__defineGetter__('block_y', function(){
 			return this.add_y - this.line_height + this.cursor_sink * this.font_size
 		})
+
+		this.__defineGetter__('bound_w', function(){
+			return this.text_w
+		})
+
+		this.__defineGetter__('bound_h', function(){
+			return this.text_h + this.cursor_sink * this.font_size
+		})
+
 		
 		this.clear = function(){
 			this.text_w = 0

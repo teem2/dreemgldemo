@@ -78,8 +78,8 @@ define.class('./sprite_gl', function(require, exports, self){
 
 	this.doDraw = function(){
 		//this.bg._matrix = renderstate.matrix
-		this.bg.width = this.textbuf.text_w
-		this.bg.height = this.textbuf.text_h
+		this.bg.width = this.textbuf.bound_w
+		this.bg.height = this.textbuf.bound_h
 		this.bg.draw(this.screen.device)
 		
 		this.markers._matrix = this.bg._matrix;

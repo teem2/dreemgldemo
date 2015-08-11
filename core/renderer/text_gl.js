@@ -31,7 +31,7 @@ define.class('./sprite_gl', function(require, exports, self){
 
 	this.sizetocontent = function(width){
 		this.lazyInit()
-		return {width: this.fg.mesh.text_w, height: this.fg.mesh.text_h};
+		return {width: this.fg.mesh.bound_w, height: this.fg.mesh.bound_h};
 	}
 
 	this.atDraw = function(){
