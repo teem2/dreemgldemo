@@ -1,4 +1,4 @@
-define.browser(function(require, screen, view, edit, text, myview, treeview, ruler, foldcontainer,button){
+define.browser(function(require, screen, view, edit, text, myview, treeview, ruler, foldcontainer,button, splitcontainer){
 		
 	this.render = function(){return[
 		view({position: "relative",   flexdirection: "column", height: 20, bgcolor: "black", flex:1},[
@@ -34,6 +34,15 @@ define.browser(function(require, screen, view, edit, text, myview, treeview, rul
 						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"row" }
 							,edit({fontsize:20, height: 100, width:100,position:"relative" , cursorcolor: "black", markercolor:"#9090f0", flex: 1.0,fgcolor: "black",'bg.color':function(){return vec4("#f0f0f0")} ,text:'another editbox'})
 							)
+					)
+					,foldcontainer({title:"Split Test", alignself: "stretch",marginbottom: 2}				
+						,splitcontainer({},[
+						text({fontsize: 16, text:"A", bgcolor: "transparent" , margin: 2, marginleft:15})
+						,text({fontsize: 16, text:"B", bgcolor: "transparent" , margin: 2, marginleft:15})
+						,text({fontsize: 16, text:"C", bgcolor: "transparent" , margin: 2, marginleft:15})
+						,text({fontsize: 16, text:"D", bgcolor: "transparent" , margin: 2, marginleft:15})
+						]
+						)
 					)
 					
 				)
