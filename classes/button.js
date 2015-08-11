@@ -23,7 +23,6 @@ define.class(function(sprite, text, view){
 		return fill;
 	}
 	
-	
 	this.bg.wobbleamount = 0.0;
 	this.padding = 8;
 	this.cornerradius = 8;
@@ -38,49 +37,46 @@ define.class(function(sprite, text, view){
 	
 	this.pressed = 0;
 	this.hovered = 0;
-	
-	this.dodirty = function(){
-			this.setDirty(true);	
-	}
-	
+		
 	this.mouseover  = function(){		
 		this.hovered++;
-		this.dodirty();
+		this.setDirty(true)
 	}
 	
 	this.attribute("bgcolor", {type:vec4, duration: 1.0});
 	
 	this.mouseout = function(){
 		this.hovered--;
-		this.dodirty();
+		this.setDirty(true)
 	}
 	
 	this.mouseleftdown = function(){
-		this.pressed++;
-		this.dodirty();
-	//	console.log(this.pressed);
+		this.pressed++
+		this.setDirty(true)
 	}
 	
 	this.mouseleftup = function(){
 		this.pressed--;
-	//	console.log(this.pressed);
-		this.dodirty();
+		this.setDirty(true)
 	}
 	this.drawcount = 0;
 	this.atDraw = function(){
 		this.buttonres.fgcolor = this.labelcolor;
 		this.drawcount ++;
 	//	console.log("atdraw button", this.drawcount);
+		console.log('drawin', this.pressed)
 		if (this.pressed > 0){
 			this.bg.col2 = this.pressedcolor2;
 			this.bg.col1 = this.pressedcolor1;
-		}else{
+		}
+		else{
 			if (this.hovered > 0){
-			this.bg.col2 = this.hovercolor2;
-			this.bg.col1 = this.hovercolor1;
-			}else{
-			this.bg.col2 = this.buttoncolor2;
-			this.bg.col1 = this.buttoncolor1;
+				this.bg.col2 = this.hovercolor2;
+				this.bg.col1 = this.hovercolor1;
+			}
+			else{
+				this.bg.col2 = this.buttoncolor2;
+				this.bg.col1 = this.buttoncolor1;
 			}
 		}
 	}

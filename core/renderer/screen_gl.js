@@ -252,6 +252,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 		
 		if (this.dirty === true) {
+			this.dirty = false
 			this.device.setTargetFrame()
 			//for(var i = 0;i<20;i++)
 			this.drawColor();
