@@ -84,6 +84,8 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.attribute('fontsize', {type:float, value: 12});
 	this.attribute('fgcolor', {type:vec4, value: vec4(1,1,1,1)});
 
+	this.event("reinit")
+
 	this.event("click")
 	this.event("mouseout")
 	this.event("mouseover")

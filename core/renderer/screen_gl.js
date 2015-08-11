@@ -130,8 +130,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.lasty = this.mouse.y
 			
 			var overnode = this.guidmap[id]
-			if (overnode && overnode.hasListeners)
-			{
+			if (overnode && overnode.hasListeners){
 				if(overnode.hasListeners('mousemove')){
 					overnode.emit('mousemove', this.remapMouse(overnode))
 				}
@@ -291,7 +290,10 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.diff = function(other, globals){
 		// if we diff well get a complete new one..
 		baseclass.prototype.diff.call(this, other, globals)
+		
+		for(i = 0; i < this.children.length; i++) this.children[i].parent = this
 		// alright now lets copy over the settings
+
 		this._init = 1
 
 		this.pic_tex = other.pic_tex
@@ -302,8 +304,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.keyboard = other.keyboard
 
 		this.initVars()
-
 		this.bindInputs()
+		other.degraded = true
 		return this
 	}
 
@@ -403,6 +405,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.lastmouseguid = 0;
 		this.lastidundermouse = 0;
 		this.effectiveguid = 0;
+		this.interfaceguid = 0;
 		this.readGuidTimeout = this.readGuidTimeout.bind(this)
 	}
 

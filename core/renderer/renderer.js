@@ -30,7 +30,7 @@ define.class(function(require, exports){
 
 	exports.render = function(object, parent, globals, rerender){
 		// set up property binding values
-		Object.defineProperty(object, 'parent', {value:parent})
+		Object.defineProperty(object, 'parent', {writable:true, value:parent})
 
 		exports.defineGlobals(object, globals)
 
@@ -78,6 +78,7 @@ define.class(function(require, exports){
 		if(!node._init){
 			node.emit('init',1)
 		}
+		node.emit('reinit')
 
 		if(node.children) for(var i = 0; i < node.children.length; i++){
 			this.fireInit(node.children[i])

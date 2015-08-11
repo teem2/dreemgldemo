@@ -35,7 +35,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 
 		// render our screen
 		renderer.render(this.screen, null, globals, function rerender(what){
-			
+			// ...
 		}.bind(this))
 		
 		// diff it
@@ -47,6 +47,8 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		renderer.connectWires(this.screen, wireinits)
 
 		renderer.fireInit(this.screen)
+
+		//console.log(this.screen.guidmap)
 
 		for(var i = 0; i < wireinits.length; i++){
 			wireinits[i]()

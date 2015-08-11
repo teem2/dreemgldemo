@@ -25,7 +25,7 @@ define.browser(function(require, screen, view, edit, text, myview, treeview, rul
 					)
 					,foldcontainer({title:"Fancy buttons",marginbottom: 2},
 						view({ position:"relative", padding: 4, flexwrap:"wrap", alignitems: "flex-start", bgcolor: "transparent"}
-							,button({text:"I am a button"})
+							,button({text:"I am a b"})
 							,button({text:"me too"})
 							,button({text:"so am I"})
 							,button({text:"me me me me!"}))

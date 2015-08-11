@@ -38,7 +38,7 @@ define.class(function(sprite, text, view){
 	this.pressed = 0;
 	this.hovered = 0;
 		
-	this.mouseover  = function(){		
+	this.mouseover  = function(){
 		this.hovered++;
 		this.setDirty(true)
 	}

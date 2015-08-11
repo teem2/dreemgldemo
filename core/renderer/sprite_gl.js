@@ -139,6 +139,13 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.matrixdirty = false;
 	}
 	
+	this.reinit = function(){
+		this.interfaceguid = this.screen.interfaceguid++;
+//		console.log(this.interfaceguid)
+		this.screen.guidmap[this.interfaceguid] = this;
+		this.effectiveguid = this.interfaceguid;
+	}
+
 	this.init = function (obj){
 		
 		this.orientation = {
@@ -149,9 +156,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			worldmatrix : mat4.identity() // calculated
 		};
 		
-		this.interfaceguid = exports.interfaceguid++;
-		this.screen.guidmap[this.interfaceguid] = this;
-
 		this.rotation = function(){
 			this.orientation.rotation[2] = this.rotation;
 			this.setDirty(true)
@@ -183,7 +187,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.backgroundTexture = false;
 		this.texturecache = false;
 		this.effectiveopacity = this.opacity;
-		this.effectiveguid = this.interfaceguid;
 		
 		// if we have a bgimage, we have to set our bgimage function to something
 		if(this.bgimage){

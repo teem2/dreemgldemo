@@ -532,15 +532,18 @@ define.class(function(require, constructor){
 				if(child.atDestroy) child.atDestroy()
 			}
 		}
-
 		// check if we changed class
 		if(define.classHash(this.constructor) === define.classHash(other.constructor) && this.constructorPropsEqual(other)){
 			other.children = my_children
+			if(my_children) for(i = 0; i < my_children.length; i++) my_children[i].parent = other
 			if(this.atDestroy) this.atDestroy()
 			if(globals) for(var key in globals){
 				other[key] = globals[key]
 			}
 			return other
+		}
+		else{
+			if(my_children) for(i = 0; i < my_children.length; i++) my_children[i].parent = this
 		}
 
 		if(other.atDestroy) other.atDestroy()
