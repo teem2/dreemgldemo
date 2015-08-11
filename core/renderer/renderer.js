@@ -29,6 +29,8 @@ define.class(function(require, exports){
 	}
 
 	exports.render = function(object, parent, globals, rerender){
+		//console.log(object)
+
 		// set up property binding values
 		Object.defineProperty(object, 'parent', {writable:true, value:parent})
 
@@ -47,15 +49,20 @@ define.class(function(require, exports){
 			}
 		}
 
-		// create more children!
-		var children = object.render(parent)
-
+		// define children
+		object.children = object.render(parent)
 		object.atAttributeGet = undefined
 			
-		if(children) exports.mergeChildren(object, children)
+		//if(children) exports.mergeChildren(object, children)
 
 		if(object.children) for(var i = 0; i < object.children.length; i++){
-			this.render(object.children[i], object, globals, rerender)
+			
+			var child = object.children[i]
+
+			var name = child.name || child.constructor.classname
+			if(name !== undefined && !(name in object)) object[name] = child
+
+			this.render(child, object, globals, rerender)
 		}
 	}
 

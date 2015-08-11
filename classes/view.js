@@ -2,5 +2,4 @@
 // view class
 
 define.class(function(sprite){
-	this.render = function(){}
 })

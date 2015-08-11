@@ -97,14 +97,7 @@ define.class(function(sprite, text, view){
 		this.bar.click = this.toggle.bind(this);
 		var res = [this.bar];
 		if (this.collapsed == false) {
-			var childrenarray = [];
-			var childref = this.children;
-			if (childref) {
-				for(var i = 0;i<childref.length;i++){
-					childrenarray.push(childref[i]);
-				}
-			}
-			this.container = view({bgcolor: "#202040",  padding: 15,position:"relative"} ,childrenarray) 
+			this.container = view({bgcolor: "#202040",  padding: 15,position:"relative"} ,this.instance_children) 
 			res.push(this.container)
 		}
 		this.children = [];
