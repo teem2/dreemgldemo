@@ -207,6 +207,7 @@ define.mixin(function(require){
 		if(this.keyboard.leftmeta || this.keyboard.rightmeta) name += 'Cmd'
 		if(this.keyboard.ctrl) name += 'Ctrl'
 		if(this.keyboard.alt) name += 'Alt'
+		if(this.keyboard.shift) name += 'Shift'
 
 		if(this[name]) this[name](v)
 		else if(this.keyboard.alt){
@@ -333,6 +334,14 @@ define.mixin(function(require){
 
 	}
 
+	this.keyTab = function(){
+		this.screen.focusNext(this)
+	}
+
+	this.keyTabShift = function(){
+		this.screen.focusPrev(this)
+	}
+
 	this.keyDelete = function(){
 		this.cursors.delete()
 		this.doCursor()
@@ -360,55 +369,67 @@ define.mixin(function(require){
 		this.doCursor()
 	}
 
+	this.keyLeftArrowAltShift = 
+	this.keyLeftArrowCtrlShift = 
 	this.keyLeftArrowCtrl = 
 	this.keyLeftarrowAlt = function(){
 		this.cursors.moveLeftWord(this.keyboard.shift)
 		this.doCursor()
 	}
 	
+	this.keyRightArrowAltShift = 
+	this.keyRightArrowCtrlShift = 
 	this.keyRightArrowCtrl = 
 	this.keyRightarrowAlt = function(){
 		this.cursors.moveRightWord(this.keyboard.shift)
 		this.doCursor()
 	}
 
+	this.keyLeftarrowCmdShift = 
 	this.keyLeftarrowCmd = function(){
 		this.cursors.moveLeftLine(this.keyboard.shift)
 		this.doCursor()
 	}
 
+	this.keyRightarrowCmdShift = 
 	this.keyRightarrowCmd = function(){
 		this.cursors.moveRightLine(this.keyboard.shift)
 		this.doCursor()
 	}
  
 	this.keyHome = 
+	this.keyUparrowCmdShift = 
 	this.keyUparrowCmd = function(){
 		this.cursors.moveTop(this.keyboard.shift)
 		this.doCursor()
 	}
 
 	this.keyEnd = 
+	this.keyDownarrowCmdShift = 
 	this.keyDownarrowCmd = function(){
 		this.cursors.moveBottom(this.keyboard.shift)
 		this.doCursor()
 	}
 
+	this.keyLeftarrowShift = 
 	this.keyLeftarrow = function(){ 
 		this.cursors.moveLeft(this.keyboard.shift)
 		this.doCursor()
 	}
 
+	this.keyRightarrowShift = 
 	this.keyRightarrow = function(){
 		this.cursors.moveRight(this.keyboard.shift)
 		this.doCursor()
 	}
 
+	this.keyUparrowShift = 
 	this.keyUparrow = function(){
 		this.cursors.moveUp(this.keyboard.shift)
 		this.doCursor()
 	}
 
+	this.keyDownarrowShift = 
 	this.keyDownarrow = function(){
 		this.cursors.moveDown(this.keyboard.shift)
 		this.doCursor()

@@ -43,6 +43,10 @@ define.class('$base/node', function (require, exports, self){
 
 		var click_count = 0
 
+		this.resetClicker = function(){
+			click_count = 0
+		}
+
 		window.addEventListener('mousedown', function(e){
 			var now = Date.now()
 			if (this.activedown == 0){
