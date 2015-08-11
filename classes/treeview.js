@@ -25,7 +25,19 @@ define.class(function(sprite, text, view, button){
 							]}
 					]},
 			]}
-
+	
+	var treeitem = view.extend(function(){
+		this.flex = 1.0;
+		this.attribute("text", {type:String, value:""});
+		this.attribute("fontsize", {type:float, value:12});
+		this.flexdirection = "row" ;
+		this.position = "relative";
+		this.render = function(){
+			return [button({text: ">", margin: 3, padding:3, fontsize: this.fontsize }), text({text:this.text, bgcolor: this.bgcolor, fgcolor: this.fgcolor, fontsize: this.fontsize})];
+		}
+		
+	});
+	
 	function recur(node){
 		var accum = 0
 		// view
@@ -35,7 +47,7 @@ define.class(function(sprite, text, view, button){
 		// collapsible subbox: 
 		// recursive treeitmes
 		
-		var res = view({ flexdirection:"column", margin: 0, padding: 0, bgcolor: "transparent" , tag:"treeitem container"}, text({ fontsize: 16,text:'- ' + node.name, flex:1, tag: "item label", bgcolor: "transparent" , fgcolor: "black"}));
+		var res = view({ flexdirection:"column", margin: 0, padding: 0, bgcolor: "transparent" , tag:"treeitem container"}, treeitem({ fontsize: 16,text: node.name, flex:1, tag: "item label", bgcolor: "transparent" , fgcolor: "black"}));
 		
 		if (node.children && node.children.length > 0) {	
 			var container = view({  bgcolor: "transparent" , flexdirection: "column", paddingleft: 10, tag: "subitem container"});
