@@ -140,7 +140,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 		if(id != this.lastmouseguid){
 
-			this.guidmap[this.lastmouseguid].emit('mouseout')
+			var overnode = 	this.guidmap[this.lastmouseguid];
+			if (overnode && overnode.emit) overnode.emit('mouseout')
 
 			if (this.uieventdebug){
 				$$("mouseout: " + this.guidmap[this.lastmouseguid].constructor.name + "(" + this.lastmouseguid + ")")
@@ -281,7 +282,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			if (this.uieventdebug){
 				console.log(" clicked: " + this.guidmap[this.lastmouseguid].constructor.name);
 			}
-			this.guidmap[this.lastmouseguid].emit('click')
+			var overnode = this.guidmap[this.lastmouseguid];
+			if (overnode && overnode.emit) overnode.emit('click')
 		}
 	}
 
@@ -371,7 +373,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 		this.mouse.leftup = function(){ 
 			this.mousecapturecount--;
-			this.guidmap[this.lastmouseguid].emit('mouseleftup')
+			var overnode = this.guidmap[this.lastmouseguid]
+			if (overnode && overnode.emit) overnode.emit('mouseleftup')
 			if (this.mousecapturecount === 0) {
 				this.mousecapture = false;
 				this.setguid(this.lastidundermouse);
