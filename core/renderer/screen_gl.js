@@ -357,7 +357,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 		this.mouse.leftup = function(){ 
 			this.mousecapturecount--;
-			this.guidmap[this.lastmouseguid].emit('mouseleftup')
+			var overnode = this.guidmap[this.lastmouseguid]
+			if (overnode && overnode.emit) overnode.emit('mouseleftup')
 			if (this.mousecapturecount === 0) {
 				this.mousecapture = false;
 				this.setguid(this.lastidundermouse);

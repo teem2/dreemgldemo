@@ -38,12 +38,12 @@ define.class(function(sprite, text, view){
 
 		this.bgcolor = "#8080b0";
 			this.flexdirection ="column";
-		this.bg.offset = this.offset;			
 		this.alignself = "stretch" ;
 	
 	this.render = function(){
 		if (this.vertical == false){
 			this.bg.color = this.ruler;
+		this.bg.offset = this.offset;			
 	
 						
 			var rulerres = [
@@ -55,6 +55,7 @@ define.class(function(sprite, text, view){
 		}
 		else{
 			this.bg.color = this.vruler;
+		this.bg.offset = this.offset;			
 	
 			var rulerres = [
 				text({rotation: -90, bgcolor:"transparent",width: 100, height: 20,position: "absolute", text: this.from.toString(), left:-45,top: this.from+this.offset})
