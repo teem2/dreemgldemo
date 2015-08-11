@@ -75,13 +75,7 @@ define.class(function(require, exports){
 	}
 
 	exports.fireInit = function(node){
-		// on demand attribute binding initializer
-		//node.atAttributeGet = function(key){
-		//	if(this.isBound(key)){
-		//		attr.connectBinding()
-		//		attr.bindfn()
-		//	}
-		//}
+
 		if(!node._init){
 			node.emit('init',1)
 		}
