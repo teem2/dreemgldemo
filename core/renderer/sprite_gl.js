@@ -426,9 +426,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.screen.setFocus(this)
 	}
 
-	this.render = function(){
-	}
-
 	this.spawn = function (parent) {}
 
 	this.hideProperty(Object.keys(self))

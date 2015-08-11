@@ -19,6 +19,7 @@ define.class(function(require, constructor){
 	}
 
 	this.initFromConstructorArgs = function(args){
+		this.instance_children = []
 		var off = 0
 		for(var i = 0; i < args.length; i++){
 			var arg = args[i]
@@ -56,8 +57,6 @@ define.class(function(require, constructor){
 				this.initFromConstructorArgs(arg)
 			}
 			else if(arg !== undefined && typeof arg === 'object'){
-				if(!this.children) this.children = [], this.instance_children = []
-				this.children.push(arg)
 				this.instance_children.push(arg)
 				var name = arg.name || arg.constructor && arg.constructor.classname
 				if(name !== undefined && !(name in this)) this[name] = arg
@@ -107,6 +106,7 @@ define.class(function(require, constructor){
 
 	// render this node
 	this.render = function(){
+		return this.instance_children
 	}
 
 	// Mixes in another class

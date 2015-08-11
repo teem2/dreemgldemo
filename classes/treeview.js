@@ -39,27 +39,12 @@ define.class(function(sprite, text, view, button){
 	});
 	
 	function recur(node){
-		var accum = 0
-		// view
-		// collapse button
-		// title
-
-		// collapsible subbox: 
-		// recursive treeitmes
-		
-		var res = view({ flexdirection:"column", margin: 0, padding: 0, bgcolor: "transparent" , tag:"treeitem container"}, treeitem({ fontsize: 16,text: node.name, flex:1, tag: "item label", bgcolor: "transparent" , fgcolor: "black"}));
-		
-		if (node.children && node.children.length > 0) {	
-			var container = view({  bgcolor: "transparent" , flexdirection: "column", paddingleft: 10, tag: "subitem container"});
-			res.children.push(container);
-			
-			container.children = [];
-			
-			for (var a in node.children) {				
-				container.children.push(recur(node.children[a]));
-			}
-		}
-		return  res;	
+		return view({ flexdirection:"column", margin: 0, padding: 0, bgcolor: "transparent" , tag:"treeitem container"}
+			,treeitem({ fontsize: 16,text: node.name, flex:1, tag: "item label", bgcolor: "transparent" , fgcolor: "black"})
+			,view({  bgcolor: "transparent" , flexdirection: "column", paddingleft: 10, tag: "subitem container"}
+				,node.children?node.children.map(function(value){return recur(value) }):[]
+			)
+		)
 	}
 	
 	function viewtree(node, prefix){
@@ -86,13 +71,6 @@ define.class(function(sprite, text, view, button){
 	this.alignself="stretch" ;
 	
 	this.render = function(){
-		// ok so how do we process the testdata
-		// lets make a textnode
-		var treeres =recur(testdata);
-		
-		//viewtree(treeres,"");	
-		
-		
-		return treeres;
+		return [recur(testdata)]
 	}
 })

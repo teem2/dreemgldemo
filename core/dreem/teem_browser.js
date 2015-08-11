@@ -45,6 +45,9 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 
 			// lets diff them
 			what.diff(old, globals)
+			for(var i = 0; i < what.children.length; i++){
+				what.children[i].parent = what
+			}
 
 			var wireinits = []
 			renderer.connectWires(what, wireinits)

@@ -83,11 +83,10 @@ define.class(function(sprite, text, view){
 			}
 		}
 	}
-	this.render = function(){
 
-			this.buttonres =  text({rotation: 0, bgcolor:"transparent",fgcolor:"white", fontsize: this.fontsize, position: "relative", text: this.text.toUpperCase()})
-			
-			return this.buttonres;
-		}
+	this.render = function(){
+		this.buttonres =  text({rotation: 0, bgcolor:"transparent",fgcolor:"white", fontsize: this.fontsize, position: "relative", text: this.text.toUpperCase()})
+		return [this.buttonres];
+	}
 	
 })
