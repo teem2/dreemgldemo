@@ -13,13 +13,8 @@ define.class('./sprite_gl', function(require, exports, self){
 	this.text = function(){
 		this.dirty = true;
 	}
-	this.sizetocontent = function(width)
-	{
-		console.log(this);
-		console.log("width: " ,  width);
-		return {width: 100, height: 20};
-	}
-	this.atDraw = function(){
+
+	this.lazyInit = function(){
 		if(this.rendered_text !== this.text){
 			this.rendered_text = this.text
 			var textbuf = this.fg.newText()
@@ -27,9 +22,19 @@ define.class('./sprite_gl', function(require, exports, self){
 			textbuf.add_y = textbuf.line_height;
 			textbuf.fgcolor = this.color
 			textbuf.start_y = textbuf.line_height
+			textbuf.clear()
 			textbuf.add(this.text)
 			//this.fg.textcolor = this.color;
 			this.fg.mesh = textbuf
 		}
+	}
+
+	this.sizetocontent = function(width){
+		this.lazyInit()
+		return {width: this.fg.mesh.text_w, height: this.fg.mesh.text_h};
+	}
+
+	this.atDraw = function(){
+		this.lazyInit()
 	}
 })
