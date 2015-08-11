@@ -11,12 +11,12 @@ define.class(function(sprite, text, view){
 
 	this.bg.color = function(){
 		// we have a rectangle
-		var rel = mesh.xy
+		var rel = vec2(mesh.x*width, mesh.y*height)
 		var edge = min(length(vec2(length(dFdx(rel)), length(dFdy(rel)))) * SQRT_1_2, 0.001)
-		var field = shape.roundbox(rel, 0.1,offset,.8,total,0.01)
+		var field = shape.roundbox(rel, 0.05 * width,offset*height,.9*width,total*height,4)
 		var fg = vec4(1.,1.,1., smoothstep(edge, -edge, field))
-		var bg = vec4(0.,0.,0.,1.)
-		return mix(bg.rgb, fg.rgb, fg.a)
+		var bg = vec4(0.,0.,0.,0.05)
+		return mix(bg.rgba, fg.rgba, fg.a)
 	}	
 
 	this.bg.col1 = vec4("yellow");
