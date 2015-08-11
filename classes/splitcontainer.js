@@ -4,7 +4,7 @@
 define.class(function(sprite,  view){
 	this.attribute("vertical", {type: Boolean, value: true});
 	this.attribute("firstnode", {type: int, value: 0});
-	this.attribute("splitsize", {type: float, value: 14});
+	this.attribute("splitsize", {type: float, value: 8});
 	this.attribute("splittercolor", {type: vec4, value: vec4("#404050")});
 	this.attribute("hovercolor", {type: vec4, value: vec4("#5050a0")});
 	this.attribute("activecolor", {type: vec4, value: vec4("#7070a0")});
@@ -49,6 +49,9 @@ define.class(function(sprite,  view){
 				var dx = this.mouse.x - this.dragstart.x;
 				var dy = this.mouse.y - this.dragstart.y;
 				
+				this.dragstart.x = this.mouse.x;
+				this.dragstart.y = this.mouse.y;
+				
 				var leftnode = this.parent.children[this.firstnode];
 				var rightnode = this.parent.children[this.firstnode+2];
 				
@@ -64,17 +67,14 @@ define.class(function(sprite,  view){
 				if (this.vertical){
 					var h1 = leftnode.layout.height;
 					var h2 = rightnode.layout.height;
-					var hadd = h1 + h2;
-					
+					var hadd = h1 + h2;	
 					h1 += dy;
 					h2 -= dy;
 					
 					var f1n = h1 / (hadd);
-					var f2n = h2 / (hadd);
-					//console.log("changing flex: " , f1,f1n, f2,f2n);
-				
-					leftnode.flex = f1n;
-					rightnode.flex = f2n;
+					var f2n = h2 / (hadd);					
+					leftnode.flex = f1n * totf;
+					rightnode.flex = f2n* totf;
 				}else{					
 					var w1 = leftnode.layout.width;
 					var w2 = rightnode.layout.width;
@@ -85,10 +85,10 @@ define.class(function(sprite,  view){
 					
 					var f1n = w1 / (wadd);
 					var f2n = w2 / (wadd);
-			//		console.log("changing flex: " , f1,f1n, f2,f2n);				
-					leftnode.flex = f1n;
-					rightnode.flex = f2n;
+					leftnode.flex = f1n* totf;
+					rightnode.flex = f2n* totf;
 				}
+				this.setDirty(true);
 				//		console.log(dx,dy)			
 			}.bind(this);
 		}

@@ -5,7 +5,7 @@ define.browser(function(require, screen, view, edit, text, myview, treeview, rul
 			view({position: "relative",  cornerradius:"vec4(0,0,0,14)" , borderwidth:1, height: 50, flexdirection: "row", bgcolor: "#404080",'bg.bgcolorfn':function(a,b){return vec4(mesh.x * bgcolor.rgb, 1.0)} , alignitems:"stretch", alignself: "stretch" , flex: undefined}
 				,text({fontsize: 26, text:"Visionary Studio 3016", width: 200, bgcolor: "transparent" , margin: 2, marginleft:15})
 			)
-			,view({position: "relative",   flexdirection: "row", bgcolor: "black", alignitems:"stretch", alignself: "stretch" , flex:1}
+			,splitcontainer({vertical: false,position: "relative",   flexdirection: "row", bgcolor: "black", alignitems:"stretch", alignself: "stretch" , flex:1}
 				,view({position: "relative", width: 400,  flexdirection: "column", bgcolor: "#b0b0b0", alignself: "stretch", borderwidth: 1,cornerradius: "vec4(0,14,0,0)" , bordercolor: "gray" }
 					,treeview({})
 					)
