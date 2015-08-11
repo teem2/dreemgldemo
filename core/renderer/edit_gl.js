@@ -13,7 +13,9 @@ define.class('./sprite_gl', function(require, exports, self){
 	this.attribute('text', {type:String, value: "HELLO" })
 	this.attribute('fontsize', {type:float, value: 18});
 	this.attribute('color', {type:vec4, value: vec4(1,1,1,1)});
-	this.attribute("markercolor", {type:vec4, value: vec4("ocea")});
+	this.attribute("markercolor", {type:vec4, value: vec4("gray")});
+	this.attribute("markerfocuscolor", {type:vec4, value: vec4("ocea")});
+
 	this.attribute("cursorcolor", {type:vec4, value: vec4("black")});
 	
 	exports.nest('Fg', GLText.extend(function(exports, self){}))
@@ -83,16 +85,35 @@ define.class('./sprite_gl', function(require, exports, self){
 		this.bg.draw(this.screen.device)
 		
 		this.markers._matrix = this.bg._matrix;
-		this.markers.fgcolor = this.markercolor;
-		
+
+		if(this.hasfocus){
+			this.markers.fgcolor = this.markerfocuscolor;
+		}
+		else{
+			this.markers.fgcolor = this.markercolor;
+		}
 		this.markers.draw(this.screen.device)
 
-		this.cursor._matrix = this.bg._matrix
-		this.cursor.fgcolor = this.cursorcolor;
-		
-		this.cursor.draw(this.screen.device)
+		if(this.hasfocus){
+			this.cursor._matrix = this.bg._matrix
+			this.cursor.fgcolor = this.cursorcolor;
 			
+			this.cursor.draw(this.screen.device)
+		}
+
 		this.fg.draw(this.screen.device)
+	}
+
+	this.tabstop = 1
+
+	this.focusget = function(){
+		this.hasfocus = 1
+		this.setDirty(true)
+	}
+
+	this.focuslost = function(){
+		this.hasfocus = 0
+		this.setDirty(true)
 	}
 
 	this.doDrawGuid = function(renderstate){
