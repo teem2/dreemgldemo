@@ -282,7 +282,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			if (this.uieventdebug){
 				console.log(" clicked: " + this.guidmap[this.lastmouseguid].constructor.name);
 			}
-			this.guidmap[this.lastmouseguid].emit('click')
+			var overnode = this.guidmap[this.lastmouseguid];
+			if (overnode && overnode.emit) overnode.emit('click')
 		}
 	}
 
