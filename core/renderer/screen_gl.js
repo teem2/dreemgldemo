@@ -305,7 +305,17 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.setFocus = function(object){
-		this.focus_object = object
+		if(this.focus_object !== object){
+			if(this.focus_object) this.focus_object.emit('focuslost')
+			this.focus_object = object
+			object.emit('focusget')
+		}
+	}
+
+	this.focusNext = function(obj){
+	}
+
+	this.focusPrev = function(obj){
 	}
 
 	this.bindInputs = function(){
@@ -351,7 +361,12 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 				this.mousecapturecount++;
 			}
 			var overnode = this.guidmap[this.lastmouseguid]
-			if (overnode && overnode.emit) overnode.emit('mouseleftdown', this.remapMouse(overnode))
+			// lets give this thing focus
+
+			if (overnode && overnode.emit){
+				this.setFocus(overnode)
+				overnode.emit('mouseleftdown', this.remapMouse(overnode))
+			} 
 		}.bind(this)
 
 		this.mouse.leftup = function(){ 
