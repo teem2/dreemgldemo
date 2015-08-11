@@ -149,7 +149,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 				$$("mouseenter: " + this.guidmap[id].constructor.name + "(" + id + ")")
 			}
 
-			this.guidmap[id].emit('mouseover')
+			if (this.guidmap[id]) this.guidmap[id].emit('mouseover')
 			this.lastmouseguid = id
 		}
 	}
@@ -351,7 +351,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 				this.mousecapturecount++;
 			}
 			var overnode = this.guidmap[this.lastmouseguid]
-			overnode.emit('mouseleftdown', this.remapMouse(overnode))
+			if (overnode && overnode.emit) overnode.emit('mouseleftdown', this.remapMouse(overnode))
 		}.bind(this)
 
 		this.mouse.leftup = function(){ 

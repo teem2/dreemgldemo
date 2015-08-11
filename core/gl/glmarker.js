@@ -4,7 +4,7 @@ define.class('$gl/glshader', function(require, exports, self){
 	this.matrix = mat4()
 
 	this.border_radius = 3.5
-	this.gloop = 8
+	this.gloop = 10
 
 	this.position = function(){
 		return mesh.pos * matrix
@@ -40,7 +40,7 @@ define.class('$gl/glshader', function(require, exports, self){
 
 		if(alpha < 0.001) discard;
 
-		return vec4('ocea'.rgb, alpha)
+		return vec4(fgcolor.rgb, alpha)
 	}
 
 	this.markergeom = define.struct({
@@ -103,6 +103,7 @@ define.class('$gl/glshader', function(require, exports, self){
 			)
 		}
 	})
-
+	
 	this.mesh = this.markergeom.array()
+	this.fgcolor = vec4("ocea");
 })

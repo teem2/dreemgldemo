@@ -13,7 +13,9 @@ define.class('./sprite_gl', function(require, exports, self){
 	this.attribute('text', {type:String, value: "HELLO" })
 	this.attribute('fontsize', {type:float, value: 18});
 	this.attribute('color', {type:vec4, value: vec4(1,1,1,1)});
-
+	this.attribute("markercolor", {type:vec4, value: vec4("ocea")});
+	this.attribute("cursorcolor", {type:vec4, value: vec4("black")});
+	
 	exports.nest('Fg', GLText.extend(function(exports, self){}))
 	exports.nest('Cursor', GLCursor.extend(function(exports, self){}))
 	exports.nest('Markers', GLMarker.extend(function(exports, self){}))
@@ -59,7 +61,6 @@ define.class('./sprite_gl', function(require, exports, self){
 		
 		this.cursor.mesh = this.cursor.cursorgeom.array()
 		this.markers.mesh = this.markers.markergeom.array()
-
 		this.initEditImpl()
 		//this.cursors.moveRight()
 		this.focus()
@@ -81,10 +82,14 @@ define.class('./sprite_gl', function(require, exports, self){
 		this.bg.height = this.textbuf.text_h
 		this.bg.draw(this.screen.device)
 		
-		this.markers._matrix = this.bg._matrix
+		this.markers._matrix = this.bg._matrix;
+		this.markers.fgcolor = this.markercolor;
+		
 		this.markers.draw(this.screen.device)
 
 		this.cursor._matrix = this.bg._matrix
+		this.cursor.fgcolor = this.cursorcolor;
+		
 		this.cursor.draw(this.screen.device)
 			
 		this.fg.draw(this.screen.device)

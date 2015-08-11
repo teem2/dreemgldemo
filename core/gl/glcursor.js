@@ -6,7 +6,7 @@ define.class('$gl/glshader', function(require, exports, self){
 	this.position = function(){
 		return mesh.pos * matrix
 	}
-
+	
 	this.color = function(){
 		var rel = mesh.edge//cursor_pos
 		var dpdx = dFdx(rel)
@@ -16,7 +16,7 @@ define.class('$gl/glshader', function(require, exports, self){
 			if(rel.x < dpdx.x) return 'white'
 			return vec4(0.)
 		}
-		return vec4(vec3(1.), smoothstep(edge, -edge, shape.box(rel, 0,0,0.05,1.)))
+		return vec4(fgcolor.rgb, smoothstep(edge, -edge, shape.box(rel, 0,0,0.05,1.)))
 	}
 
 	this.cursorgeom = define.struct({
@@ -27,7 +27,8 @@ define.class('$gl/glshader', function(require, exports, self){
 		this.addCursor = function(textbuf, start){
 			var pos = textbuf.cursorRect(start)
 			//pos.y = 0//this.textbuf.font_size - this.textbuf.font_size * this.textbuf.cursor_sink
-			pos.w = textbuf.font_size		
+			pos.w = textbuf.font_size + 10;		
+			console.log("Rik - please find out why cursorwidth is near invisible at small fontsizes ;-) ");
 			//this.cursor.mesh.length = 0
 			this.pushQuad(
 				pos.x, pos.y, 0, 0, 
@@ -37,7 +38,8 @@ define.class('$gl/glshader', function(require, exports, self){
 			)
 
 		}
-	})
+	}) 
 
 	this.mesh = this.cursorgeom.array()
+	this.fgcolor = vec4("white");
 })
