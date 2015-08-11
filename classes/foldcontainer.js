@@ -85,9 +85,7 @@ define.class(function(sprite, text, view){
 					this.bg.col1 = this.parent.buttoncolor1;
 					this.bg.col2 = this.parent.buttoncolor2;
 			}
-		}
-		
-			
+		}			
 	});
 	
 	this.render = function(){
