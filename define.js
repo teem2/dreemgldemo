@@ -259,8 +259,8 @@
 				else if(builtin === 4) args[i] = Constructor.prototype
 				else if(builtin === 5) args[i] = baseclass
 			}
-			else{
-				if(!require) throw new Error('Can only use fast-require classes on a file-class')
+			else if(arg){
+				if(!require) throw new Error('Can only use fast-require classes on a file-class for arg:' + arg)
 				args[i] = require(define.atLookupClass(arg))
 			}
 		}
