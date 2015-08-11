@@ -108,9 +108,12 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.remapMouse = function(node){
-		var M = node.getInvertedMatrix()
-		var R = vec2.mul_mat4_t(vec2(this.mouse.glx, this.mouse.gly), M)
-		return R
+		if (node && node.getInvertedMatrix)
+		{
+			var M = node.getInvertedMatrix()
+			var R = vec2.mul_mat4_t(vec2(this.mouse.glx, this.mouse.gly), M)
+			return R
+		}
 	}
 
 	this.setguid = function(id){
@@ -127,7 +130,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.lasty = this.mouse.y
 			
 			var overnode = this.guidmap[id]
-			if (overnode.hasListeners)
+			if (overnode && overnode.hasListeners)
 			{
 				if(overnode.hasListeners('mousemove')){
 					overnode.emit('mousemove', this.remapMouse(overnode))
