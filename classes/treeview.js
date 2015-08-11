@@ -25,8 +25,15 @@ define.class(function(sprite, text, view, button){
 							]}
 					]},
 			]}
-	
-	var treeitem = view.extend(function(){
+			
+	var itemheading = view.extend(function itemheading(){
+		this.attribute("text", {type:String, value:""});
+		
+		this.render = function(){
+			return [view({"bg.bgcolorfn": function(a,b){return vec4(vec3(1.-a.y/19.), 1.0)} ,flex:1},text({text: this.text, bgcolor: "transparent", fgcolor: "black"}))];
+		}
+	})
+	var treeitem = view.extend(function (){
 		this.flex = 1.0;
 		
 		
@@ -56,16 +63,18 @@ define.class(function(sprite, text, view, button){
 		
 			this.collapsed;
 			console.log("rendering", this.count++, this.item.name);		
-			return [view({bgcolor:"transparent",flexdirection:"column" },
-							[button({click: this.toggle.bind(this), text:this.item.name, bgcolor: "red", fgcolor: "black" }),
+			return [view({flexdirection:"column", flex:1},
+							[itemheading({click: this.toggle.bind(this), text:this.item.name }),
 								(this.item.collapsed==false)?
-											view({bgcolor:"blue",bordercolor: "white", borderwidth: 2,padding:4, marginleft:20,  flexdirection:"column" },
-												this.item.children?
+								view({bgcolor:"transparent",flexdirection:"row" },
+											view({width:1,marginleft: 10,marginright: 10, bgcolor: "#c0c0c0" }), 
+											view({bgcolor:"transparent",  flexdirection:"column" , flex:1},
+													this.item.children?
 													this.item.children.map(function(m){return treeitem({item: m})})
 													:[]
-												)
+													))
 											:[]
-							])];	
+										])];	
 		}
 	});
 	
