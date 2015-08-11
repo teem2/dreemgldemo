@@ -13,7 +13,12 @@ define.class('./sprite_gl', function(require, exports, self){
 	this.text = function(){
 		this.dirty = true;
 	}
-
+	this.sizetocontent = function(width)
+	{
+		console.log(this);
+		console.log("width: " ,  width);
+		return {width: 100, height: 20};
+	}
 	this.atDraw = function(){
 		if(this.rendered_text !== this.text){
 			this.rendered_text = this.text

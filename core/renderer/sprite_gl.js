@@ -63,6 +63,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			var precol = mix(bordercolor, bgcolor, b)
 			var col =  precol //pal.dither(precol);
 			col.a *= clamped * opacity
+			
 			return col
 		}
 
