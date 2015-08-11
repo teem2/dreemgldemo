@@ -35,7 +35,26 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 
 		// render our screen
 		renderer.render(this.screen, null, globals, function rerender(what){
-			// ...
+			// lets rerender it
+			// clear out em children
+			var old = Object.create(what)
+			old.children = what.children
+			what.children = []
+
+			renderer.render(what, what.parent, globals, rerender.bind(this))
+
+			// lets diff them
+			what.diff(old, globals)
+
+			var wireinits = []
+			renderer.connectWires(what, wireinits)
+			renderer.fireInit(what)
+
+			for(var i = 0; i < wireinits.length; i++){
+				wireinits[i]()
+			}
+			what.setDirty(true)
+			this.screen.performLayout()
 		}.bind(this))
 		
 		// diff it
