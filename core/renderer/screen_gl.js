@@ -140,7 +140,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 		if(id != this.lastmouseguid){
 
-			this.guidmap[this.lastmouseguid].emit('mouseout')
+			var overnode = 	this.guidmap[this.lastmouseguid];
+			if (overnode && overnode.emit) overnode.emit('mouseout')
 
 			if (this.uieventdebug){
 				$$("mouseout: " + this.guidmap[this.lastmouseguid].constructor.name + "(" + this.lastmouseguid + ")")
