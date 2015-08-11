@@ -209,7 +209,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.size = [this._width, this._height];
 		this.pos = [0,0];
 		this.flexdirection = "column" ;
-
 		
 		this._top = 0;
 		this._left =0;
@@ -305,7 +304,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 		this.initVars()
 		this.bindInputs()
-		other.degraded = true
+
 		return this
 	}
 
@@ -318,9 +317,48 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.focusNext = function(obj){
+		// continue the childwalk.
+		var screen = this, found 
+		function findnext(node, find){
+			for(var i = 0; i < node.children.length; i++){
+				var obj = node.children[i]
+				if(obj === find){
+					found = true
+				}
+				else if(obj.tabstop && found){
+					screen.setFocus(obj)
+					return true
+				}
+				if(findnext(obj, find)) return true
+			}
+		}
+		if(!findnext(this, obj)){
+			found = true
+			findnext(this)
+		}
 	}
 
 	this.focusPrev = function(obj){
+		var screen = this, last
+		function findprev(node, find){
+			for(var i = 0; i < node.children.length; i++){
+				var obj = node.children[i]
+				if(find && obj === find){
+					if(last){
+						screen.setFocus(last)
+						return true
+					}
+				}
+				else if(obj.tabstop){
+					last = obj
+				}
+				if(findprev(obj, find)) return true
+			}
+		}
+		if(!findprev(this, obj)){
+			findprev(this)
+			if(last) screen.setFocus(last)
+		}
 	}
 
 	this.bindInputs = function(){
