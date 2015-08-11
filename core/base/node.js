@@ -506,7 +506,14 @@ define.class(function(require, constructor){
 				if(arg1.toString() !== arg2.toString()) return false
 			}
 			else if(typeof arg1 === 'object'){
-				console.log("TODO add object diffing")
+				if(arg1.struct){
+					if(arg1.length !== arg2.length) return false
+					for(var i = 0; i < arg1.length; i++){
+						if(arg1[i] !== arg2[i]) return false
+					}
+					return true
+				}
+				console.log("TODO add object diffing", arg1)
 			}
 			else if(arg1 !== arg2) return false
 		}
