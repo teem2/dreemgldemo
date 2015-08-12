@@ -13,6 +13,7 @@ define.class(function(sprite, text, view){
 		return vec4(min(dx,  dy));
 	}
 	this.mousemove = function(a){
+		console.log(a)
 		this.bg.mousepos = vec2(a[0],a[1]);		
 		this.setDirty(true);
 	}

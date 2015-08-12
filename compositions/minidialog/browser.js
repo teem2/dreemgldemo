@@ -5,7 +5,7 @@ define.browser(function(require, screen, view, edit, text, treeview, splitcontai
 				view({bgcolor: "#a0a070" , padding: 4,flexdirection:"column" },
 					text({text:"The amazing tinydialog!", bgcolor: "transparent" , fontsize: 20})
 				),
-				mousedebug({flex: undefined, margin:4, width: 100, height: 100, bgcolor: "blue"}),
+				mousedebug({flex: undefined, margin:4, width: 300, height: 300, bgcolor: "blue"}),
 				mousedebug({flex: undefined, margin:4, width: 200, height: 100, bgcolor: "blue"}),
 				mousedebug({flex: undefined, margin:4, width: 300, height: 500, bgcolor: "blue", rotation: 45}),
 				splitcontainer({bgcolor: "#f0f0f0" , padding: 4,margin: 4,flexdirection:"column" }

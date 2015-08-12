@@ -113,9 +113,9 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			
 			var M = node.getWorldMatrix()
 			//mat4.debug(M);
-					var screenw = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
-		var screenh = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
-
+			var screenw = this.device.main_frame.size[0] /// this.device.main_frame.ratio;
+			var screenh = this.device.main_frame.size[1] /// this.device.main_frame.ratio;
+			//console.log(this.mouse.glx, this.mouse.gly)
 			var M2 =mat4.ortho(0, screenw, 0, screenh -100, 100);
 			 var M3 = mat4.mul( M, M2);
 			 var M3i = mat4.invert(M3)
