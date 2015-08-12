@@ -6,9 +6,11 @@ define.class(function(sprite,  view, scrollbar){
 		this.flexwrap = "none" ;
 		this.alignitems = "stretch";
 		this.flex = 1;
+		
 		this.updatescrollbars = function(view){
-			console.log(view.layout.width, view.layout.height);
-		}
+			console.log(view.layout.width, view.layout.height);			
+		}	
+		
 		this.render = function(){		
 		if (this.instance_children.length > 0){
 						return [

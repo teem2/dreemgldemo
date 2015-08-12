@@ -3,7 +3,6 @@
 define.class(function(require, exports, self){
 	
 	this.pushClip = function( sprite){
-		
 		var previousdepth = this.clipStack.length;
 		this.clipStack.push(sprite.boundingrect);		
 		var gl = this.device.gl;
@@ -24,12 +23,13 @@ define.class(function(require, exports, self){
 		var gl = this.device.gl;
 		var depth = this.clipStack.length
 
-	//	gl.colorMask(true,true,true,true);
+		//gl.colorMask(true,true,true,true);
+	
 		gl.stencilFunc(gl.EQUAL, depth, 0xFF);
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);	
 	}
 	
-	this.popClip = function( sprite) {
+	this.popClip = function(sprite) {
 		
 		this.clipStack.pop();
 		var previousdepth = this.clipStack.length;
@@ -46,6 +46,30 @@ define.class(function(require, exports, self){
 		gl.colorMask(true,true,true,true);
 		gl.stencilFunc(gl.EQUAL, previousdepth - 1, 0xFF);
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);			
+	}
+	
+	this.setupsubrect = function(device, x,y,w,h){
+		
+		this.device = device;
+	//	this.device.clear(vec4(1))
+		
+		this.clipStack = [];
+		this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+		
+		var screenw = device.main_frame.size[0];
+		var screenh  = device.main_frame.size[1];
+		
+		y = (screenh  - y ) - h; 
+		
+		//console.log("subrect:",x,y,w,h, screenw * device.ratio, screenh* device.ratio, device.ratio);
+		
+		this.uimode = true;
+		this.matrix = mat4.identity();
+		this.viewmatrix = mat4.ortho(0, screenw, 0, screenh, -100, 100);
+		
+		this.device.gl.scissor(x,y  , w * device.ratio, h * device.ratio);
+		this.device.gl.viewport(0,0,screenw * device.ratio, screenh * device.ratio);//x* device.ratio, screenh- y, w * device.ratio, h * device.ratio)
+		this.boundingrect = rect(x,y, w,h);
 	}
 
 	this.setup = function(device, viewportwidth, viewportheight){

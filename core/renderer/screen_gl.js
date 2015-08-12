@@ -159,14 +159,28 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.drawColor = function(){
-		this.renderstate.setup(this.device);
-		this.orientation = {};
 		
+		if (this.dirtyrect && !isNaN(this.dirtyrect.left)){
+			var w = this.dirtyrect.right - this.dirtyrect.left;
+			var h = this.dirtyrect.bottom - this.dirtyrect.top;
+			if (isNaN(w) || isNaN(h)){
+				this.renderstate.setup(this.device);
+			}
+			else{
+				//console.log(w,h);
+			this.renderstate.setupsubrect(this.device, this.dirtyrect.left, this.dirtyrect.top, w, h);
+			//this.renderstate.translate(-this.dirtyrect.left,  -this.dirtyrect.top);
+			}
+		}else{
+			this.renderstate.setup(this.device);
+		}
+		
+		this.orientation = {};
 		this.orientation.worldmatrix = this.renderstate.matrix;
 		this.invertedworldmatrix =  mat4.invert(this.orientation.worldmatrix)
 		this.renderstate.debugmode = false;
 		this.renderstate.drawmode = 0;
-		this.device.clear(this.bgcolor)
+	//	this.device.clear(this.bgcolor)
 		this.device.gl.clearStencil(0);
 		//this.device.clear(this.device.gl.STENCIL_BUFFER_BIT);
 		for (var i = 0; i < this.children.length; i++){
@@ -258,6 +272,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.device.setTargetFrame()
 			//for(var i = 0;i<20;i++)
 			this.drawColor();
+			this.dirtyrect = {};
+			
 		}
 
 		if(anim || this.hasListeners('time')){
@@ -266,9 +282,18 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		//console.log(this.draw_calls, Date.now() - delta)
 	}
 
-	this.setDirty = function(value){
+	this.setDirty = function(value, rect){
 		if (this.dirty === false && value === true && this.device !== undefined){
 			this.dirty = true
+			if (this.dirtyrect && this.dirtyrect.left)
+			{
+				this.dirtyrect.top = Math.min(this.dirtyrect.top, rect.top);
+				this.dirtyrect.bottom = Math.max(this.dirtyrect.bottom, rect.bottom);
+				this.dirtyrect.left = Math.min(this.dirtyrect.left, rect.left);
+				this.dirtyrect.right = Math.max(this.dirtyrect.right, rect.right);
+			}else{
+				this.dirtyrect = rect;
+			}
 			this.device.redraw();
 		}
 	}
