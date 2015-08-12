@@ -54,7 +54,6 @@ define.class(function(require, exports, self){
 	//	this.device.clear(vec4(1))
 		
 		this.clipStack = [];
-		this.device.gl.enable(this.device.gl.SCISSOR_TEST);
 		
 		var screenw = device.main_frame.size[0];
 		var screenh  = device.main_frame.size[1];
@@ -68,6 +67,8 @@ define.class(function(require, exports, self){
 		this.viewmatrix = mat4.ortho(0, screenw, 0, screenh, -100, 100);
 		
 		this.device.gl.scissor(x,y  , w * device.ratio, h * device.ratio);
+		this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+		
 		this.device.gl.viewport(0,0,screenw * device.ratio, screenh * device.ratio);//x* device.ratio, screenh- y, w * device.ratio, h * device.ratio)
 		this.boundingrect = rect(x,y, w,h);
 	}

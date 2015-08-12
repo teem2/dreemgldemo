@@ -23,7 +23,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 	this.renderstate = new RenderState();
 
-	this.debug = true
+	this.debug = false
 
 	this.lastx = -1;
 	this.lasty = -1;
@@ -180,9 +180,10 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.invertedworldmatrix =  mat4.invert(this.orientation.worldmatrix)
 		this.renderstate.debugmode = false;
 		this.renderstate.drawmode = 0;
-	//	this.device.clear(this.bgcolor)
+		this.device.clear(this.bgcolor)
 		this.device.gl.clearStencil(0);
 		//this.device.clear(this.device.gl.STENCIL_BUFFER_BIT);
+		//if (this.dirtyrect && isNaN(this.dirtyrect.left) == false)
 		for (var i = 0; i < this.children.length; i++){
 			this.children[i].draw(this.renderstate)
 		}

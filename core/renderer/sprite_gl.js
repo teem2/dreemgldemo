@@ -128,7 +128,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.recomputeMatrix = function(){
 		
 		var o = this.orientation;
-		if (this.parent && this.parent.matrixdirty || (this.parent.hasLayoutChanged && this.parent.hasLayoutChanged()))  {
+		if (!o) return;
+		if ((this.parent && this.parent.matrixdirty) || (this.parent && this.parent.hasLayoutChanged && this.parent.hasLayoutChanged()))  {
 					if (parent.recomputeMatrix) parent.recomputeMatrix();
 			}
 	
@@ -418,7 +419,11 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			
 			
 		}
-		if (changed) this.layoutchanged();
+		if (changed) 
+		{
+			this.layoutchanged();
+			this.setDirty();
+		}
 		return changed;
 	}
 	
