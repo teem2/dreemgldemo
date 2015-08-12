@@ -8,6 +8,9 @@ define.class(function(require, exports, self){
 	this.frame = 
 	this.main_frame = Texture.rgb_depth_stencil()
 	
+	this.preserveDrawingBuffer = true
+	this.antialias = false
+	
 	this.atConstructor = function(){
 		this.extensions = {}
 		this.shadercache = {}
