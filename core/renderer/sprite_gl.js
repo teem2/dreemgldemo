@@ -79,7 +79,10 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	exports.nest('Fg', GLText.extend(function(exports, self){
 		this.no_guid = 1
 	}))
-
+	
+	this.layoutchanged = function(){
+	}
+	
 	this.enableTextureCache = function(enabled){
 		if (enabled == false){
 			if(this.texturecache != false){
@@ -100,8 +103,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	
 	this.getWorldMatrix = function(){
 		
-		if (this.matrixdirty || this.layoutChanged()){
-			if (this.parent && this.parent.matrixdirty || (this.parent.layoutChanged && this.parent.layoutChanged())) {
+		if (this.matrixdirty || this.hasLayoutChanged()){
+			if (this.parent && this.parent.matrixdirty || (this.parent.hasLayoutChanged && this.parent.hasLayoutChanged())) {
 					if (parent.recomputeMatrix) parent.recomputeMatrix();
 			}
 			this.recomputeMatrix();
@@ -111,7 +114,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 	
 	this.getInvertedMatrix = function(){
-		if (this.matrixdirty || this.layoutChanged()){
+		if (this.matrixdirty || this.hasLayoutChanged()){
 			this.recomputeMatrix();
 			this.orientation.worldmatrix = mat4.mul(this.orientation.matrix, this.parent.orientation.worldmatrix);
 		}
@@ -125,7 +128,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.recomputeMatrix = function(){
 		
 		var o = this.orientation;
-		if (this.parent && this.parent.matrixdirty || (this.parent.layoutChanged && this.parent.layoutChanged()))  {
+		if (this.parent && this.parent.matrixdirty || (this.parent.hasLayoutChanged && this.parent.hasLayoutChanged()))  {
 					if (parent.recomputeMatrix) parent.recomputeMatrix();
 			}
 	
@@ -395,7 +398,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.hideContent = this.hideContentDOM
 	this.lastLayout ;
 	
-	this.layoutChanged = function(){
+	this.hasLayoutChanged = function(){
 		var changed = false;
 		
 		if (this.layout && !this.lastLayout){
@@ -411,9 +414,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			if (this.layout.right != this.lastLayout.right) { this.lastLayout.right = this.layout.right;changed = true;}
 			if (this.layout.bottom != this.lastLayout.bottom) { this.lastLayout.bottom = this.layout.bottom;changed = true;}
 			
-			return changed;
+			
 		}
-		
+		if (changed) this.layoutchanged();
 		return changed;
 	}
 	
@@ -421,7 +424,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		if (this.atDraw) this.atDraw(renderstate)
 
 		if (this.visible){
-			if (this.dirty != false || this.layoutChanged()) {
+			if (this.dirty != false || this.hasLayoutChanged()) {
 				//if(this.matrixdirty) 
 				this.recomputeMatrix();
 
