@@ -17,7 +17,6 @@ define.class(function(require, view){
 			define.atLookupClass = define.lookupClass
 			// alright lets load this thing up
 			this.sub_teem = new TeemClient(undefined, this)
-			// now lets draw this fucker.
 			this.children = [this.sub_teem.screen]
 
 			this.setDirty(true)

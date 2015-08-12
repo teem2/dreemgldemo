@@ -13,7 +13,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 	var Mouse = require('$renderer/mouse_$rendermode')
 	var Keyboard = require('$renderer/keyboard_$rendermode')
 
-	self.doRender = function(previous){
+	self.doRender = function(previous, parent){
 		
 		var globals = {
 			teem:this, 
@@ -22,8 +22,10 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 
 		// copy keyboard and mouse objects from previous
 		if(!previous){
-			this.mouse = globals.mouse = new Mouse()
-			this.keyboard = globals.keyboard = new Keyboard()
+			if(!parent){
+				this.mouse = globals.mouse = new Mouse()
+				this.keyboard = globals.keyboard = new Keyboard()
+			}
 		}
 		else{
 			this.mouse = globals.mouse = previous.mouse
@@ -206,6 +208,6 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		// alright now we find the screen we wanna render somehow
 		this.screen = this.screens.browser
 
-		if(previous || parent) this.doRender(previous)
+		if(previous || parent) this.doRender(previous, parent)
 	}
 })
