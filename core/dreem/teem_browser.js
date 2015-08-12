@@ -146,7 +146,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 					this.bus.send({type:'webrtcOffer', offer:offer, index: this.index})
 				}.bind(this)
 
-				this.doRender()
+				if(!this.parent) this.doRender()
 			}
 			else if(msg.type == 'connectScreen'){
 				//var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
