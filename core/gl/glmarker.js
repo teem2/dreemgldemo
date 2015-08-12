@@ -2,12 +2,12 @@
 // Parts copyright 2012 Google, Inc. All Rights Reserved. (APACHE 2.0 license)
 define.class('$gl/glshader', function(require, exports, self){
 	this.matrix = mat4()
-
+	this.viewmatrix = mat4()
 	this.border_radius = 2.5
 	this.gloop = 8
 
 	this.position = function(){
-		return mesh.pos * matrix
+		return mesh.pos * matrix * viewmatrix
 	}
 
 	this.color = function(){

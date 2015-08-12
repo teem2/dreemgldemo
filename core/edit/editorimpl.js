@@ -271,6 +271,7 @@ define.mixin(function(require){
 		else{
 			// in that case what we need to 
 			this.cursors.fusing = true
+		
 			this.cursors.moveTo(start[0], start[1])
 
 			if(this.mouse.clicker == 2) this.cursors.selectWord()
