@@ -258,7 +258,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			this.bg.width = this.width;
 			this.bg.height = this.height;
 		}
-		this.bg.draw();
+		this.bg.draw(renderstate.device);
 	}
 	
 	this.drawContentDOM = function(renderstate){
@@ -452,6 +452,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 					}
 				}
 			}
+			
 			if (actuallyclipping) renderstate.popClip(this);
 
 			renderstate.matrix = prevmatrix;

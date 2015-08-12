@@ -26,7 +26,7 @@ define.class(function(sprite, text, view){
 		// we have a rectangle
 		var rel = vec2(mesh.x*width, mesh.y*height)
 		var edge = min(length(vec2(length(dFdx(rel)), length(dFdy(rel)))) * SQRT_1_2, 0.001)
-		var field = shape.roundbox(rel, 0.05 * width, offset*height,9*width, total*height,4)
+		var field = shape.roundbox(rel, 0.05 * width, offset*height,.9*width, total*height,4)
 		var fg = vec4(draggercolor.rgb, smoothstep(edge, -edge, field)*draggercolor.a)
 		var bg = vec4(0.,0.,0.,0.05)
 		return mix(bg.rgba, fg.rgba, fg.a)
