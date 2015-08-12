@@ -90,12 +90,13 @@ define.class('./sprite_gl', function(require, exports, self){
 	this.doDraw = function(renderstate){
 		//this.bg._matrix = renderstate.matrix
 		this.bg.width = this.textbuf.bound_w;
-		this.bg.viewmatrix = renderstate.viewmatrix;
+		this.bg._viewmatrix = renderstate.viewmatrix;
 		
 		this.bg.height = this.textbuf.bound_h
 		this.bg.draw(this.screen.device)
 		
 		this.markers._matrix = this.bg._matrix;
+		this.markers._viewmatrix = this.bg._viewmatrix;
 
 		if(this.hasfocus){
 			this.markers.fgcolor = this.markerfocuscolor;
@@ -107,6 +108,8 @@ define.class('./sprite_gl', function(require, exports, self){
 
 		if(this.hasfocus){
 			this.cursor._matrix = this.bg._matrix
+			this.cursor._viewmatrix = this.bg._viewmatrix
+
 			this.cursor.fgcolor = this.cursorcolor;
 			
 			this.cursor.draw(this.screen.device)
