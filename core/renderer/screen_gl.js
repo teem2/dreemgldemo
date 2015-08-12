@@ -110,12 +110,14 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.remapMouse = function(node){
 		if (node && node.getWorldMatrix)
 		{
+			
 			var M = node.getWorldMatrix()
+			//mat4.debug(M);
 			var M2 =mat4.ortho(0, this.device.main_frame.size[0], 0, this.device.main_frame.size[1], -100, 100);
 			 var M3 = mat4.mul( M, M2);
 			 var M3i = mat4.invert(M3)
 			var R = vec2.mul_mat4_t(vec2(this.mouse.glx, this.mouse.gly), M3i)
-			console.log(this.device.main_frame.size, R);
+			//console.log(this.lastidundermouse,  this.device.main_frame.size, R);
 			
 			return R
 		}

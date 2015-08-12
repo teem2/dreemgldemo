@@ -34,7 +34,8 @@ define.class('./sprite_gl', function(require, exports, self){
 		return {width: this.fg.mesh.bound_w, height: this.fg.mesh.bound_h};
 	}
 
-	this.atDraw = function(){
+	this.atDraw = function(renderstate){
+		this.fg.viewmatrix = renderstate.viewmatrix;
 		this.lazyInit()
 	}
 })

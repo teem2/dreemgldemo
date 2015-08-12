@@ -17,7 +17,7 @@ define.class(function(require, exports, self){
 	this.translate = function(x,y){
 		var m2 = mat4.T(x,y,0);
 	//	this.matrix = mat4.mul(this.matrix, m2);
-		this.viewmatrix = mat4.mul(m2, this.matrix);
+		this.viewmatrix = mat4.mul( m2, this.viewmatrix);
 	}
 	
 	this.stopClipSetup = function(sprite){

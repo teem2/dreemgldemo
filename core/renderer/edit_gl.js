@@ -87,9 +87,11 @@ define.class('./sprite_gl', function(require, exports, self){
 		}
 	}
 
-	this.doDraw = function(){
+	this.doDraw = function(renderstate){
 		//this.bg._matrix = renderstate.matrix
-		this.bg.width = this.textbuf.bound_w
+		this.bg.width = this.textbuf.bound_w;
+		this.bg.viewmatrix = renderstate.viewmatrix;
+		
 		this.bg.height = this.textbuf.bound_h
 		this.bg.draw(this.screen.device)
 		
@@ -109,7 +111,7 @@ define.class('./sprite_gl', function(require, exports, self){
 			
 			this.cursor.draw(this.screen.device)
 		}
-
+		this.fg.viewmatrix = renderstate.viewmatrix;
 		this.fg.draw(this.screen.device)
 
 		if(this.debug){
@@ -131,6 +133,7 @@ define.class('./sprite_gl', function(require, exports, self){
 	}
 
 	this.doDrawGuid = function(renderstate){
+		this.bg.viewmatrix = renderstate.viewmatrix;
 		this.bg.width = this.textbuf.text_w
 		this.bg.height = this.textbuf.text_h
 		this.bg.drawGuid(this.screen.device)

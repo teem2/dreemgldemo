@@ -418,7 +418,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 	
 	this.draw = function(renderstate){
-		if (this.atDraw) this.atDraw()
+		if (this.atDraw) this.atDraw(renderstate)
 
 		if (this.visible){
 			if (this.dirty != false || this.layoutChanged()) {
