@@ -8,17 +8,17 @@ define.class(function(sprite, text, view){
 	this.attribute("activecolor", {type: vec4, value: vec4("#8080c0")});
 	this.attribute("vertical", {type: Boolean, value: true});
 	this.attribute("offset", {type:float, value:0})
-	this.attribute("total", {type:float, value:0.3})
+	this.attribute("page", {type:float, value:0.3})
 
 	this.bg.draggercolor = vec4();
 	this.bg.offset = 0
-	this.bg.total = 0.3
+	this.bg.page = 0.3
 
 	this.hslider = function(){
 		// we have a rectangle
 		var rel = vec2(mesh.x*width, mesh.y*height)
 		var edge = min(length(vec2(length(dFdx(rel)), length(dFdy(rel)))) * SQRT_1_2, 0.001)		
-		var field = shape.roundbox(rel, offset * width, 0.05*height,total*width, .9*height,4)
+		var field = shape.roundbox(rel, offset * width, 0.05*height,page*width, .9*height,4)
 		var fg = vec4(draggercolor.rgb, smoothstep(edge, -edge, field)*draggercolor.a)
 		var bg = vec4(0.,0.,0.,0.05)
 		return mix(bg.rgba, fg.rgba, fg.a)
@@ -28,7 +28,7 @@ define.class(function(sprite, text, view){
 		// we have a rectangle
 		var rel = vec2(mesh.x*width, mesh.y*height)
 		var edge = min(length(vec2(length(dFdx(rel)), length(dFdy(rel)))) * SQRT_1_2, 0.001)
-		var field = shape.roundbox(rel, 0.05 * width, offset*height,.9*width, total*height,4)
+		var field = shape.roundbox(rel, 0.05 * width, offset*height,.9*width, page*height,4)
 		var fg = vec4(draggercolor.rgb, smoothstep(edge, -edge, field)*draggercolor.a)
 		var bg = vec4(0.,0.,0.,0.05)
 		return mix(bg.rgba, fg.rgba, fg.a)
@@ -76,11 +76,11 @@ define.class(function(sprite, text, view){
 			var p = start[0] / this.layout.width
 		}
 		if(p < this.offset){
-			this.offset = clamp(p - 0.5 * this.total, 0, 1.-this.total)
+			this.offset = clamp(p - 0.5 * this.page, 0, 1.-this.page)
 			this.setDirty(true)
 		}
-		else if (p > this.offset + this.total){
-			this.offset = clamp(p - 0.5*this.total, 0, 1.-this.total)
+		else if (p > this.offset + this.page){
+			this.offset = clamp(p - 0.5*this.page, 0, 1.-this.page)
 			this.setDirty(true)
 		}
 		var start_offset = this.offset
@@ -91,7 +91,7 @@ define.class(function(sprite, text, view){
 			else{
 				var p = start_offset + (pos[0] - start[0]) / this.layout.width
 			}
-			this.offset = clamp(p, 0, 1.-this.total)
+			this.offset = clamp(p, 0, 1.-this.page)
 			this.setDirty(true)
 		}
 	}
@@ -106,7 +106,7 @@ define.class(function(sprite, text, view){
 	this.atDraw = function(){
 		this.drawcount ++;
 		this.bg._offset = this._offset
-		this.bg._total = this._total
+		this.bg._page = this._page
 
 	//	console.log("atdraw button", this.drawcount);
 		if (this.pressed > 0){
