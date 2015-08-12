@@ -11,7 +11,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.dump = 1
 
 	exports.interfaceguid = 1
-
+	this.matrixdirty = true;
 	this.dirty = true
 	this.attribute("texturecache", {type:boolean, value:false})
 
@@ -97,9 +97,21 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			}
 		}
 	}
-
+	
+	this.getWorldMatrix = function(){
+		
+		if (this.matrixdirty || this.layoutChanged()){
+			if (this.parent && this.parent.matrixdirty || (this.parent.layoutChanged && this.parent.layoutChanged())) {
+					if (parent.recomputeMatrix) parent.recomputeMatrix();
+			}
+			this.recomputeMatrix();
+			this.orientation.worldmatrix = mat4.mul(this.orientation.matrix, this.parent.orientation.worldmatrix);
+		}	
+		return this.orientation.worldmatrix;
+	}
+	
 	this.getInvertedMatrix = function(){
-		if (this.matrixdirty){
+		if (this.matrixdirty || this.layoutChanged()){
 			this.recomputeMatrix();
 			this.orientation.worldmatrix = mat4.mul(this.orientation.matrix, this.parent.orientation.worldmatrix);
 		}
@@ -113,6 +125,12 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.recomputeMatrix = function(){
 		
 		var o = this.orientation;
+		if (this.parent && this.parent.matrixdirty || (this.parent.layoutChanged && this.parent.layoutChanged()))  {
+					if (parent.recomputeMatrix) parent.recomputeMatrix();
+			}
+	
+		o.rotation[2] = this._rotation * 6.283 / 360;
+		
 		if (this.layout) {
 			var s = o.scale;
 			var r = o.rotation;
@@ -376,9 +394,28 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.drawContent = this.drawContentGL
 
 	this.hideContent = this.hideContentDOM
-
+	this.lastLayout ;
+	
 	this.layoutChanged = function(){
-		return true;
+		var changed = false;
+		
+		if (this.layout && !this.lastLayout){
+				changed = true
+				this.lastLayout = {left:0, top:0, width:0, height:0, right: 0, bottom: 0};
+		}
+		
+		if (!this.layout && this.lastLayout) changed = true;
+		
+		if (this.layout){
+			if (this.layout.left != this.lastLayout.left) { this.lastLayout.left = this.layout.left;changed = true;}
+			if (this.layout.top != this.lastLayout.top) { this.lastLayout.top = this.layout.top;changed = true;}
+			if (this.layout.right != this.lastLayout.right) { this.lastLayout.right = this.layout.right;changed = true;}
+			if (this.layout.bottom != this.lastLayout.bottom) { this.lastLayout.bottom = this.layout.bottom;changed = true;}
+			
+			return changed;
+		}
+		
+		return changed;
 	}
 	
 	this.draw = function(renderstate){
@@ -386,7 +423,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 		if (this.visible){
 			if (this.dirty != false || this.layoutChanged()) {
-				this.orientation.rotation[2] = this._rotation * 6.283 / 360;
+				
 				this.recomputeMatrix();
 
 				this.effectiveopacity = this._opacity !== undefined ? this._opacity : 1.0;
