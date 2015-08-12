@@ -109,7 +109,7 @@ define.class(function(sprite, text, view, button){
 		
 			this.collapsed;
 			
-			return [view({flexdirection:"column", flex:1},
+			return [view({flexdirection:"column", flexwrap:"none",flex:1},
 							[itemheading({click: this.toggle.bind(this), text:this.item.name }),
 								(this.item.collapsed==false)?
 								view({bgcolor:"transparent",flexdirection:"row" },
