@@ -28,9 +28,59 @@ define.class(function(sprite, text, view, button){
 			
 	var itemheading = view.extend(function itemheading(){
 		this.attribute("text", {type:String, value:""});
+		this.pressed = 0;
+		this.hovered = 0;
+		this.attribute("color1", {type:vec4, value:vec4("white")});
+		this.attribute("color2", {type:vec4, value:vec4("#e0e0f0")});
+		this.attribute("hovercolor1", {type:vec4, value:vec4("white")});
+		this.attribute("hovercolor2", {type:vec4, value:vec4("#f0f0ff")});
+		this.attribute("activecolor1", {type:vec4, value:vec4("#e0e0f0")});
+		this.attribute("activecolor2", {type:vec4, value:vec4("white")});
+		this.bg.col1 = vec4("white");
+		this.bg.col2 = vec4("#e0e0f0");
+		this.mouseover  = function(){
+			this.hovered++;
+			this.setDirty(true);
+		}			
+		
+		this.mouseout  = function(){
+			this.hovered--;
+			this.setDirty(true);
+		}			
+		
+		this.mouseleftdown = function(){
+			this.pressed++;
+			this.setDirty(true);
+		}
+		
+		this.mouseleftup = function(){
+			this.pressed--;
+			this.setDirty(true);
+		}
+		
+		this.atDraw = function(){
+			
+			if (this.hovered> 0){
+					if (this.pressed > 0){
+						this.bg.col1 = this.activecolor1;
+						this.bg.col2 = this.activecolor2;
+					}else{
+						
+						this.bg.col1 = this.hovercolor1;
+						this.bg.col2 = this.hovercolor2;
+					}
+						
+			}else{
+										this.bg.col1 = this.color1;
+						this.bg.col2 = this.color2;
+
+			}
+		}
+		this.bg.bgcolorfn = function(a,b){return mix(col1, col2, a.y);};
+		
 		
 		this.render = function(){
-			return [view({"bg.bgcolorfn": function(a,b){return vec4(vec3(1.-a.y/19.), 1.0)} ,flex:1},text({text: this.text, bgcolor: "transparent", fgcolor: "black"}))];
+			return [text({text: this.text, bgcolor: "transparent", fgcolor: "black", fontsize: 16, fgcolor: "#404040", margin: 2})];
 		}
 	})
 	var treeitem = view.extend(function (){
@@ -48,13 +98,9 @@ define.class(function(sprite, text, view, button){
 			if (!this.item.collapsed) this.item.collapsed = true;else this.item.collapsed = false;
 			this.collapsed = this.item.collapsed;
 			this.setDirty(true);
-			
-			console.log(this.item.name);
 		};
 		this.bgcolor = vec4("transparent");
 		this.atConstructor = function(){
-			//console.log("init!", this);
-			console.log (this.item)
 			if (!this.item.collapsed) this.item.collapsed = false;
 		//	this.text = this.item.name;
 		}
@@ -62,7 +108,7 @@ define.class(function(sprite, text, view, button){
 		this.render = function(){	
 		
 			this.collapsed;
-			console.log("rendering", this.count++, this.item.name);		
+			
 			return [view({flexdirection:"column", flex:1},
 							[itemheading({click: this.toggle.bind(this), text:this.item.name }),
 								(this.item.collapsed==false)?

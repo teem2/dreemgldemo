@@ -57,14 +57,12 @@ define.class(function(sprite, text, view){
 			this.setDirty(true);
 		}			
 		
-		this.mouseleftdown = function()
-		{
+		this.mouseleftdown = function(){
 			this.pressed++;
 			this.setDirty(true);
 		}
 		
-		this.mouseleftup = function()
-		{
+		this.mouseleftup = function(){
 			this.pressed--;
 			this.setDirty(true);
 		}
