@@ -1,4 +1,4 @@
-define.browser(function(require, screen, view, edit, text, myview, treeview){
+define.browser(function(require, screen, view, edit, text, treeview){
 	this.render = function(){return[
 		view({},
 			view({},
