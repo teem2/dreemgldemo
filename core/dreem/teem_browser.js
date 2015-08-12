@@ -163,9 +163,10 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		}.bind(this)
 	}
 
-	self.atConstructor = function(){
-		var previous = define.teemClient
-		define.teemClient = this
+	self.atConstructor = function(parent){
+		
+		var previous = parent.teemClient
+		parent.teemClient = this
 
 		if(previous){
 			

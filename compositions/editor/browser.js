@@ -1,7 +1,7 @@
 define.browser(function(require, screen, view, edit, text, myview, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar){
 		
 	this.render = function(){return[
-		view({position: "relative",   flexdirection: "column", height: 20, bgcolor: "black", flex:1},[
+		view({rotation:0,position: "relative",   flexdirection: "column", height: 20, bgcolor: "black", flex:1},[
 			view({position: "relative",  cornerradius:"vec4(0,0,0,14)" , borderwidth:1, height: 50, flexdirection: "row", bgcolor: "#404080",'bg.bgcolorfn':function(a,b){return vec4(mesh.x * bgcolor.rgb, 1.0)} , alignitems:"stretch", alignself: "stretch" , flex: undefined}
 				,text({fontsize: 26, text:"Visionary Studio 3016", width: 200, bgcolor: "transparent" , margin: 2, marginleft:15})
 			)

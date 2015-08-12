@@ -513,7 +513,9 @@ define.class(function(require, constructor){
 					}
 					return true
 				}
-				console.log("TODO add object diffing", arg1)
+				if(arg1 !== arg2) return false
+				return true
+				//console.log("TODO add object diffing", arg1)
 			}
 			else if(arg1 !== arg2) return false
 		}
