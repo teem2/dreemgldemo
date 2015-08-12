@@ -72,6 +72,7 @@ define.class(function(require){
 
 	this.moveTo = function(x, y, only_end){
 		var off = this.textbuf.offsetFromPos(x, y)
+		//console.log(off)
 		if(off<0){
 			if(off === -4 || off === -3) off = this.textbuf.lengthQuad()
 			else off = 0
