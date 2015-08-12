@@ -1,8 +1,12 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 define.class(function(require, view){
-	this.bg.color = '"white"'
-
+	
+	this.flex = 1;
+	this.flexdirection = "column" ;
+	this.alignitem = "stretch";
+	this.alignself = "stretch"; 
+	
 	this.init = function(){
 
 		// we need to map 'screen' to something else
@@ -17,6 +21,9 @@ define.class(function(require, view){
 			define.atLookupClass = define.lookupClass
 			// alright lets load this thing up
 			this.sub_teem = new TeemClient(undefined, this)
+			this.sub_teem.screen.flex=1;
+			this.sub_teem.screen.alignself="stretch";
+			
 			this.children = [this.sub_teem.screen]
 
 			this.setDirty(true)

@@ -14,7 +14,7 @@ define.browser(function(require, screen, view, edit, text, myview, treeview, rul
 					,view({position: "relative", flex: 1.0, padding: 0, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection: "row" }
 						,ruler({width: 20, vertical: true, offset:0})
 						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"row" }
-							,editlayout({flex:1.0, composition:'minidialog'})
+							,editlayout({flex:1.0, borderwidth:3,padding:10, bordercolor: "red", composition:'minidialog'})
 						,scrollbar({width:15, position:'relative'})
 						)
 					)
