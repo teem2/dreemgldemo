@@ -6,6 +6,7 @@ define.class('./sprite_gl', function(require, exports, self){
 	var GLShader = require('$gl/glshader')
 	var GLCursor = require('$gl/glcursor')
 	var GLMarker = require('$gl/glmarker')
+	var GLDebug = require('$gl/gldebug')
 
 	// lets require the keyhandling from edit
 	this.mixin(require('$edit/editorimpl'))
@@ -21,6 +22,9 @@ define.class('./sprite_gl', function(require, exports, self){
 	exports.nest('Fg', GLText.extend(function(exports, self){}))
 	exports.nest('Cursor', GLCursor.extend(function(exports, self){}))
 	exports.nest('Markers', GLMarker.extend(function(exports, self){}))
+
+	exports.nest('Debug', GLDebug.extend(function(exports, self){}))
+
 
 	this.bg.color = 'vec4(0.6)'
 	this.text = function(){
@@ -58,6 +62,12 @@ define.class('./sprite_gl', function(require, exports, self){
 		this.textbuf.clear()
 		this.textbuf.add(this.text)
 
+		//this.cursors.moveRight()
+		if(this.debug){
+			this.debug.mesh = this.debug.debuggeom.array()
+			this.textbuf.debug = this.debug.mesh
+		}
+
 		//console.log(this.textbuf.charCoords(0))
 		this.fg.mesh = this.textbuf
 		
@@ -66,7 +76,6 @@ define.class('./sprite_gl', function(require, exports, self){
 		this.initEditImpl()
 		//this.cursors.moveRight()
 		this.focus()
-		//this.cursors.moveRight()
 	}
 
 	this.atDraw = function(){
@@ -102,6 +111,11 @@ define.class('./sprite_gl', function(require, exports, self){
 		}
 
 		this.fg.draw(this.screen.device)
+
+		if(this.debug){
+			this.debug._matrix = this.bg._matrix
+			this.debug.draw(this.screen.device)
+		}
 	}
 
 	this.tabstop = 1

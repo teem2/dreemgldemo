@@ -3,8 +3,8 @@
 define.class('$gl/glshader', function(require, exports, self){
 	this.matrix = mat4()
 
-	this.border_radius = 3.5
-	this.gloop = 10
+	this.border_radius = 2.5
+	this.gloop = 8
 
 	this.position = function(){
 		return mesh.pos * matrix

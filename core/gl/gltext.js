@@ -163,8 +163,8 @@ define.class('$gl/glshader', function(require, exports, self){
 
 		this.offsetFromPos = function(x, y){
 			var height = this.line_height
-
-			if(y < 0) return -2
+			//console.log(x, y)
+			//if(y < 0) return -2
 
 			for(var len = this.lengthQuad(), o = len - 1; o >= 0; o--){
 
@@ -173,12 +173,19 @@ define.class('$gl/glshader', function(require, exports, self){
 
 				var y2 = this.array[o*6*8 + 1] + this.font_size * info.min_y + this.font_size * this.cursor_sink
 				var y1 = y2 - this.line_height
+				
 
 				if(y>=y1 && y<=y2){
-					var hx = (this.array[o*6*8 + 0] + this.array[o*6*8 + 0 + 8])/2
-					
 					var tl_x = this.array[o*6*8 + 0]
 					var tr_x = this.array[o*6*8 + 0 + 8]
+					var hx = (tl_x+tr_x)/2
+
+					// lets debug paint these 2
+					this.debug.length = 0
+					this.debug.add(tl_x, y1, 3, 3, 0.)
+					this.debug.add(tr_x, y2, 3, 3, 1.)				
+					this.debug.add(x, y, 3, 3, 2.)				
+
 					if(this.charCodeAt(o-1) == 10 && x< tl_x){
 						return o 
 					}
@@ -198,7 +205,7 @@ define.class('$gl/glshader', function(require, exports, self){
 					}
 				}
 				if(y>y2){
-					//console.log(y, y2, '#'+serializeText()+'#')
+					//console.log(y, y2, -3)
 					return -3 // below self
 				}
 			}
