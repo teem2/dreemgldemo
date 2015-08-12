@@ -399,10 +399,11 @@
 		return map
 	}
 
-	define.atLookupClass = function(cls, basepath){
-		var luc = define.local_classes[cls]
+	define.atLookupClass =
+	define.lookupClass = function(cls){
+		var luc = define.system_classes[cls]
 		if(luc !== undefined) return luc
-		return '$classes/' + cls
+		return './' + cls
 	}
 
 	// defining a class as environment specific
@@ -458,7 +459,6 @@
 
 		// make an argmap
 		body.argmap = define.buildArgMap(body)
-	
 		// lets parse the named argument pattern for the body
 		moduleFactory.body = body
 		// put the baseclass on the deps

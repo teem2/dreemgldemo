@@ -59,18 +59,18 @@ define.class(function(require){
 		console.color("~bg~Reloading~~ composition\n")
 		this.destroy()
 
-		var dir = fs.readdirSync(define.expandVariables('$compositions/' + this.name))
-		var local_classes = this.local_classes = {}
+		var dir = fs.readdirSync(define.expandVariables('$classes'))
+		var system_classes = this.system_classes = {}
 		for(var i = 0; i<dir.length; i++){
 			var clsname = dir[i].replace(/\.js$/, '')
-			local_classes[clsname] = '$compositions/'+this.name+'/'+clsname
+			system_classes[clsname] = '$classes/'+clsname
 		}
 
 		// lets fill 
 		require.clearCache()
 
 		// ok, we will need to compute the local classes thing
-		define.local_classes = local_classes
+		define.system_classes = system_classes
 
 		// lets load up the teem nodejs part
 		var TeemServer = require('$compositions/' + this.name + '/index.js')
@@ -93,7 +93,7 @@ define.class(function(require){
 			'  <script type="text/javascript">\n'+
 			'    window.define = {\n'+
 			'	   $rendermode:"gl",\n'+
-			'      local_classes:' + JSON.stringify(this.local_classes) + ',\n' + 
+			'      system_classes:' + JSON.stringify(this.system_classes) + ',\n' + 
 			'      main:["$base/math", "' + boot + '"],\n'+
 			'      atMain:function(require, modules){\n'+
 			'		 define.global(require(modules[0]))\n'+
