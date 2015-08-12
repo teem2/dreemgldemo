@@ -56,7 +56,8 @@ define.class(function(require, exports, self){
 		if (viewportheight === undefined) viewportheight = device.size[1];
 		
 		this.uimode = true;
-		this.matrix = mat4.ortho(0, device.size[0], 0, device.size[1], -100, 100);
+		this.matrix = mat4.identity();
+		this.viewmatrix = mat4.ortho(0, device.size[0], 0, device.size[1], -100, 100);
 		this.device.gl.scissor(0,0, viewportwidth * device.ratio, viewportheight * device.ratio);
 		this.device.gl.viewport(0, 0, device.size[0] * device.ratio, device.size[1] * device.ratio)
 		this.boundingrect = rect(0,0, device.size[0], device.size[1]);

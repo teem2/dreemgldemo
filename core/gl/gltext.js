@@ -12,7 +12,8 @@ define.class('$gl/glshader', function(require, exports, self){
 
 	// initial pixel and vertex shaders
 	this.matrix = mat4.identity();
-	this.position = "glyphy_mesh()"
+	this.viewmatrix = mat4.identity();
+	this.position = "glyphy_mesh() "
 	this.textcolor = vec4(0.9, 0.9, 0.9, 1);
 	this.color = "glyphy_pixel()"//" * textcolor"
 	this.fgcolor = vec4("blue");
@@ -299,13 +300,13 @@ define.class('$gl/glshader', function(require, exports, self){
 	}
 
 	this.glyphy_mesh_sdf = function(){
-		return (mesh.pos+vec2(mesh.shift_x,mesh.shift_y)) * matrix 
+		return (mesh.pos+vec2(mesh.shift_x,mesh.shift_y)) * matrix  * viewmatrix
 	}
 
 	this.glyphy_mesh = 
 	this.glyphy_mesh_atlas = function(){
 		glyph = glyph_vertex_transcode(mesh.tex)
-		return (mesh.pos+vec2(mesh.shift_x,mesh.shift_y)) * matrix
+		return (mesh.pos+vec2(mesh.shift_x,mesh.shift_y)) * matrix * viewmatrix
 	}
 
 	// glyphy shader library

@@ -47,6 +47,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		//this.dump = 1
 		this.height = 0
 		this.matrix = mat4.identity()
+		this.viewmatrix = mat4.identity();
 		this.opacity = 0.0;
 		this.time = 0.1
 
@@ -71,7 +72,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		//this.color_blend = 'src_alpha * src_color + dst_color'
 		this.position = function(){
 			sized = vec2(mesh.x * width, mesh.y * height)
-			return vec4(sized.x, sized.y, 0, 1) * matrix
+			return vec4(sized.x, sized.y, 0, 1) * matrix * viewmatrix
 		}
 	}))
 	
@@ -307,10 +308,12 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 	this.drawContentGL = function(renderstate){
 		//mat4.debug(this.orientation.matrix);
-		if (this.texturecache == false || this.texturecache == true && this.dirty){
-			
 			var bg = this.bg
 			var fg = this.fg
+			bg.viewmatrix = renderstate.viewmatrix;
+			fg.viewmatrix = renderstate.viewmatrix;
+		if (this.texturecache == false || this.texturecache == true && this.dirty){
+			
 			// idea reference outer node using shader.node
 			// and 
 			if (this.matrixdirty) this.recomputeMatrix()
