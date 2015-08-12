@@ -422,11 +422,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 		if (this.visible){
 			if (this.dirty != false || this.layoutChanged()) {
-<<<<<<< HEAD
-				
-=======
 				//if(this.matrixdirty) 
->>>>>>> 516170275da2b6b74f18ea078e28e48910a2fe2e
 				this.recomputeMatrix();
 
 				this.effectiveopacity = this._opacity !== undefined ? this._opacity : 1.0;
