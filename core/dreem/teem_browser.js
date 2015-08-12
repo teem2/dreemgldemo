@@ -163,13 +163,11 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		}.bind(this)
 	}
 
-	self.atConstructor = function(parent){
-		
-		var previous = parent.teemClient
-		parent.teemClient = this
+	self.atConstructor = function(previous, parent){
+
+		this.parent = parent
 
 		if(previous){
-			
 			this.reload = (previous.reload||0)+1
 			console.log("Reload " + this.reload)
 		}

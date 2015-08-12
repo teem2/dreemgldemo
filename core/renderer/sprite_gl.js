@@ -112,6 +112,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.recomputeMatrix = function(){
 		
 		var o = this.orientation;
+		o.rotation[2] = this._rotation * 6.283 / 360;
+
 		if (this.layout) {
 			var s = o.scale;
 			var r = o.rotation;
@@ -187,7 +189,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.backgroundTexture = false;
 		this.texturecache = false;
 		this.effectiveopacity = this.opacity;
-		
 		// if we have a bgimage, we have to set our bgimage function to something
 		if(this.bgimage){
 			// lets make the thing fetch a texture
@@ -383,7 +384,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 		if (this.visible){
 			if (this.dirty != false || this.layoutChanged()) {
-				this.orientation.rotation[2] = this._rotation * 6.283 / 360;
+				//if(this.matrixdirty) 
 				this.recomputeMatrix();
 
 				this.effectiveopacity = this._opacity !== undefined ? this._opacity : 1.0;

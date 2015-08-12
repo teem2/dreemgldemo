@@ -108,10 +108,11 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.remapMouse = function(node){
-		if (node && node.getInvertedMatrix)
-		{
+		if (node && node.getInvertedMatrix){
 			var M = node.getInvertedMatrix()
+			//mat4.debug(node.orientation.worldmatrix)
 			var R = vec2.mul_mat4_t(vec2(this.mouse.glx, this.mouse.gly), M)
+			//console.log(parseInt(this.mouse.gly*1000))
 			return R
 		}
 	}
