@@ -98,7 +98,7 @@ define.class(function(require){
 			'      atMain:function(require, modules){\n'+
 			'		 define.global(require(modules[0]))\n'+
 			'		 var TeemClient = require(modules[1])\n'+
-			'        new TeemClient(define)\n'+
+			'        define.rootTeemClient = new TeemClient(define.rootTeemClient)\n'+
 			'      }\n'+
 			'    }\n'+
 			'  </script>\n'+

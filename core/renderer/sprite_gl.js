@@ -206,7 +206,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.backgroundTexture = false;
 		this.texturecache = false;
 		this.effectiveopacity = this.opacity;
-		
 		// if we have a bgimage, we have to set our bgimage function to something
 		if(this.bgimage){
 			// lets make the thing fetch a texture
@@ -423,7 +422,11 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 		if (this.visible){
 			if (this.dirty != false || this.layoutChanged()) {
+<<<<<<< HEAD
 				
+=======
+				//if(this.matrixdirty) 
+>>>>>>> 516170275da2b6b74f18ea078e28e48910a2fe2e
 				this.recomputeMatrix();
 
 				this.effectiveopacity = this._opacity !== undefined ? this._opacity : 1.0;
