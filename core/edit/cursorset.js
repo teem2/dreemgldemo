@@ -128,7 +128,7 @@ define.class(function(require){
 	this.update = function(){
 		if(this.updating) return
 		this.updating = 1
-		if(this.editor.screen) this.editor.screen.device.redraw()
+		if(this.editor.setDirty) this.editor.setDirty(true)
 	}
 
 	this.updateCursors = function(){

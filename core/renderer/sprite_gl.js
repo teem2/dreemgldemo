@@ -392,7 +392,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	
 	this.drawContent = this.drawContentGL
 
-	this.hideContent = this.hideContentDOM
+	this.hideContent = function(){
+		
+	}
 	this.lastLayout ;
 	
 	this.layoutChanged = function(){

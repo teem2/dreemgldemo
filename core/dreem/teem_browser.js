@@ -65,6 +65,11 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 			this.screen = this.screen.diff(previous.screen, globals)
 		}
 
+		if(this.parent){
+			this.screen.device = this.parent.screen.device
+			this.screen.parent = this.parent
+		}
+
 		var wireinits = []
 		renderer.connectWires(this.screen, wireinits)
 
@@ -201,6 +206,6 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		// alright now we find the screen we wanna render somehow
 		this.screen = this.screens.browser
 
-		if(previous) this.doRender(previous)
+		if(previous || parent) this.doRender(previous)
 	}
 })
