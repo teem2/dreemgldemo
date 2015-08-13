@@ -6,7 +6,7 @@ define.class('$gl/glshader', function(require, exports, self){
 	var fontParser = require('$parsers/fontparser')
 
 	// our font blob
-	this.font = fontParser(require('$fonts/code_font2_ascii.glf'))
+	this.font = fontParser(require('$fonts/code_font3_1024.glf'))
 
 	//this.has_guid = false
 
