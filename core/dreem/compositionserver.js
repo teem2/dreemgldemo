@@ -88,6 +88,11 @@ define.class(function(require){
 			'  <meta name="format-detection" content="telephone=no">\n'+
 			'  <title>' + title + '</title>\n'+
 			'  <style>\n'+ 
+			'    .unselectable{\n'+
+			' 		-webkit-user-select: none;\n'+
+  			'		-moz-user-select: none;\n'+
+  			'		-user-select: none;\n'+
+  			'    }\n'+
 			'    body {background-color:black;margin:0;padding:0;height:100%;overflow:hidden;}\n'+
 			'  </style>'+
 			'  <script type="text/javascript">\n'+
@@ -104,7 +109,7 @@ define.class(function(require){
 			'  </script>\n'+
 			'  <script type="text/javascript" src="/define.js"></script>\n'+
 			' </head>\n'+
-			' <body>\n'+
+			' <body class="unselectable">\n'+
 			' </body>\n'+
 			'</html>\n'
 	}
