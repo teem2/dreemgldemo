@@ -5,6 +5,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	var GLDevice = require('$gl/gldevice')
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')
+	var GLText = require('$gl/gltext')
+
 	var Sprite = require('./sprite_gl')
 	var Text = require('./text_gl')
 	var RenderState = require('./renderstate_gl')
@@ -22,7 +24,12 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.renderstate = new RenderState();
-
+	
+	this.debuglabels = []
+	this.debugtext = function(x,y,text,color){
+			if (color === undefined) color = vec4("black");
+			this.debuglabels.push({x:x, y:y, text:text, color: color});	
+	}
 	this.debug = false
 
 	this.lastx = -1;
@@ -186,6 +193,23 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		for (var i = 0; i < this.children.length; i++){
 			this.children[i].draw(this.renderstate)
 		}
+		for (var i =0 ;i<20;i++) this.debugtext(20,20 + i *20,"TEXTLABELS!", vec4("purple"));
+		
+		for (var a in this.debuglabels)
+		{
+			var label = this.debuglabels[a];
+				var textbuf = this.debugtextshader.newText()
+			textbuf.font_size = 12;
+			this.debugtextshader.matrix = mat4.identity();;
+			this.debugtextshader.viewmatrix = this.renderstate.viewmatrix;
+			textbuf.fgcolor = label.color
+			textbuf.clear()
+			textbuf.add(label.text)
+			this.debugtextshader.mesh = textbuf;
+			 this.debugtextshader.draw(this.device.gl);
+			
+		}
+		this.debuglabels = [];
 	}
 
 	this.readGuidTimeout = function(){
@@ -283,7 +307,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.setDirty = function(value, rect){
-		console.log(rect);
+//		console.log(rect);
 		if ( this.device !== undefined){
 			this.dirty = true
 			if (this.hasDirtyRect() && rect)
@@ -480,10 +504,13 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.init = function (parent) {
 
 		this.pic_tex = GLTexture.rgba_depth_stencil(16, 16)
-		this.debug_tex = GLTexture.rgba_depth_stencil(16, 16)
+		this.debug_tex = GLTexture.rgba_depth_stencil(16, 16)	
 		this.buf = new Uint8Array(4);
 		this.device = new GLDevice()
-
+		this.debugtextshader = new GLText();
+		this.debugtextshader.has_guid = false;
+			
+		console.log("this.debugtextshader", this.debugtextshader);
 		this.initVars()
 
 		this.bindInputs()

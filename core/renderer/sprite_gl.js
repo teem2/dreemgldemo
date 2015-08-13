@@ -148,8 +148,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		v2 = vec2.mul_mat4_t(v2, this.orientation.worldmatrix)
 		v3 = vec2.mul_mat4_t(v3, this.orientation.worldmatrix)
 		v4 = vec2.mul_mat4_t(v4, this.orientation.worldmatrix)		
-		mat4.debug(this.orientation.worldmatrix,true);
-		mat4.debug(this.orientation.matrix,true);
+		//mat4.debug(this.orientation.worldmatrix,true);
+		//mat4.debug(this.orientation.matrix,true);
 		var minx = v1[0];
 		var miny = v1[1];
 		var maxx = v1[0];
