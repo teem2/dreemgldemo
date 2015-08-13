@@ -65,7 +65,7 @@ define.class(function(require, exports, self){
 		
 		this.uimode = true;
 		this.matrix = mat4.identity();
-		this.viewmatrix = mat4.ortho(0, screenw, 0, screenh, -100, 100);
+		this.viewmatrix = mat4.ortho(0, screenw/device.ratio, 0, screenh/device.ratio, -100, 100);
 		
 		this.device.gl.enable(this.device.gl.SCISSOR_TEST);
 		this.device.gl.scissor(x * device.ratio ,y * device.ratio  , w * device.ratio, h * device.ratio);
@@ -76,7 +76,7 @@ define.class(function(require, exports, self){
 		}
 		this.device.clear(vec4(1,0,0,1))
 		
-		this.device.gl.viewport(0,0,screenw * device.ratio, screenh * device.ratio);//x* device.ratio, screenh- y, w * device.ratio, h * device.ratio)
+		this.device.gl.viewport(0,0,screenw, screenh);//x* device.ratio, screenh- y, w * device.ratio, h * device.ratio)
 		this.boundingrect = rect(x,y, w,h);
 	}
 
