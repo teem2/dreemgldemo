@@ -539,14 +539,14 @@ define.class(function(require, constructor){
 			// clear out whatever is left
 			if(other_children) for(; i < other_children.length; i++){
 				var child = other_children[i]
-				if(child.atDestroy) child.atDestroy()
+				child.emit('destroy')
 			}
 		}
 		// check if we changed class
 		if(define.classHash(this.constructor) === define.classHash(other.constructor) && this.constructorPropsEqual(other)){
 			other.children = my_children
 			if(my_children) for(i = 0; i < my_children.length; i++) my_children[i].parent = other
-			if(this.atDestroy) this.atDestroy()
+			this.emit('destroy')
 			if(globals) for(var key in globals){
 				other[key] = globals[key]
 			}
@@ -556,7 +556,7 @@ define.class(function(require, constructor){
 			if(my_children) for(i = 0; i < my_children.length; i++) my_children[i].parent = this
 		}
 
-		if(other.atDestroy) other.atDestroy()
+		other.emit('destroy')
 		return this		
 	}
 
