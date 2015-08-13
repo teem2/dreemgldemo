@@ -125,8 +125,14 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		return this.orientation.invertedworldmatrix;
 	}
 	
+	this.boundingRectCache = {}
+	
 	this.getBoundingRect = function(){
-		return this.calculateBoundingRect();
+		if (this.dirty || !this.boundingRectCache)
+		{
+			this.boundingRectCache =this.calculateBoundingRect();
+		}
+		return this.boundingRectCache;
 	}
 	
 	this.calculateBoundingRect = function(){	
@@ -399,6 +405,19 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			fg.viewmatrix = renderstate.viewmatrix;
 		if (this.texturecache == false || this.texturecache == true && this.dirty){
 			
+
+		
+			if (this.texturecache == false)
+			{
+						var bound = this.getBoundingRect();
+						var myrect = rect(bound.left, bound.top, bound.right, bound.bottom);
+						var actuallyvisible = renderstate.boundrect? rect.intersects(myrect, renderstate.boundrect): true;
+						if (!actuallyvisible)
+						{
+							this.screen.debugtext(bound.left, bound.top, "not drawn!");
+						
+						}
+			}
 			// idea reference outer node using shader.node
 			// and 
 			if (this.matrixdirty) this.recomputeMatrix()

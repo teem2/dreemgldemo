@@ -8,7 +8,8 @@ define.class('./sprite_gl', function (require, exports, self) {
 
 	this.setFocus = function(){
 	}
-
+	this.debugtext = function(){
+	}
 	this.addDirtyNode = function(node){
 	}
 })

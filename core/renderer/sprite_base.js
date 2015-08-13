@@ -108,7 +108,8 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.attribute("clipping", {type:boolean, value:false})
 	
 	this.init = function(){
-		if (this.screen) this.screen.addDirtyNode(this);
+		//if (this.screen) this.screen.addDirtyNode(this);
+		this.setDirty();
 	}
 	
 	this.destroy = function(){

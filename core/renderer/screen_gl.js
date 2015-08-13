@@ -12,35 +12,40 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	var RenderState = require('./renderstate_gl')
 	var FlexLayout = require('$lib/layout')
 	
-	//this.attribute('time', {type:float, value: 0});
-	//this.attribute('moved', {type:boolean, value : true});
-
 	this.dirty = true
 	this.totaldirtyrect = {};
-	this.atConstructor = function(){}
-
-	this.render = function(){
-		//console.log("render");
-	}
-
-	this.renderstate = new RenderState();
-	
-	this.debuglabels = []
-	this.debugtext = function(x,y,text,color){
-		if (color === undefined) color = vec4("black");
-		this.debuglabels.push({x:x, y:y, text:text, color: color});	
-	}
-
-	this.debugtext = function(x,y,text,color){
-		if (color === undefined) color = vec4("black");
-		this.debuglabels.push({x:x, y:y, text:text, color: color});	
-	}
-
+	this.dirtyrectset = false;
 	this.debugshader = false
 	this.debug = false;
 	
 	this.lastx = -1;
 	this.lasty = -1;
+
+	this.renderstate = new RenderState();	
+	this.atConstructor = function(){}
+
+	this.render = function(){
+		//console.log("render");
+	}
+	
+	this.debuglabels = []
+	this.frameconsolecounter = 0;
+	
+	this.debugtext = function(x,y,text,color){
+		if (color === undefined) color = vec4("black");
+		this.debuglabels.push({x:x, y:y, text:text, color: color});	
+	}
+
+	this.frameconsoletext = function(text, color){
+		if (color === undefined) color = vec4("black");
+		this.debugtext(10, this.frameconsolecounter * 14, text, color);
+		this.frameconsolecounter++;
+	}
+	
+	this.debugtext = function(x,y,text,color){
+		if (color === undefined) color = vec4("black");
+		this.debuglabels.push({x:x, y:y, text:text, color: color});	
+	}
 
 	this.logDebug = function(value){
 		console.log(value)
@@ -135,6 +140,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.setguid = function(id){
+		
 		var screenw = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
 		var screenh = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
 		
@@ -144,6 +150,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		//var R = vec2.mul_mat4_t(vec2(this.mouse.glx, this.mouse.gly), this.invertedworldmatrix);
 
 		if(id != this.lastmouseguid || this.mouse.x != this.lastx || this.mouse.y != this.lasty){
+			//this.frameconsoletext("new mouseguid:" + id + "  " + (this.mousecapture?"captured":"noncaptured"), vec4("white"));
+		
 			this.lastx = this.mouse.x
 			this.lasty = this.mouse.y
 			
@@ -174,7 +182,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 	this.hasDirtyRect = function()
 	{
-		return this.totaldirtyrect && !isNaN(this.totaldirtyrect.left)
+		return this.dirtyrectset
 	}
 
 	this.drawColor = function(){
@@ -182,11 +190,20 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		if (this.hasDirtyRect()){
 			var w = this.totaldirtyrect.right - this.totaldirtyrect.left;
 			var h = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
-			this.renderstate.setupsubrect(this.device, this.totaldirtyrect.left, this.totaldirtyrect.top, w, h);
-			//this.renderstate.translate(-this.dirtyrect.left,  -this.dirtyrect.top);
+			if (isNaN(w) || isNaN(h)){
+				this.renderstate.setup(this.device);
+				this.debugtext(0,0,"Full screen repaint!", vec4("black"));
+				this.debugtext(1,1,"Full screen repaint!", vec4("white"));				
+			}else{					
+				this.renderstate.setupsubrect(this.device, this.totaldirtyrect.left, this.totaldirtyrect.top, w, h);
+				//this.renderstate.translate(-this.dirtyrect.left,  -this.dirtyrect.top);
+				this.debugtext(0,0,"subregion paint: " + w + " " + h, vec4("black"));
+				this.debugtext(1,1,"subregion paint: " + w + " " + h, vec4("white"));
+			}
 		}else{
 			this.renderstate.setup(this.device);
-		
+			this.debugtext(0,0,"Full screen repaint!", vec4("black"));
+			this.debugtext(1,1,"Full screen repaint!", vec4("white"));
 		}
 		
 		this.orientation = {};
@@ -199,7 +216,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		if (this.debug){
 			if (this.debuglabels.length  > 0){
 				this.device.gl.disable(this.device.gl.SCISSOR_TEST);
-			//this.device.clear(this.bgcolor)
 				this.debugrectshader.viewmatrix = this.renderstate.viewmatrix;
 				this.debugrectshader.matrix = mat4.identity();
 				this.debugrectshader.draw(this.device);
@@ -220,22 +236,30 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 				var label = this.debuglabels[a];
 				var textbuf = this.debugtextshader.newText()
 				textbuf.font_size = 12;
-				var t = mat4.identity();
-				mat4.translate(t, vec3(label.x, label.y, 0), t);
-				mat4.transpose(t,t);
-				this.debugtextshader.matrix = t;
 				textbuf.fgcolor = label.color;
 				textbuf.bgcolor = label.color;
 				textbuf.clear()
 				textbuf.add(label.text)
-				this.debugtextshader.bgcolor = vec4("white")
-				
-				this.debugtextshader.fgcolor = label.color;
+			
+				var ofx = [-1, 0, 1,-1,1,-1,0,1,0];
+				var ofy = [-1,-1,-1, 0,0,1,1,1,0];
 				this.debugtextshader.mesh = textbuf;
-				 this.debugtextshader.draw(this.device);
+				this.debugtextshader.bgcolor = vec4("white");
+				this.debugtextshader.fgcolor =vec4("black");
+
+				for (var i =0 ;i<9;i++)
+				{
+					var t = mat4.identity();
+					mat4.translate(t, vec3(label.x + ofx[i], label.y + ofy[i] + 10, 0), t);
+					mat4.transpose(t,t);
+					this.debugtextshader.matrix = t;
+					if (i == 8) this.debugtextshader.fgcolor = label.color;									
+					this.debugtextshader.draw(this.device);
+				}
 				
 			}
 			this.debuglabels = [];
+			//this.frameconsolecounter = 0;
 		}
 	}
 
@@ -243,36 +267,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		var dt = Date.now()
 		this.device.setTargetFrame(this.pic_tex)
 		this.readGuid()
-	}
-	
-	this.dumped = 1;	
-	this.dumpLayout = function(node, styleorlayout, depth){
-		if (this.dumped<=0) return;
-		if (!depth) depth = "";
-	//	if (depth === ""){
-		
-		console.log(depth, node.constructor.name,styleorlayout?node.style: node.layout);
-//		}
-		for (var i = 0; i < node.children.length; i++) {
-			this.dumpLayout(node.children[i],styleorlayout, depth + " " );
-		}
-		if (depth ==="")  this.dumped --;
-	}
-	
-	this.structuredumped = 1;	
-	this.dumpStructure = function(node, depth){
-		if (this.structuredumped<=0) return;
-		if (!depth) depth = "";
-	//	if (depth === ""){
-		console.log(depth , node.constructor.name, node);
-//		}
-		for (var i = 0; i < node.children.length; i++) {
-			this.dumpStructure(node.children[i], depth + " " );
-		}
-		if (depth ==="")  this.structuredumped --;
-	}
-	
-	this.recursiveMatrixUpdate = function(){
 	}
 	
 	this.performLayout = function(){
@@ -287,19 +281,14 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this._right = this._width;
 		this._bottom = this._height;
 		FlexLayout.fillNodes(this);
-	//	 this.dumpLayout(this, true);
-
+	
 		FlexLayout.computeLayout(this);
 		
-		this.recursiveMatrixUpdate(this);
-		this.dumped = 1;	
 		for(a in this.dirtyNodes)
 		{
 			this.addDirtyRect(this.dirtyNodes[a].getBoundingRect());
 		}
 		this.dirtyNodes = [];
-	//	 this.dumpLayout(this, false);
-		// this.dumpStructure(this);
 	}
 
 	this.draw = function (time) {
@@ -329,11 +318,12 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 		
 		if (this.dirty === true) {
-			this.dirty = false
 			this.device.setTargetFrame()
 			//for(var i = 0;i<20;i++)
 			this.drawColor();
+			this.dirty = false
 			this.totaldirtyrect = {};
+			this.dirtyrectset = false;
 			
 		}
 
@@ -344,24 +334,31 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 	
 	this.dirtyNodes = [];
+	
 	this.addDirtyNode =function(node){
 		this.addDirtyRect(node.getBoundingRect());
 		this.dirtyNodes.push(node);	
 	}
 	
 	this.addDirtyRect = function(rect){				
+		// round to visible pixels.. round up.
 		rect.bottom = Math.ceil(rect.bottom);
 		rect.right = Math.ceil(rect.right);
 		rect.left = Math.floor(rect.left);
 		rect.top = Math.floor(rect.top);
-		this.debugtext(rect.left+1.5, rect.top+1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
-		this.debugtext(rect.left-1.5, rect.top+1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
-		this.debugtext(rect.left+1.5, rect.top-1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
-		this.debugtext(rect.left-1.5, rect.top-1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
-		this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("purple") );
-		this.dirty = true
-		if (this.hasDirtyRect())
-		{
+		var w = rect.right - rect.left;
+		var h = rect.bottom - rect.top;
+		
+		if (w == 0 || h == 0) {
+			//zero area rect;	
+			return;
+		}
+		
+		if (this.debug){
+			this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );	
+		}
+		
+		if (this.dirtyrectset){			
 			this.totaldirtyrect.top = Math.min(this.totaldirtyrect.top, rect.top);
 			this.totaldirtyrect.bottom = Math.max(this.totaldirtyrect.bottom, rect.bottom);
 			this.totaldirtyrect.left = Math.min(this.totaldirtyrect.left, rect.left);
@@ -369,14 +366,19 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}else{
 			this.totaldirtyrect = rect;
 		}
+		
+		this.dirtyrectset = true;
 	}
 	
 	this.bubbleDirty = function(){
 		this.dirty = true;
-			this.device.redraw();
+		this.moved = true;
+		this.device.redraw();
 	}
 
 	this.setDirty = function(){
+		this.bubbleDirty();
+//		this.device.redraw();
 	}
 
 	this.onmoved = function(value){
@@ -443,6 +445,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 				if(findnext(obj, find)) return true
 			}
 		}
+		
 		if(!findnext(this, obj)){
 			found = true
 			findnext(this)
@@ -538,7 +541,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}.bind(this)
 
 		this.device.atResize = function(){
-			this.setDirty(true)
+			this.setDirty()
 		}.bind(this)
 
 		this.device.atRedraw = function (time) {
@@ -559,7 +562,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.init = function (parent) {
-
 		this.pic_tex = GLTexture.rgba_depth_stencil(16, 16)
 		this.debug_tex = GLTexture.rgba_depth_stencil(16, 16)	
 		this.buf = new Uint8Array(4);
@@ -569,15 +571,15 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.debugrectshader = new GLShader();
 		this.debugrectshader.has_guid = false;
 		
-			this.debugrectshader.bgcolor = vec4(0,0,0,0.1);
-			this.debugrectshader.color = function(){return bgcolor;};
-			this.debugrectshader.mesh = vec2.array();
-			this.debugrectshader.mesh.length = 0;
-			this.debugrectshader.mesh.pushQuad(0,0,10000,0,0,10000,10000,10000);
-			this.debugrectshader.viewmatrix = mat4;
-			this.debugrectshader.matrix = mat4;
-			
-			this.debugrectshader.position = function(){return mesh * matrix * viewmatrix};
+		this.debugrectshader.bgcolor = vec4(0.6,0.6,1.0,0.07);
+		this.debugrectshader.color = function(){return bgcolor;};
+		this.debugrectshader.mesh = vec2.array();
+		this.debugrectshader.mesh.length = 0;
+		this.debugrectshader.mesh.pushQuad(0,0,10000,0,0,10000,10000,10000);
+		this.debugrectshader.viewmatrix = mat4;
+		this.debugrectshader.matrix = mat4;
+		
+		this.debugrectshader.position = function(){return mesh * matrix * viewmatrix};
 		console.log("this.debugtextshader", this.debugtextshader);
 		this.initVars()
 

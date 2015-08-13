@@ -8,14 +8,18 @@ define.browser(function(require, screen, view, edit, text, treeview, splitcontai
 				
 				splitcontainer({bgcolor: "#f0f0f0" , padding: 4,margin: 4,flexdirection:"column" }
 					
-					, splitcontainer({vertical:false},edit({margin:2,fontsize:30,text:'This box contains editable text.\nTo the right is a mouse-test box', flex: 1, 'bg.color':function(){return vec4("#f0f0f0")} , fgcolor: "black"}), mousedebug({flex: 1, margin:4,  alignself: "stretch",bgcolor: "blue"}),treeview({flex:1,alignself:"stretch"}))
+					, splitcontainer({vertical:false}
+						,edit({margin:2,fontsize:30,text:'This box contains editable text.\nTo the right is a mouse-test box', flex: 1, 'bg.color':function(){return vec4("#f0f0f0")} , fgcolor: "black"})
+						,mousedebug({flex: 1, margin:4,  alignself: "stretch",bgcolor: "blue"})
+						,treeview({flex:1,alignself:"stretch"})
+					)
 					,scrollcontainer({bgcolor: "#f0f0ff"},
 						 view({x: 20, y:20,width: 20, height:20, position:"absolute", bgcolor: "yellow" })
 						,view({y: 120,x:20, width: 20, height: 20, position:"absolute", height:20, bgcolor: "green" })
 						,view({y: 20, x: 120,position:"absolute", width: 20, height:20, bgcolor: "blue" })
-						,view({x:120, y:120, position:"relative", width: 20, height:20, bgcolor: "red" })
-						
-						)
+						,view({x:120, y:120, position:"relative", width: 20, height:20, bgcolor: "red" })		
+						,mousedebug({flex: 1, margin:4,  alignself: "stretch",bgcolor: "blue"})
+					)
 										
 				)
 			)

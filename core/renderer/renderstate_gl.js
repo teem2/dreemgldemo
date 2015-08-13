@@ -65,18 +65,26 @@ define.class(function(require, exports, self){
 		this.uimode = true;
 		this.matrix = mat4.identity();
 		this.viewmatrix = mat4.ortho(0, screenw/device.ratio, 0, screenh/device.ratio, -100, 100);
+		if (w  < screenw || h  < screenh){
+			this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+			//debugtext(10,40,"scissored mode!", vec4("white"));
+		}else{
+			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
+			
+		//	this.debugtext(10,40,"defauled to full mode because the area is too big", vec4("white"));
+		}
 		
-		this.device.gl.enable(this.device.gl.SCISSOR_TEST);
 		this.device.gl.scissor(x * device.ratio ,y * device.ratio  , w * device.ratio, h * device.ratio);
 		if (this.debugrects){
 		//this.device.clear(vec4(1,0.5+0.5*sin(this.clearcount++) ,0,1))
 			this.device.clear(vec4(1,0.5+0.5*sin(this.clearcount++) ,0,1))
 			this.device.gl.scissor(x* device.ratio+2,y* device.ratio+2  , w * device.ratio - 4, h * device.ratio-4);
+			this.device.clear(vec4(1,0,0,1))
 		}
-		this.device.clear(vec4(1,0,0,1))
 		
 		this.device.gl.viewport(0,0,screenw, screenh);//x* device.ratio, screenh- y, w * device.ratio, h * device.ratio)
 		this.boundingrect = rect(x,y, w,h);
+		this.boundrect = rect(x,y,x + w, y + h);
 	}
 
 	this.setup = function(device, viewportwidth, viewportheight, offx, offy){
