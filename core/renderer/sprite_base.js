@@ -162,7 +162,7 @@ define.class('$base/nodeworker', function(require, exports, self){
 					this.dirtyrect = rect;
 				}
 			}
-			if (this.parent !== undefined) this.parent.setDirty(true, rect) 
+			if (this.parent) this.parent.setDirty(true, rect) 
 		}
 	}
 })

@@ -51,29 +51,31 @@ define.class(function(require, exports, self){
 	this.setupsubrect = function(device, x,y,w,h){
 		
 		this.device = device;
-	//	this.device.clear(vec4(1))
 		
 		this.clipStack = [];
 		
 		var screenw = device.main_frame.size[0];
 		var screenh  = device.main_frame.size[1];
 		
-		y = (screenh  - y ) - h; 
+		y = (screenh  - y ) -h; 
 		
-		//console.log("subrect:",x,y,w,h, screenw * device.ratio, screenh* device.ratio, device.ratio);
+		console.log("subrect:",x,y,w,h, screenw * device.ratio, screenh* device.ratio, device.ratio);
 		
 		this.uimode = true;
 		this.matrix = mat4.identity();
 		this.viewmatrix = mat4.ortho(0, screenw, 0, screenh, -100, 100);
 		
-		this.device.gl.scissor(x,y  , w * device.ratio, h * device.ratio);
 		this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+		this.device.gl.scissor(x,y  , w * device.ratio, h * device.ratio);
+		this.device.clear(vec4(1,0,0,1))
+		this.device.gl.scissor(x+1,y+1  , w * device.ratio - 2, h * device.ratio-2);
 		
 		this.device.gl.viewport(0,0,screenw * device.ratio, screenh * device.ratio);//x* device.ratio, screenh- y, w * device.ratio, h * device.ratio)
 		this.boundingrect = rect(x,y, w,h);
 	}
 
 	this.setup = function(device, viewportwidth, viewportheight){
+		
 		this.device = device;
 		this.clipStack = [];
 		this.device.gl.enable(this.device.gl.SCISSOR_TEST);

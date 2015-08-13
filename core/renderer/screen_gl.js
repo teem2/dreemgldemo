@@ -14,7 +14,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	//this.attribute('moved', {type:boolean, value : true});
 
 	this.dirty = true
- 
+	this.totaldirtyrect = {};
 	this.atConstructor = function(){}
 
 	this.render = function(){
@@ -158,21 +158,21 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 	}
 
+	this.hasDirtyRect = function()
+	{
+		return this.totaldirtyrect && !isNaN(this.totaldirtyrect.left)
+	}
+
 	this.drawColor = function(){
 		
-		if (this.dirtyrect && !isNaN(this.dirtyrect.left)){
-			var w = this.dirtyrect.right - this.dirtyrect.left;
-			var h = this.dirtyrect.bottom - this.dirtyrect.top;
-			if (isNaN(w) || isNaN(h)){
-				this.renderstate.setup(this.device);
-			}
-			else{
-				//console.log(w,h);
-			this.renderstate.setupsubrect(this.device, this.dirtyrect.left, this.dirtyrect.top, w, h);
+		if (this.hasDirtyRect()){
+			var w = this.totaldirtyrect.right - this.totaldirtyrect.left;
+			var h = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
+			this.renderstate.setupsubrect(this.device, this.totaldirtyrect.left, this.totaldirtyrect.top, w, h);
 			//this.renderstate.translate(-this.dirtyrect.left,  -this.dirtyrect.top);
-			}
 		}else{
 			this.renderstate.setup(this.device);
+		
 		}
 		
 		this.orientation = {};
@@ -182,8 +182,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.renderstate.drawmode = 0;
 		this.device.clear(this.bgcolor)
 		this.device.gl.clearStencil(0);
-		//this.device.clear(this.device.gl.STENCIL_BUFFER_BIT);
-		//if (this.dirtyrect && isNaN(this.dirtyrect.left) == false)
+		
 		for (var i = 0; i < this.children.length; i++){
 			this.children[i].draw(this.renderstate)
 		}
@@ -273,7 +272,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.device.setTargetFrame()
 			//for(var i = 0;i<20;i++)
 			this.drawColor();
-			this.dirtyrect = {};
+			this.totaldirtyrect = {};
 			
 		}
 
@@ -284,16 +283,17 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.setDirty = function(value, rect){
-		if (this.dirty === false && value === true && this.device !== undefined){
+		
+		if ( this.device !== undefined){
 			this.dirty = true
-			if (this.dirtyrect && this.dirtyrect.left)
+			if (this.hasDirtyRect() && rect)
 			{
-				this.dirtyrect.top = Math.min(this.dirtyrect.top, rect.top);
-				this.dirtyrect.bottom = Math.max(this.dirtyrect.bottom, rect.bottom);
-				this.dirtyrect.left = Math.min(this.dirtyrect.left, rect.left);
-				this.dirtyrect.right = Math.max(this.dirtyrect.right, rect.right);
+				this.totaldirtyrect.top = Math.min(this.totaldirtyrect.top, rect.top);
+				this.totaldirtyrect.bottom = Math.max(this.totaldirtyrect.bottom, rect.bottom);
+				this.totaldirtyrect.left = Math.min(this.totaldirtyrect.left, rect.left);
+				this.totaldirtyrect.right = Math.max(this.totaldirtyrect.right, rect.right);
 			}else{
-				this.dirtyrect = rect;
+				this.totaldirtyrect = rect;
 			}
 			this.device.redraw();
 		}
