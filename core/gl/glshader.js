@@ -700,7 +700,7 @@ define.class('$base/node', function(require, exports, self){
 		}
 		this.shader = this.compileShader(gldevice)
 
-		if(gldevice) this.connectWires()
+		this.connectWires()
 	}		
 
 	this.useShader = function(gl, shader){
@@ -833,7 +833,7 @@ define.class('$base/node', function(require, exports, self){
 		return len
 	}
 
-	this.compile_use = false
+	this.compile_use = true
 
 	this.useShaderTemplate = function(gl, shader, root){
 		// use the shader
