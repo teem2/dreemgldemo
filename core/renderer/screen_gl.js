@@ -34,8 +34,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.drawDebug = function(){
-		this.renderstate.setup(this.device, 2, 2);
-		this.renderstate.translate(-this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
+		this.renderstate.setup(this.device, 2, 2,-this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
+		//this.renderstate.translate(-this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
 		this.renderstate.drawmode = 2;
 		this.renderstate.debugtypes = []
 		this.device.clear(vec4(0.5, 0.5, 0.5, 1))
@@ -81,8 +81,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.drawGuid = function(){
-		this.renderstate.setup(this.device, 2, 2);
-		this.renderstate.translate(- this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
+		this.renderstate.setup(this.device, 2, 2, this.mouse.x - 1, -this.device.size[1] + (this.mouse.y) + 1);
+		//this.renderstate.translate(- this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
 		this.renderstate.drawmode = 1;
 
 		this.device.clear(vec4(0, 0, 0, 1))

@@ -48,6 +48,8 @@ define.class(function(require, exports, self){
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);			
 	}
 	
+	this.clearcount = 0;
+	this.debugrects = true;
 	this.setupsubrect = function(device, x,y,w,h){
 		
 		this.device = device;
@@ -57,7 +59,7 @@ define.class(function(require, exports, self){
 		var screenw = device.main_frame.size[0];
 		var screenh  = device.main_frame.size[1];
 		
-		y = (screenh  - y ) -h; 
+		y = (screenh/device.ratio  - y ) -h; 
 		
 		console.log("subrect:",x,y,x+w,y+h, screenw * device.ratio, screenh* device.ratio, device.ratio);
 		
@@ -66,16 +68,21 @@ define.class(function(require, exports, self){
 		this.viewmatrix = mat4.ortho(0, screenw, 0, screenh, -100, 100);
 		
 		this.device.gl.enable(this.device.gl.SCISSOR_TEST);
-		this.device.gl.scissor(x,y  , w * device.ratio, h * device.ratio);
+		this.device.gl.scissor(x * device.ratio ,y * device.ratio  , w * device.ratio, h * device.ratio);
+		if (this.debugrects){
+		//this.device.clear(vec4(1,0.5+0.5*sin(this.clearcount++) ,0,1))
+			this.device.clear(vec4(1,0.5+0.5*sin(this.clearcount++) ,0,1))
+			this.device.gl.scissor(x* device.ratio+2,y* device.ratio+2  , w * device.ratio - 4, h * device.ratio-4);
+		}
 		this.device.clear(vec4(1,0,0,1))
-		this.device.gl.scissor(x+1,y+1  , w * device.ratio - 2, h * device.ratio-2);
 		
 		this.device.gl.viewport(0,0,screenw * device.ratio, screenh * device.ratio);//x* device.ratio, screenh- y, w * device.ratio, h * device.ratio)
 		this.boundingrect = rect(x,y, w,h);
 	}
 
-	this.setup = function(device, viewportwidth, viewportheight){
-		
+	this.setup = function(device, viewportwidth, viewportheight, offx, offy){
+		if (offx === undefined) offx = 0;
+		if (offy === undefined) offy = 0;
 		this.device = device;
 		this.clipStack = [];
 		this.device.gl.enable(this.device.gl.SCISSOR_TEST);
@@ -84,7 +91,7 @@ define.class(function(require, exports, self){
 		
 		this.uimode = true;
 		this.matrix = mat4.identity();
-		this.viewmatrix = mat4.ortho(0, device.size[0], 0, device.size[1], -100, 100);
+		this.viewmatrix = mat4.ortho(0 + offx, device.size[0] + offx, 0 + offy, device.size[1] + offy, -100, 100);
 		this.device.gl.scissor(0,0, viewportwidth * device.ratio, viewportheight * device.ratio);
 		this.device.gl.viewport(0, 0, device.size[0] * device.ratio, device.size[1] * device.ratio)
 		this.boundingrect = rect(0,0, device.size[0], device.size[1]);
