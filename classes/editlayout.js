@@ -7,6 +7,7 @@ define.class(function(require, view){
 	this.alignitem = "stretch";
 	this.alignself = "stretch"; 
 	this.bgcolor = vec4("#d0d0d0");
+
 	this.bg.bgcolorfn = function(a,b){
 		if (floor(mod(a.x * width,50. )) == 0. ||floor(mod(a.y * height,50. )) == 0.)	{
 		return mix(bgcolor, vec4(1.0), 0.5);
@@ -16,6 +17,7 @@ define.class(function(require, view){
 		}
 		return bgcolor;
 	}
+
 	this.init = function(){
 
 		// we need to map 'screen' to something else
@@ -43,6 +45,5 @@ define.class(function(require, view){
 		// alright now we need to draw the things in our sub_teem
 		// screen.
 		if(!this.sub_teem) return
-
 	}
 })

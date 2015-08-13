@@ -23,6 +23,7 @@ define.class(function(require, exports, self){
 		if(!this.parent) this.parent = document.body
 
 		this.canvas = document.createElement("canvas")
+		this.canvas.className = 'unselectable'
 		this.parent.appendChild(this.canvas)
 		
 		var options = {
