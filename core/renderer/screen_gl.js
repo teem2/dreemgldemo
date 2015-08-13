@@ -193,23 +193,33 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		for (var i = 0; i < this.children.length; i++){
 			this.children[i].draw(this.renderstate)
 		}
-		for (var i =0 ;i<20;i++) this.debugtext(20,20 + i *20,"TEXTLABELS!", vec4("purple"));
 		
-		for (var a in this.debuglabels)
-		{
-			var label = this.debuglabels[a];
-				var textbuf = this.debugtextshader.newText()
-			textbuf.font_size = 12;
-			this.debugtextshader.matrix = mat4.identity();;
-			this.debugtextshader.viewmatrix = this.renderstate.viewmatrix;
-			textbuf.fgcolor = label.color
-			textbuf.clear()
-			textbuf.add(label.text)
-			this.debugtextshader.mesh = textbuf;
-			 this.debugtextshader.draw(this.device.gl);
+		if (this.debuglabels.length > 0){
+			this.device.gl.clearStencil(0);
+			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
 			
+			this.debugtextshader.viewmatrix = this.renderstate.viewmatrix;
+				
+			for (var a in this.debuglabels){
+				var label = this.debuglabels[a];
+				var textbuf = this.debugtextshader.newText()
+				textbuf.font_size = 12;
+				var t = mat4.identity();
+				mat4.translate(t, vec3(label.x, label.y, 0), t);
+				mat4.transpose(t,t);
+				this.debugtextshader.matrix = t;
+				textbuf.fgcolor = label.color;
+				textbuf.bgcolor = label.color;
+				textbuf.clear()
+				textbuf.add(label.text)
+				this.debugtextshader.bgcolor = vec4("white")
+				this.debugtextshader.fgcolor = label.color;
+				this.debugtextshader.mesh = textbuf;
+				 this.debugtextshader.draw(this.device);
+				
+			}
+			this.debuglabels = [];
 		}
-		this.debuglabels = [];
 	}
 
 	this.readGuidTimeout = function(){
@@ -309,6 +319,15 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.setDirty = function(value, rect){
 //		console.log(rect);
 		if ( this.device !== undefined){
+			
+			if (rect) {
+				rect.bottom = Math.ceil(rect.bottom);
+				rect.right = Math.ceil(rect.right);
+				rect.left = Math.floor(rect.left);
+				rect.top = Math.floor(rect.top);
+				this.debugtext(rect.left+1, rect.top+1, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
+				this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("purple") );
+			}
 			this.dirty = true
 			if (this.hasDirtyRect() && rect)
 			{
@@ -355,7 +374,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.buf = other.buf
 		this.mouse = other.mouse
 		this.keyboard = other.keyboard
-
+		this.debugtextshader = other.debugtextshader;
 		this.initVars()
 		this.bindInputs()
 

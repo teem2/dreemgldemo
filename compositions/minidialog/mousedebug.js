@@ -17,12 +17,16 @@ define.class(function(sprite, text, view){
 	this.render = function(){
 		return [text({bgcolor: "transparent", fgcolor: "darkgray", text:"t", position:"absolute" ,width: 10})]
 	}
+	
 	this.mousemove = function(a){
 		if (this.children.length > 0)
 		{
-		this.children[0].text = Math.round(a[0]) + ", " + Math.round(a[1]);
-		this.children[0].pos = vec2(a[0],a[1]);
-		
+		//this.children[0].text = Math.round(a[0]) + ", " + Math.round(a[1]);
+		//	this.children[0].setDirty(true);
+			this.children[0].pos = vec2(a[0],a[1]);
+			
+			this.children[0].setDirty(true);
+			
 		}
 		this.bg.mousepos = vec2(a[0],a[1]);		
 		this.setDirty(true);

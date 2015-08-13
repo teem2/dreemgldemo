@@ -172,7 +172,11 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		var o = this.orientation;
 		if (!o) return;
 		if ((this.parent && this.parent.matrixdirty) || (this.parent && this.parent.hasLayoutChanged && this.parent.hasLayoutChanged()))  {
-					if (parent.recomputeMatrix) parent.recomputeMatrix();
+					if (parent.recomputeMatrix){
+						parent.recomputeMatrix();
+						mat4.debug(parent.orientation.worldmatrix, true);
+					}
+					
 			}
 	
 		o.rotation[2] = this._rotation * 6.283 / 360;
@@ -200,9 +204,20 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		}
 		
 		this.orientation.invertedworldmatrix = undefined;
-		if (this.parent && this.parent.orientation) {
-				
-			this.orientation.worldmatrix = mat4.mul(this.orientation.matrix,this.parent.orientation.worldmatrix );
+		if (this.parent ) {
+				if ( this.parent.orientation){
+					this.orientation.worldmatrix = mat4.mul(this.orientation.matrix,this.parent.orientation.worldmatrix );
+				}else{
+					if (this.parent.matrix){
+					this.orientation.worldmatrix = mat4.mul(this.orientation.matrix,this.parent.matrix);
+					}else{
+						console.log("hmm?");
+					}
+				}
+		}
+		else{
+			this.orientation.worldmatrix = this.orientation.matrix;
+			
 		}
 		
 		this.matrixdirty = false;
