@@ -580,7 +580,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.debugrectshader.matrix = mat4;
 		
 		this.debugrectshader.position = function(){return mesh * matrix * viewmatrix};
-		console.log("this.debugtextshader", this.debugtextshader);
+
 		this.initVars()
 
 		this.bindInputs()

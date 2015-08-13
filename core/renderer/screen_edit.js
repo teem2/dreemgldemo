@@ -12,4 +12,8 @@ define.class('./sprite_gl', function (require, exports, self) {
 	}
 	this.addDirtyNode = function(node){
 	}
+
+	this.addDirtyRect = function(node){
+	}
+
 })

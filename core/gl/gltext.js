@@ -3,10 +3,10 @@
 define.class('$gl/glshader', function(require, exports, self){
 	
 	var GLTexture = require('$gl/gltexture')
-	var fontParser = require('$parsers/fontparser')
+	var glfontParser = require('$gl/glfontparser')
 
 	// our font blob
-	this.font = fontParser(require('$fonts/code_font3_1024.glf'))
+	this.font = glfontParser(require('$fonts/code_font3_1024.glf'))
 
 	//this.has_guid = false
 
@@ -18,7 +18,7 @@ define.class('$gl/glshader', function(require, exports, self){
 	this.color = "glyphy_pixel()"//" * textcolor"
 	this.fgcolor = vec4("blue");
 	// lets define a custom struct and subclass the array
-	this.text = define.struct({
+	this.textgeom = define.struct({
 		pos:vec2,
 		tex:vec2,
 		tag:vec4,
@@ -269,13 +269,12 @@ define.class('$gl/glshader', function(require, exports, self){
 	})
 
 	// for type information
-	this.mesh = this.text.array()
+	this.mesh = this.textgeom.array()
 	this.mesh.font = this.font
-	this.font.texture = GLTexture.fromArray(this.font.tex_array, this.font.tex_geom[0], this.font.tex_geom[1])
 
 	// this thing makes a new text array buffer
 	this.newText = function(font, length){
-		var buf = this.text.array() 
+		var buf = this.textgeom.array() 
 		// load the font
 		// check if the font has a loaded texture
 		buf.font = this.font
@@ -283,12 +282,12 @@ define.class('$gl/glshader', function(require, exports, self){
 	}
 
 	this.subpixel = false
+	this.glyphy_mesh = this.glyphy_mesh_atlas
+	this.glyphy_pixel = this.glyphy_atlas_draw
 
 	this.atConstructor = function(){
 		// lets check 
-		if(this.font instanceof ArrayBuffer) this.font = fontParser(this.font)
-		
-		if(!this.mesh.font) this.mesh.font = this.font
+		/*
 		if(this.font.baked){
 			this.glyphy_mesh = this.glyphy_mesh_sdf
 			// load the sdf texture
@@ -301,9 +300,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		}
 		else{
 			// load the atlas
-			this.glyphy_mesh = this.glyphy_mesh_atlas
-			this.glyphy_pixel = this.glyphy_atlas_draw
-		}
+		}*/
 	}
 
 	this.glyphy_mesh_sdf = function(){

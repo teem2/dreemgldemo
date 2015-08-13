@@ -15,8 +15,9 @@ define.class(function(require, exports){
 		// splat in the children
 		var objchildren = object.children
 		if(!objchildren) object.children = objchildren = []
-		if(Array.isArray(children))
+		if(Array.isArray(children)){
 			objchildren.push.apply(object.children, children)
+		}
 		else objchildren.push(children)
 
 		// merge name

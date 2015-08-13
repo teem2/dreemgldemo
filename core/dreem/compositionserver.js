@@ -27,7 +27,7 @@ define.class(function(require){
 		this.watcher = new FileWatcher()
 		this.watcher.atChange = function(){
 			// lets reload this app
-			//this.reload()
+			this.reload()
 		}.bind(this)
 
 		this.components = {}

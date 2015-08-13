@@ -501,7 +501,9 @@ define.class(function(require, constructor){
 		for(var key in my_prop){
 			var arg1 = my_prop[key]
 			var arg2 = other_prop[key]
+
 			if(typeof arg1 !== typeof arg2) return false
+			
 			if(typeof arg1 == 'function'){
 				if(arg1.toString() !== arg2.toString()) return false
 			}
@@ -511,13 +513,12 @@ define.class(function(require, constructor){
 					for(var i = 0; i < arg1.length; i++){
 						if(arg1[i] !== arg2[i]) return false
 					}
-					return true
 				}
-				if(arg1 !== arg2) return false
-				return true
-				//console.log("TODO add object diffing", arg1)
+				else if(arg1 !== arg2) return false
 			}
-			else if(arg1 !== arg2) return false
+			else{
+				if(arg1 !== arg2) return false
+			}
 		}
 		return true
 	}
