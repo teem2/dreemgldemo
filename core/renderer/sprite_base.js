@@ -110,7 +110,8 @@ define.class('$base/nodeworker', function(require, exports, self){
 		var x1 = 0;
 		var x2 =  this.layout?this.layout.width:this.width;
 		var y1 = 0;
-		var y2 = this.layout?this.layout.height:this.height;
+		console.log(this.layout, this.constructor.name);
+		var y2 = this.layout?(Math.abs(this.layout.height)):this.height;
 		var v1 = vec2(x1,y1);
 		var v2 = vec2(x2,y1);
 		var v3 = vec2(x2,y2);
@@ -159,10 +160,10 @@ define.class('$base/nodeworker', function(require, exports, self){
 				this.dirtyrect.left = Math.min(this.dirtyrect.left, rect.left);
 				this.dirtyrect.right = Math.max(this.dirtyrect.right, rect.right);
 				}else{
-					this.dirtyrect = rect;
+					this.dirtyrect = {left: rect.left, right:rect.right, top:rect.top, bottom:rect.bottom};
 				}
 			}
-			if (this.parent) this.parent.setDirty(true, rect) 
+			if (this.parent) this.parent.setDirty(true, this.dirtyrect) 
 		}
 	}
 })

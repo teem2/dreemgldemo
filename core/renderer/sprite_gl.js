@@ -408,22 +408,23 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				changed = true
 				this.lastLayout = {left:0, top:0, width:0, height:0, right: 0, bottom: 0};
 		}
-		
 		if (!this.layout && this.lastLayout) changed = true;
 		
 		if (this.layout){
-			if (this.layout.left != this.lastLayout.left) { this.lastLayout.left = this.layout.left;changed = true;}
-			if (this.layout.top != this.lastLayout.top) { this.lastLayout.top = this.layout.top;changed = true;}
-			if (this.layout.right != this.lastLayout.right) { this.lastLayout.right = this.layout.right;changed = true;}
-			if (this.layout.bottom != this.lastLayout.bottom) { this.lastLayout.bottom = this.layout.bottom;changed = true;}
+			if (this.layout.left != this.lastLayout.left) { changed = true;}
+			if (this.layout.top != this.lastLayout.top) { changed = true;}
+			if (this.layout.right != this.lastLayout.right) {changed = true;}
+			if (this.layout.bottom != this.lastLayout.bottom) { changed = true;}
 			
 			
 		}
 		if (changed) 
 		{
 			this.layoutchanged();
-			this.setDirty();
+			this.setDirty(true);
+			this.setDirty(true, this.lastLayout)
 		}
+		if (this.layout) this.lastLayout= {left:this.layout.left, top:this.layout.top, width:this.layout.width, height:this.layout.height, right: this.layout.right, bottom:this.layout.bottom};
 		return changed;
 	}
 	
