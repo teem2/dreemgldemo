@@ -3,28 +3,26 @@
 
 define.class(function(sprite, text, view, button){
 
-	var testdata = {
-		name:'Root Node',
-		children:[
-				{name:'Child 1',	children:[
-						{name:'node 0-0-0 '}
-					]},
-				{name:'Child 2',	children:[
-						{name:'node 0-1-0'}
-					]},
-				{name:'node 0-2' },
-				{name:'node 0-3',	children:[
-						{name:'node 0-3-0'},
-						{name:'node 0-3-1',	children:[
-							{name:'node 0-3-1-0',	children:[
-									{name:'node 0-3-1-0-0', children:[
-											{name:'node1a'}
-										]}
-								]},
-								{name:'node with an earlier parent'}
-							]}
-					]},
+	var testdata = {name:'test Node', children:[
+		{name:'Child 1', children:[
+			{name:'node 0-0-0 '}
+		]},
+		{name:'Child 2', children:[
+			{name:'node 0-1-0'}
+		]},
+		{name:'node 0-2' },
+		{name:'node 0-3', children:[
+			{name:'node 0-3-0'},
+			{name:'node 0-3-1',	children:[
+				{name:'node 0-3-1-0', children:[
+					{name:'node 0-3-1-0-0', children:[
+						{name:'node1a'}
+					]}
+				]},
+				{name:'node with an earlier parent'}
 			]}
+		]}
+	]}
 			
 	var itemheading = view.extend(function itemheading(){
 		this.attribute("text", {type:String, value:""});
@@ -61,19 +59,19 @@ define.class(function(sprite, text, view, button){
 		this.atDraw = function(){
 			
 			if (this.hovered> 0){
-					if (this.pressed > 0){
-						this.bg.col1 = this.activecolor1;
-						this.bg.col2 = this.activecolor2;
-					}else{
+				if (this.pressed > 0){
+					this.bg.col1 = this.activecolor1;
+					this.bg.col2 = this.activecolor2;
+				}else{
+					
+					this.bg.col1 = this.hovercolor1;
+					this.bg.col2 = this.hovercolor2;
+				}
 						
-						this.bg.col1 = this.hovercolor1;
-						this.bg.col2 = this.hovercolor2;
-					}
-						
-			}else{
-										this.bg.col1 = this.color1;
-						this.bg.col2 = this.color2;
-
+			}
+			else {
+				this.bg.col1 = this.color1;
+				this.bg.col2 = this.color2;
 			}
 		}
 		this.bg.bgcolorfn = function(a,b){return mix(col1, col2, a.y);};

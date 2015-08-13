@@ -569,16 +569,16 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.debugrectshader = new GLShader();
 		this.debugrectshader.has_guid = false;
 		
-			this.debugrectshader.bgcolor = vec4(0,0,0,0.1);
-			this.debugrectshader.color = function(){return bgcolor;};
-			this.debugrectshader.mesh = vec2.array();
-			this.debugrectshader.mesh.length = 0;
-			this.debugrectshader.mesh.pushQuad(0,0,10000,0,0,10000,10000,10000);
-			this.debugrectshader.viewmatrix = mat4;
-			this.debugrectshader.matrix = mat4;
-			
-			this.debugrectshader.position = function(){return mesh * matrix * viewmatrix};
-		console.log("this.debugtextshader", this.debugtextshader);
+		this.debugrectshader.bgcolor = vec4(0,0,0,0.1);
+		this.debugrectshader.color = function(){return bgcolor;};
+		this.debugrectshader.mesh = vec2.array();
+		this.debugrectshader.mesh.length = 0;
+		this.debugrectshader.mesh.pushQuad(0,0,10000,0,0,10000,10000,10000);
+		this.debugrectshader.viewmatrix = mat4;
+		this.debugrectshader.matrix = mat4;
+		
+		this.debugrectshader.position = function(){return mesh * matrix * viewmatrix};
+	//	console.log("this.debugtextshader", this.debugtextshader);
 		this.initVars()
 
 		this.bindInputs()

@@ -214,7 +214,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 					if (this.parent.matrix){
 					this.orientation.worldmatrix = mat4.mul(this.orientation.matrix,this.parent.matrix);
 					}else{
-						console.log("hmm?");
+						//console.log("hmm?");
 					}
 				}
 		}
