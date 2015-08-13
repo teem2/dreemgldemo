@@ -107,35 +107,22 @@ define.class('$base/nodeworker', function(require, exports, self){
 	}
 	this.attribute("clipping", {type:boolean, value:false})
 	
-	this.setDirty = function(value, rect){
-		
-		if (rect === undefined && this.screen) this.screen.addDirtyNode(this);
-		
-		if (value === true)
-		{
-			if(this.dirty === false) {			
-				if (rect === undefined){					
-					this.dirtyrect = this.calculateBoundingRect();					
-				}else{
-					this.dirtyrect = rect;
-				}
-				
-				this.dirty = true
-			}
-			else{
-				if (rect === undefined){					
-					rect = this.calculateBoundingRect();					
-				}
-				if (this.dirtyrect){
-				this.dirtyrect.top = Math.min(this.dirtyrect.top, rect.top);
-				this.dirtyrect.bottom = Math.max(this.dirtyrect.bottom, rect.bottom);
-				this.dirtyrect.left = Math.min(this.dirtyrect.left, rect.left);
-				this.dirtyrect.right = Math.max(this.dirtyrect.right, rect.right);
-				}else{
-					this.dirtyrect = {left: rect.left, right:rect.right, top:rect.top, bottom:rect.bottom};
-				}
-			}
-			if (this.parent) this.parent.setDirty(true, this.dirtyrect) 
+	this.init = function(){
+		if (this.screen) this.screen.addDirtyNode(this);
+	}
+	
+	this.destroy = function(){
+		if (this.screen) this.screen.addDirtyRect(this.getBoundingRect());
+	}
+	
+	this.bubbleDirty = function(){
+		if (this.dirty === false){
+			this.dirty = true;
+			if (this.parent) this.parent.bubbleDirty();
 		}
+	}
+	this.setDirty = function(){		
+		this.bubbleDirty();
+		if (this.screen) this.screen.addDirtyNode(this);
 	}
 })

@@ -125,6 +125,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		return this.orientation.invertedworldmatrix;
 	}
 	
+	this.getBoundingRect = function(){
+		return this.calculateBoundingRect();
+	}
 	
 	this.calculateBoundingRect = function(){	
 		if (!this.orientation) return{left:0,right:0, top:0, bottom: 0};

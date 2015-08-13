@@ -37,7 +37,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.debugshader = false
-	this.debug = false;
+	this.debug = true;
 	
 	this.lastx = -1;
 	this.lasty = -1;
@@ -293,6 +293,11 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		
 		this.recursiveMatrixUpdate(this);
 		this.dumped = 1;	
+		for(a in this.dirtyNodes)
+		{
+			this.addDirtyRect(this.dirtyNodes[a].getBoundingRect());
+		}
+		this.dirtyNodes = [];
 	//	 this.dumpLayout(this, false);
 		// this.dumpStructure(this);
 	}
@@ -337,37 +342,41 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 		//console.log(this.draw_calls, Date.now() - delta)
 	}
-	this.addDirtyNode =function(node)
-	{
+	
+	this.dirtyNodes = [];
+	this.addDirtyNode =function(node){
+		this.addDirtyRect(node.getBoundingRect());
+		this.dirtyNodes.push(node);	
 	}
-	this.setDirty = function(value, rect){
-			
-//		console.log(rect);
-		if ( this.device !== undefined){
-			
-			if (rect) {
-				rect.bottom = Math.ceil(rect.bottom);
-				rect.right = Math.ceil(rect.right);
-				rect.left = Math.floor(rect.left);
-				rect.top = Math.floor(rect.top);
-				this.debugtext(rect.left+1.5, rect.top+1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
-				this.debugtext(rect.left-1.5, rect.top+1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
-				this.debugtext(rect.left+1.5, rect.top-1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
-				this.debugtext(rect.left-1.5, rect.top-1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
-				this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("purple") );
-			}
-			this.dirty = true
-			if (this.hasDirtyRect() && rect)
-			{
-				this.totaldirtyrect.top = Math.min(this.totaldirtyrect.top, rect.top);
-				this.totaldirtyrect.bottom = Math.max(this.totaldirtyrect.bottom, rect.bottom);
-				this.totaldirtyrect.left = Math.min(this.totaldirtyrect.left, rect.left);
-				this.totaldirtyrect.right = Math.max(this.totaldirtyrect.right, rect.right);
-			}else{
-				this.totaldirtyrect = rect;
-			}
-			this.device.redraw();
+	
+	this.addDirtyRect = function(rect){				
+		rect.bottom = Math.ceil(rect.bottom);
+		rect.right = Math.ceil(rect.right);
+		rect.left = Math.floor(rect.left);
+		rect.top = Math.floor(rect.top);
+		this.debugtext(rect.left+1.5, rect.top+1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
+		this.debugtext(rect.left-1.5, rect.top+1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
+		this.debugtext(rect.left+1.5, rect.top-1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
+		this.debugtext(rect.left-1.5, rect.top-1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
+		this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("purple") );
+		this.dirty = true
+		if (this.hasDirtyRect())
+		{
+			this.totaldirtyrect.top = Math.min(this.totaldirtyrect.top, rect.top);
+			this.totaldirtyrect.bottom = Math.max(this.totaldirtyrect.bottom, rect.bottom);
+			this.totaldirtyrect.left = Math.min(this.totaldirtyrect.left, rect.left);
+			this.totaldirtyrect.right = Math.max(this.totaldirtyrect.right, rect.right);
+		}else{
+			this.totaldirtyrect = rect;
 		}
+	}
+	
+	this.bubbleDirty = function(){
+		this.dirty = true;
+			this.device.redraw();
+	}
+
+	this.setDirty = function(){
 	}
 
 	this.onmoved = function(value){
