@@ -695,12 +695,12 @@ define.class('$base/node', function(require, exports, self){
 		}
 		this.dirty = false
 
-		if(!this.device){
+		if(!gldevice){
 			return
 		}
 		this.shader = this.compileShader(gldevice)
+
 		if(gldevice) this.connectWires()
-		//	console.log("HII")
 	}		
 
 	this.useShader = function(gl, shader){
@@ -1022,6 +1022,7 @@ define.class('$base/node', function(require, exports, self){
 	// lets draw ourselves
 	this.draw = function(gldevice, start, end){
 		if(this.color === undefined) return
+		//if(this.mydbg) debugger
 		if(!this.hasOwnProperty('shader') || !this.shader) this.compile(gldevice)
 		var gl = gldevice.gl
 		var len = this.useShader(gl, this.shader)
@@ -1031,6 +1032,8 @@ define.class('$base/node', function(require, exports, self){
 
 	this.drawGuid = function(gldevice, start, end){
 		if(this.color === undefined) return
+		//if(this.mydbg) debugger
+
 		if(!this.hasOwnProperty('shader') || !this.shader) this.compile(gldevice)
 		var gl = gldevice.gl
 		var len = this.useShader(gl, this.shader.guid)
