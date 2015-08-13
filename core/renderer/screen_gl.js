@@ -27,11 +27,18 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	
 	this.debuglabels = []
 	this.debugtext = function(x,y,text,color){
-			if (color === undefined) color = vec4("black");
-			this.debuglabels.push({x:x, y:y, text:text, color: color});	
+		if (color === undefined) color = vec4("black");
+		this.debuglabels.push({x:x, y:y, text:text, color: color});	
 	}
-	this.debug = false
 
+	this.debugtext = function(x,y,text,color){
+		if (color === undefined) color = vec4("black");
+		this.debuglabels.push({x:x, y:y, text:text, color: color});	
+	}
+
+	this.debugshader = false
+	this.debug = false;
+	
 	this.lastx = -1;
 	this.lasty = -1;
 
@@ -189,20 +196,21 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.renderstate.drawmode = 0;
 		this.device.clear(this.bgcolor)
 		this.device.gl.clearStencil(0);
-		if (this.debuglabels.length  > 0)
-		{
-			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
-		//this.device.clear(this.bgcolor)
-			this.debugrectshader.viewmatrix = this.renderstate.viewmatrix;
-			this.debugrectshader.matrix = mat4.identity();
-			this.debugrectshader.draw(this.device);
-			this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+		if (this.debug){
+			if (this.debuglabels.length  > 0){
+				this.device.gl.disable(this.device.gl.SCISSOR_TEST);
+			//this.device.clear(this.bgcolor)
+				this.debugrectshader.viewmatrix = this.renderstate.viewmatrix;
+				this.debugrectshader.matrix = mat4.identity();
+				this.debugrectshader.draw(this.device);
+				this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+			}
 		}
 		for (var i = 0; i < this.children.length; i++){
 			this.children[i].draw(this.renderstate)
 		}
 		
-		if (this.debuglabels.length > 0){
+		if (this.debug && this.debuglabels.length > 0){
 			this.device.gl.clearStencil(0);
 			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
 			
@@ -264,6 +272,9 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		if (depth ==="")  this.structuredumped --;
 	}
 	
+	this.recursiveMatrixUpdate = function(){
+	}
+	
 	this.performLayout = function(){
 		this._width = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
 		this._height = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
@@ -279,6 +290,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	//	 this.dumpLayout(this, true);
 
 		FlexLayout.computeLayout(this);
+		
+		this.recursiveMatrixUpdate(this);
 		this.dumped = 1;	
 	//	 this.dumpLayout(this, false);
 		// this.dumpStructure(this);
@@ -294,7 +307,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	//	console.log(this.time)		
 		this.last_time = time
 	
-		if (this.debug === true) {
+		if (this.debugshader === true) {
 			if (!this.debug_tex.frame_buf) this.debug_tex.allocRenderTarget(this.device)
 			this.device.setTargetFrame(this.debug_tex)
 			this.drawDebug()
@@ -324,8 +337,11 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 		//console.log(this.draw_calls, Date.now() - delta)
 	}
-
+	this.addDirtyNode =function(node)
+	{
+	}
 	this.setDirty = function(value, rect){
+			
 //		console.log(rect);
 		if ( this.device !== undefined){
 			

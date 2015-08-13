@@ -10,25 +10,25 @@ define.class(function(sprite, text, view){
 		var dx = abs(a.x  * width - mousepos.x)/10.0;
 		var dy = abs(a.y  * height - mousepos.y)/10.0;
 		var mindist = min(dx,  dy);
-		mindist = pow(mindist,0.08);
-		
+		mindist = pow(mindist,0.08);	
 		return vec4(0.7, 0.6,0.3,clamp(1.-mindist, 0.,1. ));
 	}
+	
 	this.render = function(){
-		return [text({bgcolor: "transparent", fgcolor: "darkgray", text:"t", position:"absolute" ,width: 10})]
+		return [text({bgcolor: "transparent", fgcolor: "darkgray", text:"this is a small text that will contain the cursor after move", position:"absolute" ,width: 10})]
 	}
 	
 	this.mousemove = function(a){
-		if (this.children.length > 0)
-		{
-		//this.children[0].text = Math.round(a[0]) + ", " + Math.round(a[1]);
-		//	this.children[0].setDirty(true);
-			this.children[0].pos = vec2(a[0],a[1]);
-			
-			this.children[0].setDirty(true);
-			
-		}
 		this.bg.mousepos = vec2(a[0],a[1]);		
 		this.setDirty(true);
+		
+		
+		if (this.children.length > 0)
+		{
+			this.children[0].text = Math.round(a[0]) + ", " + Math.round(a[1]);
+			this.children[0].pos = vec2(a[0],a[1]);		
+			
+		}
+		
 	}
 });

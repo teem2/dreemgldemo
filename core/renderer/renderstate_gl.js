@@ -49,7 +49,7 @@ define.class(function(require, exports, self){
 	}
 	
 	this.clearcount = 0;
-	this.debugrects = true;
+	this.debugrects = false;
 	this.setupsubrect = function(device, x,y,w,h){
 		
 		this.device = device;
