@@ -59,7 +59,7 @@ define.class(function(require, exports, self){
 		
 		y = (screenh  - y ) -h; 
 		
-		console.log("subrect:",x,y,w,h, screenw * device.ratio, screenh* device.ratio, device.ratio);
+		console.log("subrect:",x,y,x+w,y+h, screenw * device.ratio, screenh* device.ratio, device.ratio);
 		
 		this.uimode = true;
 		this.matrix = mat4.identity();

@@ -176,7 +176,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 		
 		this.orientation = {};
-		this.orientation.worldmatrix = this.renderstate.matrix;
+		this.orientation.worldmatrix = mat4();
 		this.invertedworldmatrix =  mat4.invert(this.orientation.worldmatrix)
 		this.renderstate.debugmode = false;
 		this.renderstate.drawmode = 0;
@@ -283,7 +283,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.setDirty = function(value, rect){
-		
+		console.log(rect);
 		if ( this.device !== undefined){
 			this.dirty = true
 			if (this.hasDirtyRect() && rect)

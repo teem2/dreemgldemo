@@ -125,6 +125,48 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		return this.orientation.invertedworldmatrix;
 	}
 	
+	
+	this.calculateBoundingRect = function(){	
+		if (!this.orientation) return{left:0,right:0, top:0, bottom: 0};
+		if (this.matrixdirty) this.recomputeMatrix();
+		var x1 = 0;
+		var x2 = this._width;
+		var y1 = 0;
+		var y2 = this._height;
+
+		if(this.layout){
+			x2 = this.layout.width;
+			y2 = this.layout.height;
+		}
+
+		var v1 = vec2(x1,y1);
+		var v2 = vec2(x2,y1);
+		var v3 = vec2(x2,y2);
+		var v4 = vec2(x1,y2);
+		
+		v1 = vec2.mul_mat4_t(v1, this.orientation.worldmatrix)
+		v2 = vec2.mul_mat4_t(v2, this.orientation.worldmatrix)
+		v3 = vec2.mul_mat4_t(v3, this.orientation.worldmatrix)
+		v4 = vec2.mul_mat4_t(v4, this.orientation.worldmatrix)		
+		mat4.debug(this.orientation.worldmatrix,true);
+		mat4.debug(this.orientation.matrix,true);
+		var minx = v1[0];
+		var miny = v1[1];
+		var maxx = v1[0];
+		var maxy = v1[1];
+		if (v2[0] < minx) minx = v2[0];else if (v2[0] > maxx) maxx = v2[0];
+		if (v3[0] < minx) minx = v3[0];else if (v3[0] > maxx) maxx = v3[0];
+		if (v4[0] < minx) minx = v4[0];else if (v4[0] > maxx) maxx = v4[0];
+		
+		if (v2[1] < miny) miny = v2[1];else if (v2[1] > maxy) maxy = v2[1];
+		if (v3[1] < miny) miny = v3[1];else if (v3[1] > maxy) maxy = v3[1];
+		if (v4[1] < miny) miny = v4[1];else if (v4[1] > maxy) maxy = v4[1];
+		
+		var ret = {left: minx, top: miny, right: maxx, bottom: maxy};
+		return ret
+	}
+	
+	
 	this.recomputeMatrix = function(){
 		
 		var o = this.orientation;
@@ -158,7 +200,11 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		}
 		
 		this.orientation.invertedworldmatrix = undefined;
-		//this.orientation.worldmatrix = mat4.mul(this.orientation.matrix,this.parent.orientation.worldmatrix );
+		if (this.parent && this.parent.orientation) {
+				
+			this.orientation.worldmatrix = mat4.mul(this.orientation.matrix,this.parent.orientation.worldmatrix );
+		}
+		
 		this.matrixdirty = false;
 	}
 	

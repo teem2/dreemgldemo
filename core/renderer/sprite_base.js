@@ -102,44 +102,10 @@ define.class('$base/nodeworker', function(require, exports, self){
 
 	this.event("focusget")
 	this.event("focuslost")
-	
-	this.attribute("clipping", {type:boolean, value:false})
-	this.calculateBoundingRect = function(){	
-		if (!this.orientation) return{left:0,right:0, top:0, bottom: 0};
-		if (this.matrixdirty) this.recomputeMatrix();
-		var x1 = 0;
-		var x2 =  this.layout?this.layout.width:this.width;
-		var y1 = 0;
-		var y2 = this.layout?(Math.abs(this.layout.height)):this.height;
-		var v1 = vec2(x1,y1);
-		var v2 = vec2(x2,y1);
-		var v3 = vec2(x2,y2);
-		var v4 = vec2(x1,y2);
-		
-	
-		v1 = vec2.mul_mat4_t(v1, this.orientation.worldmatrix)
-		v2 = vec2.mul_mat4_t(v2, this.orientation.worldmatrix)
-		v3 = vec2.mul_mat4_t(v3, this.orientation.worldmatrix)
-		v4 = vec2.mul_mat4_t(v4, this.orientation.worldmatrix)		
-		
-		var minx = v1[0];
-		var miny = v1[1];
-		var maxx = v1[0];
-		var maxy = v1[1];
-		if (v2[0] < minx) minx = v2[0];else if (v2[0] > maxx) maxx = v2[0];
-		if (v3[0] < minx) minx = v3[0];else if (v3[0] > maxx) maxx = v3[0];
-		if (v4[0] < minx) minx = v4[0];else if (v4[0] > maxx) maxx = v4[0];
-		
-		if (v2[1] < miny) miny = v2[1];else if (v2[1] > maxy) maxy = v2[1];
-		if (v3[1] < miny) miny = v3[1];else if (v3[1] > maxy) maxy = v3[1];
-		if (v4[1] < miny) miny = v4[1];else if (v4[1] > maxy) maxy = v4[1];
-		
-		var ret = {left: minx, top: miny, right: maxx, bottom: maxy};
-		console.log("object: " , this.constructor.name);
-		console.log("layout:", this.layout);
-		console.log("retval:" , ret);
-		return ret
+	this.calculateBoundingRect = function(){
+		console.log("replace me!");
 	}
+	this.attribute("clipping", {type:boolean, value:false})
 	
 	this.setDirty = function(value, rect){
 		if (value === true)

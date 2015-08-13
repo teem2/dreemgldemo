@@ -1159,14 +1159,18 @@ define(function(require, exports){
 	}, 'mat4')
 	matApi(exports.mat4)
 
-	exports.mat4.debug = function(d){
+	exports.mat4.debug = function(d, inline){
+		var r = "";
 		for(var i =0 ;i<16;i+=4){
-			var r = (Array(6).join(' ') + Math.round(d[i]*1000)/1000).slice(-6) + ", ";
+			r += (Array(6).join(' ') + Math.round(d[i]*1000)/1000).slice(-6) + ", ";
 			 r +=(Array(6).join(' ') +  Math.round(d[i+1]*1000)/1000).slice(-6) + ", ";
 			 r += (Array(6).join(' ') + Math.round(d[i+2]*1000)/1000).slice(-6) + ", ";
 			 r += (Array(6).join(' ') + Math.round(d[i+3]*1000)/1000).slice(-6) + "  ";
-			console.log(r);
+			if (!inline){ 
+				console.log(r); r = "";
+			}
 		}
+		if (inline) console.log(r);
 	}
 	
 	exports.mat4.identity = function(o){
