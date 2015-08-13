@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // ruler class
 
-define.class(function(sprite, text, view){
+define.class(function(sprite, text, icon, view){
 
 	this.title = "folding thing";
 	this.position ="relative";
@@ -12,6 +12,8 @@ define.class(function(sprite, text, view){
 	
 	this.flexdirection = "column";
 	this.attribute("collapsed", {type: Boolean, value: false});
+
+	this.attribute("icon", {type: String, value: 'times'});
 	
 	this.attribute("buttoncolor1", {type: vec4, value: vec4("#303060")});
 	this.attribute("buttoncolor2", {type: vec4, value: vec4("#303060")});	
@@ -39,9 +41,8 @@ define.class(function(sprite, text, view){
 		this.bg.bgcolorfn = this.bggradient;
 		this.padding = 6;
 			
-		this.render = function()
-		{			
-			return [view({bgcolor: "red",width:16,  margin:4}), text({fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })];
+		this.render = function(){			
+			return [icon({fontsize:16, icon:this.icon}), text({marginleft:5,fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })];
 		}
 		
 		this.pressed = 0;
@@ -88,7 +89,7 @@ define.class(function(sprite, text, view){
 	
 	this.render = function(){
 		
-		this.bar = this.clickablebar({title: this.title});
+		this.bar = this.clickablebar({icon:this.icon, title: this.title});
 		
 		this.bar.click = this.toggle.bind(this);
 		var res = [this.bar];

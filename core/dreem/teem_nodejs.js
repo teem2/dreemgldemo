@@ -76,5 +76,31 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 			else if(msg.type == 'webrtcOfferCandidate'){ bus.broadcast(msg) }
 			else if(msg.type == 'webrtcAnswerCandidate'){ bus.broadcast(msg) }
 		}.bind(this)
+
+		// we have to render the RPC bus
+		var composition = this.render()
+		
+		// lets see which objects need to be RPC-proxified
+		for(var i = 0; i < composition.length; i++){
+			// ok so as soon as we are stubbed, we need to proxify the object
+			var obj = composition[i]
+			if(obj.constructor.stubbed){ // we are a stubbed out class
+				var rpcid = obj.name || obj.constructor.name
+				//composition[i] = RpcProxy.createFromStub(obj, Node.prototype, rpcid, this.rpcpromise)
+			}
+			else{
+				renderer.defineGlobals(obj, {teem:this})
+			}
+		}
+
+		// splat our children into the teem object
+		renderer.mergeChildren(this, composition)
+
+		// lets call init
+		var wireinits = []
+		renderer.connectWires(this, wireinits)
+
+		renderer.fireInit(this)
+
 	}
 })

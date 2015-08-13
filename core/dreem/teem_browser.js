@@ -23,6 +23,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		// copy keyboard and mouse objects from previous
 		if(!previous){
 			if(!parent){
+				if(window.breakin)debugger
 				this.mouse = globals.mouse = new Mouse()
 				this.keyboard = globals.keyboard = new Keyboard()
 			}
@@ -85,13 +86,15 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 
 		// lets redraw screen
 		if(previous) this.screen.device.redraw()
+
+		this.rendered = true
 	}
 
 	self.createBus = function(){
 		
 		this.bus = new BusClient(location.pathname)
 		
-		var rpcpromise = new RpcPromise(this.bus)
+		this.rpcpromise = new RpcPromise(this.bus)
 		
 		this.bus.atMessage = function(msg){
 			if(msg.type == 'sessionCheck'){
@@ -146,7 +149,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 					this.bus.send({type:'webrtcOffer', offer:offer, index: this.index})
 				}.bind(this)
 
-				if(!this.parent) this.doRender()
+				if(!this.rendered) this.doRender()
 			}
 			else if(msg.type == 'connectScreen'){
 				//var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
@@ -165,7 +168,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 				RpcProxy.handleCall(this.root, msg, this.bus)
 			}
 			else if (msg.type == 'return'){
-				rpcpromise.resolveResult(msg)
+				this.rpcpromise.resolveResult(msg)
 			}
 		}.bind(this)
 	}
@@ -173,7 +176,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 	self.atConstructor = function(previous, parent){
 
 		this.parent = parent
-
+		
 		if(previous){
 			this.reload = (previous.reload||0)+1
 			console.log("Reload " + this.reload)
@@ -183,20 +186,24 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		baseclass.prototype.atConstructor.call(this)
 
 		// web environment
-		if(previous) this.bus = previous.bus
+		if(previous){
+			this.bus = previous.bus
+			this.rpcpromise = previous.rpcpromise
+		}
 		else this.createBus()
 
-		window.teem = this
+		if(!parent) window.teem = this
 
 		//ooookay. so. lets 'render' ourselves to spawn up the first level 
 		var composition = this.render()
-
+		
 		// lets see which objects need to be RPC-proxified
 		for(var i = 0; i < composition.length; i++){
 			// ok so as soon as we are stubbed, we need to proxify the object
 			var obj = composition[i]
 			if(obj.constructor.stubbed){ // we are a stubbed out class
-				composition[i] = RpcProxy.createFromStub(obj)
+				var rpcid = obj.name || obj.constructor.name
+				composition[i] = RpcProxy.createFromStub(obj, Node.prototype, rpcid, this.rpcpromise)
 			}
 			else{
 				renderer.defineGlobals(obj, {teem:this})

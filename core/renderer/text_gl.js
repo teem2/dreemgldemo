@@ -3,9 +3,11 @@
 
 define.class('./sprite_gl', function(require, exports, self){	
 	var GLText = require('$gl/gltext')
+	var glfontParser = require('$gl/glfontparser')
 
 	this.attribute('text', {type:String, value: "HELLO" })
 	this.attribute('fontsize', {type:float, value: 18});
+	this.attribute('font', {type:Object, value: undefined});
 	this.attribute('color', {type:vec4, value: vec4(1,1,1,1)});
 	
 	exports.nest('Fg', GLText.extend(function(exports, self){}))
@@ -14,10 +16,17 @@ define.class('./sprite_gl', function(require, exports, self){
 		this.dirty = true;
 	}
 
+	this.init = function(){
+		if(this.font) this.font = glfontParser(this.font)
+	}
+
 	this.lazyInit = function(){
 		if(this.rendered_text !== this.text){
 			this.rendered_text = this.text
 			var textbuf = this.fg.newText()
+
+			if(this.font) textbuf.font = this.font
+
 			textbuf.font_size = this.fontsize;
 			textbuf.add_y = textbuf.line_height;
 			textbuf.fgcolor = this.color

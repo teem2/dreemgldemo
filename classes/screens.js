@@ -7,10 +7,10 @@ define.class(function(node, require, self){
 
 	self.init = function(){
 		// lets put our multi children on ourselves
-		for(var i = 0; i < this.children.length; i++){
+/*		for(var i = 0; i < this.children.length; i++){
 			var child = this.children[i]
 			var rpcdef = RpcProxy.createRpcDef(child, node)
 			this[child.name] = RpcMulti.createFromDef(rpcdef)
-		}
+		}*/
 	}
 })

@@ -121,12 +121,22 @@ define.class('$base/node', function(require, exports, self){
 	}
 
 	RpcProxy.isJsonSafe = function(obj, stack){
-		if(!obj) return true
+		if(obj === undefined || obj === null) return true
 		if(typeof obj === 'function') return false
 		if(typeof obj !== 'object') return true
 		if(!stack) stack = []
 		stack.push(obj)
+
+		if(Array.isArray(obj)){
+			for(var i = 0; i < obj.length; i++){
+				if(!RpcProxy.isJsonSafe(obj[i])) return false
+			}
+			stack.pop()
+			return true
+		}
+
 		if(Object.getPrototypeOf(obj) !== Object.prototype) return false
+
 		for(var key in obj){
 			var prop = obj[key]
 			if(typeof prop == 'object'){
