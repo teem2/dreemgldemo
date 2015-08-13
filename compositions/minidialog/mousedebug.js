@@ -15,7 +15,7 @@ define.class(function(sprite, text, view){
 		return vec4(0.7, 0.6,0.3,clamp(1.-mindist, 0.,1. ));
 	}
 	this.render = function(){
-		return [text({bgcolor: "transparent", fgcolor: "darkgray", text:"t"})]
+		return [text({bgcolor: "transparent", fgcolor: "darkgray", text:"t", position:"absolute" ,width: 10})]
 	}
 	this.mousemove = function(a){
 		this.children[0].text = Math.round(a[0]) + ", " + Math.round(a[1]);

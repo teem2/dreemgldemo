@@ -110,7 +110,6 @@ define.class('$base/nodeworker', function(require, exports, self){
 		var x1 = 0;
 		var x2 =  this.layout?this.layout.width:this.width;
 		var y1 = 0;
-		console.log(this.layout, this.constructor.name);
 		var y2 = this.layout?(Math.abs(this.layout.height)):this.height;
 		var v1 = vec2(x1,y1);
 		var v2 = vec2(x2,y1);
@@ -135,7 +134,11 @@ define.class('$base/nodeworker', function(require, exports, self){
 		if (v3[1] < miny) miny = v3[1];else if (v3[1] > maxy) maxy = v3[1];
 		if (v4[1] < miny) miny = v4[1];else if (v4[1] > maxy) maxy = v4[1];
 		
-		return {left: minx, top: miny, right: maxx, bottom: maxy};
+		var ret = {left: minx, top: miny, right: maxx, bottom: maxy};
+		console.log("object: " , this.constructor.name);
+		console.log("layout:", this.layout);
+		console.log("retval:" , ret);
+		return ret
 	}
 	
 	this.setDirty = function(value, rect){
