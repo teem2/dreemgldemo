@@ -37,7 +37,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.debugshader = false
-	this.debug = true;
+	this.debug = false;
 	
 	this.lastx = -1;
 	this.lasty = -1;
