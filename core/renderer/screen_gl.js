@@ -189,7 +189,15 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.renderstate.drawmode = 0;
 		this.device.clear(this.bgcolor)
 		this.device.gl.clearStencil(0);
-		
+		if (this.debuglabels.length  > 0)
+		{
+			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
+		//this.device.clear(this.bgcolor)
+			this.debugrectshader.viewmatrix = this.renderstate.viewmatrix;
+			this.debugrectshader.matrix = mat4.identity();
+			this.debugrectshader.draw(this.device);
+			this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+		}
 		for (var i = 0; i < this.children.length; i++){
 			this.children[i].draw(this.renderstate)
 		}
@@ -213,6 +221,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 				textbuf.clear()
 				textbuf.add(label.text)
 				this.debugtextshader.bgcolor = vec4("white")
+				
 				this.debugtextshader.fgcolor = label.color;
 				this.debugtextshader.mesh = textbuf;
 				 this.debugtextshader.draw(this.device);
@@ -325,7 +334,10 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 				rect.right = Math.ceil(rect.right);
 				rect.left = Math.floor(rect.left);
 				rect.top = Math.floor(rect.top);
-				this.debugtext(rect.left+1, rect.top+1, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
+				this.debugtext(rect.left+1.5, rect.top+1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
+				this.debugtext(rect.left-1.5, rect.top+1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
+				this.debugtext(rect.left+1.5, rect.top-1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
+				this.debugtext(rect.left-1.5, rect.top-1.5, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );
 				this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("purple") );
 			}
 			this.dirty = true
@@ -375,6 +387,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.mouse = other.mouse
 		this.keyboard = other.keyboard
 		this.debugtextshader = other.debugtextshader;
+		this.debugrectshader = other.debugrectshader;
 		this.initVars()
 		this.bindInputs()
 
@@ -528,7 +541,18 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.device = new GLDevice()
 		this.debugtextshader = new GLText();
 		this.debugtextshader.has_guid = false;
+		this.debugrectshader = new GLShader();
+		this.debugrectshader.has_guid = false;
+		
+			this.debugrectshader.bgcolor = vec4(0,0,0,0.1);
+			this.debugrectshader.color = function(){return bgcolor;};
+			this.debugrectshader.mesh = vec2.array();
+			this.debugrectshader.mesh.length = 0;
+			this.debugrectshader.mesh.pushQuad(0,0,10000,0,0,10000,10000,10000);
+			this.debugrectshader.viewmatrix = mat4;
+			this.debugrectshader.matrix = mat4;
 			
+			this.debugrectshader.position = function(){return mesh * matrix * viewmatrix};
 		console.log("this.debugtextshader", this.debugtextshader);
 		this.initVars()
 
