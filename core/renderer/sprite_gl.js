@@ -324,6 +324,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 	this.drawStencil = function (renderstate) {
 		this.bg.matrix = renderstate.matrix;
+		this.bg.viewmatrix = renderstate.viewmatrix;
+		
 		if (this.layout){
 			this.bg.width = this.layout.width? this.layout.width:this.width;
 			this.bg.height = this.layout.height? this.layout.height:this.height;
@@ -332,6 +334,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			this.bg.width = this.width;
 			this.bg.height = this.height;
 		}
+		
 		this.bg.draw(renderstate.device);
 	}
 	
@@ -394,6 +397,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 
 	this.doDrawGuid = function(renderstate){
+		this.bg.viewmatrix = renderstate.viewmatrix;		
 		this.bg.drawGuid(this.screen.device)
 	}
 
@@ -411,11 +415,14 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			{
 						var bound = this.getBoundingRect();
 						var myrect = rect(bound.left, bound.top, bound.right, bound.bottom);
+						
 						var actuallyvisible = renderstate.boundrect? rect.intersects(myrect, renderstate.boundrect): true;
+						if (isNaN(myrect[0])) actuallyvisible = true;
 						if (!actuallyvisible)
 						{
 							this.screen.debugtext(bound.left, bound.top, "not drawn!");
-						
+							//console.log(myrect, renderstate.boundrect);
+							//return false;
 						}
 			}
 			// idea reference outer node using shader.node

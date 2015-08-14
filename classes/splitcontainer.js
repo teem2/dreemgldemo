@@ -15,6 +15,11 @@ define.class(function(sprite,  view){
 	this.borderwidth =1;
 	this.bordercolor = vec4("#303060");
 	
+	this.vertical = function(){
+		this.flexdirection = this.vertical?"column":"row" ;
+	}
+	
+	
 	this.splitter = view.extend(function(){
 		this.bgcolor = vec4("red");
 		this.alignitem = "stretch";
@@ -116,7 +121,6 @@ define.class(function(sprite,  view){
 	
 	this.render = function(){		
 		if (this.instance_children.length > 1){
-			this.flexdirection = this.vertical?"column":"row" ;
 			this.newchildren = []
 			this.newchildren.push(this.instance_children[0]);
 			if (!this.instance_children[0].flex) this.instance_children[0].flex =1;

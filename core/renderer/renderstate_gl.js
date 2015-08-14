@@ -36,7 +36,7 @@ define.class(function(require, exports, self){
 		var gl = this.device.gl;
 		
 		//gl.enable(GL_STENCIL_TEST);		// should still be enabled!
-		gl.colorMask(gl.FALSE, gl.FALSE, gl.FALSE, gl.FALSE);
+		//gl.colorMask(gl.FALSE, gl.FALSE, gl.FALSE, gl.FALSE);
 		gl.stencilFunc(gl.EQUAL, previousdepth + 1, 0xFF);
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR);
 
@@ -50,6 +50,8 @@ define.class(function(require, exports, self){
 	
 	this.clearcount = 0;
 	this.debugrects = false;
+	
+	
 	this.setupsubrect = function(device, x,y,w,h){
 		
 		this.device = device;
