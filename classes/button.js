@@ -1,9 +1,10 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // ruler class
 
-define.class(function(sprite, text, view){
+define.class(function(sprite, text, view, icon){
 	
 	this.attribute("text", {type: String, value: "button"});
+	this.attribute("icon", {type: String, value: ""});
 	this.attribute("fontsize", {type: float, value: 20});
 	this.attribute("labelcolor", {type: vec4, value: vec4("black")});
 	this.attribute("labelactivecolor", {type: vec4, value: vec4("white")});
@@ -18,10 +19,6 @@ define.class(function(sprite, text, view){
 	this.buttonfill = function(a,b){
 		
 		var fill = mix(col1, col2,  (a.y)/0.8);
-				
-	//	if (a.y< 0.2) fill  = mix(col2, fill, a.y*5.)
-	//	if (a.x < 0.1) fill =  mix(col2, fill, a.x*10.)
-	//	if (a.x > 0.9) fill =  mix(col2, fill, 1.-(a.x-0.9)*10.)
 		return fill;
 	}
 	
@@ -69,15 +66,19 @@ define.class(function(sprite, text, view){
 			this.bg.col2 = this.pressedcolor2;
 			this.bg.col1 = this.pressedcolor1;
 			this.buttonres.fgcolor = this.labelactivecolor;		
+			
+				if (this.iconres) this.iconres.fgcolor = this.labelactivecolor;
 		}
 		else{
 			if (this.hovered > 0){
 				this.bg.col2 = this.hovercolor2;
 				this.bg.col1 = this.hovercolor1;
 				this.buttonres.fgcolor = this.labelactivecolor;
+				if (this.iconres) this.iconres.fgcolor = this.labelactivecolor;
 			}
 			else{
 				this.buttonres.fgcolor = this.labelcolor;
+				if (this.iconres) this.iconres.fgcolor = this.labelcolor;
 				this.bg.col2 = this.buttoncolor2;
 				this.bg.col1 = this.buttoncolor1;
 			}
@@ -85,8 +86,16 @@ define.class(function(sprite, text, view){
 	}
 
 	this.render = function(){
-		this.buttonres =  text({rotation: 0, bgcolor:"transparent",fgcolor:"white", fontsize: this.fontsize, position: "relative", text: this.text.toUpperCase()})
+		this.buttonres =  text({rotation: 0, bgcolor:"transparent",fgcolor:"white", marginleft: 4,fontsize: this.fontsize, position: "relative", text: this.text.toUpperCase()})
+		if (!this.icon || this.icon.length == 0)
+		{
+			this.iconres = undefined;
 		return [this.buttonres];
+		}
+		else{
+				this.iconres =icon({fontsize: this.fontsize, icon: this.icon}); 
+		return [this.iconres,this.buttonres];
+		}
 	}
 	
 })

@@ -27,9 +27,9 @@ define.browser(function(require, screen, view, edit, text, icon, myview, treevie
 					)
 					,foldcontainer({title:"Fancy buttons", icon:'gamepad', marginbottom: 2}
 						,view({ position:"relative", flexwrap:"wrap", alignitems: "stretch", bgcolor: "transparent"}
-							,button({text:"I am a b"})
-							,button({text:"me too"})
-							,button({text:"so am I"})
+							,button({text:"Youtube",icon:"youtube"})
+							,button({text:"Github", icon:"github"})
+							,button({text:"Google", icon: "gear"})
 							,button({text:"me me me me!"})
 						)
 					)
