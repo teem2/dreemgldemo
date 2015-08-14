@@ -11,6 +11,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	var Text = require('./text_gl')
 	var RenderState = require('./renderstate_gl')
 	var FlexLayout = require('$lib/layout')
+
+	var renderer = require('$renderer/renderer')
 	
 	this.dirty = true
 	this.totaldirtyrect = {};
@@ -24,8 +26,11 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.renderstate = new RenderState();	
 	this.atConstructor = function(){}
 
-	this.render = function(){
-		//console.log("render");
+	// show a modal view.
+	this.modal = function(){
+		return new Promise(function(resolve, reject){
+			
+		})
 	}
 	
 	this.debuglabels = []

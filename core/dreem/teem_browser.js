@@ -8,10 +8,10 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 	var RpcMulti = require('$rpc/rpcmulti')
 	var RpcPromise = require('$rpc/rpcpromise')
 	var WebRTC = require('$rpc/webrtc')
-	var renderer = require('$renderer/renderer')
 	var BusClient = require('$rpc/busclient')
 	var Mouse = require('$renderer/mouse_$rendermode')
 	var Keyboard = require('$renderer/keyboard_$rendermode')
+	var renderer = require('$renderer/renderer')
 
 	self.doRender = function(previous, parent){
 		
@@ -23,7 +23,6 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		// copy keyboard and mouse objects from previous
 		if(!previous){
 			if(!parent){
-				if(window.breakin)debugger
 				this.mouse = globals.mouse = new Mouse()
 				this.keyboard = globals.keyboard = new Keyboard()
 			}
@@ -36,56 +35,13 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 			globals.mouse.removeAllListeners()
 		}
 
-		// render our screen
-		renderer.render(this.screen, null, globals, function rerender(what){
-			// lets rerender it
-			// clear out em children
-			var old = Object.create(what)
-			old.children = what.children
-			what.children = []
-
-			renderer.render(what, what.parent, globals, rerender.bind(this))
-
-			// lets diff them
-			what.diff(old, globals)
-			for(var i = 0; i < what.children.length; i++){
-				what.children[i].parent = what
-			}
-
-			var wireinits = []
-			renderer.connectWires(what, wireinits)
-			renderer.fireInit(what)
-
-			for(var i = 0; i < wireinits.length; i++){
-				wireinits[i]()
-			}
-			what.setDirty(true)
-			this.screen.performLayout()
-		}.bind(this))
-		
-		// diff it
-		if(previous){
-			this.screen = this.screen.diff(previous.screen, globals)
+		if(parent){
+			this.screen.device = parent.screen.device
 		}
 
-		if(this.parent){
-			this.screen.device = this.parent.screen.device
-			this.screen.parent = this.parent
-		}
-
-		var wireinits = []
-		renderer.connectWires(this.screen, wireinits)
-
-		renderer.fireInit(this.screen)
-
-		//console.log(this.screen.guidmap)
-
-		for(var i = 0; i < wireinits.length; i++){
-			wireinits[i]()
-		}
-
-		// lets redraw screen
-		if(previous) this.screen.device.redraw()
+		renderer.renderDiff(this.screen, parent, previous && previous.screen, globals)
+				
+		if(previous) this.screen.setDirty(true)
 
 		this.rendered = true
 	}
@@ -188,6 +144,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		// web environment
 		if(previous){
 			this.bus = previous.bus
+			this.rendered = true
 			this.rpcpromise = previous.rpcpromise
 		}
 		else this.createBus()

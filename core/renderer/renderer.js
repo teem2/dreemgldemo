@@ -4,14 +4,61 @@
 define.class(function(require, exports){
 
 	var Node = require('$base/node')
-	
-	exports.defineGlobals = function(object, globals){
+	var renderer = exports
+
+	renderer.renderDiff = function(object, parent, previous, globals){
+
+		// render our object
+		renderer.render(object, parent, globals, function rerender(what){
+			// lets rerender it
+			var old = Object.create(what)
+			old.children = what.children
+			what.children = []
+
+			renderer.render(what, what.parent, globals, rerender.bind(this))
+
+			// lets diff them
+			what.diff(old, globals)
+			for(var i = 0; i < what.children.length; i++){
+				what.children[i].parent = what
+			}
+			
+			var wireinits = []
+			renderer.connectWires(what, wireinits)
+			renderer.fireInit(what)
+
+			for(var i = 0; i < wireinits.length; i++){
+				wireinits[i]()
+			}
+			what.setDirty(true)
+			// do this?
+			//what.screen.performLayout()
+		}.bind(this))
+		
+		// diff it
+		if(previous){
+			object = object.diff(previous, globals)
+		}
+
+		var wireinits = []
+		renderer.connectWires(object, wireinits)
+
+		renderer.fireInit(object)
+
+		for(var i = 0; i < wireinits.length; i++){
+			wireinits[i]()
+		}
+
+		return object
+	}
+
+	renderer.defineGlobals = function(object, globals){
 		for(var key in globals){
 			Object.defineProperty(object, key, {writable:true, value:globals[key]})
 		}
 	}
 
-	exports.mergeChildren = function(object, children, globals){
+	renderer.mergeChildren = function(object, children, globals){
 		// splat in the children
 		var objchildren = object.children
 		if(!objchildren) object.children = objchildren = []
@@ -29,7 +76,7 @@ define.class(function(require, exports){
 		}
 	}
 
-	exports.render = function(object, parent, globals, rerender){
+	renderer.render = function(object, parent, globals, rerender){
 		//console.log(object)
 
 		// set up property binding values
@@ -67,7 +114,7 @@ define.class(function(require, exports){
 		}
 	}
 
-	exports.connectWires = function(object, initarray){
+	renderer.connectWires = function(object, initarray){
 		object.connectWires(initarray)
 		if(object.children) for(var i = 0; i < object.children.length; i++){
 			var child = object.children[i]
@@ -75,7 +122,7 @@ define.class(function(require, exports){
 		}
 	}
 
-	exports.fireInit = function(node){
+	renderer.fireInit = function(node){
 
 		if(!node._init){
 			node.emit('init',1)
@@ -89,7 +136,7 @@ define.class(function(require, exports){
 		node.atAttributeGet = undefined
 	}
 
-	exports.destroy = function(object, parent){
+	renderer.destroy = function(object, parent){
 		// tear down all listener structures
 		var obj = object
 		while(obj){
@@ -118,7 +165,7 @@ define.class(function(require, exports){
 		}
 	}
 
-	exports.dump = function(node, depth){
+	renderer.dump = function(node, depth){
 		var ret = ''
 		if(!depth) depth = ''
 		ret += depth + node.name + ': ' + node.constructor.name

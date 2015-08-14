@@ -31,7 +31,7 @@ define.class(function(sprite, text, view, icon){
 	this.bg.col2 = vec4("yellow");
 	this.borderwidth  = 2;
 	this.margin = 4;
-	this.bordercolor =vec4("#303060");
+	this.bordercolor = vec4("#303060");
 	this.alignItems = "center";
 	
 	this.pressed = 0;

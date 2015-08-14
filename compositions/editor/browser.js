@@ -1,9 +1,9 @@
 define.browser(function(require, screen, view, edit, text, icon, myview, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){
 		
 	this.render = function(){return[
+
 		view({rotation:0,position: "relative",   flexdirection: "column", height: 20, bgcolor: "black", flex:1},[
 			view({position: "relative",  cornerradius:"vec4(0,0,0,14)" , borderwidth:1, height: 50, flexdirection: "row", bgcolor: "#404080",'bg.bgcolorfn':function(a,b){return vec4(mesh.x * bgcolor.rgb, 1.0)} , alignitems:"stretch", alignself: "stretch" , flex: undefined}
-				
 				,text({fontsize: 26, text:"Visionary Studio 3016", width: 200, bgcolor: "transparent" , margin: 2, marginleft:15})
 			)
 			,splitcontainer({vertical:false, position: "relative",   flexdirection: "row", bgcolor: "black", alignitems:"stretch", alignself: "stretch" , flex:1}
@@ -27,7 +27,13 @@ define.browser(function(require, screen, view, edit, text, icon, myview, treevie
 					)
 					,foldcontainer({title:"Fancy buttons", icon:'gamepad', marginbottom: 2}
 						,view({ position:"relative", flexwrap:"wrap", alignitems: "stretch", bgcolor: "transparent"}
-							,button({text:"Youtube",icon:"youtube"})
+							,button({text:"Youtube",icon:"youtube", click:function(){
+								this.screen.modal(
+									view({w:100,h:100})
+								).then(function(result){
+									
+								})
+							}})
 							,button({text:"Github", icon:"github"})
 							,button({text:"Google", icon: "gear"})
 							,button({text:"me me me me!"})
