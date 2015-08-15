@@ -111,7 +111,9 @@ define.class(function(sprite, text, view, button){
 							[itemheading({click: this.toggle.bind(this), text:this.item.name }),
 								(this.item.collapsed==false)?
 								view({bgcolor:"transparent",flexdirection:"row" },
-											view({width:1,marginleft: 10,marginright: 10, bgcolor: "#c0c0c0" }), 
+								view({width:1,marginleft: 10,marginright: 10, bgcolorfn: function(a,b){return mix('red', 'blue', a.y)}}),
+
+								     
 											view({bgcolor:"transparent",  flexdirection:"column" , flex:1},
 													this.item.children?
 													this.item.children.map(function(m){return treeitem({item: m})})

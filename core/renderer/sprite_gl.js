@@ -383,6 +383,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 
 	this.doDraw = function(renderstate){
+                if (this.bgcolorfn) {
+ 		        this.bg.bgcolorfn = this.bgcolorfn
+		}
 		this.bg.time = this.screen.time
 		this.fg.time = this.screen.time
 
