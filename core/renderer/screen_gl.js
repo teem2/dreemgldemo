@@ -18,7 +18,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.totaldirtyrect = {};
 	this.dirtyrectset = false;
 	this.debugshader = false
-	this.debug = false;
+	this.debug = true;
 	this.showdebugtext = true;
 	
 	this.lastx = -1;
@@ -266,10 +266,11 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		if (clippedrect)
 		{
 			this.device.gl.enable(this.device.gl.SCISSOR_TEST);
-			this.device.gl.scissor(x, devh -  y -h,w,h);
+			var ratio = this.device.ratio
+			this.device.gl.scissor(x*ratio, (devh -  y*ratio -h*ratio),w *ratio,h *ratio);
 		}
 		this.device.clear(this.bgcolor)
-//		this.device.clear(vec4(sin(this.renderstate.frame), 0,0,1));
+		this.device.clear(vec4(sin(this.renderstate.frame), 0,0,1));
 		
 		if (clippedrect)
 		{
@@ -279,8 +280,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		for (var i = 0; i < this.children.length; i++){
 			this.children[i].draw(this.renderstate)
 		}
-			if (clippedrect)
-		{
+
+		if (clippedrect){
 			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
 		}
 
@@ -427,11 +428,11 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 		
 		if (isNaN(w) || isNaN(h)) {
-			console.log("NaN?");
+			//console.log("NaN?");
 			return;
 		}
 		if (this.debug){
-			//this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );	
+			this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );	
 		}
 		
 		if (this.dirtyrectset){	
