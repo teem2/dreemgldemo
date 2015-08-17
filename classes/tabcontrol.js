@@ -5,6 +5,7 @@ define.class(function(sprite,  view, button){
 	this.attribute("vertical", {type: Boolean, value: false});
 	this.attribute("activetab", {type: int, value: 0});
 	
+	this.flex = 1;
 	
 	this.buttoncolor1= vec4("#b0b0b0");
 	this.buttoncolor2= vec4("#c0c0c0");
