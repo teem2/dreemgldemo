@@ -18,7 +18,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.totaldirtyrect = {};
 	this.dirtyrectset = false;
 	this.debugshader = false
-	this.debug = false;
+	this.debug = true;
+	this.showdebugtext = false;;
 	
 	this.lastx = -1;
 	this.lasty = -1;
@@ -195,7 +196,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		if (this.hasDirtyRect()){
 			var w = this.totaldirtyrect.right - this.totaldirtyrect.left;
 			var h = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
-			if (isNaN(w) || isNaN(h)){
+			if (isNaN(w) || isNaN(h)  ){
 				this.renderstate.setup(this.device);
 				this.debugtext(0,0,"Full screen repaint!", vec4("black"));
 				this.debugtext(1,1,"Full screen repaint!", vec4("white"));				
@@ -217,51 +218,56 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.renderstate.debugmode = false;
 		this.renderstate.drawmode = 0;
 		this.device.clear(this.bgcolor)
+		if (this.renderstate.scissor) this.device.gl.disable(this.device.gl.SCISSOR_TEST);
+				
 		this.device.gl.clearStencil(0);
-		if (this.debug){
+		if (this.renderstate.scissor) this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+				
+		if (this.debug ){
 			if (this.debuglabels.length  > 0){
-				this.device.gl.disable(this.device.gl.SCISSOR_TEST);
+				if (this.renderstate.scissor) this.device.gl.disable(this.device.gl.SCISSOR_TEST);
 				this.debugrectshader.viewmatrix = this.renderstate.viewmatrix;
 				this.debugrectshader.matrix = mat4.identity();
 				this.debugrectshader.draw(this.device);
-				this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+				if (this.renderstate.scissor) this.device.gl.enable(this.device.gl.SCISSOR_TEST);
 			}
 		}
 		for (var i = 0; i < this.children.length; i++){
 			this.children[i].draw(this.renderstate)
 		}
 		
-		if (this.debug && this.debuglabels.length > 0){
+		if (this.debug && this.debuglabels.length > 0 ){
 			this.device.gl.clearStencil(0);
-			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
+			if (this.renderstate.scissor) this.device.gl.disable(this.device.gl.SCISSOR_TEST);
 			
 			this.debugtextshader.viewmatrix = this.renderstate.viewmatrix;
 				
-			for (var a in this.debuglabels){
-				var label = this.debuglabels[a];
-				var textbuf = this.debugtextshader.newText()
-				textbuf.font_size = 12;
-				textbuf.fgcolor = label.color;
-				textbuf.bgcolor = label.color;
-				textbuf.clear()
-				textbuf.add(label.text)
-			
-				var ofx = [-1, 0, 1,-1,1,-1,0,1,0];
-				var ofy = [-1,-1,-1, 0,0,1,1,1,0];
-				this.debugtextshader.mesh = textbuf;
-				this.debugtextshader.bgcolor = vec4("white");
-				this.debugtextshader.fgcolor =vec4("black");
-
-				for (var i =0 ;i<9;i++)
-				{
-					var t = mat4.identity();
-					mat4.translate(t, vec3(label.x + ofx[i], label.y + ofy[i] + 10, 0), t);
-					mat4.transpose(t,t);
-					this.debugtextshader.matrix = t;
-					if (i == 8) this.debugtextshader.fgcolor = label.color;									
-					this.debugtextshader.draw(this.device);
-				}
+				if( this.showdebugtext === true){
+				for (var a in this.debuglabels){
+					var label = this.debuglabels[a];
+					var textbuf = this.debugtextshader.newText()
+					textbuf.font_size = 12;
+					textbuf.fgcolor = label.color;
+					textbuf.bgcolor = label.color;
+					textbuf.clear()
+					textbuf.add(label.text)
 				
+					var ofx = [-1, 0, 1,-1,1,-1,0,1,0];
+					var ofy = [-1,-1,-1, 0,0,1,1,1,0];
+					this.debugtextshader.mesh = textbuf;
+					this.debugtextshader.bgcolor = vec4("white");
+					this.debugtextshader.fgcolor =vec4("black");
+
+					for (var i =0 ;i<9;i++)
+					{
+						var t = mat4.identity();
+						mat4.translate(t, vec3(label.x + ofx[i], label.y + ofy[i] + 10, 0), t);
+						mat4.transpose(t,t);
+						this.debugtextshader.matrix = t;
+						if (i == 8) this.debugtextshader.fgcolor = label.color;									
+						this.debugtextshader.draw(this.device);
+					}					
+				}
 			}
 			this.debuglabels = [];
 			//this.frameconsolecounter = 0;

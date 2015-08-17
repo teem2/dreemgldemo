@@ -22,7 +22,7 @@ define.class(function(require, exports, self){
 	this.stopClipSetup = function(sprite){
 		var gl = this.device.gl;
 		var depth = this.clipStack.length
-
+		
 		//gl.colorMask(true,true,true,true);
 	
 		gl.stencilFunc(gl.EQUAL, depth, 0xFF);
@@ -35,8 +35,8 @@ define.class(function(require, exports, self){
 		var previousdepth = this.clipStack.length;
 		var gl = this.device.gl;
 		
-		//gl.enable(GL_STENCIL_TEST);		// should still be enabled!
-		//gl.colorMask(gl.FALSE, gl.FALSE, gl.FALSE, gl.FALSE);
+		//gl.enable(gl.STENCIL_TEST);		// should still be enabled!
+		gl.colorMask(gl.FALSE, gl.FALSE, gl.FALSE, gl.FALSE);
 		gl.stencilFunc(gl.EQUAL, previousdepth + 1, 0xFF);
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR);
 
@@ -55,7 +55,6 @@ define.class(function(require, exports, self){
 	this.setupsubrect = function(device, x,y,w,h){
 		
 		this.device = device;
-		
 		this.clipStack = [];
 		
 		var screenw = device.main_frame.size[0];
@@ -66,25 +65,25 @@ define.class(function(require, exports, self){
 		
 		this.uimode = true;
 		this.matrix = mat4.identity();
-		this.viewmatrix = mat4.ortho(0, screenw/device.ratio, 0, screenh/device.ratio, -100, 100);
+		this.viewmatrix = mat4.ortho(x, x+w,(screenh-(y+h)), (screenh-y), -100, 100);
 		if (w  < screenw || h  < screenh){
-			this.device.gl.enable(this.device.gl.SCISSOR_TEST);
-			//debugtext(10,40,"scissored mode!", vec4("white"));
+	//		this.scissor = true;
+	//		this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+	//		this.device.gl.scissor(x * device.ratio ,y * device.ratio  , w * device.ratio, h * device.ratio);
 		}else{
-			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
-			
-		//	this.debugtext(10,40,"defauled to full mode because the area is too big", vec4("white"));
+//			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
+			this.scissor = false;
 		}
+			this.scissor = false;
 		
-		this.device.gl.scissor(x * device.ratio ,y * device.ratio  , w * device.ratio, h * device.ratio);
 		if (this.debugrects){
 		//this.device.clear(vec4(1,0.5+0.5*sin(this.clearcount++) ,0,1))
 			this.device.clear(vec4(1,0.5+0.5*sin(this.clearcount++) ,0,1))
-			this.device.gl.scissor(x* device.ratio+2,y* device.ratio+2  , w * device.ratio - 4, h * device.ratio-4);
+			if (this.scissor) 	this.device.gl.scissor(x* device.ratio+2,y* device.ratio+2  , w * device.ratio - 4, h * device.ratio-4);
 			this.device.clear(vec4(1,0,0,1))
 		}
 		
-		this.device.gl.viewport(0,0,screenw, screenh);//x* device.ratio, screenh- y, w * device.ratio, h * device.ratio)
+		this.device.gl.viewport(x,y,w, h);//x* device.ratio, screenh- y, w * device.ratio, h * device.ratio)
 		this.boundingrect = rect(x,y, w,h);
 		this.boundrect = rect(x,y,x + w, y + h);
 	}
@@ -94,8 +93,13 @@ define.class(function(require, exports, self){
 		if (offy === undefined) offy = 0;
 		this.device = device;
 		this.clipStack = [];
-		this.device.gl.enable(this.device.gl.SCISSOR_TEST);
-		if (viewportwidth === undefined) viewportwidth = device.size[0];
+		
+		this.scissor = false;
+		if (viewportwidth === undefined){
+			viewportwidth = device.size[0];
+			this.scissor = true;
+			this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+		}
 		if (viewportheight === undefined) viewportheight = device.size[1];
 		
 		this.uimode = true;

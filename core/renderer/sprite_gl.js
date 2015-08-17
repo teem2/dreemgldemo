@@ -128,7 +128,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.boundingRectCache = {}
 	
 	this.getBoundingRect = function(){
-		if (this.dirty || !this.boundingRectCache)
+		if (this.matrixdirty || !this.boundingRectCache)
 		{
 			this.boundingRectCache =this.calculateBoundingRect();
 		}
@@ -411,20 +411,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			
 
 		
-			if (this.texturecache == false)
-			{
-						var bound = this.getBoundingRect();
-						var myrect = rect(bound.left, bound.top, bound.right, bound.bottom);
-						
-						var actuallyvisible = renderstate.boundrect? rect.intersects(myrect, renderstate.boundrect): true;
-						if (isNaN(myrect[0])) actuallyvisible = true;
-						if (!actuallyvisible)
-						{
-							this.screen.debugtext(bound.left, bound.top, "not drawn!");
-							//console.log(myrect, renderstate.boundrect);
-							//return false;
-						}
-			}
 			// idea reference outer node using shader.node
 			// and 
 			if (this.matrixdirty) this.recomputeMatrix()
@@ -438,6 +424,22 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				//console.log(this.layout.width);
 				this.bg._width = this._width
 				this.bg._height = this._height
+			}
+			
+			
+			if (this.texturecache == false)
+			{
+						var bound = this.getBoundingRect();
+						var myrect = rect(bound.left, bound.top, bound.right, bound.bottom);
+						
+						var actuallyvisible = renderstate.boundrect? rect.intersects(myrect, renderstate.boundrect): true;
+						if (isNaN(myrect[0])) actuallyvisible = true;
+						if (!actuallyvisible)
+						{
+							//this.screen.debugtext(bound.left, bound.top, "not drawn!");
+							//console.log(myrect, renderstate.boundrect);
+							return false;
+						}
 			}
 			
 			bg._borderwidth = this._borderwidth[0]
