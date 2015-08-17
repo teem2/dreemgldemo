@@ -31,7 +31,7 @@ define.browser(function(require, screen, view, edit, text, icon, myview, treevie
 						,view({ position:"relative", flexwrap:"wrap", alignitems: "stretch", bgcolor: "transparent"}
 							,button({text:"Youtube",icon:"youtube", click:function(){
 								this.screen.modal(
-									view({w:100,h:100})
+									view({position:'absolute',bgcolor:'red',w:100,h:100})
 								).then(function(result){
 									
 								})

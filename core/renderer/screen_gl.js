@@ -25,20 +25,23 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.lastx = -1;
 	this.lasty = -1;
 
-	this.renderstate = new RenderState();	
+	this.renderstate = new RenderState();
 	this.atConstructor = function(){}
 
 	// show a modal view.
-	this.modal = function(){
+	this.modal = function(object){
 		return new Promise(function(resolve, reject){
-			
-		})
+			renderer.renderDiff(object, this, undefined, this.globals)
+			this.children.push(object)
+			object.parent = this
+			object.reLayout()
+			object.setDirty(true)
+		}.bind(this))
 	}
 	
 	this.debuglabels = []
 	this.frameconsolecounter = 0;
 	
-
 	this.frameconsoletext = function(text, color){
 		if (color === undefined) color = vec4("white");
 		this.debugtext(10, this.frameconsolecounter * 14, text, color);
@@ -565,6 +568,10 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 	}
 
+	this.inModalChain = function(object){
+
+	}
+
 	this.bindInputs = function(){
 
 		this.keyboard.down = function(v){
@@ -589,9 +596,9 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.focus_object.emit('keypaste', v)
 		}.bind(this)
 
-		this.mouse.move = function () {
+		this.mouse.move = function(){
 			if (this.mousecapture){
-				this.setguid (this.lastmouseguid);
+				this.setguid(this.lastmouseguid);
 			}
 			else{
 				this.moved = true;
@@ -609,7 +616,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			}
 			var overnode = this.guidmap[this.lastmouseguid]
 			// lets give this thing focus
-
 			if (overnode && overnode.emit){
 				this.setFocus(overnode)
 				overnode.emit('mouseleftdown', this.remapMouse(overnode))

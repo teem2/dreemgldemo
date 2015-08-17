@@ -10,10 +10,10 @@ define.class(function(require, view){
 
 	this.bg.bgcolorfn = function(a,b){
 		if (floor(mod(a.x * width,50. )) == 0. ||floor(mod(a.y * height,50. )) == 0.)	{
-		return mix(bgcolor, vec4(1.0), 0.5);
+			return mix(bgcolor, vec4(1.0), 0.5);
 		}
 		if (floor(mod(a.x * width,10. )) == 0. ||floor(mod(a.y * height,10. )) == 0.)	{
-		return mix(bgcolor, vec4(1.0), 0.2);
+			return mix(bgcolor, vec4(1.0), 0.2);
 		}
 		return bgcolor;
 	}
@@ -32,12 +32,13 @@ define.class(function(require, view){
 			define.atLookupClass = define.lookupClass
 			// alright lets load this thing up
 			this.sub_teem = new TeemClient(undefined, this)
-			this.sub_teem.screen.flex=1;
-			this.sub_teem.screen.alignself="stretch";
+			this.sub_teem.screen.flex = 1;
+			this.sub_teem.screen.alignself = "stretch";
 			
 			this.children = [this.sub_teem.screen]
 
 			this.setDirty(true)
+			this.reLayout()
 		}.bind(this))
 	}
 
