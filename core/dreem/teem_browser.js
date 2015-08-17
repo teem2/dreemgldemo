@@ -19,6 +19,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 			teem:this, 
 			screen:this.screen
 		}
+		globals.globals = globals
 
 		// copy keyboard and mouse objects from previous
 		if(!previous){
