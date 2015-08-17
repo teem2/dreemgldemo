@@ -13,8 +13,10 @@ define.class('./sprite_gl', function (require, exports, self) {
 
 	this.setFocus = function(){
 	}
+	
 	this.debugtext = function(){
 	}
+	
 	this.addDirtyNode = function(node){
 	}
 
@@ -23,6 +25,13 @@ define.class('./sprite_gl', function (require, exports, self) {
 	
 	this.requestLayout = function(){
 		//this.screen.requestLayout();
+	}	
+	
+	this.atLoad = function(){
+		this.reLayout();
 	}
-
+	this.atRender = function(){
+		this.reLayout();
+	}
+	
 })
