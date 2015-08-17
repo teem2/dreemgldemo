@@ -10,15 +10,13 @@ define.browser(function(require, screen, view, edit, text, icon, myview, treevie
 				,view({position: "relative", flex: 0.2,  flexdirection: "column", bgcolor: "#b0b0b0", alignself: "stretch", borderwidth: 1,cornerradius: "vec4(0,14,0,0)" , bordercolor: "gray" }
 					,treeview({})
 					)
-				,view({position: "relative", flex:0.34,  flexdirection: "column", bgcolor: "darkgray",padding: 1, borderwidth: 4, bordercolor: "red" , cornerradius: 0, clipping: true}
+				,view({position: "relative", flex:0.34,  flexdirection: "column", bgcolor: "darkgray",padding: 1, cornerradius: 0, clipping: true}
 					,ruler({height: 20})
 					,view({position: "relative", flex: 1.0, padding: 0, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection: "row" }
 						,ruler({width: 20, vertical: true, offset:0})
 						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"row" ,clipping: false}
-							,scrollbar({width:15, position:'relative'})
 						,editlayout({flex:1.0,padding:10,  composition:'minidialog', clipping: true})
 						
-						,scrollbar({flex: 0.5, position:'relative'})
 						,scrollbar({width:15, position:'relative'})
 						
 						)

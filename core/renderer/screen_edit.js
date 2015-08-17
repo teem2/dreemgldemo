@@ -25,9 +25,12 @@ define.class('./sprite_gl', function (require, exports, self) {
 	
 	this.requestLayout = function(){
 		//this.screen.requestLayout();
+		this.reLayout();
 	}	
 	
 	this.atLoad = function(){
+		console.log("atload" );
+		
 		this.reLayout();
 	}
 	this.atRender = function(){

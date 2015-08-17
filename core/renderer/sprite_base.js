@@ -30,9 +30,6 @@ define.class('$base/nodeworker', function(require, exports, self){
 		return value
 	}
 
-	this.reLayout = function(){
-		if (this.screen) this.screen.requestLayout();
-	}
 
 	
 	this.attribute("w", {storage:'size', index:0, parser:percentParser})
@@ -143,6 +140,9 @@ define.class('$base/nodeworker', function(require, exports, self){
 		if (this.screen) this.screen.requestLayout();
 	}
 	
+	this.reLayout = function(){
+		if (this.screen) this.screen.requestLayout();
+	}
 	
 	
 })
