@@ -18,8 +18,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.totaldirtyrect = {};
 	this.dirtyrectset = false;
 	this.debugshader = false
-	this.debug = true;
-	this.showdebugtext = false;;
+	this.debug = false;
+	this.showdebugtext = true;
 	
 	this.lastx = -1;
 	this.lasty = -1;
@@ -37,19 +37,15 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.debuglabels = []
 	this.frameconsolecounter = 0;
 	
-	this.debugtext = function(x,y,text,color){
-		if (color === undefined) color = vec4("black");
-		this.debuglabels.push({x:x, y:y, text:text, color: color});	
-	}
 
 	this.frameconsoletext = function(text, color){
-		if (color === undefined) color = vec4("black");
+		if (color === undefined) color = vec4("white");
 		this.debugtext(10, this.frameconsolecounter * 14, text, color);
 		this.frameconsolecounter++;
 	}
 	
 	this.debugtext = function(x,y,text,color){
-		if (color === undefined) color = vec4("black");
+		if (color === undefined) color = vec4("white");
 		this.debuglabels.push({x:x, y:y, text:text, color: color});	
 	}
 
@@ -188,61 +184,117 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 	this.hasDirtyRect = function()
 	{
-		return this.dirtyrectset
+		return this.dirtyrectset;
 	}
 
+	this.drawColorFrames = 0;
 	this.drawColor = function(){
+		this.drawColorFrames++;
+		var clippedrect = false;
+		var donesetup = false;
 		
+			var devw = (this.device.size[0] * this.device.ratio)
+					var devh = (this.device.size[1] * this.device.ratio)
+				
+				
+		var w = devw;
+			var h = devh;
+			var x = 0;
+			var y =	0;
+			
+			
 		if (this.hasDirtyRect()){
-			var w = this.totaldirtyrect.right - this.totaldirtyrect.left;
-			var h = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
+		w = this.totaldirtyrect.right - this.totaldirtyrect.left;
+			 h = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
+			 x = this.totaldirtyrect.left;
+			 y =	this.totaldirtyrect.top;
 			if (isNaN(w) || isNaN(h)  ){
-				this.renderstate.setup(this.device);
-				this.debugtext(0,0,"Full screen repaint!", vec4("black"));
-				this.debugtext(1,1,"Full screen repaint!", vec4("white"));				
-			}else{					
-				this.renderstate.setupsubrect(this.device, this.totaldirtyrect.left, this.totaldirtyrect.top, w, h);
-				//this.renderstate.translate(-this.dirtyrect.left,  -this.dirtyrect.top);
-				this.debugtext(0,0,"subregion paint: " + w + " " + h, vec4("black"));
-				this.debugtext(1,1,"subregion paint: " + w + " " + h, vec4("white"));
+			//	console.log("Nans?", this.totaldirtyrect, h, w)
+			//	this.debugtext(0,0,"Full screen repaint: " + this.drawColorFrames);
 			}
-		}else{
-			this.renderstate.setup(this.device);
-			this.debugtext(0,0,"Full screen repaint!", vec4("black"));
-			this.debugtext(1,1,"Full screen repaint!", vec4("white"));
+			else{
+					//console.log("should clip:", this.totaldirtyrect);
+					this.renderstate.setup(this.device);
+					clippedrect = true;
+					
+					//this.renderstate.viewmatrix = mat4.ortho(x, x + w, y+h,y,	 -100, 100);
+					//this.device.gl.scissor(0,0, viewportwidth * device.ratio, viewportheight * device.ratio);
+					//this.device.gl.viewport(this.totaldirtyrect.left;, devh -h, w, h)
+		
+		
+					donesetup = true;
+					
+					this.debugrectshader.viewmatrix = this.renderstate.viewmatrix;
+					this.debugrectshader.matrix = mat4.identity();
+					this.debugrectshader.frame = this.renderstate.frame;
+				
+					this.debugrectshader.bgcolor = vec4("black");
+					
+			//		this.renderstate.pushClipRect(rect(0,0,0,0));
+					
+					this.debugrectshader.width = w;
+					this.debugrectshader.height = h;
+					this.debugrectshader.x = this.totaldirtyrect.left;
+					this.debugrectshader.y = this.totaldirtyrect.top;
+					
+					this.debugrectshader.draw(this.device);
+				
+					this.renderstate.cliprect =  rect(this.totaldirtyrect.left,this.totaldirtyrect.top,this.totaldirtyrect.left+ w,this.totaldirtyrect.top+ h);;
+				
+				//	this.renderstate.stopClipSetup();
+					
+			//		this.device.gl.enable(this.device.gl.STENCIL_TEST);	
+					
+				
+					//this.debugrectshader.draw(this.device);									
+					//this.renderstate.setupsubrect(this.device, this.totaldirtyrect.left, this.totaldirtyrect.top, w,h);
+					//donesetup = true;
+			}
 		}
 		
+		if (donesetup == false)
+		{
+				this.renderstate.setup(this.device);
+				this.device.gl.clearStencil(0);
+
+		}
 		this.orientation = {};
 		this.orientation.worldmatrix = mat4();
 		this.invertedworldmatrix =  mat4.invert(this.orientation.worldmatrix)
 		this.renderstate.debugmode = false;
 		this.renderstate.drawmode = 0;
-		this.device.clear(this.bgcolor)
-		if (this.renderstate.scissor) this.device.gl.disable(this.device.gl.SCISSOR_TEST);
-				
-		this.device.gl.clearStencil(0);
-		if (this.renderstate.scissor) this.device.gl.enable(this.device.gl.SCISSOR_TEST);
-				
-		if (this.debug ){
-			if (this.debuglabels.length  > 0){
-				if (this.renderstate.scissor) this.device.gl.disable(this.device.gl.SCISSOR_TEST);
-				this.debugrectshader.viewmatrix = this.renderstate.viewmatrix;
-				this.debugrectshader.matrix = mat4.identity();
-				this.debugrectshader.draw(this.device);
-				if (this.renderstate.scissor) this.device.gl.enable(this.device.gl.SCISSOR_TEST);
-			}
+		if (clippedrect)
+		{
+			this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+			this.device.gl.scissor(x, devh -  y -h,w,h);
 		}
+		this.device.clear(this.bgcolor)
+//		this.device.clear(vec4(sin(this.renderstate.frame), 0,0,1));
+		
+		if (clippedrect)
+		{
+//			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
+		}
+
 		for (var i = 0; i < this.children.length; i++){
 			this.children[i].draw(this.renderstate)
 		}
-		
+			if (clippedrect)
+		{
+			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
+		}
+
+		if (clippedrect) this.renderstate.popClip();
 		if (this.debug && this.debuglabels.length > 0 ){
+				this.renderstate.setup(this.device);
+		
 			this.device.gl.clearStencil(0);
 			if (this.renderstate.scissor) this.device.gl.disable(this.device.gl.SCISSOR_TEST);
 			
 			this.debugtextshader.viewmatrix = this.renderstate.viewmatrix;
 				
-				if( this.showdebugtext === true){
+				if( this.showdebugtext == true){
+					
 				for (var a in this.debuglabels){
 					var label = this.debuglabels[a];
 					var textbuf = this.debugtextshader.newText()
@@ -280,6 +332,15 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.readGuid()
 	}
 	
+	this.computeBoundingRects = function (node)
+	{
+			if (node.getBoundingRect) node.getBoundingRect(true);
+			for(a in node.children){
+				this.computeBoundingRects(node.children[a]);
+			}
+	
+	}
+	
 	this.performLayout = function(){
 		this._width = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
 		this._height = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
@@ -291,10 +352,10 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this._left =0;
 		this._right = this._width;
 		this._bottom = this._height;
-		FlexLayout.fillNodes(this);
-	
-		FlexLayout.computeLayout(this);
 		
+		FlexLayout.fillNodes(this);	
+		FlexLayout.computeLayout(this);
+		this.computeBoundingRects(this);
 		for(a in this.dirtyNodes)
 		{
 			this.addDirtyRect(this.dirtyNodes[a].getBoundingRect());
@@ -365,19 +426,24 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			return;
 		}
 		
+		if (isNaN(w) || isNaN(h)) {
+			console.log("NaN?");
+			return;
+		}
 		if (this.debug){
-			this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );	
+			//this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );	
 		}
 		
-		if (this.dirtyrectset){			
+		if (this.dirtyrectset){	
+//			console.log("adding to existing dirtyrect: ", rect);	
 			this.totaldirtyrect.top = Math.min(this.totaldirtyrect.top, rect.top);
 			this.totaldirtyrect.bottom = Math.max(this.totaldirtyrect.bottom, rect.bottom);
 			this.totaldirtyrect.left = Math.min(this.totaldirtyrect.left, rect.left);
 			this.totaldirtyrect.right = Math.max(this.totaldirtyrect.right, rect.right);
 		}else{
+		//	console.log("replacing existing dirtyrect: ", rect);	
 			this.totaldirtyrect = rect;
 		}
-		
 		this.dirtyrectset = true;
 	}
 	
@@ -583,14 +649,19 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.debugrectshader.has_guid = false;
 		
 		this.debugrectshader.bgcolor = vec4(0.6,0.6,1.0,0.07);
-		this.debugrectshader.color = function(){return bgcolor;};
+		this.debugrectshader.x = 10;
+		this.debugrectshader.y = 10;
+		this.debugrectshader.width = 100;
+		this.debugrectshader.frame = 0;
+		this.debugrectshader.height = 100;
+		this.debugrectshader.color = function(){return bgcolor + sin(frame + mesh.x)*vec4(0,1,0,0) + mesh.y * vec4(0,0,1,0) + mesh.x * vec4(1,0,0,0);;};
 		this.debugrectshader.mesh = vec2.array();
 		this.debugrectshader.mesh.length = 0;
-		this.debugrectshader.mesh.pushQuad(0,0,10000,0,0,10000,10000,10000);
+		this.debugrectshader.mesh.pushQuad(0,0,1,0,0,1,1,1);
 		this.debugrectshader.viewmatrix = mat4;
 		this.debugrectshader.matrix = mat4;
 		
-		this.debugrectshader.position = function(){return mesh * matrix * viewmatrix};
+		this.debugrectshader.position = function(){return (vec2(mesh.x * width, mesh.y*height)  + vec2(x,y))* matrix * viewmatrix};
 
 		this.initVars()
 

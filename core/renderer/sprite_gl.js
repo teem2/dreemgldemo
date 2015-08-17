@@ -127,8 +127,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	
 	this.boundingRectCache = {}
 	
-	this.getBoundingRect = function(){
-		if (this.matrixdirty || !this.boundingRectCache)
+	this.getBoundingRect = function(force){
+		if (this.dirty || !this.boundingRectCache || force)
 		{
 			this.boundingRectCache =this.calculateBoundingRect();
 		}
@@ -303,7 +303,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 		//this.shader = new this.Shader()
 		//this.textureshader = new this.TexturedShader()
-		this.boundingrect = rect(0, 0, 0, 0);
+		//this.boundingrect = rect(0, 0, 0, 0);
 	
 		this.recomputeMatrix();
 
@@ -320,7 +320,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		}
 	}
 
-	this.renderQuad = function(texture, boundingrect) {}
+	this.renderQuad = function(texture, rect) {}
 
 	this.drawStencil = function (renderstate) {
 		this.bg.matrix = renderstate.matrix;
@@ -432,11 +432,24 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 						var bound = this.getBoundingRect();
 						var myrect = rect(bound.left, bound.top, bound.right, bound.bottom);
 						
-						var actuallyvisible = renderstate.boundrect? rect.intersects(myrect, renderstate.boundrect): true;
-						if (isNaN(myrect[0])) actuallyvisible = true;
-						if (!actuallyvisible)
+						var actuallyvisible = true;
+							if (renderstate.cliprect)
+							{
+								actuallyvisible = rect.intersects(myrect, renderstate.cliprect);
+								if (actuallyvisible == false) 
+								{
+							//		console.log("rects: ", myrect, renderstate.cliprect);
+								}
+							}  ;
+						
+						if (isNaN(myrect[0]))
 						{
-							//this.screen.debugtext(bound.left, bound.top, "not drawn!");
+							actuallyvisible = true;
+						}
+						if ( actuallyvisible == false && renderstate.drawmode == 0)
+						{
+							//console.log("hmm?");
+							//this.screen.debugtext(bound.left, bound.top, "not drawn: " + bound.left + " " +  bound.top + " " + renderstate.cliprect[0] +" " +  renderstate.cliprect[1]);
 							//console.log(myrect, renderstate.boundrect);
 							return false;
 						}
@@ -480,10 +493,10 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		} 
 		else {
 			console.log("Drawing cached content");
-			this.renderQuad(textureID, this.boundingrect);
+			this.renderQuad(textureID, this.getBoundingRect());
 		}
 		this.dirty = false;
-		return rect.intersects(this.boundingrect, renderstate.boundingrect);
+		return rect.intersects(this.getBoundingRect(), renderstate.cliprect);
 	}
 	
 	this.drawContent = this.drawContentGL
@@ -540,12 +553,12 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 			var actuallyclipping = this._clipping == true || this.texturecache != false;
 
-			if (actuallyclipping)
-				renderstate.pushClip(this);
+			if (actuallyclipping) renderstate.pushClip(this);
 
 			var onscreen = this.drawContent(renderstate); // should check against bounds?
-			if (actuallyclipping)
-				renderstate.stopClipSetup();
+			onscreen = true;
+
+			if (actuallyclipping) renderstate.stopClipSetup();
 
 			if ((actuallyclipping && onscreen) || actuallyclipping == false) {
 				if (this.children) for (var i = 0; i < this.children.length; i++) {

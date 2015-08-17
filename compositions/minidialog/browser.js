@@ -25,8 +25,8 @@ define.browser(function(require, screen, view, edit, text, treeview, splitcontai
 						,treeview({flex:1,alignself:"stretch"})
 					)
 					,scrollcontainer({bgcolor: "#f0f0ff"},
-						 view({x: 20, y:20,width: 20, height:20, position:"absolute", bgcolor: "yellow" })
-						,view({y: 120,x:20, width: 20, height: 20, position:"absolute", height:20, bgcolor: "green" })
+						 view({x: 20, y:20,width: 20, height:520, position:"absolute", bgcolor: "yellow" })
+						,view({y: 120,x:20, width: 20, height: 520, position:"absolute", height:20, bgcolor: "green" })
 						,view({y: 20, x: 120,position:"absolute", width: 20, height:20, bgcolor: "blue" })
 						,view({x:120, y:120, position:"relative", width: 20, height:20, bgcolor: "red" })		
 						,mousedebug({flex: 1, margin:4,  alignself: "stretch",bgcolor: "blue"})
