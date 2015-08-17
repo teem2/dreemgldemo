@@ -31,6 +31,7 @@ define.class(function(require, exports){
 				wireinits[i]()
 			}
 			what.setDirty(true)
+			what.reLayout()
 			// do this?
 			//what.screen.performLayout()
 		}.bind(this))
