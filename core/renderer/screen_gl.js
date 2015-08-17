@@ -18,7 +18,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.totaldirtyrect = {};
 	this.dirtyrectset = false;
 	this.debugshader = false
-	this.debug = true;
+	this.debug = false;
 	this.showdebugtext = true;
 	
 	this.lastx = -1;
@@ -270,7 +270,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.device.gl.scissor(x*ratio, (devh -  y*ratio -h*ratio),w *ratio,h *ratio);
 		}
 		this.device.clear(this.bgcolor)
-		this.device.clear(vec4(sin(this.renderstate.frame), 0,0,1));
+//		this.device.clear(vec4(sin(this.renderstate.frame), 0,0,1));
 		
 		if (clippedrect)
 		{

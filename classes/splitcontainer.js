@@ -127,7 +127,7 @@ define.class(function(sprite,  view){
 			for (var i = 1;i<this.instance_children.length;i++){
 				if (!this.instance_children[i].flex) this.instance_children[i].flex =1;
 				this.newchildren.push(this.splitter({vertical: this.vertical,firstnode: (i-1)*2, splitsize: this.splitsize, splittercolor: this.splittercolor, hovercolor: this.hovercolor, activecolor: this.activecolor}));
-				this.newchildren.push(this.instance_children[i]);				
+				this.newchildren.push(view({clipping: true, flex: 1},this.instance_children[i]));				
 			}
 			this.children = [];
 			return this.newchildren;

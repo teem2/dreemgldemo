@@ -16,13 +16,11 @@ define.browser(function(require, screen, view, edit, text, treeview, splitcontai
 						,mousedebug({flex: 1, margin:4,  alignself: "stretch",bgcolor: "blue"})
 						,treeview({flex:1,alignself:"stretch"})
 					)
-					
 				)
-					
 					, splitcontainer({vertical:false}
 						,edit({margin:2,fontsize:30,text:'This box contains editable text.\nTo the right is a mouse-test box', flex: 1, 'bg.color':function(){return vec4("#f0f0f0")} , fgcolor: "black"})
 						,mousedebug({flex: 1, margin:4,  alignself: "stretch",bgcolor: "blue"})
-						,treeview({flex:1,alignself:"stretch"})
+						,treeview({flex:1,alignself:"stretch", clipping: true})
 					)
 					,scrollcontainer({bgcolor: "#f0f0ff"},
 						 view({x: 20, y:20,width: 20, height:520, position:"absolute", bgcolor: "yellow" })

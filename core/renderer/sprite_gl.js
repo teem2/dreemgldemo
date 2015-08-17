@@ -334,7 +334,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			this.bg.width = this.width;
 			this.bg.height = this.height;
 		}
-		
 		this.bg.draw(renderstate.device);
 	}
 	
@@ -449,7 +448,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 						if ( actuallyvisible == false && renderstate.drawmode == 0)
 						{
 							//console.log("hmm?");
-							//this.screen.debugtext(bound.left, bound.top, "not drawn: " + bound.left + " " +  bound.top + " " + renderstate.cliprect[0] +" " +  renderstate.cliprect[1]);
+								//this.screen.debugtext(bound.left, bound.top+15, "ND" );
 							//console.log(myrect, renderstate.boundrect);
 							return false;
 						}
@@ -496,7 +495,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			this.renderQuad(textureID, this.getBoundingRect());
 		}
 		this.dirty = false;
-		return rect.intersects(this.getBoundingRect(), renderstate.cliprect);
+		return true;
 	}
 	
 	this.drawContent = this.drawContentGL
@@ -556,7 +555,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			if (actuallyclipping) renderstate.pushClip(this);
 
 			var onscreen = this.drawContent(renderstate); // should check against bounds?
-			onscreen = true;
+			//onscreen = true;
 
 			if (actuallyclipping) renderstate.stopClipSetup();
 
