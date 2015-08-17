@@ -127,6 +127,8 @@ define.class(function(sprite, text, view, button){
 	this.cornerradius=0;
 	this.borderwidth=2;
 	this.padding= 4;
+	this.margin = 4;
+	this.clipping = true;
 	this.bgcolor = vec4("white");
 	
 	this.bggradient = function(a,b){
