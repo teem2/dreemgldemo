@@ -49,6 +49,8 @@ define.class(function(require, exports){
 			wireinits[i]()
 		}
 
+		if(globals.screen.atLoad) globals.screen.atLoad()
+
 		return object
 	}
 
