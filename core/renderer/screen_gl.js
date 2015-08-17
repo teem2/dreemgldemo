@@ -13,6 +13,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	var FlexLayout = require('$lib/layout')
 
 	var renderer = require('$renderer/renderer')
+	this.layoutRequested = true;
 	
 	this.dirty = true
 	this.totaldirtyrect = {};
@@ -343,6 +344,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 	
 	this.performLayout = function(){
+
 		this._width = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
 		this._height = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
 		this.size = [this._width, this._height];
@@ -367,12 +369,12 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.draw = function (time) {
 		this.draw_calls = 0
 		var anim = this.doAnimation(time)
-		
-		this.performLayout();
-//		var delta = Date.now()
-		this.time = time// Date.now()
-	//	console.log(this.time)		
-		this.last_time = time
+		if (this.layoutRequested)  {
+			this.performLayout();
+			this.layoutRequested = false;
+		}
+		this.time = time;
+		this.last_time = time;
 	
 		if (this.debugshader === true) {
 			if (!this.debug_tex.frame_buf) this.debug_tex.allocRenderTarget(this.device)
@@ -451,9 +453,19 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.bubbleDirty = function(){
 		this.dirty = true;
 		this.moved = true;
-		this.device.redraw();
+		if (this.device) this.device.redraw();
 	}
-
+	
+	this.requestLayout = function(){
+		if (this.layoutRequested === true)  return
+		this.layoutRequested = true;
+		this.bubbleDirty();
+	}
+	
+	this.atRender = function(){
+		this.requestLayout();
+	}
+	
 	this.setDirty = function(){
 		this.bubbleDirty();
 //		this.device.redraw();
@@ -619,6 +631,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}.bind(this)
 
 		this.device.atResize = function(){
+			this.layoutRequested = true;
 			this.setDirty()
 		}.bind(this)
 
@@ -626,7 +639,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.draw(time / 1000.)
 		}.bind(this)
 	}
-
+	
+	
 	this.initVars = function(){
 		this.guidmap = {};
 		this.guidmap[0] = this;

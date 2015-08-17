@@ -20,5 +20,9 @@ define.class('./sprite_gl', function (require, exports, self) {
 
 	this.addDirtyRect = function(node){
 	}
+	
+	this.requestLayout = function(){
+		//this.screen.requestLayout();
+	}
 
 })

@@ -27,6 +27,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.setDirty(true)
 	}
 
+
+	
 	this.plaincolor = function(pos, dist){
 		return bgcolor
 	}
@@ -374,6 +376,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 	// called by diffing
 	this.atDestroy = function(){
+
+		if (this.screen) this.screen.requestLayout();
+
 		if(this.dom) this.dom.parentNode.removeChild(this.dom)
 	}
 
@@ -555,7 +560,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			if (actuallyclipping) renderstate.pushClip(this);
 
 			var onscreen = this.drawContent(renderstate); // should check against bounds?
-			//onscreen = true;
+		//	onscreen = true;
 
 			if (actuallyclipping) renderstate.stopClipSetup();
 

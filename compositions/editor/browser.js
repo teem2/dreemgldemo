@@ -17,7 +17,7 @@ define.browser(function(require, screen, view, edit, text, icon, myview, treevie
 						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"row" ,clipping: false}
 							,scrollbar({width:15, position:'relative'})
 						,editlayout({flex:1.0,padding:10,  composition:'minidialog', clipping: true})
-						,editlayout({flex:1.0,padding:10,  composition:'minidialog', clipping: true})
+						
 						,scrollbar({flex: 0.5, position:'relative'})
 						,scrollbar({width:15, position:'relative'})
 						

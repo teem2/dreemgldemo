@@ -45,14 +45,14 @@ define.class(function(require, exports, self){
 		
 		//gl.enable(gl.STENCIL_TEST);		// should still be enabled!
 		gl.colorMask(gl.FALSE, gl.FALSE, gl.FALSE, gl.FALSE);
-		gl.stencilFunc(gl.EQUAL, previousdepth + 1, 0xFF);
+		gl.stencilFunc(gl.EQUAL, previousdepth +1, 0xFF);
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.DECR);
 
 		// this erases the current sprite from the stencilmap
 		if (sprite) sprite.drawStencil(this);
 		
 		gl.colorMask(true,true,true,true);
-		gl.stencilFunc(gl.EQUAL, previousdepth - 1, 0xFF);
+		gl.stencilFunc(gl.EQUAL, previousdepth , 0xFF);
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);			
 	}
 	

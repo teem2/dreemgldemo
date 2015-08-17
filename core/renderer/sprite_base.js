@@ -30,6 +30,11 @@ define.class('$base/nodeworker', function(require, exports, self){
 		return value
 	}
 
+	this.reLayout = function(){
+		if (this.screen) this.screen.requestLayout();
+	}
+
+	
 	this.attribute("w", {storage:'size', index:0, parser:percentParser})
 	this.attribute("h", {storage:'size', index:1, parser:percentParser})
 	this.attribute("width", {storage:'size', index:0, parser:percentParser})
@@ -102,14 +107,21 @@ define.class('$base/nodeworker', function(require, exports, self){
 
 	this.event("focusget")
 	this.event("focuslost")
+	
 	this.calculateBoundingRect = function(){
 		console.log("replace me!");
 	}
+	
 	this.attribute("clipping", {type:boolean, value:false})
 	
 	this.init = function(){
 		//if (this.screen) this.screen.addDirtyNode(this);
-		this.setDirty();
+		this.setDirty();		
+		if (this.screen) this.screen.requestLayout();
+	}
+	
+	this.atDestroy = function(){
+		if (this.screen) this.screen.requestLayout();
 	}
 	
 	this.destroy = function(){
@@ -126,4 +138,11 @@ define.class('$base/nodeworker', function(require, exports, self){
 		this.bubbleDirty();
 		if (this.screen) this.screen.addDirtyNode(this);
 	}
+	
+	this.margin = this.padding = this.borderwidth = this.cornerradius = this.flex = this.flexdirection =  this.size = this.pos = function(v){
+		if (this.screen) this.screen.requestLayout();
+	}
+	
+	
+	
 })
