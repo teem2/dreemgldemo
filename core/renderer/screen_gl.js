@@ -218,40 +218,34 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.drawColorFrames = 0;
+	
 	this.drawColor = function(){
 		this.drawColorFrames++;
 		var clippedrect = false;
 		var donesetup = false;
 		
-			var devw = (this.device.size[0] * this.device.ratio)
-					var devh = (this.device.size[1] * this.device.ratio)
+		var devw = (this.device.size[0] * this.device.ratio)
+		var devh = (this.device.size[1] * this.device.ratio)
 				
 				
 		var w = devw;
-			var h = devh;
-			var x = 0;
-			var y =	0;
-			
+		var h = devh;
+		var x = 0;
+		var y =	0;
+
 			
 		if (this.hasDirtyRect()){
-		w = this.totaldirtyrect.right - this.totaldirtyrect.left;
+			w = this.totaldirtyrect.right - this.totaldirtyrect.left;
 			 h = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
 			 x = this.totaldirtyrect.left;
 			 y =	this.totaldirtyrect.top;
 			if (isNaN(w) || isNaN(h)  ){
-			//	console.log("Nans?", this.totaldirtyrect, h, w)
-			//	this.debugtext(0,0,"Full screen repaint: " + this.drawColorFrames);
+				//	console.log("Nans?", this.totaldirtyrect, h, w)
+				//	this.debugtext(0,0,"Full screen repaint: " + this.drawColorFrames);
 			}
 			else{
-					//console.log("should clip:", this.totaldirtyrect);
 					this.renderstate.setup(this.device);
 					clippedrect = true;
-					
-					//this.renderstate.viewmatrix = mat4.ortho(x, x + w, y+h,y,	 -100, 100);
-					//this.device.gl.scissor(0,0, viewportwidth * device.ratio, viewportheight * device.ratio);
-					//this.device.gl.viewport(this.totaldirtyrect.left;, devh -h, w, h)
-		
-		
 					donesetup = true;
 					
 					this.debugrectshader.viewmatrix = this.renderstate.viewmatrix;
@@ -273,12 +267,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 				
 				//	this.renderstate.stopClipSetup();
 					
-			//		this.device.gl.enable(this.device.gl.STENCIL_TEST);	
-					
-				
-					//this.debugrectshader.draw(this.device);									
-					//this.renderstate.setupsubrect(this.device, this.totaldirtyrect.left, this.totaldirtyrect.top, w,h);
-					//donesetup = true;
+			
 			}
 		}
 		
@@ -434,7 +423,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		if(anim || this.hasListeners('time')){
 			this.device.redraw()
 		}
-		//console.log(this.draw_calls, Date.now() - delta)
 	}
 	
 	this.dirtyNodes = [];
@@ -442,6 +430,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.addDirtyNode =function(node){
 		this.addDirtyRect(node.getBoundingRect());
 		this.dirtyNodes.push(node);	
+		console.log("adding dirty node: " , node.constructor.name);
 	}
 	
 	this.addDirtyRect = function(rect){				

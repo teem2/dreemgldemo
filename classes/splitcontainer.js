@@ -46,24 +46,35 @@ define.class(function(sprite,  view){
 		this.mouseleftdown = function(){
 			this.pressed++;
 			this.dragstart = {x: this.mouse.x, y:this.mouse.y};
+			
+			this.flexstart = 
+				{
+					left: this.parent.children[this.firstnode].flex, 
+					right: this.parent.children[this.firstnode+2].flex,
+					
+					leftwidth: this.parent.children[this.firstnode].layout.width, 
+					leftheight: this.parent.children[this.firstnode].layout.height,
+					
+					rightwidth: this.parent.children[this.firstnode+2].layout.width,
+					rightheight: this.parent.children[this.firstnode+2].layout.height
+				};
+
 			this.mousemove = function(a){				
 				var dx = this.mouse.x - this.dragstart.x;
 				var dy = this.mouse.y - this.dragstart.y;
-
-				this.dragstart.x = this.mouse.x;
-				this.dragstart.y = this.mouse.y;
-
+				
 				var leftnode = this.parent.children[this.firstnode];
 				var rightnode = this.parent.children[this.firstnode+2];
 
-				var f1 = leftnode.flex;
-				var f2 = rightnode.flex;
+				var f1 = this.flexstart.left;
+				var f2 = this.flexstart.right;
 
 				var totf = f1 + f2;
 
 				if (this.vertical){
-					var h1 = leftnode.layout.height;
-					var h2 = rightnode.layout.height;
+					var h1 = this.flexstart.leftheight;
+					var h2 = this.flexstart.rightheight;
+					
 					var hadd = h1 + h2;	
 					h1 += dy;
 					h2 -= dy;
@@ -72,9 +83,10 @@ define.class(function(sprite,  view){
 					var f2n = h2 / (hadd);					
 					leftnode.flex = f1n * totf;
 					rightnode.flex = f2n* totf;
-				}else{					
-					var w1 = leftnode.layout.width;
-					var w2 = rightnode.layout.width;
+				}else{										
+					var w1 = this.flexstart.leftwidth;
+					var w2 = this.flexstart.rightwidth;
+					
 					var wadd = w1 + w2;
 					w1 += dx;
 					w2 -= dx;
