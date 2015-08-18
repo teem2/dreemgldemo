@@ -30,10 +30,13 @@ define.browser(function(require, screen, view, edit, text, icon, myview, treevie
 					,foldcontainer({title:"Fancy buttons", icon:'gamepad', marginbottom: 2}
 						,view({ position:"relative", flexwrap:"wrap", alignitems: "stretch", bgcolor: "transparent"}
 							,button({text:"Youtube",icon:"youtube", click:function(){
-								this.screen.modal(
-									view({position:'absolute',bgcolor:'red',w:100,h:100})
+								this.screen.openModal(
+									view({
+										click:function(){
+											this.screen.closeModal(1)
+										},position:'absolute',bgcolor:'red',w:100,h:100})
 								).then(function(result){
-									
+									console.log('resolved',result)
 								})
 							}})
 							,button({text:"Github", icon:"github"})

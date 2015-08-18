@@ -28,12 +28,38 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.renderstate = new RenderState();
 	this.atConstructor = function(){}
 
+	this.closeModal = function(value){
+		if(this.modal && this.modal.resolve)
+			return this.modal.resolve(value)
+	}
+
 	// show a modal view.
-	this.modal = function(object){
+	this.openModal = function(object){
 		return new Promise(function(resolve, reject){
 			renderer.renderDiff(object, this, undefined, this.globals)
+
 			this.children.push(object)
-			object.parent = this
+			this.modal_stack.push(object)
+			this.modal = object
+
+			object.resolve = function(value, rej){
+				// lets close the modal window
+				var id = this.screen.children.indexOf(this)
+				this.screen.children.splice(id, 1)
+
+				if(rej) reject(value)
+				else resolve(value)
+
+				var modal_stack = this.screen.modal_stack
+				modal_stack.pop()
+				this.screen.modal = modal_stack[modal_stack.length - 1]
+				this.screen.setDirty(true)
+			}
+
+			object.reject = function(value){
+				this.resolve(value, true)
+			}
+
 			object.reLayout()
 			object.setDirty(true)
 		}.bind(this))
@@ -508,6 +534,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.keyboard = other.keyboard
 		this.debugtextshader = other.debugtextshader;
 		this.debugrectshader = other.debugrectshader;
+		this.modal_stack = other.modal_stack
 		this.initVars()
 		this.bindInputs()
 
@@ -664,6 +691,9 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.debug_tex = GLTexture.rgba_depth_stencil(16, 16)	
 		this.buf = new Uint8Array(4);
 		this.device = new GLDevice()
+
+		this.modal_stack = []
+
 		this.debugtextshader = new GLText();
 		this.debugtextshader.has_guid = false;
 		this.debugrectshader = new GLShader();
