@@ -26,8 +26,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.opacity = function(){
 		this.setDirty(true)
 	}
-
-
 	
 	this.plaincolor = function(pos, dist){
 		return bgcolor
@@ -132,13 +130,16 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.getBoundingRect = function(force){
 		if (this.dirty || !this.boundingRectCache || force)
 		{
-			this.boundingRectCache =this.calculateBoundingRect();
+			this.boundingRectCache =this.calculateBoundingRect(force);
 		}
 		return this.boundingRectCache;
 	}
 	
-	this.calculateBoundingRect = function(){	
-		if (!this.orientation) return{left:0,right:0, top:0, bottom: 0};
+	this.calculateBoundingRect = function(force){	
+		if (!this.orientation){
+			return{left:0,right:0, top:0, bottom: 0};
+		}
+		
 		if (this.matrixdirty) this.recomputeMatrix();
 		var x1 = 0;
 		var x2 = this._width;
@@ -183,12 +184,10 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		var o = this.orientation;
 		if (!o) return;
 		if ((this.parent && this.parent.matrixdirty) || (this.parent && this.parent.hasLayoutChanged && this.parent.hasLayoutChanged()))  {
-					if (parent.recomputeMatrix){
-						parent.recomputeMatrix();
-						mat4.debug(parent.orientation.worldmatrix, true);
-					}
-					
+			if (parent.recomputeMatrix){
+				parent.recomputeMatrix();
 			}
+		}
 	
 		o.rotation[2] = this._rotation * 6.283 / 360;
 		
@@ -196,16 +195,17 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			var s = o.scale;
 			var r = o.rotation;
 			var t = vec3(this.layout.left, this.layout.top, 0);
-			if (this._position === "absolute"){
-				t[0] = this._x;
-				t[1] = this._y;
-			}
+			//if (this._position === "absolute"){
+			//	t[0] = this._x;
+		//		t[1] = this._y;
+	//		}
 			var hw = ( this.layout.width ? this.layout.width: this._width ) /  2;
 			var hh = ( this.layout.height ? this.layout.height: this._height) / 2;
 			mat4.TSRT(-hw, -hh, 0, s[0], s[1], s[2], r[0], r[1], r[2], t[0] + hw * s[0], t[1] + hh * s[1], t[2], this.orientation.matrix);
-			//console.log(this.layout)
 		}
 		else {
+			
+			console.log(" no layout?");
 			var s = o.scale;
 			var r = o.rotation;
 			var t = o.translation;
@@ -242,7 +242,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 
 	this.init = function (obj){
-		
+		console.log("init");
 		this.orientation = {
 			rotation : vec3(0, 0, 0), // (or {0,0,0} for 3d rotation)
 			translation : vec3(this.x != undefined ? this.x : 0, this.y != undefined ? this.y : 0, 0),
@@ -307,7 +307,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		//this.textureshader = new this.TexturedShader()
 		//this.boundingrect = rect(0, 0, 0, 0);
 	
-		this.recomputeMatrix();
+		//this.recomputeMatrix();
 
 		if(!this.mode && this.parent) this.mode = this.parent.mode
 

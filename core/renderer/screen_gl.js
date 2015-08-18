@@ -379,7 +379,9 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.computeBoundingRects(this);
 		for(a in this.dirtyNodes)
 		{
-			this.addDirtyRect(this.dirtyNodes[a].getBoundingRect());
+			var dr = this.dirtyNodes[a].getBoundingRect();
+			console.log(this.dirtyNodes[a].constructor.name, dr);
+			this.addDirtyRect(dr);
 		}
 		this.dirtyNodes = [];
 	}
@@ -428,9 +430,10 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.dirtyNodes = [];
 	
 	this.addDirtyNode =function(node){
-		this.addDirtyRect(node.getBoundingRect());
-		this.dirtyNodes.push(node);	
 		console.log("adding dirty node: " , node.constructor.name);
+		if (node.layout) this.addDirtyRect(node.getBoundingRect());
+		this.dirtyNodes.push(node);	
+		this.bubbleDirty();
 	}
 	
 	this.addDirtyRect = function(rect){				
@@ -654,7 +657,9 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 		this.device.atResize = function(){
 			this.layoutRequested = true;
-			this.setDirty()
+			console.log("resize", this.size);
+			this.addDirtyRect({left: 0,top: 0,right: this.size[0], bottom: this.size[1]})
+			this.bubbleDirty();	
 		}.bind(this)
 
 		this.device.atRedraw = function (time) {

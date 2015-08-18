@@ -10,7 +10,7 @@ define.browser(function(require, screen, view, edit, text, treeview, splitcontai
 						button({text:"Open Modal 1",icon:"youtube", click:
 							function(){
 								this.screen.openModal(
-									modalview({x: this.mouse.x+100})
+									modalview()
 								).then(
 									function(result){									
 									}
@@ -22,7 +22,7 @@ define.browser(function(require, screen, view, edit, text, treeview, splitcontai
 						button({text:"Open Modal 2",icon:"youtube", click:
 							function(){
 								this.screen.openModal(
-									modalview({x: 400})
+									modalview()
 								).then(
 									function(result){									
 									}
