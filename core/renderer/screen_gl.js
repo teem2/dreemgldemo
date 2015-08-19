@@ -64,6 +64,18 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			object.setDirty(true)
 		}.bind(this))
 	}
+
+	this.inModalChain = function(node){
+		if(!this.modal_stack.length) return true
+		var last = this.modal_stack[this.modal_stack.length - 1]
+		// lets check if any parent of node hits last
+		var obj = node
+		while(obj){
+			if(obj === last) return true
+			obj = obj.parent
+		}
+		return false
+	}
 	
 	this.debuglabels = []
 	this.frameconsolecounter = 0;
@@ -188,7 +200,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.lasty = this.mouse.y
 			
 			var overnode = this.guidmap[id]
-			if (overnode && overnode.hasListeners){
+			if (this.inModalChain(overnode) && overnode && overnode.hasListeners){
 				if(overnode.hasListeners('mousemove')){
 					overnode.emit('mousemove', this.remapMouse(overnode))
 				}
@@ -206,8 +218,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			if (this.uieventdebug){
 				$$("mouseenter: " + this.guidmap[id].constructor.name + "(" + id + ")")
 			}
-
-			if (this.guidmap[id]) this.guidmap[id].emit('mouseover')
+			var overnode = this.guidmap[id]
+			if (this.inModalChain(overnode) && overnode) overnode.emit('mouseover')
 			this.lastmouseguid = id
 		}
 	}
@@ -380,7 +392,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		for(a in this.dirtyNodes)
 		{
 			var dr = this.dirtyNodes[a].getBoundingRect();
-			console.log(this.dirtyNodes[a].constructor.name, dr);
 			this.addDirtyRect(dr);
 		}
 		this.dirtyNodes = [];
@@ -430,7 +441,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.dirtyNodes = [];
 	
 	this.addDirtyNode =function(node){
-		console.log("adding dirty node: " , node.constructor.name);
+		//console.log("adding dirty node: " , node.constructor.name);
 		if (node.layout) this.addDirtyRect(node.getBoundingRect());
 		this.dirtyNodes.push(node);	
 		this.bubbleDirty();
@@ -505,7 +516,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 				console.log(" clicked: " + this.guidmap[this.lastmouseguid].constructor.name);
 			}
 			var overnode = this.guidmap[this.lastmouseguid];
-			if (overnode && overnode.emit) overnode.emit('click')
+			if (this.inModalChain(overnode) && overnode && overnode.emit) overnode.emit('click')
 		}
 	}
 
@@ -524,8 +535,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.buf = other.buf
 		this.mouse = other.mouse
 		this.keyboard = other.keyboard
-		this.debugtextshader = other.debugtextshader;
-		this.debugrectshader = other.debugrectshader;
+		this.debugtextshader = other.debugtextshader
+		this.debugrectshader = other.debugrectshader
 		this.modal_stack = other.modal_stack
 		this.initVars()
 		this.bindInputs()
@@ -587,31 +598,31 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 	}
 
-	this.inModalChain = function(object){
-
-	}
-
 	this.bindInputs = function(){
 
 		this.keyboard.down = function(v){
 			if(!this.focus_object) return
+			if(!this.inModalChain(this.focus_object)) return
 			this.focus_object.emit('keydown', v)
 		}.bind(this)
 
 		this.keyboard.up = function(v){
 			if(!this.focus_object) return
+			if(!this.inModalChain(this.focus_object)) return
 			this.focus_object.emit('keyup', v)
 		}.bind(this)
 
 		this.keyboard.press = function(v){
 			// lets reroute it to the element that has focus
 			if(!this.focus_object) return
+			if(!this.inModalChain(this.focus_object)) return
 			this.focus_object.emit('keypress', v)
 		}.bind(this)
 
 		this.keyboard.paste = function(v){
 			// lets reroute it to the element that has focus
 			if(!this.focus_object) return
+			if(!this.inModalChain(this.focus_object)) return
 			this.focus_object.emit('keypaste', v)
 		}.bind(this)
 
@@ -635,7 +646,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			}
 			var overnode = this.guidmap[this.lastmouseguid]
 			// lets give this thing focus
-			if (overnode && overnode.emit){
+			if (this.inModalChain(overnode) && overnode && overnode.emit){
 				this.setFocus(overnode)
 				overnode.emit('mouseleftdown', this.remapMouse(overnode))
 			} 
@@ -644,7 +655,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.mouse.leftup = function(){ 
 			this.mousecapturecount--;
 			var overnode = this.guidmap[this.lastmouseguid]
-			if (overnode && overnode.emit) overnode.emit('mouseleftup')
+
+			if (this.inModalChain(overnode) && overnode && overnode.emit) overnode.emit('mouseleftup')
 			if (this.mousecapturecount === 0) {
 				this.mousecapture = false;
 				this.setguid(this.lastidundermouse);
@@ -657,7 +669,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 		this.device.atResize = function(){
 			this.layoutRequested = true;
-			console.log("resize", this.size);
 			this.addDirtyRect({left: 0,top: 0,right: this.size[0], bottom: this.size[1]})
 			this.bubbleDirty();	
 		}.bind(this)
