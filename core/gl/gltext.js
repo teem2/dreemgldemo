@@ -780,14 +780,24 @@ define.class('$gl/glshader', function(require, exports, self){
 		var atlas_pos = ivec2(glyph.zw) / 256
 
 		var pos = glyph.xy
+
+		//if(mesh.tag.x == 69.){
+			//var center = vec2(10.,10.)
+			//pos =  math.rotate2d(pos-center, length(pos)*0.1+time)+center
+			///pos = math.rotate2d(pos-center, time)+center
+		//}
+
+
 		/* isotropic antialiasing */
 		var dpdx = dFdx(pos) // this should mark it pixel and redo the function with a new highmark
 		var dpdy = dFdy(pos)
 		var m = length(vec2(length(dpdx), length(dpdy))) * SQRT_1_2
 
 		mesh.distance = glyphy_sdf(pos, nominal_size, atlas_pos) //+ noise.noise3d(vec3(glyph.x, glyph.y, time))*0.6
+		
+		dbg = mesh.distance
 		mesh.scaling = m
-
+		//dump = mesh.distance
 		//return mix(vec4(0.),'green',1.-mesh.distance)
 		//mesh.outline = true
 		//dump = mesh.distance

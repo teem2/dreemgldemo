@@ -17,7 +17,6 @@ define.class(function(sprite, text, view, icon){
 	this.buttonres = {};
 		
 	this.buttonfill = function(a,b){
-		
 		var fill = mix(col1, col2,  (a.y)/0.8);
 		return fill;
 	}
@@ -45,7 +44,7 @@ define.class(function(sprite, text, view, icon){
 	this.attribute("bgcolor", {type:vec4, duration: 1.0});
 	
 	this.mouseout = function(){
-		this.hovered--;
+		if(this.hovered>0)this.hovered--;
 		this.setDirty(true)
 	}
 	

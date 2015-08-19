@@ -12,7 +12,7 @@ define.class('$base/node', function(require, exports, self){
 	this.default_texture = GLTexture.fromArray(new Float32Array(4*4*4), 4,4)
 
 	this.noise = require('$gl/glnoise')
-	this.palette = require('$gl/glpalette')
+	this.pal = require('$gl/glpalette')
 	this.shape = require('$gl/glshape')
 	this.math = require('$gl/glmath')
 	this.demos = require('$gl/gldemos')
@@ -930,7 +930,7 @@ define.class('$base/node', function(require, exports, self){
 			var split = loc.split
 			if(split){
 				var name = split.join('.')
-				out += '\t\tvar uni = root._' + name + '\n'
+				out += '\t\tvar uni = root.' + name + '\n'
 			}
 			else{
 				out += '\t\tvar uni = root._' + key + '\n'
@@ -959,10 +959,10 @@ define.class('$base/node', function(require, exports, self){
 
 				var TEXTURE_VALUE =''
 				if(split){
-					TEXTURE_VALUE = 'root._' + split.join('.')
+					TEXTURE_VALUE = 'root.' + split.join('.')
 				}
 				else{
-					TEXTURE_VALUE = 'root._' + texinfo.name
+					TEXTURE_VALUE = 'root.' + texinfo.name
 				}
 
 				out += body
@@ -1017,8 +1017,8 @@ define.class('$base/node', function(require, exports, self){
 		shader.use = new Function('return ' + tpl)()
 	}
 
-	this.draw_type = 'TRIANGLES'
-
+	this.draw_type = 'TRIANGLES'//POINTS:0x0,LINES:0x1,LINE_LOOP:0x2,LINE_STRIP:0x3,TRIANGLES:0x4,TRIANGLE_STRIP:0x5,TRIANGLE_FAN:0x6
+	
 	// lets draw ourselves
 	this.draw = function(gldevice, start, end){
 		if(this.color === undefined) return

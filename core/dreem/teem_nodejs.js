@@ -75,6 +75,9 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 			else if(msg.type == 'webrtcAnswer'){ bus.broadcast(msg) }
 			else if(msg.type == 'webrtcOfferCandidate'){ bus.broadcast(msg) }
 			else if(msg.type == 'webrtcAnswerCandidate'){ bus.broadcast(msg) }
+			else if(msg.type == 'log'){
+				console.log.apply(console, msg.args)
+			}
 		}.bind(this)
 
 		// we have to render the RPC bus

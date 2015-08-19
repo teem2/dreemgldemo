@@ -1,5 +1,6 @@
-define.browser(function(require, screen, thing, view, edit, text, treeview, splitcontainer, tabcontrol, button, scrollbar,icon){
+define.browserClass(function(require, screen, thing, view, edit, text, treeview, splitcontainer, tabcontrol, button, scrollbar,icon){
 	
+	console.log(typeof(thing));
 	
 	var thing2 = thing.extend(function(){
 		this.bg.color = function(){

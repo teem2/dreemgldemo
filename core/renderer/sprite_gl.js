@@ -26,7 +26,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.opacity = function(){
 		this.setDirty(true)
 	}
-	
+
 	this.plaincolor = function(pos, dist){
 		return bgcolor
 	}
@@ -130,16 +130,13 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.getBoundingRect = function(force){
 		if (this.dirty || !this.boundingRectCache || force)
 		{
-			this.boundingRectCache =this.calculateBoundingRect(force);
+			this.boundingRectCache =this.calculateBoundingRect();
 		}
 		return this.boundingRectCache;
 	}
 	
-	this.calculateBoundingRect = function(force){	
-		if (!this.orientation){
-			return{left:0,right:0, top:0, bottom: 0};
-		}
-		
+	this.calculateBoundingRect = function(){	
+		if (!this.orientation) return{left:0,right:0, top:0, bottom: 0};
 		if (this.matrixdirty) this.recomputeMatrix();
 		var x1 = 0;
 		var x2 = this._width;
@@ -184,10 +181,12 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		var o = this.orientation;
 		if (!o) return;
 		if ((this.parent && this.parent.matrixdirty) || (this.parent && this.parent.hasLayoutChanged && this.parent.hasLayoutChanged()))  {
-			if (parent.recomputeMatrix){
-				parent.recomputeMatrix();
+					if (parent.recomputeMatrix){
+						parent.recomputeMatrix();
+						mat4.debug(parent.orientation.worldmatrix, true);
+					}
+					
 			}
-		}
 	
 		o.rotation[2] = this._rotation * 6.283 / 360;
 		
@@ -195,17 +194,16 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			var s = o.scale;
 			var r = o.rotation;
 			var t = vec3(this.layout.left, this.layout.top, 0);
-			//if (this._position === "absolute"){
-			//	t[0] = this._x;
-		//		t[1] = this._y;
-	//		}
+			if (this._position === "absolute"){
+				t[0] = this._x;
+				t[1] = this._y;
+			}
 			var hw = ( this.layout.width ? this.layout.width: this._width ) /  2;
 			var hh = ( this.layout.height ? this.layout.height: this._height) / 2;
 			mat4.TSRT(-hw, -hh, 0, s[0], s[1], s[2], r[0], r[1], r[2], t[0] + hw * s[0], t[1] + hh * s[1], t[2], this.orientation.matrix);
+			//console.log(this.layout)
 		}
 		else {
-			
-			console.log(" no layout?");
 			var s = o.scale;
 			var r = o.rotation;
 			var t = o.translation;
@@ -242,7 +240,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 
 	this.init = function (obj){
-		console.log("init");
+		
 		this.orientation = {
 			rotation : vec3(0, 0, 0), // (or {0,0,0} for 3d rotation)
 			translation : vec3(this.x != undefined ? this.x : 0, this.y != undefined ? this.y : 0, 0),
@@ -286,12 +284,12 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		if(this.bgimage){
 			// lets make the thing fetch a texture
 			this.bg.texture = new GLTexture()
-
+			
 			if(this.bg.bgcolorfn === this.plaincolor){
 				this.bg.bgcolorfn = function(pos, dist){
 					var aspect = texture.size.y / texture.size.x
 					var center = (1. - aspect) * .5
-					var sam = vec2(pos.x * aspect, pos.y)
+					var sam = vec2(pos.x * aspect + center, pos.y)
 					var col = texture.sample(sam)
 					if(sam.x< 0. || sam.x > 1.) col.a = 0.
 					return col
@@ -300,14 +298,25 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 			require.async(this.bgimage).then(function(result){
 				this.bg.texture = GLTexture.fromImage(result)
+				if(isNaN(this.width)) this.width = this.bg.texture.size[0]
+				if(isNaN(this.height)) this.height = this.bg.texture.size[1]
+				this.reLayout()
+				this.setDirty(true)
 			}.bind(this))
+		}
+
+		if (this.hasListeners('click') || this.hasListeners('mouseleftdown') || this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| this.hasListeners('mouseup') || this.hasListeners('mousemove') ||this.hasListeners('scroll')){
+			this.effectiveguid = this.interfaceguid;
+		}
+		else{
+			this.effectiveguid = this.parent.effectiveguid;
 		}
 
 		//this.shader = new this.Shader()
 		//this.textureshader = new this.TexturedShader()
 		//this.boundingrect = rect(0, 0, 0, 0);
 	
-		//this.recomputeMatrix();
+		this.recomputeMatrix();
 
 		if(!this.mode && this.parent) this.mode = this.parent.mode
 
@@ -396,12 +405,13 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		// lets check if we have a reference on time
 		if(this.bg.shader && this.bg.shader.unilocs.time || 
 			this.fg.shader && this.fg.shader.unilocs.time){
-			this.screen.device.redraw()
+			//console.log('here')
+			this.setDirty(true)
 		}
 	}
 
 	this.doDrawGuid = function(renderstate){
-		this.bg.viewmatrix = renderstate.viewmatrix;		
+		this.bg._viewmatrix = renderstate.viewmatrix;		
 		this.bg.drawGuid(this.screen.device)
 	}
 
@@ -409,12 +419,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		//mat4.debug(this.orientation.matrix);
 			var bg = this.bg
 			var fg = this.fg
-			bg.viewmatrix = renderstate.viewmatrix;
-			fg.viewmatrix = renderstate.viewmatrix;
+			bg._viewmatrix = renderstate.viewmatrix;
+			fg._viewmatrix = renderstate.viewmatrix;
 		if (this.texturecache == false || this.texturecache == true && this.dirty){
-			
-
-		
 			// idea reference outer node using shader.node
 			// and 
 			if (this.matrixdirty) this.recomputeMatrix()
@@ -444,7 +451,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 								{
 							//		console.log("rects: ", myrect, renderstate.cliprect);
 								}
-							}  ;
+							} 
 						
 						if (isNaN(myrect[0]))
 						{
@@ -476,10 +483,11 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			if(renderstate.drawmode === 2){
 				var type = bg.drawDebug(this.screen.device)
 				if(type) renderstate.debugtypes.push(type)
-				fg.drawDebug(this.screen.device)
+				type = fg.drawDebug(this.screen.device)
+				if(type) renderstate.debugtypes.push(type)
 			}
 			else if(renderstate.drawmode === 1){
-				if (this.hasListeners('click') || this.hasListeners('mouseleftdown') || this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| this.hasListeners('mouseup') || this.hasListeners('mousemove') ||this.hasListeners('scroll')){
+				if(this.hasListeners('click') || this.hasListeners('mouseleftdown') || this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| this.hasListeners('mouseup') || this.hasListeners('mousemove') ||this.hasListeners('scroll')){
 					this.effectiveguid = this.interfaceguid;
 				}
 				else{

@@ -8,6 +8,7 @@ define.class(function(require, exports, self){
 	var path = require('path')
 	var fs = require('fs')
 	var url = require('url')
+	var zlib = require('zlib')
 
 	var FileWatcher = require('$server/filewatcher')
 	var ExternalApps = require('$server/externalapps')
@@ -23,6 +24,12 @@ define.class(function(require, exports, self){
 		this.args = args
 		var port = this.args['-port'] || 8080
 		var iface = this.args['-iface'] || '0.0.0.0'
+
+		this.cache_dir = path.join(define.expandVariables(define.$root)+'/gzcache')
+
+		if(!fs.existsSync(this.cache_dir)){
+			fs.mkdirSync(this.cache_dir)
+		}
 
 		this.server = http.createServer(this.request.bind(this))
 		this.server.listen(port, iface)
@@ -137,8 +144,8 @@ define.class(function(require, exports, self){
 			return
 		}
 
-		if(requrl.indexOf('_extlib_') != -1){
-			var file = requrl.replace(/\_extlib\_/, define.expandVariables(define.$extlib))
+		if(requrl.indexOf('_external_') != -1){
+			var file = requrl.replace(/\_external\_/, define.expandVariables(define.$external))
 		}
 		else{
 			var idx = requrl.indexOf('?')
@@ -146,10 +153,9 @@ define.class(function(require, exports, self){
 			var file = path.join(define.expandVariables(define.$root), requrl)
 		}
 
-
 		fs.stat(file, function(err, stat){
 			if(err || !stat.isFile()){
-				if(url =='/favicon.ico'){
+				if(requrl =='/favicon.ico'){
 					res.writeHead(200)
 					res.end()
 					return
@@ -173,10 +179,36 @@ define.class(function(require, exports, self){
 				res.end()
 				return 
 			}
+			// lets add a gzip cache
+			var type = header["Content-Type"]
+			if(type !== 'image/jpeg' && type !== 'image/png'){
+				header["Content-encoding"] = "deflate"
+				var gzip_file = path.join(this.cache_dir, requrl.replace(/\//g,'_')+header.ETag)
+				fs.stat(gzip_file, function(err, stat){
+					if(err){ // make it
+						fs.readFile(file, function(err, data){
+							zlib.deflate(data, function(err, compr){
+								res.writeHead(200, header)
+								res.write(compr)
+								res.end()
+								fs.writeFile(gzip_file, compr, function(err){
 
-			var stream = fs.createReadStream(file)
-			res.writeHead(200, header)
-			stream.pipe(res)
+								})
+							})
+						})
+					}
+					else{
+						var stream = fs.createReadStream(gzip_file)
+						res.writeHead(200, header)
+						stream.pipe(res)
+					}
+				})
+			}
+			else{
+				var stream = fs.createReadStream(file)
+				res.writeHead(200, header)
+				stream.pipe(res)
+			}
 			// ok so we get a filechange right?
 			
 		}.bind(this))

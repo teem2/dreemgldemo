@@ -6,24 +6,28 @@ define.class(function(sprite, text, view){
 	this.attribute("buttoncolor1", {type: vec4, value: vec4("#9090b0")});
 	this.attribute("buttoncolor2", {type: vec4, value: vec4("#8080c0")});
 	this.bg.mousepos = vec2(0);
-	this.bg.gridcolor = vec4("#909090");
+	this.bg.gridcolor = vec4("#ffffff");
 	
 	this.bg.grid = function(a,b){
 		if (floor(mod(a.x * width,50. )) == 0. ||floor(mod(a.y * height,50. )) == 0.)	{
-			return mix(gridcolor, vec4(1.0), 0.5);
+			return mix(gridcolor, vec4(0.9,0.9,1.0,1.0), 0.5);
 		}
 		if (floor(mod(a.x * width,10. )) == 0. ||floor(mod(a.y * height,10. )) == 0.)	{
-			return mix(gridcolor, vec4(1.0), 0.2);
+			return mix(gridcolor, vec4(0.9,0.9,1.0,1.0), 0.2);
 		}
 		return gridcolor;
 	}
-	
+	this.bordercolor =vec4("#c0c0c0");
+	this.borderwidth = 1;
+	this.cornerradius = 14;
 	this.bg.bgcolorfn = function(a,b){
-		var dx = abs(a.x  * width - mousepos.x)/10.0;
-		var dy = abs(a.y  * height - mousepos.y)/10.0;
+		var dx = abs(a.x  * width - mousepos.x);
+		var dy = abs(a.y  * height - mousepos.y);
+		
+		
 		var mindist = min(dx,  dy);
-		mindist = pow(mindist,0.08);	
-		return mix(grid(a,b),vec4(0.7, 0.6,0.3,1.0),clamp((1.-mindist)*4.0, 0.,1. ));
+		//mindist = pow(mindist,0.08);	
+		return mix(grid(a,b), mix(vec4(1,1,0.8,1),vec4(0,0,0,1),clamp((1.-mindist)*1.0, 0.,1. )),clamp((1.-mindist/5.0)*1.0, 0.,1. )/2.);
 	}
 	
 	this.render = function(){

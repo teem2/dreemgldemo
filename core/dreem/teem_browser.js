@@ -9,11 +9,12 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 	var RpcPromise = require('$rpc/rpcpromise')
 	var WebRTC = require('$rpc/webrtc')
 	var BusClient = require('$rpc/busclient')
-	var Mouse = require('$renderer/mouse_$rendermode')
-	var Keyboard = require('$renderer/keyboard_$rendermode')
+	var Mouse = require('$renderer/mouse_web')
+	var Keyboard = require('$renderer/keyboard_web')
+	var Touch = require('$renderer/touch_web')
 	var renderer = require('$renderer/renderer')
 
-	self.doRender = function(previous, parent){
+	this.doRender = function(previous, parent){
 		
 		var globals = {
 			teem:this, 
@@ -24,11 +25,16 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		// copy keyboard and mouse objects from previous
 		if(!previous){
 			if(!parent){
+				this.touch = globals.touch = new Touch()
 				this.mouse = globals.mouse = new Mouse()
 				this.keyboard = globals.keyboard = new Keyboard()
+				renderer.defineGlobals(this.touch, globals)
+				renderer.defineGlobals(this.mouse, globals)
+				renderer.defineGlobals(this.keyboard, globals)
 			}
 		}
 		else{
+			this.touch = globals.touch = previous.touch
 			this.mouse = globals.mouse = previous.mouse
 			this.keyboard = globals.keyboard = previous.keyboard
 			// this isnt exactly right.
@@ -47,7 +53,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		this.rendered = true
 	}
 
-	self.createBus = function(){
+	this.createBus = function(){
 		
 		this.bus = new BusClient(location.pathname)
 		
@@ -130,7 +136,17 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		}.bind(this)
 	}
 
-	self.atConstructor = function(previous, parent){
+	this.log = function(){
+		var args = Array.prototype.slice.apply(arguments)
+		RpcProxy.isJsonSafe(args)
+		this.bus.send({
+			type:'log',
+			args:args
+		})
+		console.log.apply(console, args)
+	}
+
+	this.atConstructor = function(previous, parent){
 
 		this.parent = parent
 		

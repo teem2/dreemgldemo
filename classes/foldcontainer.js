@@ -42,7 +42,7 @@ define.class(function(sprite, text, icon, view){
 		this.padding = 6;
 			
 		this.render = function(){			
-			return [icon({fontsize:16, icon:this.icon}), text({marginleft:5,fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })];
+			return [icon({fontsize:16, icon:this.icon, fgcolor: "white" }), text({marginleft:5,fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })];
 		}
 		
 		this.pressed = 0;

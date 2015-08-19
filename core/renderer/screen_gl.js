@@ -407,12 +407,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.time = time;
 		this.last_time = time;
 	
-		if (this.debugshader === true) {
-			if (!this.debug_tex.frame_buf) this.debug_tex.allocRenderTarget(this.device)
-			this.device.setTargetFrame(this.debug_tex)
-			this.drawDebug()
-		}
-
 		if (this.moved === true){//} || this.dirty === true) {
 			this.moved = false
 			if (!this.pic_tex.frame_buf) this.pic_tex.allocRenderTarget(this.device)
@@ -426,11 +420,17 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		if (this.dirty === true) {
 			this.device.setTargetFrame()
 			//for(var i = 0;i<20;i++)
-			this.drawColor();
 			this.dirty = false
+			this.drawColor();
 			this.totaldirtyrect = {};
 			this.dirtyrectset = false;
 			
+		}
+
+		if (this.debugshader === true) {
+			if (!this.debug_tex.frame_buf) this.debug_tex.allocRenderTarget(this.device)
+			this.device.setTargetFrame(this.debug_tex)
+			this.drawDebug()
 		}
 
 		if(anim || this.hasListeners('time')){
@@ -661,6 +661,18 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 				this.mousecapture = false;
 				this.setguid(this.lastidundermouse);
 			}
+		}.bind(this)
+
+		this.touch.start = function(){
+			
+		}.bind(this)
+
+		this.touch.end = function(){
+
+		}.bind(this)
+
+		this.touch.move = function(){
+
 		}.bind(this)
 
 		this.mouse.click = function () {

@@ -21,6 +21,7 @@ define.class(function(sprite, text, view){
 		var field = shape.roundbox(rel, offset * width, 0.05*height,page*width, .9*height,4)
 		var fg = vec4(draggercolor.rgb, smoothstep(edge, -edge, field)*draggercolor.a)
 		var bg = vec4(0.,0.,0.,0.05)
+		//dump = field*0.1 + time
 		return mix(bg.rgba, fg.rgba, fg.a)
 	}	
 	

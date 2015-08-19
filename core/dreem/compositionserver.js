@@ -72,8 +72,21 @@ define.class(function(require){
 		// ok, we will need to compute the local classes thing
 		define.system_classes = system_classes
 
+		// lets scan for the composition name in our external
+		// compositions directory
+		this.index_mapped =
+		this.index_real = '$compositions/' +this.name + '/index.js'
+
+		var ext_real =  '$external/' + this.name + '/index.js'
+		var ext_mapped = '/_external_/' + this.name + '/index.js'
+
+		if(fs.existsSync(define.expandVariables(ext_real))){
+			this.index_mapped = ext_mapped
+			this.index_real = ext_real
+		}
+
 		// lets load up the teem nodejs part
-		var TeemServer = require('$compositions/' + this.name + '/index.js')
+		var TeemServer = require(this.index_real)
 		
 		this.teem = new TeemServer(this.busserver)
 	}
@@ -146,7 +159,7 @@ define.class(function(require){
 			"Content-Type": "text/html"
 		}
 		//var screen = this.screens[app]
-		var html = this.loadHTML(this.name, '$compositions/'+this.name+'/index.js')
+		var html = this.loadHTML(this.name, this.index_mapped)
 		res.writeHead(200, header)
 		res.write(html)
 		res.end()

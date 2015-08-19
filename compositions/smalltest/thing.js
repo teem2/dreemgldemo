@@ -1,4 +1,4 @@
-define.browser(function(require, view, text){
+define.browserClass(function(require, view, text){
 	
 		
 		this.attribute("subtexts", {type: int, value: 10});

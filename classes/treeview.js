@@ -4,7 +4,7 @@
 define.class(function(sprite, text, view, button){
 
 	var testdata = {name:'test Node', children:[
-		{name:'Child 1', children:[
+		{name:'Child 1000', children:[
 			{name:'node 0-0-0 '}
 		]},
 		{name:'Child 2', children:[

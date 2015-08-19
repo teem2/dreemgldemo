@@ -407,13 +407,13 @@
 	}
 
 	// defining a class as environment specific
-	define.browser = function(body, body2){
+	define.browserClass = function(body, body2){
 		if(typeof body2 === 'function') body = body2
 		body.environment = 'browser'
 		define.class.apply(define, arguments)
 	}
 
-	define.nodejs = function(body, body2){
+	define.nodejsClass = function(body, body2){
 		if(typeof body2 === 'function') body = body2
 		body.environment = 'nodejs'
 		define.class.apply(define, arguments)
@@ -943,7 +943,7 @@
 				var ext = define.fileExt(url)
 				var abs_url, fac_url
 
-				if(url.indexOf('http:') === 0 && url.indexOf(define.$root) !== 0){ // we are fetching a url..
+				if(url.indexOf('http:') === 0){ // we are fetching a url..
 					fac_url = url
 					abs_url = define.$root + '/proxy?' + encodeURIComponent(url)
 				}

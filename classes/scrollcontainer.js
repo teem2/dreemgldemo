@@ -8,7 +8,8 @@ define.class(function(sprite,  view, scrollbar){
 	this.flex = 1;
 	
 	this.updatescrollbars = function(view){
-		//console.log(view.layout.width, view.layout.height);			
+		//console.log(view.layout.width, view.layout.height);	
+console.log("scroll!");		
 	}	
 	
 	this.render = function(){		
@@ -17,9 +18,11 @@ define.class(function(sprite,  view, scrollbar){
 		return [
 			view({flexdirection :"row", flex: 1 },
 				scrollbar({width:20}), 
-				view({bgcolor: "#c0c0a0",  clipping:true, flex:1, margin: 4, bordercolor: "red" , borderwidth: 4},
-					view({bgcolor: "#8080b0", x:10, y:10,padding:4,flex: 1,borderwidth:1, bordercolor: "red", layoutchanged:function(){this.updatescrollbars(this)}.bind(this)}, 
-						this.instance_children
+				view({bgcolor: "#c0c0c0",  clipping:false, flex:1},
+					view({bgcolor: "#c0c0c0",  clipping:true, flex:1, alignself: "stretch",  margin: 10},
+						view({bgcolor: "white", flex: 1,borderwidth:1, layoutchanged:function(){this.updatescrollbars(this)}.bind(this)}, 
+							this.instance_children
+						)
 					)
 				)
 			),
