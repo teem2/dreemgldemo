@@ -4,25 +4,28 @@ define.browserClass(function(require, screen, icon,view, edit, text,scrollbar,  
 
 	this.buildmoviegrid = function(){
 		var tiles = []
-		var results = json.searchResponse.results
-		for(var i = 0; i < 40; i++){
-			var imgs = results[i].movie.images
-			var img = imgs[imgs.length-1]
-			tiles.push(
-				view({
-					margin: 10, 
-					w:100, h:100, bgimage:img.url
-				})
-			)
-		}
-		return tiles
+			var results = json.searchResponse.results
+			for(var i = 0; i < 40; i++){
+				var imgs = results[i].movie.images
+				var img = imgs[imgs.length-1]
+				tiles.push(
+					view({
+						margin: 10, 
+						w:100,h:100,bgimage:img.url
+					})
+				)
+			}
+			return tiles
 	}
 	
-	this.render = function(){ return[
-		view({flexdirection:"column" , flex: 1, bgcolor: "#808070"	},
-			view({bgcolor: "white",flex: 1, margin: 40,flexdirection:"column" },
-				view({bgcolor: "#a0a070" , padding: 4,flexdirection:"column" },
-					text({text:"This is the amazing tinydialog!", bgcolor: "transparent" , fontsize: 20})
+	this.render = function(){return[
+		view({flexdirection:"row" , flex: 1, bgcolor: "#202060", alignitems:"center"	},
+			view({ alignself: "center", bgcolor: "#202060",flexdirection:"column",alignself:"stretch", flex:1},
+			view({ borderwidth:20, bordercolor:"white", alignself: "stretch",padding:4},
+			view({bgcolor: "white",flex: 1, margin: 0,flexdirection:"column" },
+				view({bgcolor: "#b0b010" , padding: 4,flexdirection:"row" },
+					icon({icon:"flask", fgcolor:"white", fontsize: 20, margin: 10 })
+					,text({text:"This is the amazing tinydialog!", bgcolor: "transparent" , fontsize: 25, margin: 4})
 				),
 				tabcontrol({bgcolor: "#f0f0f0" , flexdirection:"column" }
 					,tabcontrol({tabname:"tests", tabicon:"hand-lizard" }, 
@@ -90,6 +93,7 @@ define.browserClass(function(require, screen, icon,view, edit, text,scrollbar,  
 					)										
 				)
 			)
+			))
 		)]
 	}
 })

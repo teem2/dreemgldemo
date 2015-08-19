@@ -42,7 +42,7 @@ define.class(function(sprite,  view, button){
 			this.bar =[ view({flexdirection:"row", bgcolor: "#f0f0f0", borderwidth:1, cornerradius: 0, bordercolor: "#c0c0c0"  },this.instance_children.map(
 				function(m,id)
 					{						
-							return tabbutton({tabid: id, target: myparent, text: m.tabname, icon: m.tabicon? m.tabicon:"", click: function(){console.log(this.target);this.target.activetab = this.tabid}});
+							return tabbutton({tabid: id, target: myparent, text: m.tabname, icon: m.tabicon? m.tabicon:"", click: function(){this.target.activetab = this.tabid}});
 					})), view({flex: 1, borderwidth: 2,cornerradius: 0,  bordercolor: "#b0b0b0" ,padding: 4, alignself: "stretch"}, this.instance_children[this.activetab])];			
 			return this.bar;						
 		}else{

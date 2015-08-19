@@ -125,19 +125,25 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		return this.orientation.invertedworldmatrix;
 	}
 	
-	this.boundingRectCache = {}
-	
+	this.boundingRectCache = undefined;
+	this.lastdrawnboundingrect = {left:0, right: 0, top:0, bottom:0};
+	this.getLastDrawnBoundingRect = function(){
+		return this.lastdrawnboundingrect;
+	}
 	this.getBoundingRect = function(force){
-		if (this.dirty || !this.boundingRectCache || force)
-		{
-			this.boundingRectCache =this.calculateBoundingRect();
+		if (this.dirty || !this.boundingRectCache || force === true){
+			this.boundingRectCache = this.calculateBoundingRect(force);
 		}
 		return this.boundingRectCache;
 	}
 	
-	this.calculateBoundingRect = function(){	
-		if (!this.orientation) return{left:0,right:0, top:0, bottom: 0};
-		if (this.matrixdirty) this.recomputeMatrix();
+	this.calculateBoundingRect = function(force){	
+		if (!this.orientation)
+		{
+			debugger;
+			return{left:0,right:0, top:0, bottom: 0};
+		}
+		if (this.matrixdirty || force === true) this.recomputeMatrix();
 		var x1 = 0;
 		var x2 = this._width;
 		var y1 = 0;
@@ -172,6 +178,10 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		if (v4[1] < miny) miny = v4[1];else if (v4[1] > maxy) maxy = v4[1];
 		
 		var ret = {left: minx, top: miny, right: maxx, bottom: maxy};
+		if (ret.left === 0 && ret.right === 0 && ret.top === 0 && ret.bottom === 0)
+		{
+			debugger;
+		}
 		return ret
 	}
 	
@@ -179,14 +189,17 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.recomputeMatrix = function(){
 		
 		var o = this.orientation;
-		if (!o) return;
+		if (!o) {
+			debugger;
+			return;
+		}
+		
 		if ((this.parent && this.parent.matrixdirty) || (this.parent && this.parent.hasLayoutChanged && this.parent.hasLayoutChanged()))  {
-					if (parent.recomputeMatrix){
-						parent.recomputeMatrix();
-						mat4.debug(parent.orientation.worldmatrix, true);
-					}
-					
-			}
+			if (parent.recomputeMatrix){
+				parent.recomputeMatrix();
+				mat4.debug(parent.orientation.worldmatrix, true);
+			}					
+		}
 	
 		o.rotation[2] = this._rotation * 6.283 / 360;
 		
@@ -204,6 +217,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			//console.log(this.layout)
 		}
 		else {
+			console.log("eh?");
 			var s = o.scale;
 			var r = o.rotation;
 			var t = o.translation;
@@ -216,17 +230,15 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		if (this.parent ) {
 				if ( this.parent.orientation){
 					this.orientation.worldmatrix = mat4.mul(this.orientation.matrix,this.parent.orientation.worldmatrix );
-				}else{
+				} else {
 					if (this.parent.matrix){
-					this.orientation.worldmatrix = mat4.mul(this.orientation.matrix,this.parent.matrix);
-					}else{
+						this.orientation.worldmatrix = mat4.mul(this.orientation.matrix,this.parent.matrix);
+					} else {
 						//console.log("hmm?");
 					}
 				}
-		}
-		else{
-			this.orientation.worldmatrix = this.orientation.matrix;
-			
+		} else {
+			this.orientation.worldmatrix = this.orientation.matrix;			
 		}
 		
 		this.matrixdirty = false;
@@ -316,8 +328,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		//this.textureshader = new this.TexturedShader()
 		//this.boundingrect = rect(0, 0, 0, 0);
 	
-		this.recomputeMatrix();
-
+	//	this.recomputeMatrix();
+		this.screen.addDirtyNode(this);
 		if(!this.mode && this.parent) this.mode = this.parent.mode
 
 		if(this.mode === undefined || this.mode === 'GL'){
@@ -436,13 +448,20 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				this.bg._width = this._width
 				this.bg._height = this._height
 			}
-			
+
+			var bound = this.getBoundingRect();
+
+			this.lastdrawnboundingrect.left = bound.left;
+			this.lastdrawnboundingrect.right = bound.right;
+			this.lastdrawnboundingrect.top = bound.top;
+			this.lastdrawnboundingrect.bottom = bound.bottom;
+
+		
 			
 			if (this.texturecache == false)
 			{
-						var bound = this.getBoundingRect();
 						var myrect = rect(bound.left, bound.top, bound.right, bound.bottom);
-						
+
 						var actuallyvisible = true;
 							if (renderstate.cliprect)
 							{
@@ -547,7 +566,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	
 	this.draw = function(renderstate){
 		if (this.atDraw) this.atDraw(renderstate)
-
 		if (this.visible){
 			if (this.dirty != false || this.hasLayoutChanged()) {
 				//if(this.matrixdirty) 

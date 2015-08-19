@@ -19,8 +19,9 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.totaldirtyrect = {};
 	this.dirtyrectset = false;
 	this.debugshader = false
-	this.debug = false;
+	this.debug = true;
 	this.showdebugtext = true;
+	this.renderstructure = false;
 	
 	this.lastx = -1;
 	this.lasty = -1;
@@ -208,7 +209,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		}
 
 		if(id != this.lastmouseguid){
-
 			var overnode = 	this.guidmap[this.lastmouseguid];
 			if (overnode && overnode.emit) overnode.emit('mouseout')
 
@@ -230,7 +230,43 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	}
 
 	this.drawColorFrames = 0;
-	
+	this.renderBoundingBox = function(node, depth){	
+		
+		var bb = node.getBoundingRect();
+		
+		if (this.lastmouseguid == node.effectiveguid){
+			this.utilityrectangle.viewmatrix = this.renderstate.viewmatrix;
+			this.utilityrectangle.matrix = mat4.identity();
+			this.utilityrectangle.frame = this.renderstate.frame;
+			this.utilityrectangle.width = bb.right - bb.left;
+			this.utilityrectangle.height = bb.bottom - bb.top;
+			this.utilityrectangle.x = bb.left;
+			this.utilityrectangle.y = bb.top;
+			this.utilityrectangle.depth = depth;
+			this.utilityrectangle.draw(this.device);
+		}
+		else{
+		
+		}
+		
+		this.utilityframe.viewmatrix = this.renderstate.viewmatrix;
+		this.utilityframe.matrix = mat4.identity();
+		this.utilityframe.frame = this.renderstate.frame;
+		this.utilityframe.width = bb.right - bb.left;
+		this.utilityframe.height = bb.bottom - bb.top;
+		this.utilityframe.x = bb.left;
+		this.utilityframe.y = bb.top;
+		this.utilityframe.depth = depth;
+		this.utilityframe.draw(this.device);
+		
+		for(var i in node.children)
+		{
+			this.renderBoundingBox(node.children[i], depth + 1);
+		}
+
+					
+					
+	}
 	this.drawColor = function(){
 		this.drawColorFrames++;
 		var clippedrect = false;
@@ -238,14 +274,12 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		
 		var devw = (this.device.size[0] * this.device.ratio)
 		var devh = (this.device.size[1] * this.device.ratio)
-				
-				
+		
 		var w = devw;
 		var h = devh;
 		var x = 0;
 		var y =	0;
-
-			
+	
 		if (this.hasDirtyRect()){
 			w = this.totaldirtyrect.right - this.totaldirtyrect.left;
 			 h = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
@@ -260,20 +294,20 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 					clippedrect = true;
 					donesetup = true;
 					
-					this.debugrectshader.viewmatrix = this.renderstate.viewmatrix;
-					this.debugrectshader.matrix = mat4.identity();
-					this.debugrectshader.frame = this.renderstate.frame;
+					this.utilityrectangle.viewmatrix = this.renderstate.viewmatrix;
+					this.utilityrectangle.matrix = mat4.identity();
+					this.utilityrectangle.frame = this.renderstate.frame;
 				
-					this.debugrectshader.bgcolor = vec4("black");
+					this.utilityrectangle.bgcolor = vec4("black");
 					
 			//		this.renderstate.pushClipRect(rect(0,0,0,0));
 					
-					this.debugrectshader.width = w;
-					this.debugrectshader.height = h;
-					this.debugrectshader.x = this.totaldirtyrect.left;
-					this.debugrectshader.y = this.totaldirtyrect.top;
+					this.utilityrectangle.width = w;
+					this.utilityrectangle.height = h;
+					this.utilityrectangle.x = this.totaldirtyrect.left;
+					this.utilityrectangle.y = this.totaldirtyrect.top;
 					
-					this.debugrectshader.draw(this.device);
+				//	this.utilityrectangle.draw(this.device);
 				
 					this.renderstate.cliprect =  rect(this.totaldirtyrect.left,this.totaldirtyrect.top,this.totaldirtyrect.left+ w,this.totaldirtyrect.top+ h);;
 				
@@ -290,34 +324,61 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 		}
 		this.orientation = {};
-		this.orientation.worldmatrix = mat4();
+		this.orientation.worldmatrix = mat4.identity();
 		this.invertedworldmatrix =  mat4.invert(this.orientation.worldmatrix)
 		this.renderstate.debugmode = false;
 		this.renderstate.drawmode = 0;
-		if (clippedrect)
-		{
-			this.device.gl.enable(this.device.gl.SCISSOR_TEST);
-			var ratio = this.device.ratio
-			this.device.gl.scissor(x*ratio, (devh -  y*ratio -h*ratio),w *ratio,h *ratio);
-		}
-		this.device.clear(this.bgcolor)
-//		this.device.clear(vec4(sin(this.renderstate.frame), 0,0,1));
 		
-		if (clippedrect)
+		if (this.renderstructure){
+
+		this.device.clear(vec4("black"))
+
+			for (var i = 0; i < this.children.length; i++){
+				this.renderBoundingBox(this.children[i],0)
+			}
+		} else {
+			
+			if (clippedrect)
+			{
+				this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+				var ratio = this.device.ratio
+				this.device.gl.scissor(x*ratio, (devh -  y*ratio -h*ratio),w *ratio,h *ratio);
+			}
+			
+			this.device.clear(this.bgcolor)
+			
+			for (var i = 0; i < this.children.length; i++){
+				this.children[i].draw(this.renderstate)
+			}
+		
+
+			if (clippedrect){
+				this.device.gl.disable(this.device.gl.SCISSOR_TEST);
+			}
+
+		}
+		
+		//if (clippedrect) this.renderstate.popClip();
+		if (this.debug)
 		{
-//			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
-		}
-
-		for (var i = 0; i < this.children.length; i++){
-			this.children[i].draw(this.renderstate)
-		}
-
-		if (clippedrect){
-			this.device.gl.disable(this.device.gl.SCISSOR_TEST);
-		}
-
-		if (clippedrect) this.renderstate.popClip();
-		if (this.debug && this.debuglabels.length > 0 ){
+			
+			
+			for (var i in this.dirtyrects){
+				var bb = this.dirtyrects[i];
+				
+				
+					this.utilityframe.viewmatrix = this.renderstate.viewmatrix;
+		this.utilityframe.matrix = mat4.identity();
+		this.utilityframe.frame = this.renderstate.frame;
+		this.utilityframe.width = bb.right - bb.left;
+		this.utilityframe.height = bb.bottom - bb.top;
+		this.utilityframe.x = bb.left;
+		this.utilityframe.y = bb.top;
+		this.utilityframe.depth = i;
+		this.utilityframe.draw(this.device);
+			}
+			
+			if (this.debuglabels.length > 0 ){
 				this.renderstate.setup(this.device);
 		
 			this.device.gl.clearStencil(0);
@@ -325,7 +386,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			
 			this.debugtextshader.viewmatrix = this.renderstate.viewmatrix;
 				
-				if( this.showdebugtext == true){
+				if(this.showdebugtext == true){
 					
 				for (var a in this.debuglabels){
 					var label = this.debuglabels[a];
@@ -356,6 +417,10 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.debuglabels = [];
 			//this.frameconsolecounter = 0;
 		}
+		}
+		
+		this.dirtyrects = [];
+		
 	}
 
 	this.readGuidTimeout = function(){
@@ -366,15 +431,31 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	
 	this.computeBoundingRects = function (node)
 	{
-			if (node.getBoundingRect) node.getBoundingRect(true);
-			for(a in node.children){
-				this.computeBoundingRects(node.children[a]);
+			var total = 1;
+			if (node.getBoundingRect) 
+			{
+				var br = node.getBoundingRect(true);
+				var pr = node.getLastDrawnBoundingRect();
+				if (br.left != pr.left || br.top != pr.top || br.right != pr.right || br.bottom != pr.bottom) 
+				{
+					//console.log("rect changed: " , pr, br);
+					this.addDirtyRect(br);
+					this.addDirtyRect(pr);
+//					this.bubbleDirty();
+				}
 			}
+			for(a in node.children){
+				
+				total += this.computeBoundingRects(node.children[a]);
+			}
+			return total;
 	
 	}
 	
+	this.layoutcount = 0;
+	
 	this.performLayout = function(){
-
+		
 		this._width = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
 		this._height = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
 		this.size = [this._width, this._height];
@@ -386,14 +467,34 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this._right = this._width;
 		this._bottom = this._height;
 		
-		FlexLayout.fillNodes(this);	
-		FlexLayout.computeLayout(this);
-		this.computeBoundingRects(this);
+
+
 		for(a in this.dirtyNodes)
 		{
-			var dr = this.dirtyNodes[a].getBoundingRect();
-			this.addDirtyRect(dr);
+			var dn = this.dirtyNodes[a];
+			if (dn.layout) {
+				var dr = dn.getLastDrawnBoundingRect();
+				this.addDirtyRect(dr);
+			}
 		}
+
+		FlexLayout.fillNodes(this);	
+		var layouted = FlexLayout.computeLayout(this);
+		
+		var computed = this.computeBoundingRects(this);
+
+		for(a in this.dirtyNodes)
+		{			
+			var dn = this.dirtyNodes[a];
+			if (dn.layout) {
+				var dr = dn.getBoundingRect();
+				this.addDirtyRect(dr);
+			}
+			else{
+			//	debugger;
+			}
+		}
+		
 		this.dirtyNodes = [];
 	}
 
@@ -420,8 +521,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		if (this.dirty === true) {
 			this.device.setTargetFrame()
 			//for(var i = 0;i<20;i++)
-			this.dirty = false
 			this.drawColor();
+			this.dirty = false
 			this.totaldirtyrect = {};
 			this.dirtyrectset = false;
 			
@@ -442,10 +543,12 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	
 	this.addDirtyNode =function(node){
 		//console.log("adding dirty node: " , node.constructor.name);
-		if (node.layout) this.addDirtyRect(node.getBoundingRect());
+		//if (node.layout) this.addDirtyRect(node.getBoundingRect());
 		this.dirtyNodes.push(node);	
 		this.bubbleDirty();
 	}
+	
+	this.dirtyrects = [];
 	
 	this.addDirtyRect = function(rect){				
 		// round to visible pixels.. round up.
@@ -461,12 +564,15 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			return;
 		}
 		
+		this.dirtyrects.push(rect);
+		
 		if (isNaN(w) || isNaN(h)) {
 			//console.log("NaN?");
 			return;
 		}
+		
 		if (this.debug){
-			this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );	
+			//this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );	
 		}
 		
 		if (this.dirtyrectset){	
@@ -536,7 +642,8 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		this.mouse = other.mouse
 		this.keyboard = other.keyboard
 		this.debugtextshader = other.debugtextshader
-		this.debugrectshader = other.debugrectshader
+		this.utilityrectangle = other.utilityrectangle
+		this.utilityframe = other.utilityframe
 		this.modal_stack = other.modal_stack
 		this.initVars()
 		this.bindInputs()
@@ -663,18 +770,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			}
 		}.bind(this)
 
-		this.touch.start = function(){
-			
-		}.bind(this)
-
-		this.touch.end = function(){
-
-		}.bind(this)
-
-		this.touch.move = function(){
-
-		}.bind(this)
-
 		this.mouse.click = function () {
 			this.click();
 		}.bind(this)
@@ -689,7 +784,6 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 			this.draw(time / 1000.)
 		}.bind(this)
 	}
-	
 	
 	this.initVars = function(){
 		this.guidmap = {};
@@ -713,26 +807,48 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 
 		this.debugtextshader = new GLText();
 		this.debugtextshader.has_guid = false;
-		this.debugrectshader = new GLShader();
-		this.debugrectshader.has_guid = false;
 		
-		this.debugrectshader.bgcolor = vec4(0.6,0.6,1.0,0.07);
-		this.debugrectshader.x = 10;
-		this.debugrectshader.y = 10;
-		this.debugrectshader.width = 100;
-		this.debugrectshader.frame = 0;
-		this.debugrectshader.height = 100;
-		this.debugrectshader.color = function(){return bgcolor + sin(frame + mesh.x)*vec4(0,1,0,0) + mesh.y * vec4(0,0,1,0) + mesh.x * vec4(1,0,0,0);;};
-		this.debugrectshader.mesh = vec2.array();
-		this.debugrectshader.mesh.length = 0;
-		this.debugrectshader.mesh.pushQuad(0,0,1,0,0,1,1,1);
-		this.debugrectshader.viewmatrix = mat4;
-		this.debugrectshader.matrix = mat4;
+		this.utilityframe = new GLShader();
+		this.utilityframe.has_guid = false;		
+		this.utilityframe.draw_type = "LINE_STRIP";
+		this.utilityframe.depth = 0;
+		this.utilityframe.color = function(){return mix(vec4("yellow" ), vec4("purple"), 0.5 + 0.5*sin(depth*0.3));};
+		this.utilityframe.mesh = vec2.array();
+		this.utilityframe.mesh.push(vec2(0,0));
+		this.utilityframe.mesh.push(vec2(1,0));
+		this.utilityframe.mesh.push(vec2(1,1));
+		this.utilityframe.mesh.push(vec2(0,1));
+		this.utilityframe.mesh.push(vec2(0,0));
+		this.utilityframe.viewmatrix = mat4;
+		this.utilityframe.matrix = mat4;
+		this.utilityframe.x = 10;
+		this.utilityframe.y = 10;
+		this.utilityframe.width = 100;
+		this.utilityframe.frame = 0;
+		this.utilityframe.height = 100;
+		this.utilityframe.position = function(){return (vec2(mesh.x * width, mesh.y*height)  + vec2(x,y))* matrix * viewmatrix};
+
 		
-		this.debugrectshader.position = function(){return (vec2(mesh.x * width, mesh.y*height)  + vec2(x,y))* matrix * viewmatrix};
-
-		this.initVars()
-
-		this.bindInputs()
+		this.utilityrectangle = new GLShader();
+		this.utilityrectangle.has_guid = false;
+		
+		this.utilityrectangle.bgcolor1 = vec4(1.0,1.0,0.3,0.3);
+		this.utilityrectangle.bgcolor2 = vec4(1.0,0.6,0.6,0.3);
+		this.utilityrectangle.x = 10;
+		this.utilityrectangle.y = 10;
+		this.utilityrectangle.width = 100;
+		this.utilityrectangle.frame = 0;
+		this.utilityrectangle.height = 100;
+		this.utilityrectangle.alpha = 0.4;
+		this.utilityrectangle.color = function(){var t = (bgcolor1 + mesh.y  * (bgcolor2 - bgcolor1));return vec4( t.xyz, 1.0 * alpha);};
+		this.utilityrectangle.mesh = vec2.array();
+		this.utilityrectangle.mesh.length = 0;
+		this.utilityrectangle.mesh.pushQuad(0,0,1,0,0,1,1,1);
+		this.utilityrectangle.viewmatrix = mat4;
+		this.utilityrectangle.matrix = mat4;
+		
+		this.utilityrectangle.position = function(){return (vec2(mesh.x * width, mesh.y*height)  + vec2(x,y))* matrix * viewmatrix};
+		this.initVars();
+		this.bindInputs();
 	}
 })

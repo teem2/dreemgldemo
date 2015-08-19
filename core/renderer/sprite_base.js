@@ -122,7 +122,7 @@ define.class('$base/nodeworker', function(require, exports, self){
 	}
 	
 	this.destroy = function(){
-		if (this.screen) this.screen.addDirtyRect(this.getBoundingRect());
+		if (this.screen) this.screen.addDirtyRect(this.getLastDrawnBoundingRect());
 	}
 	
 	this.bubbleDirty = function(){
@@ -132,12 +132,22 @@ define.class('$base/nodeworker', function(require, exports, self){
 		}
 	}
 	this.setDirty = function(){		
+		if (this.screen) 
+		{
+			this.screen.addDirtyNode(this);
+		}
+		//console.log("dirty?");
 		this.bubbleDirty();
-		if (this.screen) this.screen.addDirtyNode(this);
+		
 	}
 	
 	this.margin = this.padding = this.borderwidth = this.cornerradius = this.flex = this.flexdirection =  this.size = this.pos = function(v){
-		if (this.screen) this.screen.requestLayout();
+		if (this.screen)
+		{
+			this.screen.addDirtyNode(this);
+			this.screen.requestLayout();
+		}
+		
 	}
 	
 	this.reLayout = function(){

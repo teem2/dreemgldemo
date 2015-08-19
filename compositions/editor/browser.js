@@ -24,7 +24,7 @@ define.browserClass(function(require, screen, view, edit, text, icon, myview, tr
 					)
 				)
 				,view({position: "relative", flex: 0.2,  flexdirection: "column", bgcolor: "#808090", alignself: "stretch" , borderwidth: 1, padding: 3,cornerradius: "vec4(0,0,14,0)" , bordercolor: "gray" , clipping: true}
-					,foldcontainer({title:"Class Library", icon:'files-o', alignself: "stretch",marginbottom: 2})
+					,foldcontainer({title:"Class Library", icon:'files', alignself: "stretch",marginbottom: 2})
 					,foldcontainer({title:"Attributes", icon:'gears', alignself: "stretch",marginbottom: 2},
 						text({fontsize: 26, text:"Visionary Studio 3016",bgcolor: "transparent" , margin: 5})
 					)

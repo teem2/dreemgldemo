@@ -23,10 +23,7 @@ define.class(function(sprite, text, view){
 	this.bg.bgcolorfn = function(a,b){
 		var dx = abs(a.x  * width - mousepos.x);
 		var dy = abs(a.y  * height - mousepos.y);
-		
-		
 		var mindist = min(dx,  dy);
-		//mindist = pow(mindist,0.08);	
 		return mix(grid(a,b), mix(vec4(1,1,0.8,1),vec4(0,0,0,1),clamp((1.-mindist)*1.0, 0.,1. )),clamp((1.-mindist/5.0)*1.0, 0.,1. )/2.);
 	}
 	
@@ -37,7 +34,7 @@ define.class(function(sprite, text, view){
 	this.mousemove = function(a){
 		this.bg.mousepos = vec2(a[0],a[1]);		
 		this.setDirty(true);
-		
+		//this.screen.addDirtyNode(this);
 		
 		if (this.children.length > 0)
 		{
