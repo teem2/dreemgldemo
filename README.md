@@ -15,3 +15,5 @@ and open compositions/imagesearch/myview.js in your editor and start typing away
 
 As the server starts, it also shows other local IP's its listening on (for trying it on your phone)
 Open http://<mylocalip>:8080/imagesearch on your mobile device to livecode shaders from your laptop to your phone.
+
+Have fun!
