@@ -4,8 +4,9 @@ define.browserClass(function(require, screen, view,menuitem, menubar, edit, text
 
 		return[
 		view({rotation:0,position: "relative",   flexdirection: "column", height: 20, bgcolor: "black", flex:1},[
-			view({position: "relative",  cornerradius:"vec4(0,0,0,14)" , borderwidth:1, height: 50, flexdirection: "row", bgcolor: "#404080",'bg.bgcolorfn':function(a,b){return vec4(mesh.x * bgcolor.rgb, 1.0)} , alignitems:"stretch", alignself: "stretch" , flex: undefined}
-				,text({fontsize: 20, text:"Visionary Studio 3016", width: 200, bgcolor: "transparent" , margin: 2, marginleft:15})
+			view({position: "relative",  cornerradius:"vec4(0,0,0,14)" , borderwidth:1,  flexdirection: "row", bgcolor: "#404080",'bg.bgcolorfn':function(a,b){return vec4(mesh.x * bgcolor.rgb, 1.0)} , alignitems:"stretch", alignself: "stretch" , flex: undefined}
+				,icon({icon:"windows", fgcolor:"white", marginleft: 15, fontsize:18})
+				,text({fontsize: 20, text:"Visionary Studio 3016", width: 200, bgcolor: "transparent" , marginbottom:10, marginleft:15})
 			)
 			,menubar({}
 						,menuitem({text: "File"}

@@ -6,6 +6,7 @@ define.class(function(sprite,  view, scrollbar){
 	this.flexwrap = "none" ;
 	this.alignitems = "stretch";
 	this.flex = 1;
+	this.attribute("scrollbarwidth", {type: int, value: 16});
 	
 	this.updatescrollbars = function(view){
 		//console.log(view.layout.width, view.layout.height);	
@@ -17,9 +18,9 @@ console.log("scroll!");
 
 		return [
 			view({flexdirection :"row", flex: 1 },
-				scrollbar({width:20}), 
+				scrollbar({width:this.scrollbarwidth}), 
 				view({bgcolor: "#c0c0c0",  clipping:false, flex:1},
-					view({bgcolor: "#c0c0c0",  clipping:true, flex:1, alignself: "stretch",  margin: 10},
+					view({bgcolor: "#c0c0c0",  clipping:true, flex:1, alignself: "stretch",  margin: 0},
 						view({bgcolor: "white", flex: 1,borderwidth:1, layoutchanged:function(){this.updatescrollbars(this)}.bind(this)}, 
 							this.instance_children
 						)
@@ -27,8 +28,8 @@ console.log("scroll!");
 				)
 			),
 			view({flexdirection :"row" },
-				view({width:20}),
-				scrollbar({vertical:false, height:20, flex:1})
+				view({width:this.scrollbarwidth}),
+				scrollbar({vertical:false, height:this.scrollbarwidth, flex:1})
 			)
 		]
 	}

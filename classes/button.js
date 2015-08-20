@@ -5,15 +5,15 @@ define.class(function(sprite, text, view, icon){
 	
 	this.attribute("text", {type: String, value: "button"});
 	this.attribute("icon", {type: String, value: ""});
-	this.attribute("fontsize", {type: float, value: 20});
-	this.attribute("labelcolor", {type: vec4, value: vec4("black")});
-	this.attribute("labelactivecolor", {type: vec4, value: vec4("white")});
-	this.attribute("buttoncolor1", {type: vec4, value: vec4("#9090b0")});
-	this.attribute("buttoncolor2", {type: vec4, value: vec4("#8080c0")});
-	this.attribute("hovercolor1", {type: vec4, value: vec4("#8080c0")});
-	this.attribute("hovercolor2", {type: vec4, value: vec4("#3b5898")});
-	this.attribute("pressedcolor1", {type: vec4, value: vec4("#3b5898")});
-	this.attribute("pressedcolor2", {type: vec4, value: vec4("#637aad")});
+	this.attribute("fontsize", {type: float, value: 22});
+	this.attribute("labelcolor", {type: vec4, value: vec4("#404040")});
+	this.attribute("labelactivecolor", {type: vec4, value: vec4("black")});
+	this.attribute("buttoncolor1", {type: vec4, value: vec4("#fffff0")});
+	this.attribute("buttoncolor2", {type: vec4, value: vec4("#ffffff")});
+	this.attribute("hovercolor1", {type: vec4, value: vec4("#f0f0f0")});
+	this.attribute("hovercolor2", {type: vec4, value: vec4("#f8f8f8")});
+	this.attribute("pressedcolor1", {type: vec4, value: vec4("#d0d0f0")});
+	this.attribute("pressedcolor2", {type: vec4, value: vec4("#d0d0f0")});
 	this.buttonres = {};
 		
 	this.buttonfill = function(a,b){
@@ -30,7 +30,7 @@ define.class(function(sprite, text, view, icon){
 	this.bg.col2 = vec4("yellow");
 	this.borderwidth  = 2;
 	this.margin = 4;
-	this.bordercolor = vec4("#303060");
+	this.bordercolor = vec4("lightgray");
 	this.alignItems = "center";
 	
 	this.pressed = 0;
@@ -85,7 +85,7 @@ define.class(function(sprite, text, view, icon){
 	}
 
 	this.render = function(){
-		this.buttonres =  text({rotation: 0, bgcolor:"transparent",fgcolor:"white", marginleft: 4,fontsize: this.fontsize, position: "relative", text: this.text.toUpperCase()})
+		this.buttonres =  text({rotation: 0, bgcolor:"transparent",fgcolor:"white", marginleft: 4,fontsize: this.fontsize, position: "relative", text: this.text})
 		if (!this.icon || this.icon.length == 0)
 		{
 			this.iconres = undefined;

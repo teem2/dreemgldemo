@@ -49,7 +49,7 @@ define.class(function(sprite, text, view){
 	this.bg.col1 = vec4("yellow");
 	this.bg.col2 = vec4("yellow");
 	this.borderwidth  = 2;
-	this.margin = 4;
+	this.margin = 1;
 	this.bordercolor = vec4("#303060");
 	
 	this.pressed = 0;

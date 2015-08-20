@@ -621,7 +621,7 @@ this.draw_calls = 0
 			return;
 		}
 		
-		var rrect = {bottom: Math.ceil(rect.bottom), right:  Math.ceil(rect.right), left:  Math.floor(rect.left), top: Math.floor(rect.top)};
+		var rrect = {bottom: Math.ceil(rect.bottom+1), right:  Math.ceil(rect.right+1), left:  Math.floor(rect.left-1), top: Math.floor(rect.top-1)};
 
 
 		

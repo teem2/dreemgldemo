@@ -3,6 +3,8 @@
 
 define.class(function(sprite, text, view, button, icon){
 
+		
+		
 	var testdata = {name:'test Node', children:[
 		{name:'Child 1000', children:[
 			{name:'node 0-0-0 '}
@@ -23,7 +25,31 @@ define.class(function(sprite, text, view, button, icon){
 			]}
 		]}
 	]}
-			
+	
+	this.attribute("data", {type: Object, value: testdata});
+
+	
+	var newitemheading = button.extend(function newitemheading(){
+
+		this.borderwidth = 0;
+		this.padding =  4;
+		this.labelactivecolor = vec4("#303000");
+		this.bordercolor= "transparent" ;
+		this.buttoncolor1 = vec4(1,1,1,0.0)
+		this.buttoncolor2 = vec4(1,1,1,0.0)
+		this.pressedcolor1 = vec4(0,0,0,0.14)
+		this.pressedcolor2 = vec4(0,0,0,0.05);
+		this.hovercolor1 = vec4(0,0,0,0.1);
+		this.hovercolor2 = vec4(0,0,0,0.1);
+		this.cornerradius = 0;
+		this.fgcolor = "black";
+		this.margin = 0;
+		this.bgcolor = "transparent";
+		this.flex = undefined;
+		this.alignself = "flex-start" 
+	
+		
+	});		
 	var itemheading = view.extend(function itemheading(){
 		this.attribute("text", {type:String, value:""});
 		this.pressed = 0;
@@ -85,7 +111,6 @@ define.class(function(sprite, text, view, button, icon){
 	var treeitem = view.extend(function (){
 		this.flex = 1.0;
 		
-		
 		this.attribute("text", {type:String, value:""});
 		this.attribute("collapsed", {type:Boolean, value:false});
 		this.attribute("bgcolor", {type:vec4, value:vec4("transparent")});
@@ -94,25 +119,30 @@ define.class(function(sprite, text, view, button, icon){
 		
 		this.flexdirection = "row" ;
 		this.toggle = function(){
-			if (!this.item.collapsed) this.item.collapsed = true;else this.item.collapsed = false;
-			this.collapsed = this.item.collapsed;
+
+			if (this.item){
+				if (!this.item.collapsed) this.item.collapsed = true;else this.item.collapsed = false;
+				this.collapsed = this.item.collapsed;
+			}
 			this.setDirty(true);
 		};
 		this.bgcolor = vec4("transparent");
 		this.atConstructor = function(){
-			if (!this.item.collapsed) this.item.collapsed = false;
+			if (this.item){
+				if (!this.item.collapsed) this.item.collapsed = false;
+			}
 		//	this.text = this.item.name;
 		}
 		this.count =0;
 		this.render = function(){	
-		
+			if (!this.item) return [];
 			this.collapsed;
 			
 			return [view({flexdirection:"row", flexwrap:"none",flex:1},
 				[
 				
 				view({bgcolor:"transparent",flexdirection:"column" },
-					itemheading({click: this.toggle.bind(this), text:this.item.name }),
+					newitemheading({click: this.toggle.bind(this), text:this.item.name }),
 					this.item.collapsed==false?
 						view({bgcolor:"transparent",flexdirection:"row" },
 							view({bgcolor:"transparent",  flexdirection:"column" , flex:1},
@@ -133,7 +163,7 @@ define.class(function(sprite, text, view, button, icon){
 	})
 	
 	var treeline = view.extend(function(){
-		this.bg.fgcolor = vec4(0.,0.,0.,1.)
+		this.bg.fgcolor = vec4(0.5,0.5,0.5,1.)
 		this.bg.last = 0
 		this.bg.color = function(){
 			//var rel = mesh.xy//cursor_pos
@@ -148,7 +178,11 @@ define.class(function(sprite, text, view, button, icon){
 						shape.box(pos, left,center,width,1)  )
 			var edge = 1.
 
+			if (mod( floor (gl_FragCoord.x) + floor(gl_FragCoord.y) , 2.) > 0.)
+			{
 			return vec4(fgcolor.rgb, smoothstep(edge, -edge, field))
+			}
+			return vec4(fgcolor.rgb,0);
 		}
 
 		this.atDraw = function(){
@@ -171,6 +205,8 @@ define.class(function(sprite, text, view, button, icon){
 	this.alignself="stretch" ;
 	
 	this.render = function(){
-		return [treeitem({item:testdata})]
+		
+		console.dir(this.data);
+		return [treeitem({item:this.data})]
 	}
 })
