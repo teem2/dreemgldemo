@@ -9,7 +9,7 @@ define.browserClass(function(require, screen, view, edit, text, treeview, splitc
 	}
 
 	this.render = function(){return[
-		view({flexdirection:"column" , flex: 1, bgcolor: "#708080"	},
+		view({_____NAME:"ROOT", flexdirection:"column" , flex: 1, bgcolor: "#708080"	},
 			view({bgcolor: "white" , flex: 1, margin: 140,flexdirection:"column" },
 				view({bgcolor: "#70a0a0" , padding: 4},
 					text({text:"Modal Dialog Test Setup 1", bgcolor: "transparent" , fontsize: 20})

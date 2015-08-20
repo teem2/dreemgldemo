@@ -211,9 +211,12 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				t[0] = this._x;
 				t[1] = this._y;
 			}
-			var hw = ( this.layout.width ? this.layout.width: this._width ) /  2;
-			var hh = ( this.layout.height ? this.layout.height: this._height) / 2;
+			var hw = ( this.layout.width !== undefined? this.layout.width: this._width ) /  2;
+			var hh = ( this.layout.height !== undefined ? this.layout.height: this._height) / 2;
 			mat4.TSRT(-hw, -hh, 0, s[0], s[1], s[2], r[0], r[1], r[2], t[0] + hw * s[0], t[1] + hh * s[1], t[2], this.orientation.matrix);
+					
+			//	for (var i =0 ;i<16;i++) if (isNaN(this.orientation.matrix[i] )) debugger;
+			
 			//console.log(this.layout)
 		}
 		else {
@@ -224,7 +227,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			var hw = this._width / 2;
 			var hh = this._height / 2;
 			mat4.TSRT(-hw, -hh, 0, s[0], s[1], s[2], r[0], r[1], r[2], t[0] + hw * s[0], t[1] + hh * s[1], t[2], this.orientation.matrix);
-		}
+				//for (var i =0 ;i<16;i++) if (isNaN(this.orientation.matrix[i] )) debugger;
+	
+	}
 		
 		this.orientation.invertedworldmatrix = undefined;
 		if (this.parent ) {
@@ -250,7 +255,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.screen.guidmap[this.interfaceguid] = this;
 		this.effectiveguid = this.interfaceguid;
 	}
-
+	this.orientation = {};
+	this.orientation.worldmatrix = mat4.identity();
+		
 	this.init = function (obj){
 		
 		this.orientation = {
@@ -433,6 +440,14 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			var fg = this.fg
 			bg._viewmatrix = renderstate.viewmatrix;
 			fg._viewmatrix = renderstate.viewmatrix;
+			
+						var bound = this.getBoundingRect();
+
+			this.lastdrawnboundingrect.left = bound.left;
+			this.lastdrawnboundingrect.right = bound.right;
+			this.lastdrawnboundingrect.top = bound.top;
+			this.lastdrawnboundingrect.bottom = bound.bottom;
+
 		if (this.texturecache == false || this.texturecache == true && this.dirty){
 			// idea reference outer node using shader.node
 			// and 
@@ -449,12 +464,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				this.bg._height = this._height
 			}
 
-			var bound = this.getBoundingRect();
-
-			this.lastdrawnboundingrect.left = bound.left;
-			this.lastdrawnboundingrect.right = bound.right;
-			this.lastdrawnboundingrect.top = bound.top;
-			this.lastdrawnboundingrect.bottom = bound.bottom;
 
 		
 			
