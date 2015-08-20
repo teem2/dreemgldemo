@@ -5,9 +5,9 @@ define.class(function(sprite, view, button, text,screenoverlay){
 
 	this.menuclick = function(){
 		// ok now we have to do a modal view of our instance_children
-		if(this.select){
-			this.select()
+		if(this.hasListeners('click')){
 			this.screen.closeModal()
+			this.emit('click')
 			return
 		}
 		var br = this.getBoundingRect();
