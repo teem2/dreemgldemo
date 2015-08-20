@@ -9,7 +9,6 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 			this.redo_stack = []
 			this.connected_objects = []
 			this.data = this.constructor_props
-			console.log(this)
 		}
 
 		this.atAttributeAssign = function(obj, key){
@@ -62,7 +61,6 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 			{to: {node:"Browser", attribute: "scale"}, from:{node:"Remote", attribute: "yslider"}}		
 		]
 	})
-
 
 	var connector = view.extend(function connector(){
 	})
@@ -142,7 +140,7 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 						,menuitem({text: "Help"}
 									,menuitem({text: "Manual"})
 									,menuitem({text: "About", click: function(){
-										
+										console.log("HI")
 									}})
 						)
 					)					
