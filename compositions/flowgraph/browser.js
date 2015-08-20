@@ -167,6 +167,15 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 						}
 					)
 					,scrollcontainer({flex: 0.8}
+							,view({flexdirection: "column" },menubar({}
+							,menuitem({text: "new block", click:function(){
+								console.log("click!");
+								dataset.modify(function(data){
+									data.screens.push({name:"new screen"})
+									
+								}  )
+							}})
+						)
 						,cadgrid({
 							dataset: dataset,
 							render: function(){
@@ -176,7 +185,7 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 									;}
 								)
 						}}
-						)
+						))
 					)
 				)
 			)
