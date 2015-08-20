@@ -103,14 +103,15 @@ define.class(function(require, exports){
 		// define children
 		object.children = object.render(parent)
 		object.atAttributeGet = undefined
-			
+
+		if(!Array.isArray(object.children) && object.children) object.children = [object.children]
 		//if(children) exports.mergeChildren(object, children)
 
 		if(object.children) for(var i = 0; i < object.children.length; i++){
 			var child = object.children[i]
 			if(Array.isArray(child)){ // splice in the children
 				var args = Array.prototype.slice.call(child)
-				args.unshift(0)
+				args.unshift(1)
 				args.unshift(i)
 				Array.prototype.splice.apply(object.children, args)
 				i-- // hop back one i so we repeat
@@ -124,6 +125,9 @@ define.class(function(require, exports){
 		}
 
 		if(globals.screen){
+			if(!globals.screen.atRender){
+				console.log("Main class is likely not a screen, please make it the first argument of your dependency class list")
+			}
 			globals.screen.atRender(object)
 		}
 	}
