@@ -1,12 +1,32 @@
-define.browserClass(function(require, screen, view, edit, text, icon, myview, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){
+define.browserClass(function(require, screen, view,menuitem, menubar, edit, text, icon, myview, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){
 	
 	this.render = function(){
 
 		return[
 		view({rotation:0,position: "relative",   flexdirection: "column", height: 20, bgcolor: "black", flex:1},[
 			view({position: "relative",  cornerradius:"vec4(0,0,0,14)" , borderwidth:1, height: 50, flexdirection: "row", bgcolor: "#404080",'bg.bgcolorfn':function(a,b){return vec4(mesh.x * bgcolor.rgb, 1.0)} , alignitems:"stretch", alignself: "stretch" , flex: undefined}
-				,text({fontsize: 26, text:"Visionary Studio 3016", width: 200, bgcolor: "transparent" , margin: 2, marginleft:15})
+				,text({fontsize: 20, text:"Visionary Studio 3016", width: 200, bgcolor: "transparent" , margin: 2, marginleft:15})
 			)
+			,menubar({}
+						,menuitem({text: "File"}
+							,menuitem({text: "Load"})
+							,menuitem({text: "Save"})
+							,menuitem({text: "Save as"})
+							,menuitem({text: "Revert"})
+						)
+						,menuitem({text: "Edit"}
+							,menuitem({text: "Copy"})
+							,menuitem({text: "Paste"})
+							,menuitem({text: "Undo"})
+							,menuitem({text: "Redo"})
+							,menuitem({text: "Options"})		
+						)
+						,menuitem({text: "Help"}
+									,menuitem({text: "Manual"})
+									,menuitem({text: "About"})
+						)
+					)					
+					
 			,splitcontainer({vertical:false, position: "relative",   flexdirection: "row", bgcolor: "black", alignitems:"stretch", alignself: "stretch" , flex:1}
 				,view({position: "relative", flex: 0.2,  flexdirection: "column", bgcolor: "#b0b0b0", alignself: "stretch", borderwidth: 1,cornerradius: "vec4(0,14,0,0)" , bordercolor: "gray" }
 					,treeview({})

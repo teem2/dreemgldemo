@@ -5,8 +5,10 @@ define.class(function(sprite, view, button, text){
 
 	this.menuclick = function(){
 		// ok now we have to do a modal view of our instance_children
+		br = this.getBoundingRect();
+		
 		this.screen.openModal(
-			view({x:this.layout.left, y:this.layout.height, miss:function(){
+			view({x:br.left, y:br.bottom, miss:function(){
 				this.screen.closeModal(-1)
 			}, position:'absolute', flexdirection:'column'}, this.instance_children)
 		)
