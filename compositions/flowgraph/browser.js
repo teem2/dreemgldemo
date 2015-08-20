@@ -1,8 +1,10 @@
-define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
+define.browserClass(function(require,screen, node, cadgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 
 	this.title = "Flowgraph Builder"
 
 	var container = node.extend(function(){
+
+	
 
 		this.atConstructor = function(){
 			this.undo_stack = []
@@ -12,34 +14,63 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 		}
 
 		this.atAttributeAssign = function(obj, key){
-			
+			for(var i = 0; i < this.connected_objects.length; i++){
+				var co = this.connected_objects[i];
+				if (co.obj === obj) return;
+			}
 			this.connected_objects.push({obj:obj, key:key})
-			console.log("connected objects", this.connected_objects);
+			
 		}
 
 		this.fork = function(callback){
 			this.undo_stack.push(JSON.stringify(this.data))
 			this.redo_stack.length = 0
-			console.log("fork!", this.data);
 			callback(this.data)
-			// cause objects that have us assigned to reload
+			this.notifyAssignedAttributes();
+		}
+
+		// cause objects that have us assigned to reload
+		this.notifyAssignedAttributes = function(){
 			for(var i = 0; i < this.connected_objects.length; i++){
 				var o = this.connected_objects[i]
 				o.obj[o.key] = this
 			}
-			
 		}
-
+		
+		
+		function recursiveCleanup(node){
+			if (typeof(node) === "object"){
+				if  (node.____struct){
+					var lookup  = define.typemap.types[node.____struct] ;
+					return lookup.apply(null, node.data);
+				}
+				else{
+					for(key in node){
+						node[key] = recursiveCleanup(node[key]);
+					}				
+				}
+			}
+			
+			return node;
+		}
+		this.JSONParse = function(stringdata){
+			var data = JSON.parse(stringdata)
+			recursiveCleanup(data);
+			return data;
+		}
+		
 		this.undo = function(){
 			if(!this.undo_stack.length) return
 			this.redo_stack.push(JSON.stringify(this.data))
-			this.data = JSON.parse(this.undo_stack.pop())
+			this.data = this.JSONParse(this.undo_stack.pop());
+			this.notifyAssignedAttributes();
 		}
 
 		this.redo = function(){
 			if(!this.redo_stack.length) return
 			this.undo_stack.push(JSON.stringify(this.data))
-			this.data = JSON.parse(this.redo_stack.pop())
+			this.data = this.JSONParse(this.redo_stack.pop())
+			this.notifyAssignedAttributes();
 		}
 	})
 
@@ -72,9 +103,8 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 	var blokjesgrid = cadgrid.extend(function blokjesgrid(){
 		this.attribute("dataset", {type: Object, value: {}});
 		this.render = function(){
-			console.log("rendering blokjesgrid");
 			return this.dataset.data.screens.map(function(d,i){
-				return blokje({x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor});
+				return blokje({x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor? d.basecolor:vec4("purple") });
 			})
 		}
 	})
@@ -147,13 +177,18 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 							,menuitem({text: "Copy"})
 							
 							,menuitem({text: "Paste"})
-							,menuitem({text: "Undo"})
-							,menuitem({text: "Redo"})
+							,menuitem({text: "Undo", click:function(){dataset.undo()}})
+							,menuitem({text: "Redo", click:function(){dataset.redo()}})
 							,menuitem({text: "Options"})		
 						)
 						,menuitem({text: "Help"}
 									,menuitem({text: "Manual"})
 									,menuitem({text: "About", click: function(){
+									this.screen.openModal(screenoverlay({}
+										,view({flexdirection: "column"},view({flexdirection: "row"},
+										text({text: "ABOUT", fontsize: 40, fgcolor: "white", bgcolor: "transparent"}) 
+										) )
+										));
 										console.log("HI")
 									}})
 						)
@@ -161,25 +196,29 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 				)
 				,splitcontainer({name:"mainsplitter", vertical: false}
 					,treeview({flex:0.2, 
-						data: 
-							{ name:"Composition", children:
-								[{name:"Screens" , children: 
-									dataset.screens.map(function(d) {
-											console.log(d);
-										return {name: d.name, children: d.linkables.map(function(c){
-												console.log(c);
-												return {name: c.name}
-											})
+						dataset: dataset,
+						buildtree: function(data)
+							{
+								console.log(data)
+								return { 
+									name:"Composition", children:
+										[{name:"Screens" , children: 
+												data.screens.map(function(d) {
+												console.log(d);
+												return {name: d.name, children: d.linkables?d.linkables.map(function(c){
+													console.log(c);
+													return {name: c.name}
+												}):[]
 										}}
 									)
 								},
 								{name:"Connections"}
 								] 
-							}
+						} }
 						}
 					)
 					,scrollcontainer({flex: 0.8}
-						,view({flexdirection: "column" },
+						,view({flexdirection: "column" , flex:1},
 							menubar({}
 								,menuitem({text: "new block", click:function(){
 									
@@ -188,7 +227,11 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 										data.screens.push({name:"new screen"})
 									
 								})
+								
 							}})
+								,menuitem({text: "Undo", click:function(){dataset.undo()}})
+								,menuitem({text: "Redo", click:function(){dataset.redo()}})
+
 							)
 							,blokjesgrid({dataset: dataset})
 						)

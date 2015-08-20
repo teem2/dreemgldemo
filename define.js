@@ -556,6 +556,12 @@
 		else{
 			function MyStruct(){
 				var out = new myarray(mysize), len = arguments.length
+				out.toJSON = function(){
+					
+					var res = [];
+					res.push.apply(res, this);										
+					return {____struct: this.struct.id, data: res}; 
+				}
 				out.struct = MyStruct
 				if(len === 0) return out
 				var arg0 = arguments[0]

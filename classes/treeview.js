@@ -27,10 +27,21 @@ define.class(function(sprite, text, view, button, icon){
 	]}
 	
 	this.attribute("data", {type: Object, value: testdata});
-
+	this.attribute("dataset", {type: Object, value:{}});
 	
-	var newitemheading = button.extend(function newitemheading(){
+	this.rebuildTree = function(){
+		if (this.buildtree) this.data = this.buildtree(this.dataset.data);else this.data = this.dataset.data;
+	}
+	
+	this.dataset = function() {	
+		this.rebuildTree();
+	}
+	
+	this.init = function(){
+		this.rebuildTree();
+	}
 
+	var newitemheading = button.extend(function newitemheading(){
 		this.borderwidth = 0;
 		this.padding =  4;
 		this.labelactivecolor = vec4("#303000");
@@ -46,10 +57,9 @@ define.class(function(sprite, text, view, button, icon){
 		this.margin = 0;
 		this.bgcolor = "transparent";
 		this.flex = undefined;
-		this.alignself = "flex-start" 
-	
-		
+		this.alignself = "flex-start" 	
 	});		
+	
 	var itemheading = view.extend(function itemheading(){
 		this.attribute("text", {type:String, value:""});
 		this.pressed = 0;
