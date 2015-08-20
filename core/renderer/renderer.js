@@ -123,7 +123,9 @@ define.class(function(require, exports){
 			this.render(child, object, globals, rerender)
 		}
 
-		if(globals.screen) globals.screen.atRender(object)
+		if(globals.screen){
+			globals.screen.atRender(object)
+		}
 	}
 
 	renderer.connectWires = function(object, initarray){

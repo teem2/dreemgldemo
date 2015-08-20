@@ -1,4 +1,4 @@
-define.browserClass(function(require, menubar, menuitem,screen, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
+define.browserClass(function(require, screen, menubar, menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 	this.render = function(){
 
 		return[
