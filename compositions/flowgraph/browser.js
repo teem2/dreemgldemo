@@ -1,6 +1,6 @@
 define.browserClass(function(require,screen, cadgrid, menubar, menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 
-	this.title = "My Flowgraph"
+	this.title = "My Flowgraph2"
 
 	var blokje = view.extend(function blokje(){
 

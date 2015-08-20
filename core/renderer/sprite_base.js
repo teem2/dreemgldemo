@@ -89,6 +89,7 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.event("reinit")
 
 	this.event("click")
+	this.event("miss")
 	this.event("mouseout")
 	this.event("mouseover")
 	this.event("mousemove")
