@@ -822,9 +822,15 @@ this.draw_calls = 0
 			}
 			var overnode = this.guidmap[this.lastmouseguid]
 			// lets give this thing focus
-			if (this.inModalChain(overnode) && overnode && overnode.emit){
-				this.setFocus(overnode)
-				overnode.emit('mouseleftdown', this.remapMouse(overnode))
+			if (overnode && overnode.emit){
+				if(this.inModalChain(overnode)){
+					this.setFocus(overnode)
+					overnode.emit('mouseleftdown', this.remapMouse(overnode))
+				}
+				else if(this.modal){
+					this.modal_miss = true
+					this.modal.emit('miss', this.remapMouse(overnode))
+				}
 			} 
 		}.bind(this)
 
@@ -840,6 +846,10 @@ this.draw_calls = 0
 		}.bind(this)
 
 		this.mouse.click = function () {
+			if(this.modal_miss){
+				this.modal_miss = false
+				return
+			}			
 			this.click();
 		}.bind(this)
 
