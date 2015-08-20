@@ -261,7 +261,12 @@
 			}
 			else if(arg){
 				if(!require) throw new Error('Can only use fast-require classes on a file-class for arg:' + arg)
-				args[i] = require(define.atLookupClass(arg))
+				if(body.stubbed){
+					args[i] = define.StubbedClass
+				}
+				else{
+					args[i] = require(define.atLookupClass(arg))
+				}
 			}
 		}
 
@@ -279,7 +284,7 @@
 			// turn require into a no-op internally
 			require = function(dep){ return new define.EnvironmentStub(dep) }
 			require.async = function(dep){ return new Promise(function(res, rej){res(null)})}
-			stubbed = true
+			stubbed = body.stubbed = true
 		}
 
 		function MyConstructor(){
@@ -345,7 +350,7 @@
 		}
 
 		Object.defineProperty(Constructor, 'extend', {value:function(body){
-
+			if(this.prototype.constructor === define.StubbedClass) return define.StubbedClass
 			return define.makeClass(this, body, require)
 		}})
 
@@ -418,6 +423,8 @@
 		body.environment = 'nodejs'
 		define.class.apply(define, arguments)
 	}
+
+	define.StubbedClass = define.makeClass(undefined, function StubbedClass(){}, undefined, undefined)
 
 	// a class which just defines the render function
 	define.render = function(render){

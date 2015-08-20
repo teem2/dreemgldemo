@@ -107,8 +107,15 @@ define.class(function(require, exports){
 		//if(children) exports.mergeChildren(object, children)
 
 		if(object.children) for(var i = 0; i < object.children.length; i++){
-			
 			var child = object.children[i]
+			if(Array.isArray(child)){ // splice in the children
+				var args = Array.prototype.slice.call(child)
+				args.unshift(0)
+				args.unshift(i)
+				Array.prototype.splice.apply(object.children, args)
+				i-- // hop back one i so we repeat
+				continue
+			}
 
 			var name = child.name || child.constructor.classname
 			if(name !== undefined && !(name in object)) object[name] = child
