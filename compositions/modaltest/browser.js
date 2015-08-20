@@ -16,6 +16,7 @@ define.browserClass(function(require, screen, view, edit, text, treeview, splitc
 				),
 				tabcontrol({}
 					,view({tabname: "thing 1" },
+						treeview(),
 						button({text:"Open Modal 1",icon:"youtube", click:
 							function(){
 								this.screen.openModal(

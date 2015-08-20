@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // view class
 
-define.class(function(sprite, text, view, button){
+define.class(function(sprite, text, view, button, icon){
 
 	var testdata = {name:'test Node', children:[
 		{name:'Child 1000', children:[
@@ -91,9 +91,8 @@ define.class(function(sprite, text, view, button){
 		this.attribute("bgcolor", {type:vec4, value:vec4("transparent")});
 		this.attribute("fgcolor", {type:vec4, value:vec4("black")});
 		this.attribute("fontsize", {type:float, value:12});
-
+		
 		this.flexdirection = "row" ;
-		this.position = "relative";
 		this.toggle = function(){
 			if (!this.item.collapsed) this.item.collapsed = true;else this.item.collapsed = false;
 			this.collapsed = this.item.collapsed;
@@ -144,8 +143,9 @@ define.class(function(sprite, text, view, button){
 			var pos = mesh.xy * vec2(width, height)
 			var center = 15
 			var left = 7
-			var field = shape.union(shape.box(pos, left,0,1,height * (1-last) + center * last),
-				shape.box(pos, left,center,width,1))
+			var field = shape.union(
+						shape.box(pos, left,0,1,height * (1-last) + center * last),
+						shape.box(pos, left,center,width,1)  )
 			var edge = 1.
 
 			return vec4(fgcolor.rgb, smoothstep(edge, -edge, field))
@@ -158,9 +158,6 @@ define.class(function(sprite, text, view, button){
 	
 	this.bordercolor = vec4("gray");
 	this.cornerradius = 0;
-	this.borderwidth = 2;
-	this.padding = 4;
-	this.margin = 4;
 	this.clipping = true;
 	this.bgcolor = vec4("white");
 	
