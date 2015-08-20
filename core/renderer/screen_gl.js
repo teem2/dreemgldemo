@@ -445,7 +445,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.computeBoundingRects = function (node)
 	{
 			var total = 1;
-			if (node.dirty === false) return;
+			//if (node.dirty === false) return;
 			if (node.getBoundingRect) 
 			{
 				var br = node.getBoundingRect(true);
@@ -459,8 +459,10 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 //					this.bubbleDirty();
 				}
 				else{
-					if (node.dirtynode) this.addDirtyRect(br);
-					node.dirtynode = false;
+					if (node.dirtynode){
+						this.addDirtyRect(br);
+						node.dirtynode = false;
+					}
 				}
 			}
 			for(a in node.children){
@@ -518,23 +520,6 @@ this.draw_calls = 0
 		}
 		
 		
-		if(false)for(a in this.dirtyNodes)
-		{			
-			var dn = this.dirtyNodes[a];
-			if (dn.layout) {
-				var dr = dn.getBoundingRect();
-				this.addDirtyRect(dr);
-			}
-			else{
-				console.log(dn.constructor.name);
-				console.log(dn.parent.layout);
-				console.log(dn.parent.orientation);
-				console.log(dn.constructor.name);
-				//debugger;
-			}
-		}
-		
-		this.dirtyNodes = [];
 		this.time = time;
 		this.last_time = time;
 	
@@ -548,9 +533,28 @@ this.draw_calls = 0
 		}
 		
 		if (this.dirty === true) {
-			
+		//	console.clear();
+		
 			var computed = this.computeBoundingRects(this);
 
+			for(a in this.dirtyNodes)
+			{			
+				var dn = this.dirtyNodes[a];
+				if (dn.layout) {
+					var dr = dn.getBoundingRect();
+				//	this.addDirtyRect(dr);
+				}
+				else{
+				//	console.log(dn.constructor.name);
+				//	console.log(dn.parent.layout);
+				//	console.log(dn.parent.orientation);
+				//	console.log(dn.constructor.name);
+			//		debugger;
+				}
+			}
+			
+			this.dirtyNodes = [];
+			
 			
 			this.device.setTargetFrame()
 			this.drawColor();
@@ -582,7 +586,7 @@ this.draw_calls = 0
 	this.addDirtyNode =function(node){
 		this.dirtyNodes.push(node);	
 		node.dirtynode = true;
-		this.bubbleDirty();
+		node.bubbleDirty();
 	}
 	
 	this.dirtyrects = [];
@@ -599,7 +603,7 @@ this.draw_calls = 0
 	}
 	
 	
-	this.addDirtyRect = function(rect){				
+	this.addDirtyRect = function(rect, tag){				
 		// round to visible pixels.. round up.
 		var w = rect.right - rect.left;
 		var h = rect.bottom - rect.top;
@@ -638,16 +642,16 @@ this.draw_calls = 0
 		
 		if (this.dirtyrectset === true){	
 			//console.log("adding to existing dirtyrect: ", rect);	
-			this.totaldirtyrect.top = Math.min(this.totaldirtyrect.top, rect.top);
-			this.totaldirtyrect.bottom = Math.max(this.totaldirtyrect.bottom, rect.bottom);
-			this.totaldirtyrect.left = Math.min(this.totaldirtyrect.left, rect.left);
-			this.totaldirtyrect.right = Math.max(this.totaldirtyrect.right, rect.right);
+			this.totaldirtyrect.top = Math.min(this.totaldirtyrect.top, rrect.top);
+			this.totaldirtyrect.bottom = Math.max(this.totaldirtyrect.bottom, rrect.bottom);
+			this.totaldirtyrect.left = Math.min(this.totaldirtyrect.left, rrect.left);
+			this.totaldirtyrect.right = Math.max(this.totaldirtyrect.right, rrect.right);
 		}else{
 			//console.log("replacing existing dirtyrect: ", rect);	
-			this.totaldirtyrect = rect;
+			this.totaldirtyrect = rrect;
 		}
 		
-		//console.log("full dirty: ",this.totaldirtyrect);		
+		//console.log("full dirty: ",this.totaldirtyrect, tag);		
 		//if (this.totaldirtyrect.right > 1998) debugger;
 		this.dirtyrectset = true;
 	}

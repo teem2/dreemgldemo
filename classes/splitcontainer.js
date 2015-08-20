@@ -96,6 +96,10 @@ define.class(function(sprite,  view){
 					leftnode.flex = f1n* totf;
 					rightnode.flex = f2n* totf;
 				}
+				leftnode.setDirty(true);
+				leftnode.reLayout();
+				rightnode.reLayout();
+				rightnode.setDirty(true);
 				this.setDirty(true);
 			}.bind(this);
 

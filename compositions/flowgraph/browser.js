@@ -1,6 +1,11 @@
-define.browserClass(function(require,screen, cadgrid, menubar, menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
+define.browserClass(function(require,screen, cadgrid, menubar,scrollcontainer, menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 
 
+
+	var connector = view.extend(function connector(){
+		
+		
+	})
 
 	var blokje = view.extend(function blokje(){
 
@@ -22,8 +27,12 @@ define.browserClass(function(require,screen, cadgrid, menubar, menuitem, view, e
 				view({ bgcolor: "#ffff80", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4},
 					text({text: this.name, bgcolor: "transparent", fgcolor: "black"})
 				),
-				view({width: 200, height: 100,bgcolor: "#ffff80", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));}})
-				]
+				view({bgcolor: "#ffff80", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));}}
+						,button({text:"button 1"})
+						,button({text:"button 2"})
+						,button({text:"button 3"})
+						,button({text:"button 4"})
+				)]
 		}
 	})
 	
@@ -54,7 +63,7 @@ define.browserClass(function(require,screen, cadgrid, menubar, menuitem, view, e
 				)
 				,splitcontainer({name:"mainsplitter", vertical: false}
 					,treeview({flex:0.2})
-					,view({flex: 0.8}
+					,scrollcontainer({flex: 0.8}
 						,cadgrid({}
 							,blokje({x:20, y:20, name: "Blokje 1!"})
 							,blokje({x:620, y:250, name: "Blokje 2!"})
