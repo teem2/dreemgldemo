@@ -32,13 +32,14 @@ define.class(function(sprite,  view, button){
 	this.flexdirection = this.vertical?"column":"row" ;
 	this.position = "relative" ;
 	this.flexdirection = "column"
+	
 	this.vertical = function(){
 		this.flexdirection = this.vertical?"row":"column" ;
 	}
+	
 	this.render = function(){		
 		var myparent = this;
-		if (this.instance_children.length > 1){
-			
+		if (this.instance_children.length > 1){		
 			this.bar =[ view({flexdirection:"row", bgcolor: "#f0f0f0", borderwidth:1, cornerradius: 0, bordercolor: "#c0c0c0"  },this.instance_children.map(
 				function(m,id)
 					{						
