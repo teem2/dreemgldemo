@@ -714,7 +714,7 @@ this.draw_calls = 0
 		this.utilityrectangle = other.utilityrectangle
 		this.debugrectangle = other.debugrectangle
 		this.utilityframe = other.utilityframe
-		//this.modal_stack = []//other.modal_stack
+		this.modal_stack = []//other.modal_stack
 		this.initVars()
 		this.bindInputs()
 
