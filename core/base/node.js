@@ -320,7 +320,7 @@ define.class(function(require, constructor){
 			setter = function(value){
 				if(this[set_key] !== undefined) value = this[set_key](value)
 				if(typeof value === 'function') return this[value.isWired? wiredfn_key: on_key] = value
-
+				if(typeof value === 'object' && value !== null && value.atAttributeAssign) value.atAttributeAssign(this, key)
 				if(!this.hasOwnProperty(storage_key)){
 					var store = this[storage_key]
 					store = this[storage_key] = store.struct(store)
@@ -350,6 +350,7 @@ define.class(function(require, constructor){
 			setter = function(value){
 				if(this[set_key] !== undefined) value = this[set_key](value)
 				if(typeof value === 'function') return this[value.isWired? wiredfn_key: on_key] = value
+				if(typeof value === 'object' && value !== null && value.atAttributeAssign) value.atAttributeAssign(this, key)
 
 				var config = this[config_key]
 				value = config.type(value)
@@ -366,6 +367,7 @@ define.class(function(require, constructor){
 			setter = function(value){
 				if(this[set_key] !== undefined) value = this[set_key](value)
 				if(typeof value === 'function') return this[value.isWired? wiredfn_key: on_key] = value
+				if(typeof value === 'object' && value !== null && value.atAttributeAssign) value.atAttributeAssign(this, key)
 				
 				var config = this[config_key]
 

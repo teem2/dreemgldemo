@@ -5,8 +5,12 @@ define.class(function(sprite, view, button, text,screenoverlay){
 
 	this.menuclick = function(){
 		// ok now we have to do a modal view of our instance_children
-		br = this.getBoundingRect();
-		
+		if(this.select){
+			this.select()
+			this.screen.closeModal()
+			return
+		}
+		var br = this.getBoundingRect();
 		this.screen.openModal(
 			view({x:br.left, y:br.bottom, miss:function(){
 				this.screen.closeModal(-1)

@@ -1,9 +1,46 @@
-define.browserClass(function(require,screen, cadgrid, menubar,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
+define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 
 	this.title = "Flowgraph Builder"
 
-	
-	var dataset = {
+	var container = node.extend(function(){
+
+		this.atConstructor = function(){
+			this.undo_stack = []
+			this.redo_stack = []
+			this.connected_objects = []
+			this.data = this.constructor_props
+			console.log(this)
+		}
+
+		this.atAttributeAssign = function(obj, key){
+			this.connected_objects.push({obj:obj, key:key})
+		}
+
+		this.fork = function(callback){
+			this.undo_stack.push(JSON.stringify(this.data))
+			this.redo_stack.length = 0
+			callback(this.data)
+			// cause objects that have us assigned to reload
+			for(var i = 0; i < this.connected_objects; i++){
+				var o = this.connected_objects[i]
+				o.obj[o.key] = this
+			}
+		}
+
+		this.undo = function(){
+			if(!this.undo_stack.length) return
+			this.redo_stack.push(JSON.stringify(this.data))
+			this.data = JSON.parse(this.undo_stack.pop())
+		}
+
+		this.redo = function(){
+			if(!this.redo_stack.length) return
+			this.undo_stack.push(JSON.stringify(this.data))
+			this.data = JSON.parse(this.redo_stack.pop())
+		}
+	})
+
+	var dataset = container({
 		screens:[
 			{name: "Browser", basecolor: vec4("#ffff60"), linkables:[
 				{name:"dataset", type: "list", input: true},
@@ -24,11 +61,10 @@ define.browserClass(function(require,screen, cadgrid, menubar,scrollcontainer,me
 			{to: {node:"Browser", attribute: "spacing"}, from:{node:"Remote", attribute: "xslider"}},
 			{to: {node:"Browser", attribute: "scale"}, from:{node:"Remote", attribute: "yslider"}}		
 		]
-	}
-	
+	})
+
+
 	var connector = view.extend(function connector(){
-		
-		
 	})
 
 	var blokje = view.extend(function blokje(){
@@ -131,10 +167,15 @@ define.browserClass(function(require,screen, cadgrid, menubar,scrollcontainer,me
 						}
 					)
 					,scrollcontainer({flex: 0.8}
-						,cadgrid({}, dataset.screens.map(function(d,i){
-								return blokje({x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor})
-								;}
-							)
+						,cadgrid({
+							dataset: dataset,
+							render: function(){
+								
+								return this.dataset.data.screens.map(function(d,i){
+									return blokje({x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor})
+									;}
+								)
+						}}
 						)
 					)
 				)
