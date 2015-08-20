@@ -47,6 +47,9 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		}
 
 		renderer.renderDiff(this.screen, parent, previous && previous.screen, globals)
+
+		if(this.screen.title !== undefined) document.title = this.screen.title 
+
 				
 		if(previous) this.screen.setDirty(true)
 

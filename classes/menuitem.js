@@ -5,7 +5,7 @@ define.class(function(sprite, view, button, text){
 
 	this.myclick = function(){
 		// ok now we have to do a modal view of our instance_children
-
+		
 	}
 
 	this.render = function(){
