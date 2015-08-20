@@ -81,6 +81,7 @@ define.class(function(sprite, text, view, button){
 			return [text({text: this.text, bgcolor: "transparent", fgcolor: "black", fontsize: 16, fgcolor: "#404040", margin: 2})];
 		}
 	})
+
 	var treeitem = view.extend(function (){
 		this.flex = 1.0;
 		
@@ -90,6 +91,7 @@ define.class(function(sprite, text, view, button){
 		this.attribute("bgcolor", {type:vec4, value:vec4("transparent")});
 		this.attribute("fgcolor", {type:vec4, value:vec4("black")});
 		this.attribute("fontsize", {type:float, value:12});
+
 		this.flexdirection = "row" ;
 		this.position = "relative";
 		this.toggle = function(){
@@ -107,26 +109,57 @@ define.class(function(sprite, text, view, button){
 		
 			this.collapsed;
 			
-			return [view({flexdirection:"column", flexwrap:"none",flex:1},
-							[itemheading({click: this.toggle.bind(this), text:this.item.name }),
-								(this.item.collapsed==false)?
-								view({bgcolor:"transparent",flexdirection:"row" },
-											view({width:1,marginleft: 10,marginright: 10, bgcolor: "#c0c0c0" }), 
-											view({bgcolor:"transparent",  flexdirection:"column" , flex:1},
-													this.item.children?
-													this.item.children.map(function(m){return treeitem({item: m})})
-													:[]
-													))
-											:[]
-										])];	
+			return [view({flexdirection:"row", flexwrap:"none",flex:1},
+				[
+				
+				view({bgcolor:"transparent",flexdirection:"column" },
+					itemheading({click: this.toggle.bind(this), text:this.item.name }),
+					this.item.collapsed==false?
+						view({bgcolor:"transparent",flexdirection:"row" },
+							view({bgcolor:"transparent",  flexdirection:"column" , flex:1},
+								this.item.children?
+								this.item.children.map(function(m, i, array){return [
+									view({bgcolor:"transparent",flexdirection:"row" },
+										treeline({width:20,'bg.last':i === array.length - 1?1:0, marginleft: 0,marginright: 0, bgcolor: "#c0c0c0" }), 
+										treeitem({item: m})
+									)
+									]})
+								:[]
+							)
+						)
+					:[]
+				)
+			])]
 		}
-	});
+	})
 	
+	var treeline = view.extend(function(){
+		this.bg.fgcolor = vec4(0.,0.,0.,1.)
+		this.bg.last = 0
+		this.bg.color = function(){
+			//var rel = mesh.xy//cursor_pos
+			//var dpdx = dFdx(rel)
+			//var dpdy = dFdy(rel)
+			//var edge = min(length(vec2(length(dpdx), length(dpdy))) * SQRT_1_2, 1.)
+			var pos = mesh.xy * vec2(width, height)
+			var center = 15
+			var left = 7
+			var field = shape.union(shape.box(pos, left,0,1,height * (1-last) + center * last),
+				shape.box(pos, left,center,width,1))
+			var edge = 1.
+
+			return vec4(fgcolor.rgb, smoothstep(edge, -edge, field))
+		}
+
+		this.atDraw = function(){
+
+		}
+	})
 	
-	this.bordercolor= vec4("gray");
-	this.cornerradius=0;
-	this.borderwidth=2;
-	this.padding= 4;
+	this.bordercolor = vec4("gray");
+	this.cornerradius = 0;
+	this.borderwidth = 2;
+	this.padding = 4;
 	this.margin = 4;
 	this.clipping = true;
 	this.bgcolor = vec4("white");
