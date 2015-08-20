@@ -12,18 +12,22 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 		}
 
 		this.atAttributeAssign = function(obj, key){
+			
 			this.connected_objects.push({obj:obj, key:key})
+			console.log("connected objects", this.connected_objects);
 		}
 
 		this.fork = function(callback){
 			this.undo_stack.push(JSON.stringify(this.data))
 			this.redo_stack.length = 0
+			console.log("fork!", this.data);
 			callback(this.data)
 			// cause objects that have us assigned to reload
-			for(var i = 0; i < this.connected_objects; i++){
+			for(var i = 0; i < this.connected_objects.length; i++){
 				var o = this.connected_objects[i]
 				o.obj[o.key] = this
 			}
+			
 		}
 
 		this.undo = function(){
@@ -65,6 +69,16 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 	var connector = view.extend(function connector(){
 	})
 
+	var blokjesgrid = cadgrid.extend(function blokjesgrid(){
+		this.attribute("dataset", {type: Object, value: {}});
+		this.render = function(){
+			console.log("rendering blokjesgrid");
+			return this.dataset.data.screens.map(function(d,i){
+				return blokje({x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor});
+			})
+		}
+	})
+	
 	var blokje = view.extend(function blokje(){
 
 		this.position = "absolute" ;
@@ -165,25 +179,19 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 						}
 					)
 					,scrollcontainer({flex: 0.8}
-							,view({flexdirection: "column" },menubar({}
-							,menuitem({text: "new block", click:function(){
-								console.log("click!");
-								dataset.modify(function(data){
-									data.screens.push({name:"new screen"})
+						,view({flexdirection: "column" },
+							menubar({}
+								,menuitem({text: "new block", click:function(){
 									
-								}  )
+										dataset.fork(function(data){
+										
+										data.screens.push({name:"new screen"})
+									
+								})
 							}})
+							)
+							,blokjesgrid({dataset: dataset})
 						)
-						,cadgrid({
-							dataset: dataset,
-							render: function(){
-								
-								return this.dataset.data.screens.map(function(d,i){
-									return blokje({x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor})
-									;}
-								)
-						}}
-						))
 					)
 				)
 			)
