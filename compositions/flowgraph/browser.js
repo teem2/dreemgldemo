@@ -1,6 +1,5 @@
-define.browserClass(function(require, menubar, menuitem,screen, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
+define.browserClass(function(require,screen, cadgrid, menubar, menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 	this.render = function(){
-
 		return[
 			view({name:"toplevel",flexdirection: "column", bgcolor: "darkgray" , flex:1}
 				,view({name:"menubarholder", bgcolor:"lightgray"}
@@ -26,10 +25,12 @@ define.browserClass(function(require, menubar, menuitem,screen, view, edit, text
 				)
 				,splitcontainer({name:"mainsplitter", vertical: false}
 					,treeview({flex:0.2})
-					,view({flex: 0.8})
+					,view({flex: 0.8}
+						,cadgrid({})
+					)
 				)
 			)
-		]}
+	]}
 });
 
 
