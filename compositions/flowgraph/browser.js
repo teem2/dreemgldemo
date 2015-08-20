@@ -1,4 +1,4 @@
-define.browserClass(function(require,screen, cadgrid, menubar,scrollcontainer, shadowbox,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
+define.browserClass(function(require,screen, cadgrid, menubar,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 
 	this.title = "Flowgraph Builder"
 
