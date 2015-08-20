@@ -2,10 +2,14 @@
 
 define.class(function(sprite, view, button, text){
 	this.bgcolor = vec4("lightgray");
-	this.click = function(){
-		
+
+	this.myclick = function(){
+		// ok now we have to do a modal view of our instance_children
+
 	}
+
 	this.render = function(){
-		return button({text: this.text, fgcolor: "black", margin: 5, bgcolor:"transparent", click:this.click.bind(this) })
+		return button({borderwidth: 0, padding: 4,bordercolor:"transparent" , click:this.myclick.bind(this), buttoncolor1:vec4(1,1,1,0.0),buttoncolor2:vec4(1,1,1,0.0),pressedcolor1:vec4(0,0,0,0.14), pressedcolor2:vec4(0,0,0,0.05),  hovercolor1:vec4(1,1,1,0.3),  hovercolor2:vec4(1,1,1,0.3), cornerradius: 0, text: this.text, fgcolor: "black", margin: 5, bgcolor:"transparent"})
+		//return button({text: this.text, fgcolor: "black", margin: 5, bgcolor:"transparent", click:this.myclick.bind(this) })
 	}
 })
