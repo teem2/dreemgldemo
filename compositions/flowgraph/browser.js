@@ -83,6 +83,7 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,scrollcontai
 
 		this.position = "absolute" ;
 		this.attribute("basecolor", {type: vec4, value: "green"});
+
 		this.mouseleftdown = function(){
 			this.start = {mousex:this.mouse.x, mousey:this.mouse.y,startx: this.x, starty: this.y}
 			this.mousemove = function(){
