@@ -315,7 +315,7 @@
 			}
 			else{
 				// lets make an fnname based on our callstack
-				if(body.name) fnname = body.name
+				if(body && body.name) fnname = body.name
 				else{
 					var origin = new Error().stack.split(/\n/)[3].match(/\/([a-zA-Z0-9\.]+)\:(\d+)\:\d+\)/)
 					if(!origin || origin[1] === 'define.js'){
