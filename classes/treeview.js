@@ -216,7 +216,6 @@ define.class(function(sprite, text, view, button, icon){
 	
 	this.render = function(){
 		
-		console.dir(this.data);
 		return [treeitem({item:this.data})]
 	}
 })

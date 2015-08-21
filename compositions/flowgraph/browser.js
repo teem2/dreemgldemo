@@ -1,4 +1,4 @@
-define.browserClass(function(require,screen, node, cadgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
+define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 
 	this.title = "Flowgraph Builder"
 
@@ -93,20 +93,105 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,screenoverla
 		],
 		connections:[
 			{to: {node:"Browser", attribute: "spacing"}, from:{node:"Remote", attribute: "xslider"}},
-			{to: {node:"Browser", attribute: "scale"}, from:{node:"Remote", attribute: "yslider"}}		
+			{to: {node:"TV", attribute: "scale"}, from:{node:"Remote", attribute: "yslider"}}		,
+			{to: {node:"Phone", attribute: "scale"}, from:{node:"TV", attribute: "yslider"}}		
 		]
 	})
 
-	var connector = view.extend(function connector(){
-	})
-
+	var connection = spline.extend(function connection(){
+		this.attribute("from", {type: Object});
+		this.attribute("to", {type: Object});
+		this.position = "absolute" 
+		this.linewidth = 10;
+		this.init = function(){
+			this.update();
+		}
+		
+		this.linecolor = vec4("black");
+		
+		this.update = function(){
+			console.log(this.from.name, this.to.name);
+			this.linecolor1 = this.from.basecolor;
+			this.linecolor2 = this.to.basecolor;
+			var br1 = this.from.lastdrawnboundingrect;
+			var w = br1.right - br1.left;
+			var fx = this.from._x;
+			var fy = this.from._y + 8;
+			var tx = this.to._x;
+			var ty = this.to._y + 8;
+			this.p0 = vec2(fx + w, fy);
+			this.p1 = vec2(fx+ w +100, fy );
+			this.p2 = vec2(tx-100,  ty);
+			this.p3 = vec2(tx, ty);
+		
+			var minx = this.p0[0];var maxx = minx;
+			if (this.p1[0] < minx) minx = this.p1[0];else if (this.p1[0]>maxx) maxx = this.p1[0];
+			if (this.p2[0] < minx) minx = this.p2[0];else if (this.p2[0]>maxx) maxx = this.p2[0];
+			if (this.p3[0] < minx) minx = this.p3[0];else if (this.p3[0]>maxx) maxx = this.p3[0];
+			
+			var miny = this.p0[1];var maxy = miny;
+			if (this.p1[1] < miny) miny = this.p1[1];else if (this.p1[1]>maxy) maxy = this.p1[1];
+			if (this.p2[1] < miny) miny = this.p2[1];else if (this.p2[1]>maxy) maxy = this.p2[1];
+			if (this.p3[1] < miny) miny = this.p3[1];else if (this.p3[1]>maxy) maxy = this.p3[1];
+			
+		//	console.log(minx, miny, maxx, maxy);
+			
+			this.pos = vec2(minx-11, miny-11);
+			this.size = vec3(maxx-minx + 22, maxy-miny +22);
+			this.off = vec4(minx-11,miny-11,0,0);
+			
+			this.setDirty();
+		}
+		
+		this.arender = function(){
+			return [button({text:"x"})]
+		}
+	});
+	
 	var blokjesgrid = cadgrid.extend(function blokjesgrid(){
 		this.attribute("dataset", {type: Object, value: {}});
-		this.render = function(){
-			return this.dataset.data.screens.map(function(d,i){
-				return blokje({x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor? d.basecolor:vec4("purple") });
-			})
+		this.connections = [];
+		
+		this.updateConnections = function(name, pos){
+			for (var i in this.connections)
+			{
+				var c = this.connections[i];
+				if (c.to.name === name || c.from.name === name) c.update();
+			}
+			
 		}
+		this.render = function(){
+			
+			
+			var blokjes = {};
+				var all = [];			
+			var connecties = {};
+			var i = 0;
+			for(a in this.dataset.data.screens)
+			{
+				
+				var d = this.dataset.data.screens[a];
+				blokjes[d.name] = blokje({x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor? d.basecolor:vec4("purple") });
+				i++;
+				
+				all.push(blokjes[d.name]);
+				
+			}
+			this.connections = []
+			for(a in this.dataset.data.connections)
+			{
+				var c = this.dataset.data.connections[a];
+				var b1 = blokjes[c.from.node];
+				var b2 = blokjes[c.to.node];
+				if (b1 && b2)
+				{
+					var newcon = connection({from: b1, to: b2});
+					this.connections.push(newcon);
+					all.push(newcon);
+				}
+			}
+			return all;
+		}	
 	})
 	
 	var blokje = view.extend(function blokje(){
@@ -120,13 +205,17 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,screenoverla
 				var dy = this.mouse.y - this.start.mousey;
 				
 				this.pos = vec2(this.start.startx + dx, this.start.starty + dy);
+				this.parent.updateConnections(this.name, this.pos);
 			
+			}
+			this.mouseleftup = function(){
+				this.mousemove = function(){};
+				this.parent.updateConnections(this.name, this.pos);
+				this.mouseleftup = function(){};
 			}
 		}
 		
-		this.mouseleftup = function(){
-			this.mousemove = function(){};
-		}
+	
 		
 		this.bgcolor = vec4("#ffff60")
 		this.bg.basecolor = vec4();
@@ -201,14 +290,12 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,screenoverla
 						dataset: dataset,
 						buildtree: function(data)
 							{
-								console.log(data)
 								return { 
 									name:"Composition", children:
 										[{name:"Screens" , children: 
 												data.screens.map(function(d) {
-												console.log(d);
+												
 												return {name: d.name, children: d.linkables?d.linkables.map(function(c){
-													console.log(c);
 													return {name: c.name}
 												}):[]
 										}}

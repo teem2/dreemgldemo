@@ -1,27 +1,37 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Sprite class
+define.class(function(sprite, text, view, button, icon){
 
-define.class('$renderer/sprite_$rendermode', function(self){
-
-	self.attribute("linewidth", {type: float, value: 5});
-	self.attribute("linecolor", {type: vec4, value: vec4(1,1,0,1)});
+	this.attribute("linewidth", {type: float, value: 5});
+	this.attribute("linecolor1", {type: vec4, value: vec4(1,1,0,1)});
+	this.attribute("linecolor2", {type: vec4, value: vec4(1,1,0,1)});
 	
-	self.attribute("p1", {type: vec2, value: vec2(100,0)});
-	self.attribute("p2", {type: vec2, value: vec2(0,100)});
-	self.attribute("p3", {type: vec2, value: vec2(100,100)});
+	this.attribute("p0", {type: vec2, value: vec2(100,0)});
+	this.attribute("p1", {type: vec2, value: vec2(100,0)});
+	this.attribute("p2", {type: vec2, value: vec2(0,100)});
+	this.attribute("p3", {type: vec2, value: vec2(100,100)});
+	this.attribute("off", {type: vec4, value: vec2(0,0,0,0)});
 
-	self.bg.draw_type = 'TRIANGLE_STRIP'
+	this.bg.draw_type = 'TRIANGLE_STRIP'
 	
-	self.bg.time = 0
-	self.bg.linewidth = 10;
-	self.bg.p0 = vec2(0,0);
-	self.bg.p1 = vec2(100,0);
-	self.bg.p2 = vec2(0,100);
-	self.bg.p3 = vec2(100,100);
-	self.bg.linecolor = vec4(1,1,1,1);
-
-	self.bg.color = function(){
-		var hm = sin(mesh.side*PI)
+	this.bg.time = 0
+	this.bg.linewidth = 10;
+	this.bg.off = vec4(0);
+	this.bg.p0 = vec2(0,0);
+	this.bg.p1 = vec2(100,0);
+	this.bg.p2 = vec2(0,100);
+	this.bg.p3 = vec2(100,100);
+	this.bg.linecolor = vec4(1,1,1,1);	
+	this.bg.fromcol = vec4("red");
+	this.bg.tocol = vec4("blue");
+	
+	this.bg.color = function(){
+		
+		var hm = sin(mesh.side*PI+ PI/2)
+		
+		var col = mix(fromcol, tocol, mesh.pos) * (1 + sin(mesh.pos * PI)*0.2);
+		return vec4(col.rgb * pow(hm, 2.0), col.a * hm);
+		
 		var norm = vec2(dFdx(hm),  dFdy(hm))
 		norm = math.rotate2d(norm, -time+timephase)
 		var lightdot = dot(norm, gl_FragCoord.xy*0.015) 
@@ -38,15 +48,15 @@ define.class('$renderer/sprite_$rendermode', function(self){
 		return linecolor * mix(mix(vec4(1.0,1.0,1.0,1.0),vec4(0.4,0.4,0.4,1.0 ), sw), vec4(1.0,1.0,1.0,1.0),1.- cos(mesh.side*3.1415));
 	}
 
-	self.bg.shapefn = function(v){
+	this.bg.shapefn = function(v){
 		return (sin(v)*.75+0.75)
 	}
-	//self.bg.dump = 1
-	self.bg.scale = function(){
+	//this.bg.dump = 1
+	this.bg.scale = function(){
 		return 4.5
 	}
 
-	self.bg.color3 = function(){
+	this.bg.color3 = function(){
 		var flowxy= vec2(bezierlen, mesh.side)
 		var slide = bezierlen*2.+4*time 
 		var flow1 = (shapefn(slide)+1.)*0.25-.35
@@ -69,9 +79,9 @@ define.class('$renderer/sprite_$rendermode', function(self){
 		return col
 	}
 
-	self.bg.timedir = 1.0
-	self.bg.timephase = 0.
-	self.bg.color3 = function(){
+	this.bg.timedir = 1.0
+	this.bg.timephase = 0.
+	this.bg.color3 = function(){
 		var flowxy= vec2(bezierlen*0.8, mesh.side)
 		var slide = bezierlen-4. * time * timedir + timephase * PI2
 		var flow1 = (shapefn(slide)+1.)*0.25-.35
@@ -92,11 +102,11 @@ define.class('$renderer/sprite_$rendermode', function(self){
 		if(hm<0.) col.a = 1.+16.*hm
 		return col
 	}
-	//self.bg.dump = 1
-	self.bg.position = function(){
-		var npos = math.bezier2d(p0, p1, p2, p3, mesh.pos);
+	//this.bg.dump = 1
+	this.bg.position = function(){
+		var npos = math.bezier2d(p0, p1, p2, p3, mesh.pos) - off;
 
-		var last = math.bezier2d(p0, p1, p2, p3, 0.)
+		var last = math.bezier2d(p0, p1, p2, p3, 0.) - off;
 		bezierlen = 0.
 		var step = int(mesh.pos * 100.)
 		for(var i = 1; i < 100; i++){
@@ -111,34 +121,36 @@ define.class('$renderer/sprite_$rendermode', function(self){
 		var ry = (npos.y + mesh.side * npos.z * linewidth);
 
 
-		return vec4(rx,ry, 0, 1) * matrix
+		return vec4(rx,ry, 0, 1) * matrix  * viewmatrix
 	}
 	
-	self.atDraw = function(){
+	this.atDraw = function(){
 		this.bg.time = (Date.now() - this.time_start)*0.001
 		this.bg.linewidth = this.linewidth;
-		this.bg.linecolor = this.linecolor;
-		this.bg.p0 = vec2(0, 0);
+		this.bg.fromcol = this.linecolor1;
+		this.bg.tocol = this.linecolor2;
+		this.bg.p0 = this.p0;
 		this.bg.p1 = this.p1;
 		this.bg.p2 = this.p2;
 		this.bg.p3 = this.p3;
+		this.bg.off = this.off;
 		
+		//console.log(this.p0, this.p1, this.p2, this.p3, this.off);
 	//	this.dirty = true
 	}
 	// ok lets do some awesome geometry
 
-	self.vertexstruct = define.struct({
+	this.vertexstruct = define.struct({
 		pos: float,
 		cap: float,
 		side: float
 	})
 	
-	self.bg.mesh = self.vertexstruct.array();
+	this.bg.mesh = this.vertexstruct.array();
 
-	self.init = function(){
+	this.init = function(){
 		this.time_start = Date.now()
-		this.bg.mesh = this.vertexstruct.array();
-		
+
 		var strip = this.bg.mesh
 		strip.length = 0
 		var steps = 100
