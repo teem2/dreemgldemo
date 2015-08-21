@@ -557,9 +557,10 @@ this.draw_calls = 0
 			
 			
 			this.device.setTargetFrame()
+			this.dirty = false
+
 			this.drawColor();
 			
-			this.dirty = false
 			if (this.dirtyrectset){
 					this.lastdrawnboundingrect = this.totaldirtyrect;
 			}else{
@@ -713,7 +714,7 @@ this.draw_calls = 0
 		this.utilityrectangle = other.utilityrectangle
 		this.debugrectangle = other.debugrectangle
 		this.utilityframe = other.utilityframe
-		this.modal_stack = other.modal_stack
+		this.modal_stack = []//other.modal_stack
 		this.initVars()
 		this.bindInputs()
 

@@ -507,7 +507,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 			fg.screen = this.screen
 			bg.screen = this.screen
-
+this.dirty = false;
 			if(renderstate.drawmode === 2){
 				var type = bg.drawDebug(this.screen.device)
 				if(type) renderstate.debugtypes.push(type)
@@ -528,6 +528,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				this.doDrawGuid(renderstate)
 			}
 			else{
+				
 				this.doDraw(renderstate)
 			}
 		} 
@@ -535,7 +536,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			console.log("Drawing cached content");
 			this.renderQuad(textureID, this.getBoundingRect());
 		}
-		this.dirty = false;
+		//this.dirty = false;
 		return true;
 	}
 	
