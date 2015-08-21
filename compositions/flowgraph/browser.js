@@ -182,15 +182,17 @@ define.browserClass(function(require,screen, node, cadgrid, menubar,screenoverla
 							,menuitem({text: "Options"})		
 						)
 						,menuitem({text: "Help"}
-									,menuitem({text: "Manual"})
-									,menuitem({text: "About", click: function(){
-									this.screen.openModal(screenoverlay({}
-										,view({flexdirection: "column"},view({flexdirection: "row"},
-										text({text: "ABOUT", fontsize: 40, fgcolor: "white", bgcolor: "transparent"}) 
-										) )
-										));
-										console.log("HI")
-									}})
+							,menuitem({text: "Manual"})
+							,menuitem({text: "About", click: function(){
+								this.screen.openModal(screenoverlay({click:function(){this.screen.closeModal()}}
+									,view({flexdirection: "column", flex: 1, bgcolor: "transparent"},view({flexdirection: "row", flex: 1, bgcolor: "transparent", alignself:"center"},												
+										view({flexdirection: "column", bordercolor: "black" ,bgcolor: vec4(0,0,0,0.3), alignself:  "center" },
+											text({text: "About Teem Flowgraph Editor", fontsize: 30, margin: 10, fgcolor: "white", bgcolor: "transparent", alignself:"center"}) ,
+											view({bgcolor:"#202020", padding: 20}, text({fontsize: 20, text:"this is a multiline thing\nthat explains what the hell this is all about", bgcolor:"transparent" }))
+										)
+									))
+								));
+							}})
 						)
 					)					
 				)
