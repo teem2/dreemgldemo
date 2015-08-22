@@ -62,24 +62,24 @@ define.class(function(sprite, text, view, icon){
 		this.drawcount ++;
 	//	console.log("atdraw button", this.drawcount);
 		if (this.pressed > 0){
-			this.bg.col2 = this.pressedcolor2;
-			this.bg.col1 = this.pressedcolor1;
-			this.buttonres.fgcolor = this.labelactivecolor;		
+			this.bg.col2 = this._pressedcolor2;
+			this.bg.col1 = this._pressedcolor1;
+			this.buttonres.fgcolor = this._labelactivecolor;		
 			
-				if (this.iconres) this.iconres.fgcolor = this.labelactivecolor;
+				if (this.iconres) this.iconres.fgcolor = this._labelactivecolor;
 		}
 		else{
 			if (this.hovered > 0){
-				this.bg.col2 = this.hovercolor2;
-				this.bg.col1 = this.hovercolor1;
-				this.buttonres.fgcolor = this.labelactivecolor;
-				if (this.iconres) this.iconres.fgcolor = this.labelactivecolor;
+				this.bg.col2 = this._hovercolor2;
+				this.bg.col1 = this._hovercolor1;
+				this.buttonres.fgcolor = this._labelactivecolor;
+				if (this.iconres) this.iconres.fgcolor = this._labelactivecolor;
 			}
 			else{
-				this.buttonres.fgcolor = this.labelcolor;
-				if (this.iconres) this.iconres.fgcolor = this.labelcolor;
-				this.bg.col2 = this.buttoncolor2;
-				this.bg.col1 = this.buttoncolor1;
+				this.buttonres.fgcolor = this._labelcolor;
+				if (this.iconres) this.iconres.fgcolor = this._labelcolor;
+				this.bg.col2 = this._buttoncolor2;
+				this.bg.col1 = this._buttoncolor1;
 			}
 		}
 	}

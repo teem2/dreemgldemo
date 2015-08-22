@@ -1,4 +1,4 @@
-define.browserClass(function(require, screen, view){
+define.browser(function(require, screen, view){
 	
 	var thing2 = view.extend(function(){
 		this.bg.color = function(){

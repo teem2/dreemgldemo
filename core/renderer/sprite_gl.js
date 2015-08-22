@@ -325,10 +325,10 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		}
 
 		if (this.hasListeners('click') || this.hasListeners('mouseleftdown') || this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| this.hasListeners('mouseup') || this.hasListeners('mousemove') ||this.hasListeners('scroll')){
-			this.effectiveguid = this.interfaceguid;
+			this.has_mouse_interaction = true
 		}
 		else{
-			this.effectiveguid = this.parent.effectiveguid;
+			this.has_mouse_interaction = false
 		}
 
 		//this.shader = new this.Shader()
@@ -415,8 +415,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 
 	this.doDraw = function(renderstate){
-		this.bg.time = this.screen.time
-		this.fg.time = this.screen.time
+		this.bg._time = this.screen.time
+		this.fg._time = this.screen.time
 
 		this.bg.draw(this.screen.device)
 		this.fg.draw(this.screen.device)
@@ -441,14 +441,14 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			bg._viewmatrix = renderstate.viewmatrix;
 			fg._viewmatrix = renderstate.viewmatrix;
 			
-						var bound = this.getBoundingRect();
+			var bound = this.getBoundingRect();
 
 			this.lastdrawnboundingrect.left = bound.left;
 			this.lastdrawnboundingrect.right = bound.right;
 			this.lastdrawnboundingrect.top = bound.top;
 			this.lastdrawnboundingrect.bottom = bound.bottom;
 
-		if (this.texturecache == false || this.texturecache == true && this.dirty){
+		if (this._texturecache == false || this._texturecache == true && this.dirty){
 			// idea reference outer node using shader.node
 			// and 
 			if (this.matrixdirty) this.recomputeMatrix()
@@ -463,11 +463,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				this.bg._width = this._width
 				this.bg._height = this._height
 			}
-
-
-		
-			
-			if (this.texturecache == false)
+	
+			if (this._texturecache == false)
 			{
 						var myrect = rect(bound.left, bound.top, bound.right, bound.bottom);
 
@@ -515,7 +512,7 @@ this.dirty = false;
 				if(type) renderstate.debugtypes.push(type)
 			}
 			else if(renderstate.drawmode === 1){
-				if(this.hasListeners('click') || this.hasListeners('mouseleftdown') || this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| this.hasListeners('mouseup') || this.hasListeners('mousemove') ||this.hasListeners('scroll')){
+				if(this.has_mouse_interaction){
 					this.effectiveguid = this.interfaceguid;
 				}
 				else{
@@ -591,7 +588,7 @@ this.dirty = false;
 			this.orientation.worldmatrix = mat4.mul(this.orientation.matrix, renderstate.matrix);
 			renderstate.matrix = mat4.copy(this.orientation.worldmatrix);
 
-			var actuallyclipping = this._clipping == true || this.texturecache != false;
+			var actuallyclipping = this._clipping == true || this._texturecache != false;
 
 			if (actuallyclipping) renderstate.pushClip(this);
 
