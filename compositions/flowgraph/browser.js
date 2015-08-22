@@ -1,76 +1,41 @@
-define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
+define.browserClass(function(require,screen, node, container, spline, cadgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
+
+	var XmlParser = require('$parsers/htmlparser')
 
 	this.title = "Flowgraph Builder"
 
-	var container = node.extend(function(){
+	this.atConstructor = function(){
+		this.composition = location.hash.slice(1) || 'compositions/example/editor.dre'
+		this.dataset = container({
+			screens:[
+			],
+			connections:[
+			]
+		})
+	}
 
-		this.atConstructor = function(){
-			this.undo_stack = []
-			this.redo_stack = []
-			this.connected_objects = []
-			this.data = this.constructor_props
-		}
-
-		this.atAttributeAssign = function(obj, key){
-			for(var i = 0; i < this.connected_objects.length; i++){
-				var co = this.connected_objects[i];
-				if (co.obj === obj) return;
-			}
-			this.connected_objects.push({obj:obj, key:key})
-		}
-
-		this.fork = function(callback){
-			this.undo_stack.push(JSON.stringify(this.data))
-			this.redo_stack.length = 0
-			callback(this.data)
-			this.notifyAssignedAttributes();
-		}
-
-		// cause objects that have us assigned to reload
-		this.notifyAssignedAttributes = function(){
-			for(var i = 0; i < this.connected_objects.length; i++){
-				var o = this.connected_objects[i]
-				o.obj[o.key] = this
-			}
-		}
-		
-		
-		function recursiveCleanup(node){
-			if (typeof(node) === "object"){
-				if  (node.____struct){
-					var lookup  = define.typemap.types[node.____struct] ;
-					return lookup.apply(null, node.data);
+	this.init = function(){
+		this.teem.fileio.readfile('../dreem2/'+this.composition).then(function(result){
+			var parser = new XmlParser()
+			var xml = parser.parse(result)
+			var screens = XmlParser.childByTagName(xml, 'composition/screens')
+			this.dataset.fork(function(data){
+				for(var i = 0; i < screens.child.length; i++){
+					var scr = screens.child[i]
+					data.screens.push({name:scr.attr.name, basecolor:vec4('yellow'), linkables:
+						XmlParser.childrenByTagName(scr,'attribute').map(function(each){
+							return {
+								name: each.attr.name, 
+								type: each.attr.type, 
+								input: each.attr.input === 'true'
+							}
+						}.bind(this))
+					})
 				}
-				else{
-					for(key in node){
-						node[key] = recursiveCleanup(node[key]);
-					}				
-				}
-			}
-			
-			return node;
-		}
-		this.JSONParse = function(stringdata){
-			var data = JSON.parse(stringdata)
-			recursiveCleanup(data);
-			return data;
-		}
-		
-		this.undo = function(){
-			if(!this.undo_stack.length) return
-			this.redo_stack.push(JSON.stringify(this.data))
-			this.data = this.JSONParse(this.undo_stack.pop());
-			this.notifyAssignedAttributes();
-		}
-
-		this.redo = function(){
-			if(!this.redo_stack.length) return
-			this.undo_stack.push(JSON.stringify(this.data))
-			this.data = this.JSONParse(this.redo_stack.pop())
-			this.notifyAssignedAttributes();
-		}
-	})
-
+			})
+		}.bind(this))
+	}
+	/*
 	var dataset = container({
 		screens:[
 			{name: "Browser", basecolor: vec4("#ffff60"), linkables:[
@@ -93,7 +58,7 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 			{to: {node:"TV", attribute: "scale"}, from:{node:"Remote", attribute: "yslider"}}		,
 			{to: {node:"Phone", attribute: "scale"}, from:{node:"TV", attribute: "yslider"}}		
 		]
-	})
+	})*/
 
 	var connection = spline.extend(function connection(){
 		this.attribute("from", {type: Object});
@@ -275,8 +240,8 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 							,menuitem({text: "Copy"})
 							
 							,menuitem({text: "Paste"})
-							,menuitem({text: "Undo", click:function(){dataset.undo()}})
-							,menuitem({text: "Redo", click:function(){dataset.redo()}})
+							,menuitem({text: "Undo", click:function(){this.dataset.undo()}.bind(this)})
+							,menuitem({text: "Redo", click:function(){this.dataset.redo()}.bind(this)})
 							,menuitem({text: "Options"})		
 						)
 						,menuitem({text: "Help"}
@@ -296,7 +261,7 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 				)
 				,splitcontainer({name:"mainsplitter", vertical: false}
 					,treeview({flex:0.2, 
-						dataset: dataset,
+						dataset: this.dataset,
 						buildtree: function(data)
 							{
 								return { 
@@ -320,21 +285,17 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 						,view({flexdirection: "column" , flex:1},
 							menubar({}
 								,menuitem({text: "new block", click:function(){
-									
-										dataset.fork(function(data){
-										
+									this.dataset.fork(function(data){
 										data.screens.push({name:"new screen"})
-									
-								})
-								
-							}})
-								,menuitem({text: "Undo", click:function(){dataset.undo()}})
-								,menuitem({text: "Redo", click:function(){dataset.redo()}})
+									})
+								}.bind(this)})
+								,menuitem({text: "Undo", click:function(){this.dataset.undo()}.bind(this)})
+								,menuitem({text: "Redo", click:function(){this.dataset.redo()}.bind(this)})
 
 							)
-							,blokjesgrid({dataset: dataset})
+							,blokjesgrid({dataset: this.dataset})
 						))
-							,view({flex:1,mode:'DOM', src:'http://localhost:8080/compositions/example/editor.dre?edit=1'})
+							,view({flex:1,mode:'DOM', src:'http://127.0.0.1:8080/'+this.composition+'?edit=1'})
 				
 						
 					)

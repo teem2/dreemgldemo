@@ -290,6 +290,7 @@
 		function MyConstructor(){
 			// if called without new, just do a new
 			var obj = this
+
 			if(!(obj instanceof MyConstructor)){
 				obj = Object.create(MyConstructor.prototype)
 				Object.defineProperty(obj, 'constructor', {value:MyConstructor})
@@ -303,6 +304,7 @@
 			}
 
 			// call atConstructor if defined
+			if(MyConstructor.stubbed) return obj
 			if(obj._atConstructor) obj._atConstructor.apply(obj, arguments)
 			if(obj.atConstructor) obj.atConstructor.apply(obj, arguments)
 			return obj

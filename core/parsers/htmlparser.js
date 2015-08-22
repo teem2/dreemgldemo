@@ -40,6 +40,58 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
+	exports.childrenByTagName = function(node, name, res){
+		if(!res) res = []
+		if(node.child){
+			var idx = name.indexOf('/')
+			var rest
+			if(idx !== -1){
+				rest = name.slice(idx + 1)
+				name = name.slice(0, idx)
+			}
+			for(var i = 0, l = node.child.length; i<l; i++){
+				var sub = node.child[i]
+				if(sub.tag === name){
+					if(rest !== undefined){
+						exports.childrenByTagName(sub, rest, res)
+					}
+					else res.push(sub)
+				}
+			}
+		}
+		return res
+	}
+
+	exports.childByTagName = function(node, name){
+		if(node.child){
+			var idx = name.indexOf('/')
+			var rest
+			if(idx !== -1){
+				rest = name.slice(idx + 1)
+				name = name.slice(0, idx)
+			}
+			for(var i = 0, l = node.child.length; i<l; i++){
+				var sub = node.child[i]
+				if(sub.tag === name){
+					if(rest !== undefined){
+						return exports.childByTagName(sub, rest)
+					}
+					return sub
+				}
+			}
+		}
+	}
+
+	exports.childByAttribute = function(node, name, value){
+		for(var i = 0, l = node.child.length; i<l; i++){
+			var sub = node.child[i]
+			if(sub.attr && name in sub.attr){
+				if(value === undefined) return sub
+				else if(sub.attr[name] == value) return sub
+			}
+		}
+	}
+
 	self.__trace__  = 3
 
 	self.appendChild = function(node, value){
@@ -290,7 +342,7 @@ define.class(function(require, exports, self){
 							if(ch == 45 && source.charCodeAt(pos) == 45 &&
 									source.charCodeAt(pos + 1) == 62){
 								pos += 2
-								this.atComment(source.slice(start, pos - 3), start - 4, pos)
+								this.atComment(source.slice(start, pos - 3), start, pos)
 								break
 							}
 							else if(pos == len) this.atError("Unexpected end of files while reading <!--", start)

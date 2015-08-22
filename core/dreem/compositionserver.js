@@ -17,7 +17,7 @@ define.class(function(require){
 	this.atConstructor = function(
 		args, //Object: Process arguments
 		name, //String: name of the composition
-		teemserver ){ //TeemServer: teem server object
+		teemserver){ //TeemServer: teem server object
 
 		this.teemserver = teemserver
 	 	this.args = args
