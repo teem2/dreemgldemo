@@ -30,7 +30,7 @@ define.class(function(require, exports, module){
 					for(var key in new_version._state){
 						new_version[key] = old_version[key]
 					}
-
+					old_version.emit('destroy')
 				}
 			}
 		}
