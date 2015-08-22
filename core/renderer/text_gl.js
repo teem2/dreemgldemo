@@ -17,7 +17,6 @@ define.class('./sprite_gl', function(require, exports, self){
 	}
 
 	this.init = function(){
-		console.log("TEXT INIT", this.text)
 		if(this.font) this.font = glfontParser(this.font)
 	}
 
