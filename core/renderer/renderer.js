@@ -5,14 +5,14 @@ define.class(function(require, exports, module){
 
 	var Node = require('$base/node')
 
-	module.exports =  function(new_version, old_version, globals, skip_old, wireinits){
+	module.exports = function renderer(new_version, old_version, globals, skip_old, wireinits){
 		var init_wires = false
 		if(!wireinits){
 			wireinits = []
 			init_wires = true
 		}
 
-		var object
+		var object = new_version
 		var old_children
 
 		if(old_version){
@@ -20,15 +20,22 @@ define.class(function(require, exports, module){
 				// old_version is identical. lets reuse it.
 				object = old_version
 				old_children = object.children
+				// but use new versions instance children
+				old_version.instance_children = new_version.instance_children
 			}
 			else{ // we are going to use new_version. lets copy _state properties
+				console.log("New  version", new_version)
 				object = new_version
-				old_children = old_version.children
-				for(var key in new_version._state){
-					new_version[key] = old_version[key]
+				if(new_version !== old_version){
+					old_children = old_version.children
+					for(var key in new_version._state){
+						new_version[key] = old_version[key]
+					}
+
 				}
 			}
 		}
+
 		for(var key in globals){
 			object[key] = globals[key]
 		}
@@ -39,9 +46,9 @@ define.class(function(require, exports, module){
 			if(!this.hasListenerName(key, '__atAttributeGet')){
 				this[key] = function __atAttributeGet(){
 					// we need to call re-render on this
-					renderer.render(this, this, globals, true)
+					renderer(this, this, globals, true)
 					this.setDirty(true)
-					this.reLayout()
+					if(this.reLayout) this.reLayout()
 				}
 			}
 		}
@@ -60,23 +67,29 @@ define.class(function(require, exports, module){
 		var new_children = object.children
 
 		if(new_children) for(var i = 0; i < new_children.length; i++){
-			var child = new_children[i]
+			var new_child = new_children[i]
 
-			if(Array.isArray(child)){ // splice in the children
-				var args = Array.prototype.slice.call(child)
+			if(Array.isArray(new_child)){ // splice in the children
+				var args = Array.prototype.slice.call(new_child)
 				args.unshift(1)
 				args.unshift(i)
-				Array.prototype.splice.apply(object.children, args)
+				Array.prototype.splice.apply(new_children, args)
 				i-- // hop back one i so we repeat
 				continue
 			}
 
+			var old_child = undefined
+			if(old_children){
+				old_child = old_children[i]
+				if(old_child) old_child.parent = object
+			}
+			new_child.parent = object
 			// render new child
-			child = new_children[i] = renderer.render(new_children[i], old_children?old_children[i]:undefined, globals)
+			new_child = new_children[i] = renderer(new_child, old_child, globals)
 	
 			// set the childs name
-			var name = child.name || child.constructor.classname
-			if(name !== undefined && !(name in object)) object[name] = child
+			var name = new_child.name || new_child.constructor.classname
+			if(name !== undefined && !(name in object)) object[name] = new_child
 		}
 
 		if(init_wires){

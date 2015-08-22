@@ -220,7 +220,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			//console.log(this.layout)
 		}
 		else {
-			console.log("eh?");
 			var s = o.scale;
 			var r = o.rotation;
 			var t = o.translation;
@@ -228,8 +227,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			var hh = this._height / 2;
 			mat4.TSRT(-hw, -hh, 0, s[0], s[1], s[2], r[0], r[1], r[2], t[0] + hw * s[0], t[1] + hh * s[1], t[2], this.orientation.matrix);
 				//for (var i =0 ;i<16;i++) if (isNaN(this.orientation.matrix[i] )) debugger;
-	
-	}
+		}
 		
 		this.orientation.invertedworldmatrix = undefined;
 		if (this.parent ) {
@@ -377,10 +375,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			var parent = this.screen.device.canvas.parentNode
 			parent.appendChild(this.dom)
 			if(this.src) dom.src = this.src
-
-			//this.addEventListener('mousedown', this.mouse.mousedown.bind(this.mouse))
-			//this.addEventListener('mouseup', this.mouse.mousedown.bind(this.mouse))
-			//this.addEventListener('mousemove', this.mouse.mousedown.bind(this.mouse))
 		}
 
 		var r = this.getBoundingRect();

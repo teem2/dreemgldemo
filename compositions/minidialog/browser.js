@@ -25,7 +25,7 @@ define.browserClass(function(require, screen, icon,view, edit, text,scrollbar,  
 			view({bgcolor: "white",flex: 1, margin: 0,flexdirection:"column" },
 				view({bgcolor: "#b0b010" , padding: 4,flexdirection:"row" },
 					icon({icon:"flask", fgcolor:"white", fontsize: 20, margin: 10 })
-					,text({text:"This is the amazing tinydialog!", bgcolor: "transparent" , fontsize: 25, margin: 4})
+					,text({text:"This is the amazing tinydialog", bgcolor: "transparent" , fontsize: 25, margin: 4})
 				),
 				tabcontrol({bgcolor: "#f0f0f0" , flexdirection:"column" }
 					,tabcontrol({tabname:"tests", tabicon:"hand-lizard" }, 

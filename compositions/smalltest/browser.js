@@ -1,4 +1,4 @@
-define.browser(function(require, screen, view){
+define.browser(function(require, screen, text, view){
 	
 	var thing2 = view.extend(function(){
 		this.bg.color = function(){
@@ -10,7 +10,7 @@ define.browser(function(require, screen, view){
 	});
 	
 	this.render = function(){return[
-		thing2({w:1000, h:1000})
+		text({text:'test2',fontsize:80,bgcolor:'transparent', fgcolor:'white', w:1000, h:1000})
 	]}
 })
 

@@ -301,7 +301,7 @@ define.class(function(require, constructor){
 		this[key] = value
 	}
 
-	this.state = function(key){
+	this.state = function(){
 		if (!this.hasOwnProperty("_state")){
 			
 			if (this._state){
@@ -310,8 +310,8 @@ define.class(function(require, constructor){
 			else{
 				this._state = {};
 			}
-			this._state[key]  = 1;
 		}
+		for(var i = 0; i < arguments.length; i++) this._state[arguments[i]] = 1
 	}
 	
 	this.attribute = function(key, config){
@@ -559,7 +559,7 @@ define.class(function(require, constructor){
 
 	// always define an init event
 	this.event("init")
-
+	this.event("reinit")
 	// and a destroy event
 	this.event("destroy")
 })

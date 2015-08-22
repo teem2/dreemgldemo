@@ -28,9 +28,6 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 				this.touch = globals.touch = new Touch()
 				this.mouse = globals.mouse = new Mouse()
 				this.keyboard = globals.keyboard = new Keyboard()
-				renderer.defineGlobals(this.touch, globals)
-				renderer.defineGlobals(this.mouse, globals)
-				renderer.defineGlobals(this.keyboard, globals)
 			}
 		}
 		else{
@@ -48,12 +45,14 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 			this.screen.device = parent.screen.device
 			this.screen.parent = parent
 		}
-
+		this.screen.teem = this
 		renderer(this.screen, previous && previous.screen, globals, true)
 
 		if(this.screen.title !== undefined) document.title = this.screen.title 
 				
-		if(previous) this.screen.setDirty(true)
+		if(previous){
+			this.screen.setDirty(true)
+		}
 
 		this.rendered = true
 	}
@@ -173,24 +172,8 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 
 		if(!parent) window.teem = this
 
-		//ooookay. so. lets 'render' ourselves to spawn up the first level 
-		var composition = this.render()
-		
-		// lets see which objects need to be RPC-proxified
-		for(var i = 0; i < composition.length; i++){
-			// ok so as soon as we are stubbed, we need to proxify the object
-			var obj = composition[i]
-			if(obj.constructor.stubbed){ // we are a stubbed out class
-				var rpcid = obj.name || obj.constructor.name
-				composition[i] = RpcProxy.createFromStub(obj, Node.prototype, rpcid, this.rpcpromise)
-			}
-			else{
-				renderer.defineGlobals(obj, {teem:this})
-			}
-		}
+		this.renderComposition()
 
-		// splat our children into the teem object
-		renderer.mergeChildren(this, composition)
 		// alright now we find the screen we wanna render somehow
 		this.screen = this.screens.browser
 
