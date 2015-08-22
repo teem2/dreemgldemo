@@ -284,6 +284,7 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 					)					
 				)
 				,splitcontainer({name:"mainsplitter", vertical: false}
+					,view({flex:1,mode:'DOM', src:'http://thisisnotrocketscience.nl'})
 					,treeview({flex:0.2, 
 						dataset: dataset,
 						buildtree: function(data)

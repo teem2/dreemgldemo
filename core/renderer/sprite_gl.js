@@ -368,32 +368,32 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 	
 	this.drawContentDOM = function(renderstate){
-		
+		console.log("DOMNODE")
 		if (this.matrixdirty) this.recomputeMatrix()
 		// lets check if we have a div
 
 		var dom = this.dom
 		if(!dom){
-			dom = this.dom = document.createElement(this.tag || 'div')
-			var parent = this.parent === this.screen? this.parent.device.canvas.parentNode: this.parent.dom
+			dom = this.dom = document.createElement(this.tag || 'iframe')
+			var parent = this.screen.device.canvas.parentNode
 			parent.appendChild(this.dom)
+			if(this.src) dom.src = this.src
 		}
 
 		if(this.layout){
 			dom.style.width = this.layout.width? this.layout.width: this._width
 			dom.style.height = this.layout.height? this.layout.height: this._height
+			dom.style.left = this.layout.left
+			dom.style.top = this.layout.top
 		}
 		else{
 			//console.log(this.layout.width);
 			dom.style.width = this._width
 			dom.style.height = this._height
 		}
-		dom.style.left = this._pos[0]
-		dom.style.top = this._pos[1]
 		dom.style.position = 'absolute' 
 		dom.style.display = 'block'
-
-		if(this.src) dom.src = this.src
+		dom.style.border = '0px'
 
 		var bg = this._bgcolor
 		if(bg){

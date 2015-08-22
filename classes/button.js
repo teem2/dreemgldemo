@@ -17,7 +17,7 @@ define.class(function(sprite, text, view, icon){
 	this.buttonres = {};
 		
 	this.buttonfill = function(a,b){
-		var fill = mix(col1, col2,  (a.y)/0.8);
+		var fill = mix(col1, col2, (a.y)/0.8);
 		return fill;
 	}
 	
