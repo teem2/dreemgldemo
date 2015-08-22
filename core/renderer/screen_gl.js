@@ -54,6 +54,9 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 				var modal_stack = this.screen.modal_stack
 				modal_stack.pop()
 				this.screen.modal = modal_stack[modal_stack.length - 1]
+				
+				this.setDirty();
+				this.emitRecursive("destroy");
 				this.screen.setDirty(true)
 			}
 
