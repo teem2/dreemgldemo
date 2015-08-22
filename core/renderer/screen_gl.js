@@ -21,7 +21,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.debugshader = false
 	this.debug = false;
 	this.showdebugtext = true;
-	// this.renderstructure = false;
+	this.renderstructure = false;
 	
 	this.lastx = -1;
 	this.lasty = -1;
@@ -37,7 +37,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	// show a modal view.
 	this.openModal = function(object){
 		return new Promise(function(resolve, reject){
-			renderer.renderDiff(object, this, undefined, this.globals)
+			renderer(object, undefined, this.globals)
 
 			this.children.push(object)
 			this.modal_stack.push(object)
@@ -713,7 +713,15 @@ this.draw_calls = 0
 			this[key] = value
 		}
 	}
+	this.state('pic_tex','debug_tex','device','buf','mouse','keyboard','debugtextshader',
+		'utilityrectangle','debugrectangle','utilityframe','_init')
 
+	this.reinit = function(){
+		console.log("REINIT SCREEN")
+		this.initVars()
+		this.bindInputs()
+	}
+	/*
 	this.diff = function(other, globals){
 		baseclass.prototype.diff.call(this, other, globals)
 		
@@ -732,13 +740,13 @@ this.draw_calls = 0
 		this.utilityrectangle = other.utilityrectangle
 		this.debugrectangle = other.debugrectangle
 		this.utilityframe = other.utilityframe
-*/
+
 		this.modal_stack = []//other.modal_stack
 		this.initVars()
 		this.bindInputs()
 
 		return this
-	}
+	}*/
 
 	this.setFocus = function(object){
 		if(this.focus_object !== object){

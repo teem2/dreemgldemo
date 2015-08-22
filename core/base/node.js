@@ -270,6 +270,16 @@ define.class(function(require, constructor){
 		}
 	}
 
+	this.hasListenerName = function(key, fnname){
+		var listen_key = '_listen_' + key
+		var listeners = this[listen_key]
+		if(!listeners) return false
+		for(var i = 0; i < listeners.length; i++){
+			if(listeners[i].name === fnname) return true
+		}
+		return false
+	}
+
 	this.hasListeners = function(key){
 		var listen_key = '_listen_' + key
 		var on_key = 'on' + key
@@ -291,7 +301,7 @@ define.class(function(require, constructor){
 		this[key] = value
 	}
 
-	this.state = function(key){
+	this.state = function(){
 		if (!this.hasOwnProperty("_state")){
 			
 			if (this._state){
@@ -300,8 +310,8 @@ define.class(function(require, constructor){
 			else{
 				this._state = {};
 			}
-			this._state[key]  = 1;
 		}
+		for(var i = 0; i < arguments.length; i++) this._state[arguments[i]] = 1
 	}
 	
 	this.attribute = function(key, config){
@@ -545,57 +555,11 @@ define.class(function(require, constructor){
 		return true
 	}
 
-	// lets diff ourselves and children
-	this.diff = function(other, globals){
-		
-		if(!other) return this
-		
-		// diff children set
-		var my_children = this.children
-		var other_children = other.children
-
-		// diff my children
-		if(other_children){
-			var i = 0
-			if(my_children) for(; i < my_children.length; i++){
-				my_children[i] = my_children[i].diff(other_children[i], globals)
-			}
-			// clear out whatever is left
-			if(other_children) for(; i < other_children.length; i++){
-				var child = other_children[i]
-				child.emit('destroy')
-			}
-		}
-		// check if we changed class
-		if(define.classHash(this.constructor) === define.classHash(other.constructor) && this.constructorPropsEqual(other)){
-			other.children = my_children
-			if(my_children) for(i = 0; i < my_children.length; i++) my_children[i].parent = other
-			this.emit('destroy')
-			if(globals) for(var key in globals){
-				other[key] = globals[key]
-			}
-		
-			return other
-		}
-		else{
-			if(my_children) for(i = 0; i < my_children.length; i++) my_children[i].parent = this
-		}
-		
-		if (this._state){
-			for(var key in this._state){
-				this[key] = other[key];
-			}
-		}
-		
-		other.emit('destroy')
-		return this		
-	}
-
 	this.hideProperty(Object.keys(this))
 
 	// always define an init event
 	this.event("init")
-
+	this.event("reinit")
 	// and a destroy event
 	this.event("destroy")
 })

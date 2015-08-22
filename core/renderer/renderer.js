@@ -1,10 +1,151 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Reactive renderer
 
-define.class(function(require, exports){
+define.class(function(require, exports, module){
 
 	var Node = require('$base/node')
-	var renderer = exports
+
+	module.exports = function renderer(new_version, old_version, globals, skip_old, wireinits){
+		var init_wires = false
+		if(!wireinits){
+			wireinits = []
+			init_wires = true
+		}
+
+		var object = new_version
+		var old_children
+
+		if(old_version){
+			if(!skip_old && define.classHash(new_version.constructor) === define.classHash(old_version.constructor) && new_version.constructorPropsEqual(old_version)){
+				// old_version is identical. lets reuse it.
+				object = old_version
+				old_children = object.children
+				// but use new versions instance children
+				old_version.instance_children = new_version.instance_children
+			}
+			else{ // we are going to use new_version. lets copy _state properties
+				console.log("New  version", new_version)
+				object = new_version
+				if(new_version !== old_version){
+					old_children = old_version.children
+					for(var key in new_version._state){
+						new_version[key] = old_version[key]
+					}
+
+				}
+			}
+		}
+
+		for(var key in globals){
+			object[key] = globals[key]
+		}
+
+		// store the attribute dependencies
+		object.atAttributeGet = function(key){
+			// lets find out if we already have a listener on it
+			if(!this.hasListenerName(key, '__atAttributeGet')){
+				this[key] = function __atAttributeGet(){
+					// we need to call re-render on this
+					renderer(this, this, globals, true)
+					this.setDirty(true)
+					if(this.reLayout) this.reLayout()
+				}
+			}
+		}
+
+		object.connectWires(wireinits)
+		
+		// lets call init only when not already called
+		if(!object._init) object.emit('init', 1)
+		object.emit('reinit')
+
+		// then call render
+		object.children = object.render()
+		object.atAttributeGet = undefined
+
+		if(!Array.isArray(object.children) && object.children) object.children = [object.children]
+		var new_children = object.children
+
+		if(new_children) for(var i = 0; i < new_children.length; i++){
+			var new_child = new_children[i]
+
+			if(Array.isArray(new_child)){ // splice in the children
+				var args = Array.prototype.slice.call(new_child)
+				args.unshift(1)
+				args.unshift(i)
+				Array.prototype.splice.apply(new_children, args)
+				i-- // hop back one i so we repeat
+				continue
+			}
+
+			var old_child = undefined
+			if(old_children){
+				old_child = old_children[i]
+				if(old_child) old_child.parent = object
+			}
+			new_child.parent = object
+			// render new child
+			new_child = new_children[i] = renderer(new_child, old_child, globals)
+	
+			// set the childs name
+			var name = new_child.name || new_child.constructor.classname
+			if(name !== undefined && !(name in object)) object[name] = new_child
+		}
+
+		if(init_wires){
+			for(var i = 0; i < wireinits.length; i++){
+				wireinits[i]()
+			}
+		}
+
+		return object
+	}
+/*
+	// lets diff ourselves and children
+	renderer.diff = function(new_version, old_version, globals){
+		
+		if(!old_version) return new_version
+		
+		// diff children set
+		var new_children = newversion.children
+		var old_children = oldversion.children
+
+		// diff my children
+		if(old_children){
+			var i = 0
+			if(new_children) for(; i < new_children.length; i++){
+				renderer.diff(new_children[i], old_children[i], globals)
+			}
+			// clear out whatever is left
+			if(old_children) for(; i < old_children.length; i++){
+				var child = old_children[i]
+				child.emit('destroy')
+			}
+		}
+		// check if we changed class
+		if(define.classHash(new_version.constructor) === define.classHash(old_version.constructor) && new_version.constructorPropsEqual(old_version)){
+			old_version.children = new_children
+			if(new_children) for(i = 0; i < new_children.length; i++) new_children[i].parent = other
+			this.emit('destroy')
+			if(globals) for(var key in globals){
+				other[key] = globals[key]
+			}
+		
+			return other
+		}
+		else{
+			if(new_children) for(i = 0; i < new_children.length; i++) new_children[i].parent = this
+		}
+		
+		if (this._state){
+			for(var key in this._state){
+				this[key] = other[key];
+			}
+		}
+		
+		other.emit('destroy')
+		return this		
+	}
 
 	renderer.renderDiff = function(object, parent, previous, globals){
 
@@ -14,11 +155,11 @@ define.class(function(require, exports){
 			var old = Object.create(what)
 			old.children = what.children
 			what.children = []
-			console.log("rerendering", what);
+
 			renderer.render(what, what.parent, globals, rerender.bind(this))
 
 			// lets diff them
-			what.diff(old, globals)
+			renderer.diff(what, old, globals)
 			for(var i = 0; i < what.children.length; i++){
 				what.children[i].parent = what
 			}
@@ -38,7 +179,7 @@ define.class(function(require, exports){
 		
 		// diff it
 		if(previous){
-			object = object.diff(previous, globals)
+			object = renderer.diff(object, previous, globals)
 		}
 
 		var wireinits = []
@@ -55,29 +196,7 @@ define.class(function(require, exports){
 		return object
 	}
 
-	renderer.defineGlobals = function(object, globals){
-		for(var key in globals){
-			Object.defineProperty(object, key, {writable:true, value:globals[key]})
-		}
-	}
 
-	renderer.mergeChildren = function(object, children, globals){
-		// splat in the children
-		var objchildren = object.children
-		if(!objchildren) object.children = objchildren = []
-		if(Array.isArray(children)){
-			objchildren.push.apply(object.children, children)
-		}
-		else objchildren.push(children)
-
-		// merge name
-		for(var i = 0; i < objchildren.length; i++){
-			// create child name shortcut
-			var child = objchildren[i]
-			var name = child.name || child.constructor.classname
-			if(name !== undefined && !(name in object)) object[name] = child
-		}
-	}
 
 	renderer.render = function(object, parent, globals, rerender){
 		//console.log(object)
@@ -132,6 +251,31 @@ define.class(function(require, exports){
 		}
 	}
 
+	renderer.defineGlobals = function(object, globals){
+		for(var key in globals){
+			Object.defineProperty(object, key, {writable:true, value:globals[key]})
+		}
+	}
+
+	renderer.mergeChildren = function(object, children, globals){
+		// splat in the children
+		var objchildren = object.children
+		if(!objchildren) object.children = objchildren = []
+		if(Array.isArray(children)){
+			objchildren.push.apply(object.children, children)
+		}
+		else objchildren.push(children)
+
+		// merge name
+		for(var i = 0; i < objchildren.length; i++){
+			// create child name shortcut
+			var child = objchildren[i]
+			var name = child.name || child.constructor.classname
+			if(name !== undefined && !(name in object)) object[name] = child
+		}
+	}
+
+
 	renderer.connectWires = function(object, initarray){
 		object.connectWires(initarray)
 		if(object.children) for(var i = 0; i < object.children.length; i++){
@@ -153,7 +297,7 @@ define.class(function(require, exports){
 
 		node.atAttributeGet = undefined
 	}
-
+	
 	renderer.destroy = function(object, parent){
 		// tear down all listener structures
 		var obj = object
@@ -181,9 +325,9 @@ define.class(function(require, exports){
 			}
 			obj = obj.outer
 		}
-	}
+	}()*/
 
-	renderer.dump = function(node, depth){
+	module.exports.dump = function(node, depth){
 		var ret = ''
 		if(!depth) depth = ''
 		ret += depth + node.name + ': ' + node.constructor.name
