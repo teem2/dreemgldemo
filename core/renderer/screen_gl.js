@@ -38,7 +38,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.openModal = function(object){
 		return new Promise(function(resolve, reject){
 			renderer(object, undefined, this.globals)
-
+			object.parent = this
 			this.children.push(object)
 			this.modal_stack.push(object)
 			this.modal = object
