@@ -8,7 +8,8 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 	
 	this.state("xmlstring");
 	this.state("xmljson");
-	
+	this.state("dataset");
+	this.state("applicationstate");
 	this.xmlstring = "";
 	this.xmljson = {};
 	
@@ -269,11 +270,11 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		}
 		this.render = function(){
 			var root = this;
-		console.log("blokjedata: " ,this.data);
+		//console.log("blokjedata: " ,this.data);
 			var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#ffc030") ;
 			return [				
 				view({ bgcolor: basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4},
-					text({text: this.data.name, bgcolor: "transparent", fgcolor: "black"})
+					text({text: this.data.name, margin: 4, fontsize:20, bgcolor: "transparent", fgcolor: "black"})
 					,button({text:"change color",margin:0, padding:0,  click: function(){
 	
 							var br = this.getBoundingRect();
