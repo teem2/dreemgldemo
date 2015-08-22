@@ -10,6 +10,7 @@ define.class('$base/node', function (require, exports, self){
 	this.attribute('middle', {type:int})
 	this.attribute('right', {type:int})
 	this.attribute('click', {type:Object})
+	this.attribute('blurred', {type:int})
 	this.attribute('dblclick', {type:Object})
 	this.attribute('clicker', {type:int})
 	this.attribute('leftdown', {type:int})
@@ -18,7 +19,7 @@ define.class('$base/node', function (require, exports, self){
 	this.attribute('rightup', {type:int})
 	
 	this.ratio = 0
-
+	
 	this.activedown = 0;
 		
 	this.clickspeed = 350
@@ -35,6 +36,10 @@ define.class('$base/node', function (require, exports, self){
 		// are we going to send a vec2? or something else
 		window.addEventListener('click', function(e){
 			this.click = 1
+		}.bind(this))
+
+		window.addEventListener('blur', function(e){
+			this.blurred =1;
 		}.bind(this))
 
 		window.addEventListener('dblclick', function(e){
