@@ -10,7 +10,8 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			screens:[
 			],
 			connections:[
-			]
+			],
+			selected:""
 		})
 	}
 
@@ -22,7 +23,8 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			this.dataset.fork(function(data){
 				for(var i = 0; i < screens.child.length; i++){
 					var scr = screens.child[i]
-					data.screens.push({name:scr.attr.name, basecolor:vec4('yellow'), linkables:
+					data.screens.push({name:scr.attr.name, 
+								basecolor: (scr.attr.basecolor)?scr.attr.basecolor: vec4('#d0d0d0'), linkables:
 						XmlParser.childrenByTagName(scr, 'attribute').map(function(each){
 							return {
 								name: each.attr.name,
@@ -141,7 +143,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			{
 				
 				var d = this.dataset.data.screens[a];
-				this.blokjes[d.name] = blokje({data: d, x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor? d.basecolor:vec4("#ffc030") });
+				this.blokjes[d.name] = blokje({dataset:this.dataset, data: d, x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor? d.basecolor:vec4("#ffc030") });
 				i++;
 				
 				all.push(this.blokjes[d.name]);			
@@ -167,10 +169,12 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 
 		this.position = "absolute" ;
 		this.attribute("basecolor", {type: vec4, value: "green"});
+		this.attribute("dataset", {type: Object});
 		
 		this.attribute("data", {type: Object});
 		
 		this.mouseleftdown = function(){
+			 
 			this.start = {mousex:this.mouse.x, mousey:this.mouse.y,startx: this.x, starty: this.y}
 			this.mousemove = function(){
 				var dx = this.mouse.x - this.start.mousex;
@@ -209,9 +213,19 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.padding = 1;
 		this.borderwidth = 1;
 		this.bordercolor = vec4("darkgray");
-
+	
+		this.atDraw = function(){
+			if (this.dataset.selected == "screen_" + this.data.name){
+				this.borderwidth = 20;
+				this.bordercolor = vec4("blue");
+			}else{
+				this.borderwidth =1;
+				this.bordercolor = vec4("darkgray");
+				
+			}
+		}
 		this.render = function(){
-			console.log(this.data);
+			
 			return [				
 				view({ bgcolor: this.basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4},
 					text({text: this.name, bgcolor: "transparent", fgcolor: "black"})
