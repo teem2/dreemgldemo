@@ -51,8 +51,8 @@ define.class('$base/node', function (require, exports, self){
 		this.resetClicker = function(){
 			click_count = 0
 		}
-
-		window.addEventListener('mousedown', function(e){
+		
+		this.mousedown = function(e){
 			var now = Date.now()
 			if (this.activedown == 0){
 				//document.body.setCapture();
@@ -73,9 +73,11 @@ define.class('$base/node', function (require, exports, self){
 			if(e.button === 1 ) this.cancapture = 3, this.middle = 1
 			if(e.button === 2 ) this.cancapture = 2, this.right = 1, this.rightdown = 1
 			this.isdown = 1
-		}.bind(this))
+		}
 
-		window.addEventListener('mouseup', function(e){
+		window.addEventListener('mousedown', this.mousedown.bind(this))
+
+		this.mouseup = function(e){
 			this.activedown--;
 			if (this.activedown == 0){
 				//document.body.releaseCapture();
@@ -88,14 +90,20 @@ define.class('$base/node', function (require, exports, self){
 			if(e.button === 1) this.middle = 0
 			if(e.button === 2) this.right = 0, this.rightup = 1
 			this.isdown = 0
-		}.bind(this))
+			e.preventDefault()
+		}
 
-		window.addEventListener('mousemove', function(e){
+		window.addEventListener('mouseup', this.mouseup.bind(this))
+		
+		this.mousemove = function(e){
 			//last_click = undefined
 			//if(layer) hit = layer.hitTest2D(e.pageX * ratio, e.pageY * ratio)
 			this.x = e.pageX// / this.ratio//* window.devicePixelRatio
 			this.y = e.pageY// / this.ratio//* window.devicePixelRatio
 			this.move = 1
-		}.bind(this))
+			e.preventDefault()
+		}
+
+		window.addEventListener('mousemove', this.mousemove.bind(this))
 	}
 })

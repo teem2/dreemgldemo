@@ -377,6 +377,10 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			var parent = this.screen.device.canvas.parentNode
 			parent.appendChild(this.dom)
 			if(this.src) dom.src = this.src
+
+			this.addEventListener('mousedown', this.mouse.mousedown.bind(this.mouse))
+			this.addEventListener('mouseup', this.mouse.mousedown.bind(this.mouse))
+			this.addEventListener('mousemove', this.mouse.mousedown.bind(this.mouse))
 		}
 
 		var r = this.getBoundingRect();
@@ -472,8 +476,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				this.bg._height = this._height
 			}
 	
-			if (this._texturecache == false)
-			{
+			if (this._texturecache == false){
 						var myrect = rect(bound.left, bound.top, bound.right, bound.bottom);
 
 						var actuallyvisible = true;

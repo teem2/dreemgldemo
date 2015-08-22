@@ -106,16 +106,19 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 		
 		this.linecolor = vec4("black");
 		
-		this.update = function(){
+		this.update = function(from, to){
 			//console.log(this.from.name, this.to.name);
-			this.linecolor1 = this.from.basecolor;
-			this.linecolor2 = this.to.basecolor;
-			var br1 = this.from.lastdrawnboundingrect;
+			if (from === undefined) from = this.from;
+			if (to === undefined) to = this.to;
+			
+			this.linecolor1 = from.basecolor;
+			this.linecolor2 = to.basecolor;
+			var br1 = from.lastdrawnboundingrect;
 			var w = br1.right - br1.left;
-			var fx = this.from._x;
-			var fy = this.from._y + 8;
-			var tx = this.to._x;
-			var ty = this.to._y + 8;
+			var fx = from._x;
+			var fy = from._y + 8;
+			var tx = to._x;
+			var ty = to._y + 8;
 			this.p0 = vec2(fx + w, fy);
 			this.p1 = vec2(fx+ w +100, fy );
 			this.p2 = vec2(tx-100,  ty);
@@ -153,33 +156,36 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 			for (var i in this.connections)
 			{
 				var c = this.connections[i];
-				if (c.to.name === name || c.from.name === name) c.update();
+				if (c.to.name === name || c.from.name === name) c.update(this.blokjes[c.from.name], this.blokjes[c.to.name]);
 			}
 			
 		}
+		
+		this.blokjes ={};
+		
 		this.render = function(){
 			
 			
-			var blokjes = {};
-				var all = [];			
+			this.blokjes = {};
+			var all = [];			
 			var connecties = {};
 			var i = 0;
 			for(a in this.dataset.data.screens)
 			{
 				
 				var d = this.dataset.data.screens[a];
-				blokjes[d.name] = blokje({x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor? d.basecolor:vec4("purple") });
+				this.blokjes[d.name] = blokje({x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor? d.basecolor:vec4("purple") });
 				i++;
 				
-				all.push(blokjes[d.name]);
+				all.push(this.blokjes[d.name]);
 				
 			}
 			this.connections = []
 			for(a in this.dataset.data.connections)
 			{
 				var c = this.dataset.data.connections[a];
-				var b1 = blokjes[c.from.node];
-				var b2 = blokjes[c.to.node];
+				var b1 = this.blokjes[c.from.node];
+				var b2 = this.blokjes[c.to.node];
 				if (b1 && b2)
 				{
 					var newcon = connection({from: b1, to: b2});
@@ -202,7 +208,12 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 				var dx = this.mouse.x - this.start.mousex;
 				var dy = this.mouse.y - this.start.mousey;
 				
-				this.pos = vec2(this.start.startx + dx, this.start.starty + dy);
+				var nx = this.start.startx + dx;
+				var ny = this.start.starty + dy;
+
+				nx = Math.floor(nx/10) * 10;
+				ny = Math.floor(ny/10) * 10;
+				this.pos = vec2(nx,ny);
 				this.parent.updateConnections(this.name, this.pos);
 			
 			}
@@ -323,7 +334,7 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 							)
 							,blokjesgrid({dataset: dataset})
 						))
-							,view({flex:1,mode:'DOM', src:'http://localhost:8080/compositions/example/components.dre?edit=1'})
+							,view({flex:1,mode:'DOM', src:'http://localhost:8080/compositions/example/editor.dre?edit=1'})
 				
 						
 					)
