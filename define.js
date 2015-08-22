@@ -412,12 +412,13 @@
 	}
 
 	// defining a class as environment specific
+	define.browser =
 	define.browserClass = function(body, body2){
 		if(typeof body2 === 'function') body = body2
 		body.environment = 'browser'
 		define.class.apply(define, arguments)
 	}
-
+	define.nodejs = 
 	define.nodejsClass = function(body, body2){
 		if(typeof body2 === 'function') body = body2
 		body.environment = 'nodejs'

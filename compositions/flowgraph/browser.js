@@ -4,8 +4,6 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 
 	var container = node.extend(function(){
 
-	
-
 		this.atConstructor = function(){
 			this.undo_stack = []
 			this.redo_stack = []
@@ -19,7 +17,6 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 				if (co.obj === obj) return;
 			}
 			this.connected_objects.push({obj:obj, key:key})
-			
 		}
 
 		this.fork = function(callback){
@@ -110,7 +107,7 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 		this.linecolor = vec4("black");
 		
 		this.update = function(){
-			console.log(this.from.name, this.to.name);
+			//console.log(this.from.name, this.to.name);
 			this.linecolor1 = this.from.basecolor;
 			this.linecolor2 = this.to.basecolor;
 			var br1 = this.from.lastdrawnboundingrect;

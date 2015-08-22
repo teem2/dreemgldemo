@@ -523,7 +523,7 @@ this.draw_calls = 0
 		this.time = time;
 		this.last_time = time;
 	
-		if (this.moved === true) {//} || this.dirty === true) {
+		if (this.moved === true && !this.mousecapture) {//} || this.dirty === true) {
 			this.moved = false
 			if (!this.pic_tex.frame_buf) this.pic_tex.allocRenderTarget(this.device)
 			this.device.setTargetFrame(this.pic_tex)

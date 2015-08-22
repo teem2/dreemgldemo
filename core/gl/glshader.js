@@ -689,8 +689,8 @@ define.class('$base/node', function(require, exports, self){
 			else if(typeof prop === 'number'){
 				this.attribute(key, {type:float, value:prop})
 			}
-			else if(prop && prop.struct){
-				this.attribute(key, {type:prop.isArray?Object:prop.struct, value:prop})
+			else if(prop && prop.struct && !prop.isArray){ // dont do it for 
+				this.attribute(key, {type:prop.struct, value:prop})
 			}
 		}
 		this.dirty = false
@@ -986,11 +986,11 @@ define.class('$base/node', function(require, exports, self){
 				var attrloc = attrlocs[key]
 				var ATTRLOC_BUF
 				if(attrloc.name){
-					ATTRLOC_BUF = 'root._' + attrloc.name 
+					ATTRLOC_BUF = 'root.' + attrloc.name 
 					var buf = this[attrloc.name]
 				}
 				else{
-					ATTRLOC_BUF = 'root._' + key 
+					ATTRLOC_BUF = 'root.' + key 
 				}
 				var ATTRLOC_LOC = 'shader.attrlocs.' + key +'.loc'
 

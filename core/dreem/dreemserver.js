@@ -22,7 +22,7 @@ define.class(function(require, exports, self){
 		this.compositions = {}
 
 		this.args = args
-		var port = this.args['-port'] || 8080
+		var port = this.args['-port'] || 2000
 		var iface = this.args['-iface'] || '0.0.0.0'
 
 		this.cache_dir = path.join(define.expandVariables(define.$root)+'/gzcache')
