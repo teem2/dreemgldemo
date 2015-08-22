@@ -171,7 +171,7 @@ define.class(function(require, exports, module){
 				wireinits[i]()
 			}
 			what.setDirty(true)
-			what.reLayout()
+			if (what.reLayout) what.reLayout()
 			// do this?
 			//what.screen.performLayout()
 		}.bind(this))

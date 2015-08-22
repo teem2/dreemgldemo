@@ -69,13 +69,14 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 						}.bind(this))
 					})
 				}
+			data.connections.push({from:{node:"default"}, to: {node:"mobile"}})
 				
 				this.xmlstring = this.BuildXML(this.xmljson, data);
 			}.bind(this))
 		}.bind(this))
 	}
-	/*
-	var dataset = datatracker({
+	
+	/*var dataset = datatracker({
 		screens:[
 			{name: "Browser", basecolor: vec4("#ffff60"), linkables:[
 				{name:"dataset", type: "list", input: true},
@@ -115,8 +116,8 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			if (from === undefined) from = this.from;
 			if (to === undefined) to = this.to;
 			
-			this.linecolor1 = from.basecolor;
-			this.linecolor2 = to.basecolor;
+			this.linecolor1 = from.data.basecolor;
+			this.linecolor2 = to.data.basecolor;
 
 			var br1 = from.lastdrawnboundingrect;
 			var w = br1.right - br1.left;
@@ -206,7 +207,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 	var blokje = view.extend(function blokje(){
 
 		this.position = "absolute" ;
-		this.attribute("basecolor", {type: vec4, value: "green"});
 		this.attribute("dataset", {type: Object});
 		this.attribute("selected", {type: boolean, value: false});
 		this.attribute("applicationstate", {type:Object})
@@ -269,21 +269,22 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		}
 		this.render = function(){
 			var root = this;
+		console.log("blokjedata: " ,this.data);
 			var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#ffc030") ;
 			return [				
-				view({ bgcolor: this.basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4},
+				view({ bgcolor: basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4},
 					text({text: this.data.name, bgcolor: "transparent", fgcolor: "black"})
 					,button({text:"change color",margin:0, padding:0,  click: function(){
 	
 							var br = this.getBoundingRect();
 							var setcolor = function(color){
-								console.log(color);
-								console.log(root.dataset);
+						//		console.log(color);
+						//		console.log(root.dataset);
 								root.dataset.fork(function(data){
 									console.log("forking!");
-									root.data.basecolor = color;
+					//				root.data.basecolor = color;
 								});
-								this.screen.closeModal();
+								//this.screen.closeModal();
 							}.bind(this);
 							this.screen.openModal(		
 								view({position: "absolute", x: br.left,top: br.bottom}
@@ -298,7 +299,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 					}
 					)
 				),
-				view({bgcolor: this.basecolor, flexdirection:"column", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));}}
+				view({bgcolor: basecolor, flexdirection:"column", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));}}
 					,this.data.linkables?this.data.linkables.map(function(d){
 						return button({text:d.name, itemalign: d.input?"flex-start":"flex-end"});
 					}):[]
@@ -307,6 +308,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			]
 		}
 	})
+	
 	var flowgraphtreeview = treeview.extend(function flowgraphtreeview(){
 		
 		this.attribute("applicationstate", {type:Object});
@@ -314,6 +316,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.applicationstate = function(){
 			this.selected = this.applicationstate.data.selectedscreen;
 		}
+	
 		this.buildtree = function(data)
 		{
 			return { 
