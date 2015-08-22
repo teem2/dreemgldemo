@@ -25,8 +25,10 @@ define.class(function(sprite, text, view, button, icon){
 	]}
 	
 	this.attribute("dataset", {type: Object, value:{}});
+	this.attribute("selected", {type: String, value:""});
 
-	var newitemheading = button.extend(function newitemheading(){
+	
+	var flatbutton = button.extend(function flatbutton(){
 		this.borderwidth = 0;
 		this.padding =  4;
 		this.labelactivecolor = vec4("#303000");
@@ -43,10 +45,38 @@ define.class(function(sprite, text, view, button, icon){
 		this.bgcolor = "transparent";
 		this.flex = undefined;
 		this.alignself = "flex-start" 	
+		
+	})
+	
+	
+	var newitemheading = view.extend(function newitemheading(){
+		this.borderwidth = 0;
+		this.attribute("folded", {type: boolean, value: false});
+		this.padding =  4;
+		this.labelactivecolor = vec4("#303000");
+		this.bordercolor= "transparent" ;
+		this.buttoncolor1 = vec4(1,1,1,0.0)
+		this.buttoncolor2 = vec4(1,1,1,0.0)
+		this.pressedcolor1 = vec4(0,0,0,0.14)
+		this.pressedcolor2 = vec4(0,0,0,0.05);
+		this.hovercolor1 = vec4(0,0,0,0.1);
+		this.hovercolor2 = vec4(0,0,0,0.1);
+		this.cornerradius = 0;
+		this.fgcolor = "black";
+		this.margin = 0;
+		this.bgcolor = "transparent";
+		this.flex = undefined;
+		this.alignself = "flex-start" 	
+		
+		this.render = function(){
+			return [flatbutton({icon:this.folded?"minus-circle":"plus-circle",padding: 2, click: this.toggleclick}), flatbutton({text: this.text})];
+		}
 	});		
+	
 	
 	var itemheading = view.extend(function itemheading(){
 		this.attribute("text", {type:String, value:""});
+		this.attribute("id", {type:String, value:""});
 		this.pressed = 0;
 		this.hovered = 0;
 		this.attribute("color1", {type:vec4, value:vec4("white")});
@@ -113,14 +143,20 @@ define.class(function(sprite, text, view, button, icon){
 		this.attribute("fontsize", {type:float, value:12});
 		
 		this.flexdirection = "row" ;
+		
 		this.toggle = function(){
-
 			if (this.item){
 				if (!this.item.collapsed) this.item.collapsed = true;else this.item.collapsed = false;
 				this.collapsed = this.item.collapsed;
 			}
-			this.setDirty(true);
+			this.reLayout();
+//			this.setDirty(true);
 		};
+		this.selectclick = function()
+		{
+			console.log("hmm");
+		}
+		
 		this.bgcolor = vec4("transparent");
 		this.atConstructor = function(){
 			if (this.item){
@@ -137,7 +173,7 @@ define.class(function(sprite, text, view, button, icon){
 				[
 				
 				view({bgcolor:"transparent",flexdirection:"column" },
-					newitemheading({click: this.toggle.bind(this), text:this.item.name }),
+					newitemheading({folded: this.item.collapsed, toggleclick: this.toggle.bind(this), selectclick: this.selectclick.bind(this),text:this.item.name, id:this.item.id }),
 					this.item.collapsed==false?
 						view({bgcolor:"transparent",flexdirection:"row" },
 							view({bgcolor:"transparent",  flexdirection:"column" , flex:1},

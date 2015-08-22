@@ -11,7 +11,11 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			],
 			connections:[
 			],
-			selected:""
+			
+		})
+
+		this.applicationstate = datatracker({
+			selected: "Composition/Screens/default"
 		})
 	}
 
@@ -142,7 +146,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			{
 				
 				var d = this.dataset.data.screens[a];
-				this.blokjes[d.name] = blokje({dataset:this.dataset, data: d, x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor? d.basecolor:vec4("#ffc030") });
+				this.blokjes[d.name] = blokje({dataset:this.dataset, data: d, x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 });
 				i++;
 				
 				all.push(this.blokjes[d.name]);			
@@ -224,28 +228,69 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			}
 		}
 		this.render = function(){
-			
+			var root = this;
+			var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#ffc030") ;
 			return [				
 				view({ bgcolor: this.basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4},
-					text({text: this.name, bgcolor: "transparent", fgcolor: "black"})
+					text({text: this.data.name, bgcolor: "transparent", fgcolor: "black"})
 					,button({text:"change color",margin:0, padding:0,  click: function(){
+	
+							var br = this.getBoundingRect();
+							var setcolor = function(color){
+								console.log(color);
+								console.log(root.dataset);
+								root.dataset.fork(function(data){
+									console.log("forking!");
+									root.data.basecolor = color;
+								});
+								this.screen.closeModal();
+							}.bind(this);
 							this.screen.openModal(		
-								screenoverlay({},text({text:"thing!", bgcolor:"transparent", fontsize: 20}))
+								view({position: "absolute", x: br.left,top: br.bottom}
+								,button({text:"Red",margin:4, padding:4,  click: function(){setcolor(vec4("#ff6060"));}})
+								,button({text:"Green",margin:4, padding:4,  click: function(){setcolor(vec4("#60ff60"));}})
+								,button({text:"Blue",margin:4, padding:4,  click: function(){setcolor(vec4("#6060ff"));}})
+								,button({text:"Yellow",margin:4, padding:4,  click: function(){setcolor(vec4("#ffff60"));}})
+								,button({text:"Gray",margin:4, padding:4,  click: function(){setcolor(vec4("gray"));}})
+								)
 							);
 						}
 					}
 					)
 				),
 				view({bgcolor: this.basecolor, flexdirection:"column", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));}}
-					,this.data.linkables.map(function(d){
+					,this.data.linkables?this.data.linkables.map(function(d){
 						return button({text:d.name, itemalign: d.input?"flex-start":"flex-end"});
-					})
+					}):[]
 					
 				)
 			]
 		}
 	})
-	
+	var flowgraphtreeview = treeview.extend(function flowgraphtreeview(){
+		
+		this.attribute("applicationstate", {type:Object});
+		
+		this.applicationstate = function(){
+			this.selected = this.applicationstate.data.selectedscreen;
+		}
+		this.buildtree = function(data)
+		{
+			return { 
+				name:"Composition", id: "comp", children:[
+					{name:"Screens" , id:"screens", children: data.screens.map(function(d) {
+							return {name: d.name, id: d.name, children: d.linkables?d.linkables.map(function(c){
+									return {name: c.name, id: c.name}
+								}):[]
+							}
+						})
+					},
+					{name:"Connections", id:"conns"}
+				] 
+			};
+			
+		}
+	})
 		
 	this.render = function(){
 		return[
@@ -282,23 +327,9 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 					)					
 				)
 				,splitcontainer({name:"mainsplitter", vertical: false}
-					,treeview({flex:0.2, 
-						dataset: this.dataset,
-						buildtree: function(data){
-							return { 
-								name:"Composition", children:
-									[{name:"Screens" , children: 
-											data.screens.map(function(d) {
-											
-											return {name: d.name, children: d.linkables?d.linkables.map(function(c){
-												return {name: c.name}
-											}):[]
-									}}
-								)
-							},
-							{name:"Connections"}
-							] 
-						} }
+					,flowgraphtreeview({flex:0.2, 
+						dataset: this.dataset,appstate: this.applicationstate
+						
 						}
 					)
 					,splitcontainer({flex: 0.8, vertical: true}
@@ -307,7 +338,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 							menubar({}
 								,menuitem({text: "new block", click:function(){
 									this.dataset.fork(function(data){
-										data.screens.push({name:"new screen"})
+										data.screens.push({name:"new screen", basecolor:vec4("green")})
 									})
 								}.bind(this)})
 								,menuitem({text: "Undo", click:function(){this.dataset.undo()}.bind(this)})
