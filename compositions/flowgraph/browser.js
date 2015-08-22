@@ -323,7 +323,7 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 							)
 							,blokjesgrid({dataset: dataset})
 						))
-							,view({flex:1,mode:'DOM', src:'http://localhost:8080/compositions/example/layouts.dre?edit=1'})
+							,view({flex:1,mode:'DOM', src:'http://localhost:8080/compositions/example/components.dre?edit=1'})
 				
 						
 					)
