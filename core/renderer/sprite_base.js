@@ -127,10 +127,10 @@ define.class('$base/nodeworker', function(require, exports, self){
 	}
 	
 	this.bubbleDirty = function(){
-		if (this.dirty === false){
+		//if (this.dirty === false){
 			this.dirty = true;
 			if (this.parent) this.parent.bubbleDirty();
-		}
+	//	}
 	}
 	this.setDirty = function(){		
 		if (this.screen) 

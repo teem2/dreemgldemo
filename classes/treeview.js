@@ -69,7 +69,7 @@ define.class(function(sprite, text, view, button, icon){
 		this.alignself = "flex-start" 	
 		
 		this.render = function(){
-			return [flatbutton({icon:this.folded?"minus-circle":"plus-circle",padding: 2, click: this.toggleclick}), flatbutton({text: this.text})];
+			return [flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}), flatbutton({text: this.text})];
 		}
 	});		
 	
@@ -136,11 +136,16 @@ define.class(function(sprite, text, view, button, icon){
 	var treeitem = view.extend(function (){
 		this.flex = 1.0;
 		
+		
+		
 		this.attribute("text", {type:String, value:""});
+		
 		this.attribute("collapsed", {type:Boolean, value:false});
 		this.attribute("bgcolor", {type:vec4, value:vec4("transparent")});
 		this.attribute("fgcolor", {type:vec4, value:vec4("black")});
 		this.attribute("fontsize", {type:float, value:12});
+		
+		this.state("item");
 		
 		this.flexdirection = "row" ;
 		
@@ -149,11 +154,11 @@ define.class(function(sprite, text, view, button, icon){
 				if (!this.item.collapsed) this.item.collapsed = true;else this.item.collapsed = false;
 				this.collapsed = this.item.collapsed;
 			}
-			this.reLayout();
-//			this.setDirty(true);
+			//this.reLayout();
+			this.setDirty(true);
 		};
-		this.selectclick = function()
-		{
+		
+		this.selectclick = function(){
 			console.log("hmm");
 		}
 		
@@ -162,18 +167,24 @@ define.class(function(sprite, text, view, button, icon){
 			if (this.item){
 				if (!this.item.collapsed) this.item.collapsed = false;
 			}
+			
 		//	this.text = this.item.name;
 		}
 		this.count =0;
 		this.render = function(){	
-			if (!this.item) return [];
+		
+			
+			if (!this.item) return [text({text:"empty"})];
+			
 			this.collapsed;
 			
+			console.log("treeitem", this.item.name, this.item.children);
+		
 			return [view({flexdirection:"row", flexwrap:"none",flex:1},
 				[
 				
 				view({bgcolor:"transparent",flexdirection:"column" },
-					newitemheading({folded: this.item.collapsed, toggleclick: this.toggle.bind(this), selectclick: this.selectclick.bind(this),text:this.item.name, id:this.item.id }),
+					newitemheading({folded: this.collapsed, toggleclick: this.toggle.bind(this), selectclick: this.selectclick.bind(this),text:this.item.name, id:this.item.id }),
 					this.item.collapsed==false?
 						view({bgcolor:"transparent",flexdirection:"row" },
 							view({bgcolor:"transparent",  flexdirection:"column" , flex:1},
@@ -236,7 +247,8 @@ define.class(function(sprite, text, view, button, icon){
 	this.alignself="stretch" ;
 	
 	this.render = function(){
-		var data
+		var data;
+		
 		if (this.buildtree) data = this.buildtree(this.dataset.data)
 		else{
 			data = this.dataset.data

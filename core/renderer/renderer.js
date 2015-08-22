@@ -14,7 +14,7 @@ define.class(function(require, exports){
 			var old = Object.create(what)
 			old.children = what.children
 			what.children = []
-
+			console.log("rerendering", what);
 			renderer.render(what, what.parent, globals, rerender.bind(this))
 
 			// lets diff them

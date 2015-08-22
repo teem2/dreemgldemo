@@ -15,7 +15,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		})
 
 		this.applicationstate = datatracker({
-			selected: "Composition/Screens/default"
+			selected: "composition/screens/default"
 		})
 	}
 
@@ -124,6 +124,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.attribute("dataset", {type: Object, value: {}});
 		this.connections = [];
 		
+		
 		this.updateConnections = function(name, pos){
 			for (var i in this.connections)
 			{
@@ -173,7 +174,12 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.position = "absolute" ;
 		this.attribute("basecolor", {type: vec4, value: "green"});
 		this.attribute("dataset", {type: Object});
-		
+		this.attribute("selected", {type: boolean, value: false});
+		this.attribute("applicationstate", {type:Object})
+		this.applicationstate = function()
+		{
+			this.selected = this.applicationstate.data.selected === ( "composition/screens" + this.data.name);
+		}
 		this.attribute("data", {type: Object});
 		
 		this.mouseleftdown = function(){
@@ -347,7 +353,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 							)
 							,blokjesgrid({dataset: this.dataset})
 						))
-							,view({flex:1,mode:'DOM', src:'http://127.0.0.1:8080/'+this.composition+'?edit=1'})
+							/*,view({flex:1,mode:'DOM', src:'http://127.0.0.1:8080/'+this.composition+'?edit=1'})*/
 				
 						
 					)

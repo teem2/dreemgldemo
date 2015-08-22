@@ -284,6 +284,19 @@ define.class(function(require, constructor){
 		this[key] = value
 	}
 
+	this.state = function(key){
+		if (!this.hasOwnProperty("_state")){
+			
+			if (this._state){
+				this._state = Object.create(this._state);
+			}
+			else{
+				this._state = {};
+			}
+			this._state[key]  = 1;
+		}
+	}
+	
 	this.attribute = function(key, config){
 		// lets create an attribute
 		var value_key = '_' + key
@@ -527,8 +540,9 @@ define.class(function(require, constructor){
 
 	// lets diff ourselves and children
 	this.diff = function(other, globals){
+		
 		if(!other) return this
-
+		
 		// diff children set
 		var my_children = this.children
 		var other_children = other.children
@@ -553,12 +567,13 @@ define.class(function(require, constructor){
 			if(globals) for(var key in globals){
 				other[key] = globals[key]
 			}
+		
 			return other
 		}
 		else{
 			if(my_children) for(i = 0; i < my_children.length; i++) my_children[i].parent = this
 		}
-
+				
 		other.emit('destroy')
 		return this		
 	}

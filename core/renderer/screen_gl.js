@@ -21,7 +21,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.debugshader = false
 	this.debug = false;
 	this.showdebugtext = true;
-	this.renderstructure = false;
+	// this.renderstructure = false;
 	
 	this.lastx = -1;
 	this.lasty = -1;
