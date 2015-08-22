@@ -573,7 +573,13 @@ define.class(function(require, constructor){
 		else{
 			if(my_children) for(i = 0; i < my_children.length; i++) my_children[i].parent = this
 		}
-				
+		
+		if (this._state){
+			for(var key in this._state){
+				this[key] = other[key];
+			}
+		}
+		
 		other.emit('destroy')
 		return this		
 	}
