@@ -46,9 +46,10 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 
 		if(parent){
 			this.screen.device = parent.screen.device
+			this.screen.parent = parent
 		}
 
-		renderer.renderDiff(this.screen, parent, previous && previous.screen, globals)
+		renderer(this.screen, previous && previous.screen, globals, true)
 
 		if(this.screen.title !== undefined) document.title = this.screen.title 
 				
