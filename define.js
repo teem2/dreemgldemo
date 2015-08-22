@@ -306,7 +306,11 @@
 			// call atConstructor if defined
 			if(MyConstructor.stubbed) return obj
 			if(obj._atConstructor) obj._atConstructor.apply(obj, arguments)
-			if(obj.atConstructor) obj.atConstructor.apply(obj, arguments)
+
+			if(obj.atConstructor){
+				var res = obj.atConstructor.apply(obj, arguments)
+				if(res !== undefined) return res
+			}
 			return obj
 		}
 		

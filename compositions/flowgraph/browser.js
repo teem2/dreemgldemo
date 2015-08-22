@@ -16,8 +16,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 
 	this.init = function(){
 		this.teem.fileio.readfile('../dreem2/' + this.composition).then(function(result){
-			var parser = new XmlParser()
-			var xml = parser.parse(result)
+			var xml = XmlParser(result)
 			var screens = XmlParser.childByTagName(xml, 'composition/screens')
 			this.dataset.fork(function(data){
 				for(var i = 0; i < screens.child.length; i++){

@@ -310,6 +310,11 @@ define.class(function(require, exports, self){
 	 * So check parserobj.errors.length after for errorhandling
 	 *
 	 */
+
+	self.atConstructor = function(data){
+		if(arguments.length) return this.parse(data)
+	}
+
 	self.parse = function(source){
 		// lets create some state
 		var root = this.node = this.createNode('$root',0)
