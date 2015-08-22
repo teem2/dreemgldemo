@@ -378,9 +378,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			parent.appendChild(this.dom)
 			if(this.src) dom.src = this.src
 
-			this.addEventListener('mousedown', this.mouse.mousedown.bind(this.mouse))
-			this.addEventListener('mouseup', this.mouse.mousedown.bind(this.mouse))
-			this.addEventListener('mousemove', this.mouse.mousedown.bind(this.mouse))
+			//this.addEventListener('mousedown', this.mouse.mousedown.bind(this.mouse))
+			//this.addEventListener('mouseup', this.mouse.mousedown.bind(this.mouse))
+			//this.addEventListener('mousemove', this.mouse.mousedown.bind(this.mouse))
 		}
 
 		var r = this.getBoundingRect();
