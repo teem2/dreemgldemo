@@ -139,11 +139,10 @@ define.browserClass(function(require,screen, node, container, spline, cadgrid, m
 			{
 				
 				var d = this.dataset.data.screens[a];
-				this.blokjes[d.name] = blokje({x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor? d.basecolor:vec4("purple") });
+				this.blokjes[d.name] = blokje({data: d, x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 , name: d.name, basecolor: d.basecolor? d.basecolor:vec4("#ffc030") });
 				i++;
 				
-				all.push(this.blokjes[d.name]);
-				
+				all.push(this.blokjes[d.name]);			
 			}
 			this.connections = []
 			for(a in this.dataset.data.connections)
@@ -166,7 +165,9 @@ define.browserClass(function(require,screen, node, container, spline, cadgrid, m
 
 		this.position = "absolute" ;
 		this.attribute("basecolor", {type: vec4, value: "green"});
-
+		
+		this.attribute("data", {type: Object});
+		
 		this.mouseleftdown = function(){
 			this.start = {mousex:this.mouse.x, mousey:this.mouse.y,startx: this.x, starty: this.y}
 			this.mousemove = function(){
@@ -188,17 +189,15 @@ define.browserClass(function(require,screen, node, container, spline, cadgrid, m
 				this.mouseleftup = function(){};
 			}
 		}
-		
-	
-		
-		this.bgcolor = vec4("#ffff60")
+
+		this.bgcolor = vec4("#ffff60");
 		this.bg.basecolor = vec4();
-		
+
 		this.atDraw = function()
 		{
 			this.bg.basecolor = this.basecolor;
 		}
-		
+
 		this.bg.bgcolorfn = function(a,b)
 		{
 			return mix(basecolor, vec4("white"), a.y/2);
@@ -208,19 +207,27 @@ define.browserClass(function(require,screen, node, container, spline, cadgrid, m
 		this.padding = 1;
 		this.borderwidth = 1;
 		this.bordercolor = vec4("darkgray");
+
 		this.render = function(){
-			
-			return [
-				
+			console.log(this.data);
+			return [				
 				view({ bgcolor: this.basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4},
 					text({text: this.name, bgcolor: "transparent", fgcolor: "black"})
+					,button({text:"change color",margin:0, padding:0,  click: function(){
+							this.screen.openModal(		
+								screenoverlay({},text({text:"thing!", bgcolor:"transparent", fontsize: 20}))
+							);
+						}
+					}
+					)
 				),
-				view({bgcolor: this.basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));}}
-						,button({text:"button 1"})
-						,button({text:"button 2"})
-						,button({text:"button 3"})
-						,button({text:"button 4"})
-				)]
+				view({bgcolor: this.basecolor, flexdirection:"column", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));}}
+					,this.data.linkables.map(function(d){
+						return button({text:d.name, itemalign: d.input?"flex-start":"flex-end"});
+					})
+					
+				)
+			]
 		}
 	})
 	
