@@ -3,7 +3,15 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 	var XmlParser = require('$parsers/htmlparser')
 
 	this.title = "Flowgraph Builder"
-
+	
+	this.attribute("dataset", {type: Object});
+	
+	this.state("xmlstring");
+	this.state("xmljson");
+	
+	this.xmlstring = "";
+	this.xmljson = {};
+	
 	this.atConstructor = function(){
 		this.composition = location.hash.slice(1) || 'compositions/example/editor.dre'
 		this.dataset = datatracker({
@@ -18,11 +26,35 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			selected: "composition/screens/default"
 		})
 	}
-
+	
+	this.BuildXML = function(originalset, dataset){
+		var res = XmlParser.reserialize(this.xmljson);
+		
+		return res;
+	}
+	
+	this.dataset = function(){
+		console.log("data set changed!");
+		
+		var newxml = this.BuildXML(this.xmljson, this.dataset.data);
+		
+		if (newxml != this.xmlstring){
+			console.log("need to save new version...");
+			this.teem.fileio.savefile('../dreem2/' + this.composition).then(function(result){				
+				console.log("saved composition to server!");
+				this.xmlstring = newxml;
+			});		
+		}else{
+			console.log("no notable changes.. not saving file to server");
+		}
+	}
+	
 	this.init = function(){
 		this.teem.fileio.readfile('../dreem2/' + this.composition).then(function(result){
-			var xml = XmlParser(result)
-			var screens = XmlParser.childByTagName(xml, 'composition/screens')
+			
+			this.xmljson= XmlParser(result)			
+			
+			var screens = XmlParser.childByTagName(this.xmljson, 'composition/screens')
 			this.dataset.fork(function(data){
 				for(var i = 0; i < screens.child.length; i++){
 					var scr = screens.child[i]
@@ -37,7 +69,9 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 						}.bind(this))
 					})
 				}
-			})
+				
+				this.xmlstring = this.BuildXML(this.xmljson, data);
+			}.bind(this))
 		}.bind(this))
 	}
 	/*
@@ -310,15 +344,15 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 							,menuitem({text: "Revert"})
 						)
 						,menuitem({text: "Edit"}
-							,menuitem({text: "Copy"})
+							,menuitem({text: "Copy", enabled: false})
 							
-							,menuitem({text: "Paste"})
+							,menuitem({text: "Paste", enabled: false})
 							,menuitem({text: "Undo", click:function(){this.dataset.undo()}.bind(this)})
 							,menuitem({text: "Redo", click:function(){this.dataset.redo()}.bind(this)})
-							,menuitem({text: "Options"})		
+							,menuitem({text: "Options", enabled: false})		
 						)
 						,menuitem({text: "Help"}
-							,menuitem({text: "Manual"})
+							,menuitem({text: "Manual", enabled: false})
 							,menuitem({text: "About", click: function(){
 								this.screen.openModal(screenoverlay({click:function(){this.screen.closeModal()}}
 									,view({flexdirection: "column", flex: 1, bgcolor: "transparent"},view({flexdirection: "row", flex: 1, bgcolor: "transparent", alignself:"center"},												

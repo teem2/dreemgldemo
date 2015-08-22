@@ -119,11 +119,16 @@ define.class('$base/nodeworker', function(require, exports, self){
 	}
 	
 	this.atDestroy = function(){
-		if (this.screen) this.screen.requestLayout();
+		if (this.screen) {
+			this.screen.requestLayout();
+			
+		}
 	}
 	
 	this.destroy = function(){
-		if (this.screen) this.screen.addDirtyRect(this.getLastDrawnBoundingRect());
+		if (this.screen){
+			this.screen.addDirtyRect(this.getLastDrawnBoundingRect());
+		}
 	}
 	
 	this.bubbleDirty = function(){

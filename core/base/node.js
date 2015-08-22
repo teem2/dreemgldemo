@@ -211,7 +211,14 @@ define.class(function(require, constructor){
 	this.parse = function(key, value){
 
 	}
-
+	
+	this.emitRecursive = function(key, value){
+			this.emit(key,value);
+			for(var a in this.children){
+				this.children[a].emitRecursive(key, value)
+			}
+	}
+	
 	this.emit = function(key, value){
 		var on_key = 'on' + key
 		var listen_key = '_listen_' + key
