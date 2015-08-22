@@ -368,7 +368,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 	
 	this.drawContentDOM = function(renderstate){
-		console.log("DOMNODE")
 		if (this.matrixdirty) this.recomputeMatrix()
 		// lets check if we have a div
 
@@ -380,6 +379,15 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			if(this.src) dom.src = this.src
 		}
 
+		var r = this.getBoundingRect();
+//		console.log(r);
+		
+		if (r){
+			dom.style.width = Math.floor(r.right - r.left);
+			dom.style.height = Math.floor(r.bottom - r.top);
+			dom.style.left = Math.floor(r.left);
+			dom.style.top = Math.floor(r.top);		
+		} else
 		if(this.layout){
 			dom.style.width = this.layout.width? this.layout.width: this._width
 			dom.style.height = this.layout.height? this.layout.height: this._height

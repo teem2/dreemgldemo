@@ -284,7 +284,6 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 					)					
 				)
 				,splitcontainer({name:"mainsplitter", vertical: false}
-					,view({flex:1,mode:'DOM', src:'http://thisisnotrocketscience.nl'})
 					,treeview({flex:0.2, 
 						dataset: dataset,
 						buildtree: function(data)
@@ -305,7 +304,8 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 						} }
 						}
 					)
-					,scrollcontainer({flex: 0.8}
+					,splitcontainer({flex: 0.8, vertical: true}
+						,scrollcontainer({}
 						,view({flexdirection: "column" , flex:1},
 							menubar({}
 								,menuitem({text: "new block", click:function(){
@@ -322,7 +322,10 @@ define.browserClass(function(require,screen, node,  spline, cadgrid, menubar,scr
 
 							)
 							,blokjesgrid({dataset: dataset})
-						)
+						))
+							,view({flex:1,mode:'DOM', src:'http://localhost:8080/compositions/example/layouts.dre?edit=1'})
+				
+						
 					)
 				)
 			)
