@@ -695,15 +695,30 @@ this.draw_calls = 0
 		}
 	}
 
+	this.copyProps = function(other){
+		// lets copy the old props
+		var keys = Object.keys(other)
+		for(var i = 0; i < keys.length ; i++){
+			var key = keys[i]
+			if(other.__lookupGetter__(key))continue
+			if(key === 'children' || key.charAt(0) === '_') continue
+			if(key === 'constructor_args' || 
+				key === 'instance_children' || 
+				key === 'atAttributeGet') continue
+			var value = other[key]
+			if(typeof value === 'function') continue
+			this[key] = value
+		}
+	}
+
 	this.diff = function(other, globals){
-		// if we diff well get a complete new one..
 		baseclass.prototype.diff.call(this, other, globals)
 		
 		for(i = 0; i < this.children.length; i++) this.children[i].parent = this
 		// alright now lets copy over the settings
 
 		this._init = 1
-
+/*
 		this.pic_tex = other.pic_tex
 		this.debug_tex = other.debug_tex
 		this.device = other.device
@@ -714,6 +729,7 @@ this.draw_calls = 0
 		this.utilityrectangle = other.utilityrectangle
 		this.debugrectangle = other.debugrectangle
 		this.utilityframe = other.utilityframe
+*/
 		this.modal_stack = []//other.modal_stack
 		this.initVars()
 		this.bindInputs()

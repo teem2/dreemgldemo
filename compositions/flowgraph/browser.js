@@ -1,4 +1,4 @@
-define.browserClass(function(require,screen, node, container, spline, cadgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
+define.browserClass(function(require,screen, node, datatracker, spline, cadgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 
 	var XmlParser = require('$parsers/htmlparser')
 
@@ -6,7 +6,7 @@ define.browserClass(function(require,screen, node, container, spline, cadgrid, m
 
 	this.atConstructor = function(){
 		this.composition = location.hash.slice(1) || 'compositions/example/editor.dre'
-		this.dataset = container({
+		this.dataset = datatracker({
 			screens:[
 			],
 			connections:[
@@ -15,7 +15,7 @@ define.browserClass(function(require,screen, node, container, spline, cadgrid, m
 	}
 
 	this.init = function(){
-		this.teem.fileio.readfile('../dreem2/'+this.composition).then(function(result){
+		this.teem.fileio.readfile('../dreem2/' + this.composition).then(function(result){
 			var parser = new XmlParser()
 			var xml = parser.parse(result)
 			var screens = XmlParser.childByTagName(xml, 'composition/screens')
@@ -23,10 +23,10 @@ define.browserClass(function(require,screen, node, container, spline, cadgrid, m
 				for(var i = 0; i < screens.child.length; i++){
 					var scr = screens.child[i]
 					data.screens.push({name:scr.attr.name, basecolor:vec4('yellow'), linkables:
-						XmlParser.childrenByTagName(scr,'attribute').map(function(each){
+						XmlParser.childrenByTagName(scr, 'attribute').map(function(each){
 							return {
-								name: each.attr.name, 
-								type: each.attr.type, 
+								name: each.attr.name,
+								type: each.attr.type,
 								input: each.attr.input === 'true'
 							}
 						}.bind(this))
@@ -36,7 +36,7 @@ define.browserClass(function(require,screen, node, container, spline, cadgrid, m
 		}.bind(this))
 	}
 	/*
-	var dataset = container({
+	var dataset = datatracker({
 		screens:[
 			{name: "Browser", basecolor: vec4("#ffff60"), linkables:[
 				{name:"dataset", type: "list", input: true},
@@ -78,12 +78,14 @@ define.browserClass(function(require,screen, node, container, spline, cadgrid, m
 			
 			this.linecolor1 = from.basecolor;
 			this.linecolor2 = to.basecolor;
+
 			var br1 = from.lastdrawnboundingrect;
 			var w = br1.right - br1.left;
 			var fx = from._x;
 			var fy = from._y + 8;
 			var tx = to._x;
 			var ty = to._y + 8;
+
 			this.p0 = vec2(fx + w, fy);
 			this.p1 = vec2(fx+ w +100, fy );
 			this.p2 = vec2(tx-100,  ty);
@@ -262,21 +264,20 @@ define.browserClass(function(require,screen, node, container, spline, cadgrid, m
 				,splitcontainer({name:"mainsplitter", vertical: false}
 					,treeview({flex:0.2, 
 						dataset: this.dataset,
-						buildtree: function(data)
-							{
-								return { 
-									name:"Composition", children:
-										[{name:"Screens" , children: 
-												data.screens.map(function(d) {
-												
-												return {name: d.name, children: d.linkables?d.linkables.map(function(c){
-													return {name: c.name}
-												}):[]
-										}}
-									)
-								},
-								{name:"Connections"}
-								] 
+						buildtree: function(data){
+							return { 
+								name:"Composition", children:
+									[{name:"Screens" , children: 
+											data.screens.map(function(d) {
+											
+											return {name: d.name, children: d.linkables?d.linkables.map(function(c){
+												return {name: c.name}
+											}):[]
+									}}
+								)
+							},
+							{name:"Connections"}
+							] 
 						} }
 						}
 					)
