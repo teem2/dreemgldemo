@@ -73,6 +73,8 @@ define.class('$base/node', function (require, exports, self){
 			if(e.button === 1 ) this.cancapture = 3, this.middle = 1
 			if(e.button === 2 ) this.cancapture = 2, this.right = 1, this.rightdown = 1
 			this.isdown = 1
+			e.preventDefault()
+			overlay.style.display = 'block'
 		}
 
 		window.addEventListener('mousedown', this.mousedown.bind(this))
@@ -82,7 +84,6 @@ define.class('$base/node', function (require, exports, self){
 			if (this.activedown == 0){
 				//document.body.releaseCapture();
 			}
-
 			this.x = e.pageX// / this.ratio//* window.devicePixelRatio
 			this.y = e.pageY// / this.ratio //* window.devicePixelRatio
 			this.cancapture = 0
@@ -91,6 +92,7 @@ define.class('$base/node', function (require, exports, self){
 			if(e.button === 2) this.right = 0, this.rightup = 1
 			this.isdown = 0
 			e.preventDefault()
+			overlay.style.display = 'none'
 		}
 
 		window.addEventListener('mouseup', this.mouseup.bind(this))
@@ -105,5 +107,22 @@ define.class('$base/node', function (require, exports, self){
 		}
 
 		window.addEventListener('mousemove', this.mousemove.bind(this))
+
+		var overlay = this.overlay
+		if(!overlay){
+			overlay = this.overlay = document.createElement(this.tag || 'div')
+			document.body.appendChild(this.overlay)
+			overlay.style.display = 'none'
+			overlay.style.position = 'absolute'
+			overlay.style.zIndex = 10000000
+			overlay.style.width = '100%'
+			overlay.style.height = '100%'
+
+			overlay.addEventListener('mousedown', this.mousedown.bind(this.mouse))
+			overlay.addEventListener('mouseup', this.mouseup.bind(this.mouse))
+			overlay.addEventListener('mousemove', this.mousemove.bind(this.mouse))
+		}
+
+
 	}
 })
