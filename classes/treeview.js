@@ -69,7 +69,11 @@ define.class(function(sprite, text, view, button, icon){
 		this.alignself = "flex-start" 	
 		
 		this.render = function(){
-			return [flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}), flatbutton({text: this.text})];
+			return [
+				//this.haschildren?flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}):[], 
+				flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}),
+				flatbutton({text: this.text})
+			];
 		}
 	});		
 	
@@ -184,7 +188,7 @@ define.class(function(sprite, text, view, button, icon){
 				[
 				
 				view({bgcolor:"transparent",flexdirection:"column" },
-					newitemheading({folded: this.collapsed, toggleclick: this.toggle.bind(this), selectclick: this.selectclick.bind(this),text:this.item.name, id:this.item.id }),
+					newitemheading({haschildren:this.item.children&&this.item.children.length, folded: this.collapsed, toggleclick: this.toggle.bind(this), selectclick: this.selectclick.bind(this),text:this.item.name, id:this.item.id }),
 					this.item.collapsed==false?
 						view({bgcolor:"transparent",flexdirection:"row" },
 							view({bgcolor:"transparent",  flexdirection:"column" , flex:1},
