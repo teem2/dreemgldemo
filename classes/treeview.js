@@ -3,8 +3,6 @@
 
 define.class(function(sprite, text, view, button, icon){
 
-		
-		
 	var testdata = {name:'test Node', children:[
 		{name:'Child 1000', children:[
 			{name:'node 0-0-0 '}
@@ -26,20 +24,7 @@ define.class(function(sprite, text, view, button, icon){
 		]}
 	]}
 	
-	this.attribute("data", {type: Object, value: testdata});
 	this.attribute("dataset", {type: Object, value:{}});
-	
-	this.rebuildTree = function(){
-		if (this.buildtree) this.data = this.buildtree(this.dataset.data);else this.data = this.dataset.data;
-	}
-	
-	this.dataset = function() {	
-		this.rebuildTree();
-	}
-	
-	this.init = function(){
-		this.rebuildTree();
-	}
 
 	var newitemheading = button.extend(function newitemheading(){
 		this.borderwidth = 0;
@@ -215,7 +200,11 @@ define.class(function(sprite, text, view, button, icon){
 	this.alignself="stretch" ;
 	
 	this.render = function(){
-		
-		return [treeitem({item:this.data})]
+		var data
+		if (this.buildtree) data = this.buildtree(this.dataset.data)
+		else{
+			data = this.dataset.data
+		}
+		return [treeitem({item:data})]
 	}
 })
