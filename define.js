@@ -1,6 +1,5 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Micro AMD module loader for browser and node.js and basic system homogenisation library
-"use strict";
 (function define_module(config_define){
 
 	// the main define function
