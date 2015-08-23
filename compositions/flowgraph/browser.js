@@ -59,7 +59,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			var attr = Xml.createChildNode('attribute', fs)
 			attr.attr = {
 				name:'screens_' + con.to.node + '_' + con.to.input,
-				to:'screens_' + con.from.node + '_' + con.from.output,
+				from:'screens_' + con.from.node + '_' + con.from.output,
 				type:'string'
 			}
 			server_output[attr.attr.name] = 1
@@ -92,9 +92,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 									txt.value += "dr.teem.flowserver.screens_" + con.to.node + '_' + con.to.input + ' = this.' + attrib.attr.name + '\n'
 								}
 							}
-							
 						}
-
 					}
 					else{ // try to remove one
 					}
@@ -108,7 +106,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 //
 		return res;
 	}
-	
 	
 	this.init = function(){
 		this.teem.fileio.readfile('../dreem2/' + this.composition).then(function(result){
@@ -133,6 +130,22 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 						}.bind(this))
 					})
 				}
+
+				var flowserver = Xml.childByTagName(this.xmljson,'composition/flowserver')
+				Xml.childrenByTagName(flowserver,'attribute').map(function(each){
+					var name = each.attr.name
+					var tonode = name.slice(name.indexOf('_')+1)
+					var toinput = tonode.slice(tonode.indexOf('_')+1)
+					tonode = tonode.slice(0,tonode.indexOf('_'))
+					var from = each.attr.from
+					var fromnode = from.slice(from.indexOf('_')+1)
+					var fromoutput = fromnode.slice(fromnode.indexOf('_')+1)
+					fromnode = fromnode.slice(0,fromnode.indexOf('_'))
+
+					console.log(tonode, toinput, fromnode, fromoutput)
+					data.connections.push({from:{node:fromnode, output:fromoutput},to:{node:tonode,input:toinput}})
+				})
+
 
 				this.xmlstring = this.BuildXML(this.xmljson, data);
 			}.bind(this))
