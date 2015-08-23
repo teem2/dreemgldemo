@@ -14,7 +14,6 @@ define.class(function(require, exports, module){
 
 		var object = new_version
 		var old_children
-
 		if(old_version){
 			if(!skip_old && define.classHash(new_version.constructor) === define.classHash(old_version.constructor) && new_version.constructorPropsEqual(old_version)){
 				// old_version is identical. lets reuse it.
@@ -25,8 +24,9 @@ define.class(function(require, exports, module){
 			}
 			else{ // we are going to use new_version. lets copy _state properties
 				object = new_version
+				
 				if(new_version !== old_version){
-					old_children = old_version.children
+					old_children = object.children
 					for(var key in new_version._state){
 						new_version[key] = old_version[key]
 					}
@@ -34,7 +34,8 @@ define.class(function(require, exports, module){
 				}
 			}
 		}
-
+		else old_children = new_version.children
+		
 		for(var key in globals){
 			object[key] = globals[key]
 		}
@@ -53,7 +54,7 @@ define.class(function(require, exports, module){
 			if(!this.hasListenerName(key, '__atAttributeGet')){
 				this[key] = function __atAttributeGet(){
 					// we need to call re-render on this
-					renderer(this, this, globals, true)
+					renderer(this, undefined, globals, true)
 					this.setDirty(true)
 					if(this.reLayout) this.reLayout()
 				}
@@ -91,7 +92,8 @@ define.class(function(require, exports, module){
 			if(name !== undefined && !(name in object)) object[name] = new_child
 		}
 		if(old_children) for(;i<old_children.length;i++){
-			old_children[i].emit('destroy')
+			console.log('emitting destroy!')
+			old_children[i].emitRecursive('destroy')
 		}
 
 		if(init_wires){
