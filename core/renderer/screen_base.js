@@ -37,6 +37,7 @@ define.class('$base/nodeworker', function(require, exports, self){
 		}
 		return hasanim
 	}
+	this.event("postLayout")
 
 	this.hideProperty(Object.keys(self))
 

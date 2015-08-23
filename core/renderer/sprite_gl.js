@@ -563,14 +563,11 @@ this.dirty = false;
 			if (this.layout.top != this.lastLayout.top) { changed = true;}
 			if (this.layout.right != this.lastLayout.right) {changed = true;}
 			if (this.layout.bottom != this.lastLayout.bottom) { changed = true;}
-			
-			
 		}
-		if (changed) 
-		{
+		if (changed){
 			this.layoutchanged();
-			this.setDirty(true);
-			this.setDirty(true, this.lastLayout)
+			this.setDirty();
+			//this.setDirty(true, this.lastLayout)
 		}
 		if (this.layout) this.lastLayout= {left:this.layout.left, top:this.layout.top, width:this.layout.width, height:this.layout.height, right: this.layout.right, bottom:this.layout.bottom};
 		return changed;

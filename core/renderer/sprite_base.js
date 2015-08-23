@@ -87,6 +87,7 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.attribute('fgcolor', {type:vec4, value: vec4(1,1,1,1)});
 
 	this.event("reinit")
+	this.event("postLayout")
 
 	this.event("click")
 	this.event("miss")

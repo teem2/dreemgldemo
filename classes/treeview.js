@@ -178,10 +178,8 @@ define.class(function(module, sprite, text, view, button, icon){
 			
 			//this.collapsed;
 			//console.log("treeitem", this.item.name, this.item.children);
-			return [view({flexdirection:"row", flexwrap:"none",flex:1},
-				[
-				
-				view({bgcolor:"transparent",flexdirection:"column" },
+			return [view({flexdirection:"row", flex:1},[
+				view({bgcolor:"transparent", flexwrap:"none",flexdirection:"column" },
 					newitemheading({haschildren:this.item.children&&this.item.children.length, folded: this.item.collapsed, toggleclick: this.toggle.bind(this), selectclick: this.selectclick.bind(this),text:this.item.name, id:this.item.id }),
 					this.item.collapsed==false?
 						view({bgcolor:"transparent",flexdirection:"row" },
@@ -240,8 +238,9 @@ define.class(function(module, sprite, text, view, button, icon){
 	}
 	
 	this.bg.bgcolorfn= this.bggradient;
-	this.flexdirection="column";
+	this.flexdirection="row";
 	this.flex= 1;
+
 	this.alignself="stretch" ;
 
 	this.render = function(){

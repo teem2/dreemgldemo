@@ -107,12 +107,22 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.state("to");
 		this.position = "absolute" 
 		this.linewidth = 10;
+		
 		this.init = function(){
 			this.update();
+			this.to.postLayout = 
+			this.from.postLayout = function(){
+				this.update()
+			}.bind(this)		
 		}
 		
 		this.linecolor = vec4("black");
-		
+
+		this.atDraw = function(){
+			this.update()
+			spline.prototype.atDraw.call(this)
+		}
+
 		this.update = function(from, to){
 			//console.log(this.from.name, this.to.name);
 			if (from === undefined) from = this.from;
@@ -123,10 +133,10 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 
 			var br1 = from.lastdrawnboundingrect;
 			var w = br1.right - br1.left;
-			var fx = from._x;
-			var fy = from._y + 8;
-			var tx = to._x;
-			var ty = to._y + 8;
+			var fx = from._pos[0];
+			var fy = from._pos[1] + 8;
+			var tx = to._pos[0];
+			var ty = to._pos[1] + 8;
 
 			this.p0 = vec2(fx + w, fy);
 			this.p1 = vec2(fx+ w +100, fy );
@@ -161,12 +171,12 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.attribute("dataset", {type: Object, value: {}});
 		this.connections = [];
 		
-		this.updateConnections = function(name, pos){
-			for (var i in this.connections){
-				var c = this.connections[i];
-				if (c.to.name === name || c.from.name === name) c.update(this.blokjes[c.from.name], this.blokjes[c.to.name]);
-			}
-		}
+		//this.updateConnections = function(name, pos){
+		//	for (var i in this.connections){
+		//		var c = this.connections[i];
+		//		if (c.to.name === name || c.from.name === name) c.update(this.blokjes[c.from.name], this.blokjes[c.to.name]);
+		//	}
+		//}
 		
 		this.blokjes ={};
 		
@@ -231,12 +241,12 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 				nx = Math.floor(nx/10) * 10;
 				ny = Math.floor(ny/10) * 10;
 				this.pos = vec2(nx,ny);
-				this.parent.updateConnections(this.name, this.pos);
+				//this.parent.updateConnections(this.name, this.pos);
 			
 			}
 			this.mouseleftup = function(){
 				this.mousemove = function(){};
-				this.parent.updateConnections(this.name, this.pos);
+				//this.parent.updateConnections(this.name, this.pos);
 				this.mouseleftup = function(){};
 			}
 		}
