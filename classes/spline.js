@@ -99,20 +99,19 @@ define.class(function(sprite, text, view, button, icon){
 	this.bg.position = function(){
 		var npos = math.bezier2d(p0, p1, p2, p3, mesh.pos) - off;
 
-		var last = math.bezier2d(p0, p1, p2, p3, 0.) - off;
-		bezierlen = 0.
-		var step = int(mesh.pos * 100.)
-		for(var i = 1; i < 100; i++){
+	//	var last = math.bezier2d(p0, p1, p2, p3, 0.) - off;
+	//	bezierlen = 0.
+	//	var step = int(mesh.pos * 100.)
+		/*for(var i = 1; i < 100; i++){
 			var mypos = math.bezier2d(p0, p1, p2, p3, float(i) / 100.)
 			bezierlen += 0.05*length(mypos - last)
 			last = mypos
 			if(i >= step) break
-		}
+		}*/
 
 		//linewidth*=sin(time + bezierlen*0.4)*10.
 		var rx = (npos.x + mesh.side * -npos.w * linewidth);
 		var ry = (npos.y + mesh.side * npos.z * linewidth);
-
 
 		return vec4(rx,ry, 0, 1) * matrix  * viewmatrix
 	}
