@@ -137,6 +137,12 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		return this.boundingRectCache;
 	}
 	
+	
+	this.calcrectv1 = vec2();
+	this.calcrectv2 = vec2();
+	this.calcrectv3 = vec2();
+	this.calcrectv4 = vec2();
+	
 	this.calculateBoundingRect = function(force){	
 		if (!this.orientation)
 		{
@@ -154,15 +160,19 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			y2 = this.layout.height;
 		}
 
-		var v1 = vec2(x1,y1);
-		var v2 = vec2(x2,y1);
-		var v3 = vec2(x2,y2);
-		var v4 = vec2(x1,y2);
+		var v1 = this.calcrectv1;
+		var v2 = this.calcrectv2;
+		var v3 = this.calcrectv3;
+		var v4 = this.calcrectv4;
+		v1[0] = x1;v1[1] = y1;
+		v2[0] = x2;v2[1] = y1;
+		v3[0] = x2;v3[1] = y2;
+		v4[0] = x1;v4[1] = y2;
 		
-		v1 = vec2.mul_mat4_t(v1, this.orientation.worldmatrix)
-		v2 = vec2.mul_mat4_t(v2, this.orientation.worldmatrix)
-		v3 = vec2.mul_mat4_t(v3, this.orientation.worldmatrix)
-		v4 = vec2.mul_mat4_t(v4, this.orientation.worldmatrix)		
+		vec2.mul_mat4_t(v1, this.orientation.worldmatrix,v1)
+		vec2.mul_mat4_t(v2, this.orientation.worldmatrix,v2)
+		vec2.mul_mat4_t(v3, this.orientation.worldmatrix,v3)
+		vec2.mul_mat4_t(v4, this.orientation.worldmatrix,v4)		
 		//mat4.debug(this.orientation.worldmatrix,true);
 		//mat4.debug(this.orientation.matrix,true);
 		var minx = v1[0];
