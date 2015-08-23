@@ -19,7 +19,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	this.totaldirtyrect = {};
 	this.dirtyrectset = false;
 	this.debugshader = false
-	this.debug = true;
+	//this.debug = true;
 	this.showdebugtext = true;
 	this.renderstructure = false;
 	

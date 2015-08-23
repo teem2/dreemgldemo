@@ -114,7 +114,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.linecolor = vec4("black");
 		
 		this.update = function(from, to){
-			return;
 			//console.log(this.from.name, this.to.name);
 			if (from === undefined) from = this.from;
 			if (to === undefined) to = this.to;
