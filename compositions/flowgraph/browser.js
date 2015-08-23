@@ -193,6 +193,40 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.attribute("dataset", {type: Object, value: {}});
 		this.connections = [];
 		
+		
+		this.connectionstart = undefined;
+		this.connectionend = undefined;
+	
+		this.tryToBuildConnection = function(){
+			if(this.connectionstart && this.connectionend)
+			{
+				this.dataset.fork(function(data){
+						data.connections.push({
+																	from:{
+																			node: this.connectionstart.screen, 
+																			output: this.connectionstart.output
+																	}
+																	,to:{
+																			node: this.connectionend.screen,
+																			input: this.connectionend.input,
+																	}
+																})
+				})
+				this.connectionstart = undefined;
+				this.connectionend = undefined;			
+			}			
+		}
+		
+		this.setConnectionStart = function(blok, output){
+			this.connectionstart = {screen: blok, output: output};
+			this.tryToBuildConnection();
+		}
+
+		this.setConnectionEnd = function(blok, input){
+			this.connectionend = {screen: blok, input: input};
+			this.tryToBuildConnection();		
+		}
+		
 		//this.updateConnections = function(name, pos){
 		//	for (var i in this.connections){
 		//		var c = this.connections[i];
@@ -240,6 +274,19 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.padding = 0;
 		this.attribute("text", {type:String, value:""});
 		this.attribute("input", {type:boolean, value:""});
+		
+		this.mouseover = function(){
+			this.setDirty();
+		}
+		
+		this.mouseout = function(){
+			this.setDirty();
+		}
+		
+		this.click = function(){
+			
+		}
+		
 		this.render =function(){		
 			if (this.input){
 				return [icon({icon: "forward", fontsize: 20}),text({text:this.text,margin: vec4(10,0,10,4), fontsize: 20, bgcolor:"transparent", fgcolor:"black"})];
@@ -325,7 +372,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.outputsdict = [];
 		this.inputs = [];
 		this.outputs = [];
-		
+				
 		if (this.data.linkables){
 			for (var i in this.data.linkables){
 				var L = this.data.linkables[i];				
@@ -337,8 +384,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 				else{
 					var newoutput = connectorbutton({text:L.name,input: false})
 					this.outputsdict[L.name] = newoutput;
-					this.outputs.push(newoutput);
-					
+					this.outputs.push(newoutput);					
 				}
 			}
 		}
