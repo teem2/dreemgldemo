@@ -6,7 +6,6 @@ define.class(function(require, exports, module){
 	var Node = require('$base/node')
 
 	module.exports = function renderer(new_version, old_version, globals, skip_old, wireinits){
-		console.trace("RENDERING", new_version)
 		var init_wires = false
 		if(!wireinits){
 			wireinits = []
