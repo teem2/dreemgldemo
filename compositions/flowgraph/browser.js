@@ -86,8 +86,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 
 			})
 		})
-
-
 		var res = Xml.reserialize(this.xmljson);
 		console.log(res)
 //
