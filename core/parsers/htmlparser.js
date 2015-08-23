@@ -32,7 +32,10 @@ define.class(function(require, exports, self){
 			else ret += '/>\n'
 		}
 		else{
-			if(node.tag == '$text') ret += indent + node.value + '\n' 
+			if(node.tag == '$text'){
+				// lets strip all empty whitespace above a value and replace it with a \n
+				ret += indent + node.value.trim() + '\n' 
+			}
 			else if(node.tag == '$cdata') ret += indent + '<![CDATA['+node.value+']]>\n'
 			else if(node.tag == '$comment') ret += indent + '<!--'+node.value+'-->\n'
 			else if(node.tag == '$root') ret += child
@@ -82,10 +85,10 @@ define.class(function(require, exports, self){
 		}
 	}
 
-	exports.childByAttribute = function(node, name, value){
+	exports.childByAttribute = function(node, name, value, tag){
 		for(var i = 0, l = node.child.length; i<l; i++){
 			var sub = node.child[i]
-			if(sub.attr && name in sub.attr){
+			if((tag === undefined || sub.tag == tag) && sub.attr && name in sub.attr){
 				if(value === undefined) return sub
 				else if(sub.attr[name] == value) return sub
 			}
@@ -94,12 +97,20 @@ define.class(function(require, exports, self){
 
 	self.__trace__  = 3
 
+	exports.createChildNode = function(tag, parent){
+		var node = this.createNode(tag,0)
+		this.appendChild(parent, node)
+		return node
+	}
+
+	exports.appendChild = 
 	self.appendChild = function(node, value){
 		var i = 0
 		if(!node.child) node.child = [value]
 		else node.child.push(value)
 	}
 
+	exports.createNode = 
 	self.createNode = function(tag, charpos){
 		return {tag:tag, pos: charpos}
 	} 
@@ -347,7 +358,7 @@ define.class(function(require, exports, self){
 							if(ch == 45 && source.charCodeAt(pos) == 45 &&
 									source.charCodeAt(pos + 1) == 62){
 								pos += 2
-								this.atComment(source.slice(start, pos - 3), start, pos)
+								this.atComment(source.slice(start + 4, pos - 3), start, pos)
 								break
 							}
 							else if(pos == len) this.atError("Unexpected end of files while reading <!--", start)
@@ -356,14 +367,14 @@ define.class(function(require, exports, self){
 						continue
 					}
 					if(after == 91){ // <![ probably followed by CDATA[ just parse to ]]>
-						pos += 8
 						start = pos
+						pos += 8
 						while(pos < len){
 							ch = source.charCodeAt(pos++)
 							if(ch == 93 && source.charCodeAt(pos) == 93 &&
 									source.charCodeAt(pos + 1) == 62){
 								pos += 2
-								this.atCDATA(source.slice(start, pos - 3), start - 8, pos)
+								this.atCDATA(source.slice(start + 8, pos - 3), start, pos)
 								break
 							}
 							else if(pos == len) this.atError("Unexpected end of file while reading <![", start)

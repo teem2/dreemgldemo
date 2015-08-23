@@ -1,7 +1,7 @@
 "use strict";
 define.browserClass(function(require,screen, node, datatracker, spline, cadgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 
-	var XmlParser = require('$parsers/htmlparser')
+	var Xml = require('$parsers/htmlparser')
 
 	this.title = "Flowgraph Builder"
 	
@@ -12,7 +12,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 	this.state("dataset");
 	this.state("appstate");
 	this.xmlstring = "";
-	this.xmljson = {};
 	
 	this.atConstructor = function(){
 		this.composition = location.hash.slice(1) || 'compositions/example/editor.dre'
@@ -30,22 +29,82 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 	}
 	
 	this.BuildXML = function(originalset, dataset){
-		var res = XmlParser.reserialize(this.xmljson);
-		
+		if(!this.xmljson) return ''
+		var fs = Xml.childByTagName(this.xmljson, 'composition/flowserver')
+		if(!fs){
+			fs = Xml.createChildNode('flowserver', Xml.childByTagName(this.xmljson, 'composition'))
+		}
+		fs.child = undefined
+		var server_output = {}
+		var server_input = {}
+		for(var i = 0; i < dataset.connections.length; i++){
+			var con = dataset.connections[i]
+			var attr = Xml.createChildNode('attribute', fs)
+			attr.attr = {
+				name:'screens_' + con.to.node + '_' + con.to.input,
+				to:'screens_' + con.from.node + '_' + con.from.output,
+				type:'string'
+			}
+			server_output[attr.attr.name] = 1
+			server_input[attr.attr.to] = 1
+		}
+
+		Xml.childrenByTagName(this.xmljson, 'composition/screens/screen').forEach(function(screen){
+			var view = Xml.childByTagName(screen, 'view')
+			Xml.childrenByTagName(view, 'attribute').forEach(function(attrib){
+				// check if we are in connections
+				var to = "screens_"  + screen.attr.name + "_" + attrib.attr.name
+				if(attrib.attr.input == 'true'){
+					if(server_output[to]){
+						attrib.attr.value = "${dr.teem.flowserver."+to+"}"
+					}
+					else delete attrib.attr.value
+				}
+				if(attrib.attr.input == 'false'){
+					var handler = Xml.childByAttribute(view,'event', 'on'+attrib.attr.name, 'handler')
+					if(server_input[to]){ // add-make one
+						if(!handler){
+							handler = Xml.createChildNode('handler', view)
+							handler.attr = {event:'on'+attrib.attr.name}
+							var txt = Xml.createChildNode('$text', handler)
+							txt.value = ''
+							for(var i = 0; i < dataset.connections.length; i++){
+								var con = dataset.connections[i]
+								if(con.from.node === screen.attr.name &&
+									con.from.output === attrib.attr.name){
+									txt.value += "dr.teem.flowserver.screens_" + con.to.node + '_' + con.to.input + ' = this.' + attrib.attr.name + '\n'
+								}
+							}
+							
+						}
+
+					}
+					else{ // try to remove one
+					}
+					// handler
+				}
+
+			})
+		})
+
+
+		var res = Xml.reserialize(this.xmljson);
+		console.log(res)
+//
 		return res;
 	}
 	
 	this.dataset = function(){
 		console.log("data set changed!");
-		
+		console.log(this.xmljson)
 		var newxml = this.BuildXML(this.xmljson, this.dataset.data);
 		
 		if (newxml != this.xmlstring){
 			console.log("need to save new version...");
-			this.teem.fileio.savefile('../dreem2/' + this.composition).then(function(result){				
+			this.teem.fileio.writefile('../dreem2/' + this.composition, newxml).then(function(result){				
 				console.log("saved composition to server!");
 				this.xmlstring = newxml;
-			});		
+			}.bind(this));		
 		}else{
 			console.log("no notable changes.. not saving file to server");
 		}
@@ -53,16 +112,17 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 	
 	this.init = function(){
 		this.teem.fileio.readfile('../dreem2/' + this.composition).then(function(result){
-			
-			this.xmljson= XmlParser(result)			
-			
-			var screens = XmlParser.childByTagName(this.xmljson, 'composition/screens')
+			this.xmljson = Xml(result)			
+
+			var screens = Xml.childByTagName(this.xmljson, 'composition/screens')
 			this.dataset.fork(function(data){
 				for(var i = 0; i < screens.child.length; i++){
 					var scr = screens.child[i]
+					var view = Xml.childByTagName(scr, 'view')
+
 					data.screens.push({name:scr.attr.name, 
 								basecolor: (scr.attr.basecolor)?scr.attr.basecolor: vec4('#d0d0d0'), linkables:
-						XmlParser.childrenByTagName(scr, 'attribute').map(function(each){
+						Xml.childrenByTagName(view, 'attribute').map(function(each){
 							return {
 								name: each.attr.name,
 								type: each.attr.type,
@@ -71,12 +131,12 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 						}.bind(this))
 					})
 				}
-				data.connections.push({from:{node:"default"}, to: {node:"mobile"}})
-				data.connections.push({from:{node:"remote"}, to: {node:"default"}})
-				data.connections.push({from:{node:"remote"}, to: {node:"mobile"}})
-				
+
 				this.xmlstring = this.BuildXML(this.xmljson, data);
 			}.bind(this))
+			this.dataset.fork(function(data){
+				data.connections.push({from:{node:"default", output:'sldvalue'}, to: {node:"mobile", input:'sldinput'}})
+			})
 		}.bind(this))
 	}
 	

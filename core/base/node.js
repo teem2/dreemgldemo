@@ -313,7 +313,13 @@ define.class(function(require, constructor){
 		}
 		for(var i = 0; i < arguments.length; i++) this._state[arguments[i]] = 1
 	}
-	
+
+	this.setWiredAttribute = function(key, value){
+		if(!this.hasOwnProperty('_wiredfns')) this._wiredfns = this._wiredfns?Object.create(this._wiredfns):{}
+		this._wiredfns[key] = value
+		this['_wiredfn_'+key] = value
+	}
+
 	this.attribute = function(key, config){
 		// lets create an attribute
 		var value_key = '_' + key
@@ -349,7 +355,11 @@ define.class(function(require, constructor){
 			
 			setter = function(value){
 				if(this[set_key] !== undefined) value = this[set_key](value)
-				if(typeof value === 'function') return this[value.isWired? wiredfn_key: on_key] = value
+				if(typeof value === 'function'){
+					if(value.isWired) this.setWiredAttribute(key, value)
+					this[on_key] = value
+					return
+				}
 				if(typeof value === 'object' && value !== null && value.atAttributeAssign) value.atAttributeAssign(this, key)
 				if(!this.hasOwnProperty(storage_key)){
 					var store = this[storage_key]
@@ -379,7 +389,11 @@ define.class(function(require, constructor){
 		else if(config.type.primitive){
 			setter = function(value){
 				if(this[set_key] !== undefined) value = this[set_key](value)
-				if(typeof value === 'function') return this[value.isWired? wiredfn_key: on_key] = value
+				if(typeof value === 'function'){
+					if(value.isWired) this.setWiredAttribute(key, value)
+					this[on_key] = value
+					return
+				}
 				if(typeof value === 'object' && value !== null && value.atAttributeAssign) value.atAttributeAssign(this, key)
 
 				var config = this[config_key]
@@ -396,7 +410,11 @@ define.class(function(require, constructor){
 		else{
 			setter = function(value){
 				if(this[set_key] !== undefined) value = this[set_key](value)
-				if(typeof value === 'function') return this[value.isWired? wiredfn_key: on_key] = value
+				if(typeof value === 'function'){
+					if(value.isWired) this.setWiredAttribute(key, value)
+					this[on_key] = value
+					return
+				}
 				if(typeof value === 'object' && value !== null && value.atAttributeAssign) value.atAttributeAssign(this, key)
 				
 				var config = this[config_key]
@@ -497,8 +515,10 @@ define.class(function(require, constructor){
 		var immediate = false
 		if(!initarray) initarray = [], immediate = true
 
-		for(key in this) if(key.indexOf('_wiredfn_') === 0){
-			this.connectWiredAttribute(key.slice(9), initarray)
+		if(this._wiredfns){
+			for(key in this._wiredfns){
+				this.connectWiredAttribute(key, initarray)
+			}
 		}
 		// lets initialize bindings on all nested classes
 		var nested = this.constructor.nested

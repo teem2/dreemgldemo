@@ -255,7 +255,25 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 	this.orientation = {};
 	this.orientation.worldmatrix = mat4.identity();
-		
+	
+	/*this.rotation = function(){
+		this.orientation.rotation[2] = this.rotation;
+		this.setDirty(true)
+		this.matrixdirty = true
+	}
+
+	this.y = function(){
+		this.orientation.translation[1] = this.y;
+		this.setDirty(true)
+		this.matrixdirty = true
+	}
+
+	this.x = function(){
+		this.orientation.translation[0] = this.x;
+		this.setDirty(true)
+		this.matrixdirty = true
+	}
+	*/
 	this.init = function (obj){
 		
 		this.orientation = {
@@ -266,33 +284,15 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			worldmatrix : mat4.identity() // calculated
 		};
 		
-		this.rotation = function(){
-			this.orientation.rotation[2] = this.rotation;
-			this.setDirty(true)
-			this.matrixdirty = true
-		}
-
-		this.y = function(){
-			this.orientation.translation[1] = this.y;
-			this.setDirty(true)
-			this.matrixdirty = true
-		}
-
-		this.x = function(){
-			this.orientation.translation[0] = this.x;
-			this.setDirty(true)
-			this.matrixdirty = true
-		}
-		
 		this.texturecache = function(){
 			//console.log("setting texturecaching: ", this.texturecache);
 			this.enableTextureCache(this.texturecache);
 		}
-		
+		/*
 		this.emit('rotation')
 		this.emit('y')
 		this.emit('x')
-	
+	*/
 		this.visible = true
 		this.backgroundTexture = false;
 		this.texturecache = false;

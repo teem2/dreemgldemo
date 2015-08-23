@@ -69,7 +69,7 @@ define.class(function(module, sprite, text, view, button, icon){
 		
 		this.render = function(){
 			return [
-				this.haschildren?flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}):[], 
+				this.haschildren?flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2,width:14,height:16, click: this.toggleclick}):[], 
 				//flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}),
 				flatbutton({text: this.text})
 			];
