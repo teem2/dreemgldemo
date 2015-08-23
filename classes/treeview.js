@@ -136,25 +136,24 @@ define.class(function(module, sprite, text, view, button, icon){
 	})
 
 	var treeitem = view.extend(function (){
-		this.flex = 1.0;
-		
-		
+		this.flex = 1.0;	
 		
 		this.attribute("text", {type:String, value:""});
 		
-		this.attribute("collapsed", {type:Boolean, value:false});
+		//this.attribute("collapsed", {type:Boolean, value:false});
 		this.attribute("bgcolor", {type:vec4, value:vec4("transparent")});
 		this.attribute("fgcolor", {type:vec4, value:vec4("black")});
 		this.attribute("fontsize", {type:float, value:12});
 		
-		this.state("item");
-		
+		this.attribute("item", {type:Object});
+
 		this.flexdirection = "row" ;
 		
 		this.toggle = function(){
 			if (this.item){
 				if (!this.item.collapsed) this.item.collapsed = true;else this.item.collapsed = false;
-				this.collapsed = this.item.collapsed;
+				//this.collapsed = this.item.collapsed;
+				this.reRender()
 			}
 			//this.reLayout();
 			this.setDirty(true);
@@ -177,15 +176,13 @@ define.class(function(module, sprite, text, view, button, icon){
 			
 			if (!this.item) return [text({text:"empty"})];
 			
-			this.collapsed;
-
+			//this.collapsed;
 			//console.log("treeitem", this.item.name, this.item.children);
-		
 			return [view({flexdirection:"row", flexwrap:"none",flex:1},
 				[
 				
 				view({bgcolor:"transparent",flexdirection:"column" },
-					newitemheading({haschildren:this.item.children&&this.item.children.length, folded: this.collapsed, toggleclick: this.toggle.bind(this), selectclick: this.selectclick.bind(this),text:this.item.name, id:this.item.id }),
+					newitemheading({haschildren:this.item.children&&this.item.children.length, folded: this.item.collapsed, toggleclick: this.toggle.bind(this), selectclick: this.selectclick.bind(this),text:this.item.name, id:this.item.id }),
 					this.item.collapsed==false?
 						view({bgcolor:"transparent",flexdirection:"row" },
 							view({bgcolor:"transparent",  flexdirection:"column" , flex:1},
@@ -246,7 +243,7 @@ define.class(function(module, sprite, text, view, button, icon){
 	this.flexdirection="column";
 	this.flex= 1;
 	this.alignself="stretch" ;
-	this.blabla = newitemheading
+
 	this.render = function(){
 		var data;
 				

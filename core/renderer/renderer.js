@@ -14,6 +14,8 @@ define.class(function(require, exports, module){
 
 		var object = new_version
 		var old_children
+		var last_children
+		var cleanup
 		if(old_version){
 			if(!skip_old && define.classHash(new_version.constructor) === define.classHash(old_version.constructor) && new_version.constructorPropsEqual(old_version)){
 				// old_version is identical. lets reuse it.
@@ -24,7 +26,6 @@ define.class(function(require, exports, module){
 			}
 			else{ // we are going to use new_version. lets copy _state properties
 				object = new_version
-				
 				if(new_version !== old_version){
 					old_children = object.children
 					for(var key in new_version._state){
@@ -34,7 +35,7 @@ define.class(function(require, exports, module){
 				}
 			}
 		}
-		else old_children = new_version.children
+		else last_children = object.children
 		
 		for(var key in globals){
 			object[key] = globals[key]
@@ -47,19 +48,22 @@ define.class(function(require, exports, module){
 		object.emit('reinit')
 
 		// then call render
+		function __atAttributeGet(){
+			// we need to call re-render on this
+			renderer(this, undefined, globals, true)
+			this.setDirty(true)
+			if(this.reLayout) this.reLayout()
+		}
 
 		// store the attribute dependencies
 		object.atAttributeGet = function(key){
 			// lets find out if we already have a listener on it
 			if(!this.hasListenerName(key, '__atAttributeGet')){
-				this[key] = function __atAttributeGet(){
-					// we need to call re-render on this
-					renderer(this, undefined, globals, true)
-					this.setDirty(true)
-					if(this.reLayout) this.reLayout()
-				}
+				this[key] = __atAttributeGet
 			}
 		}
+
+		object.reRender = __atAttributeGet
 		object.children = object.render()
 		object.atAttributeGet = undefined
 
@@ -85,15 +89,20 @@ define.class(function(require, exports, module){
 			}
 			new_child.parent = object
 			// render new child
-			new_child = new_children[i] = renderer(new_child, old_child, globals)
+			new_child = new_children[i] = renderer(new_child, old_child, globals, false, wireinits)
 	
 			// set the childs name
 			var name = new_child.name || new_child.constructor.name
 			if(name !== undefined && !(name in object)) object[name] = new_child
 		}
 		if(old_children) for(;i<old_children.length;i++){
-			//console.log('emitting destroy!')
 			old_children[i].emitRecursive('destroy')
+		}
+		if(last_children) for(var i = 0; i < last_children.length; i++){
+			var last_child = last_children[i]
+			if(new_children.indexOf(last_child) === -1){
+				last_child.emitRecursive('destroy')
+			}
 		}
 
 		if(init_wires){

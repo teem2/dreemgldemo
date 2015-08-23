@@ -10,7 +10,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 	this.state("xmlstring");
 	this.state("xmljson");
 	this.state("dataset");
-	this.state("applicationstate");
+	this.state("appstate");
 	this.xmlstring = "";
 	this.xmljson = {};
 	
@@ -24,7 +24,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			
 		})
 
-		this.applicationstate = datatracker({
+		this.appstate = datatracker({
 			selected: "composition/screens/default"
 		})
 	}
@@ -71,7 +71,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 						}.bind(this))
 					})
 				}
-			data.connections.push({from:{node:"default"}, to: {node:"mobile"}})
+				data.connections.push({from:{node:"default"}, to: {node:"mobile"}})
 				
 				this.xmlstring = this.BuildXML(this.xmljson, data);
 			}.bind(this))
@@ -161,14 +161,11 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.attribute("dataset", {type: Object, value: {}});
 		this.connections = [];
 		
-		
 		this.updateConnections = function(name, pos){
-			for (var i in this.connections)
-			{
+			for (var i in this.connections){
 				var c = this.connections[i];
 				if (c.to.name === name || c.from.name === name) c.update(this.blokjes[c.from.name], this.blokjes[c.to.name]);
 			}
-			
 		}
 		
 		this.blokjes ={};
@@ -211,10 +208,10 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.position = "absolute" ;
 		this.attribute("dataset", {type: Object});
 		this.attribute("selected", {type: boolean, value: false});
-		this.attribute("applicationstate", {type:Object})
-		this.applicationstate = function()
+		this.attribute("appstate", {type:Object})
+		this.appstate = function()
 		{
-			var newsel = this.applicationstate.data.selected === ( "composition/screens" + this.data.name);
+			var newsel = this.appstate.data.selected === ( "composition/screens" + this.data.name);
 			if (newsel !== this._selected)
 			this.selected = newsel;
 		}
@@ -325,10 +322,10 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 	})
 	var flowgraphtreeview = treeview.extend(function flowgraphtreeview(){
 		
-		this.attribute("applicationstate", {type:Object});
+		this.attribute("appstate", {type:Object});
 		
-		this.applicationstate = function(){
-			this.selected = this.applicationstate.data.selectedscreen;
+		this.appstate = function(){
+			this.selected = this.appstate.data.selectedscreen;
 		}
 	
 		this.buildtree = function(data)
@@ -386,7 +383,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 				)
 				,splitcontainer({name:"mainsplitter", vertical: false}
 					,flowgraphtreeview({flex:0.2, 
-						dataset: this.dataset,appstate: this.applicationstate
+						dataset: this.dataset,appstate: this.appstate
 						
 						}
 					)
