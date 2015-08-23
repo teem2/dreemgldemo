@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Micro AMD module loader for browser and node.js and basic system homogenisation library
-
+"use strict";
 (function define_module(config_define){
 
 	// the main define function
@@ -117,7 +117,7 @@
 
 	define.localRequire = function(base_path, from_file){
 		function require(dep_path){
-			abs_path = define.joinPath(base_path, define.expandVariables(dep_path))
+			var abs_path = define.joinPath(base_path, define.expandVariables(dep_path))
 			if(!define.fileExt(abs_path)) abs_path = abs_path + '.js'
 
 			// lets look it up
@@ -222,7 +222,8 @@
 			if(mod){
 				hash += '_'+this.moduleHash(mod)
 			}
-			if(proto.constructor.body) hash += '_' + define.uniqueHash(proto.constructor.body.toString())
+			else if(proto.constructor.body) hash += '_' + define.uniqueHash(proto.constructor.body.toString())
+			//if(proto.constructor.body) hash += '_' + define.uniqueHash(proto.constructor.body.toString())
 			proto = Object.getPrototypeOf(proto)
 		}
 		Object.defineProperty(cls, 'unique_hash', {value:hash})
@@ -266,6 +267,7 @@
 				}
 				else{
 					args[i] = require(define.atLookupClass(arg))
+					args[i].nested_module = Constructor.module
 				}
 			}
 		}
@@ -277,7 +279,7 @@
 
 	define.EnvironmentStub = function(dep){ this.dep = dep }
 
-	define.makeClass = function(baseclass, body, require, module){
+	define.makeClass = function(baseclass, body, require, module, nested_module){
 
 		var stubbed
 		if(body && body.environment !== undefined && body.environment !== define.$environment){
@@ -316,20 +318,20 @@
 		
 		if(define.debug){
 			var fnname
-			if(module){
-				fnname = define.fileBase(module.filename).replace(/\./g,'_')//.replace(/\.js/g,'').replace(/\./g,'_').replace(/\//g,'_')
+			if(body && body.name){
+				fnname = body.name
+			}
+			else if(module){
+				 fnname = define.fileBase(module.filename).replace(/\./g,'_')//.replace(/\.js/g,'').replace(/\./g,'_').replace(/\//g,'_')
 			}
 			else{
 				// lets make an fnname based on our callstack
-				if(body && body.name) fnname = body.name
-				else{
-					var origin = new Error().stack.split(/\n/)[3].match(/\/([a-zA-Z0-9\.]+)\:(\d+)\:\d+\)/)
-					if(!origin || origin[1] === 'define.js'){
-						fnname = 'extend'
-						if(baseclass && baseclass.prototype.constructor) fnname += '_' + baseclass.prototype.constructor.name
-					}
-					else fnname = origin[1].replace(/\.js/g,'').replace(/\./g,'_').replace(/\//g,'_') + '_' + origin[2]
+				var origin = new Error().stack.split(/\n/)[3].match(/\/([a-zA-Z0-9\.]+)\:(\d+)\:\d+\)/)
+				if(!origin || origin[1] === 'define.js'){
+					fnname = 'extend'
+					if(baseclass && baseclass.prototype.constructor) fnname += '_' + baseclass.prototype.constructor.name
 				}
+				else fnname = origin[1].replace(/\.js/g,'').replace(/\./g,'_').replace(/\//g,'_') + '_' + origin[2]
 			}
 			var code = 'return ' + MyConstructor.toString().replace(/MyConstructor/g, fnname)
 			var Constructor = new Function(code)()
@@ -357,7 +359,8 @@
 
 		Object.defineProperty(Constructor, 'extend', {value:function(body){
 			if(this.prototype.constructor === define.StubbedClass) return define.StubbedClass
-			return define.makeClass(this, body, require)
+
+			return define.makeClass(this, body, require, undefined, this.nested_module)
 		}})
 
 		Object.defineProperty(Constructor, 'overlay', {value:function(body){
@@ -382,12 +385,16 @@
 				else module.exports = Constructor
 				
 				Object.defineProperty(Constructor, 'module', {value:module})
-				Object.defineProperty(Constructor, 'classname', {
-					value: define.fileBase(module.filename).replace(/\./g,'_')
-				})
+				//Object.defineProperty(Constructor, 'classname', {
+				//	value: define.fileBase(module.filename).replace(/\./g,'_')
+				//})
 				define.applyBody(body, Constructor, baseclass, require)
 			}
-			else{
+			else if(nested_module){
+				Object.defineProperty(Constructor, 'module', {value:nested_module})
+				define.applyBody(body, Constructor, baseclass)
+			}
+			else {
 				define.applyBody(body, Constructor, baseclass)
 			}
 

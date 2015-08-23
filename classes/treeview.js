@@ -1,8 +1,8 @@
+"use strict";
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // view class
 
-define.class(function(sprite, text, view, button, icon){
-
+define.class(function(module, sprite, text, view, button, icon){
 	var testdata = {name:'test Node', children:[
 		{name:'Child 1000', children:[
 			{name:'node 0-0-0 '}
@@ -48,7 +48,6 @@ define.class(function(sprite, text, view, button, icon){
 		
 	})
 	
-	
 	var newitemheading = view.extend(function newitemheading(){
 		this.borderwidth = 0;
 		this.attribute("folded", {type: boolean, value: false});
@@ -70,14 +69,13 @@ define.class(function(sprite, text, view, button, icon){
 		
 		this.render = function(){
 			return [
-				//this.haschildren?flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}):[], 
-				flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}),
+				this.haschildren?flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}):[], 
+				//flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}),
 				flatbutton({text: this.text})
 			];
 		}
 	});		
-	
-	
+		
 	var itemheading = view.extend(function itemheading(){
 		this.attribute("text", {type:String, value:""});
 		this.attribute("id", {type:String, value:""});
@@ -176,13 +174,12 @@ define.class(function(sprite, text, view, button, icon){
 		}
 		this.count =0;
 		this.render = function(){	
-		
 			
 			if (!this.item) return [text({text:"empty"})];
 			
 			this.collapsed;
-			
-			console.log("treeitem", this.item.name, this.item.children);
+
+			//console.log("treeitem", this.item.name, this.item.children);
 		
 			return [view({flexdirection:"row", flexwrap:"none",flex:1},
 				[
@@ -249,10 +246,10 @@ define.class(function(sprite, text, view, button, icon){
 	this.flexdirection="column";
 	this.flex= 1;
 	this.alignself="stretch" ;
-	
+	this.blabla = newitemheading
 	this.render = function(){
 		var data;
-		
+				
 		if (this.buildtree) data = this.buildtree(this.dataset.data)
 		else{
 			data = this.dataset.data

@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Sprite class
 
-define.class('./screen_base', function (require, exports, self, baseclass) {
+define.class('./screen_base', function screen(require, exports, self, baseclass) {
 	var GLDevice = require('$gl/gldevice')
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')
@@ -717,7 +717,6 @@ this.draw_calls = 0
 		'utilityrectangle','debugrectangle','utilityframe','_init')
 
 	this.reinit = function(){
-		console.log("REINIT SCREEN")
 		this.initVars()
 		this.bindInputs()
 	}

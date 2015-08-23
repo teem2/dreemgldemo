@@ -1,3 +1,4 @@
+"use strict";
 define.browserClass(function(require,screen, node, datatracker, spline, cadgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 
 	var XmlParser = require('$parsers/htmlparser')
@@ -309,7 +310,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			]
 		}
 	})
-	
 	var flowgraphtreeview = treeview.extend(function flowgraphtreeview(){
 		
 		this.attribute("applicationstate", {type:Object});
@@ -335,8 +335,9 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			
 		}
 	})
-		
+
 	this.render = function(){
+
 		return[
 			view({name:"toplevel",flexdirection: "column", bgcolor: "darkgray" , flex:1}
 				,view({name:"menubarholder", bgcolor:"lightgray"}
