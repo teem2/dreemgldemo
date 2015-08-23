@@ -217,8 +217,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			var ty = to._pos[1] + 13 + tooff;
 			
 			
-			console.log(fromoff, tooff);
-			//debugger;
 			
 			this.p0 = vec2(fx + w, fy);
 			this.p1 = vec2(fx+ w +100, fy );
@@ -368,10 +366,10 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		
 		this.render =function(){		
 			if (this.input){
-				return [icon({icon: "forward", fontsize: 20}),text({text:this.text,margin: vec4(10,0,10,4), fontsize: 20, bgcolor:"transparent", fgcolor:"black"})];
+				return [icon({icon: "forward", fontsize: 14}),text({text:this.text,margin: vec4(10,0,10,4), fontsize: 14, bgcolor:"transparent", fgcolor:"black"})];
 			}
 			else{
-				return [text({text:this.text, margin: vec4(10,0,10,4), fontsize: 20, bgcolor:"transparent", fgcolor:"black"}), icon({icon: "forward", fontsize: 20})];
+				return [text({text:this.text, margin: vec4(10,0,10,4), fontsize: 14, bgcolor:"transparent", fgcolor:"#404040"}), icon({icon: "forward", fontsize: 14})];
 			}
 		}
 	})
@@ -469,7 +467,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#ffc030") ;
 			return [				
 				view({ bgcolor: basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4},
-					text({text: this.data.name, margin: 4, fontsize:20, bgcolor: "transparent", fgcolor: "black"})
+					text({text: this.data.name, margin: 4, fontsize:16, bgcolor: "transparent", fgcolor: "#404040"})
 	/*				,button({text:"change color",margin:0, padding:0,  click: function(){
 	
 							var br = this.getBoundingRect();
