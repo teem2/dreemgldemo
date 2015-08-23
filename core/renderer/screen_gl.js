@@ -188,6 +188,37 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 			return R
 		}
 	}
+	
+
+	this.registerPredraw = function(node){
+		this.predraw_registry.push(node);
+	}
+	
+	this.unregisterPredraw = function(node){
+		var idx = this.predraw_registry.indexOf(node);
+		if (idx >-1) this.predraw_registry.splice(idx, 1);
+	}
+	
+	
+	this.allocGuid = function(node){
+		if (this.free_guids.length > 0) 
+		{
+			var reusedguid = this.free_guids.pop();;
+			
+			this.guidmap[reusedguid] = node;
+			return reusedguid;
+		}
+		
+		var newguid = this.interfaceguid++;
+		this.guidmap[newguid] = node;
+		return newguid;
+	}
+
+	this.freeGuid = function(guid){
+		this.guidmap[guid] = undefined;
+		this.free_guids.push(guid);		
+	}
+	
 
 	this.setguid = function(id){
 		
@@ -195,12 +226,9 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		var screenh = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
 		
 		this.mouse.glx = (this.mouse.x/(screenw/2))-1;
-		this.mouse.gly = -(this.mouse.y/(screenh/2)-1);
-				
-		//var R = vec2.mul_mat4_t(vec2(this.mouse.glx, this.mouse.gly), this.invertedworldmatrix);
+		this.mouse.gly = -(this.mouse.y/(screenh/2)-1);				
 
 		if(id != this.lastmouseguid || this.mouse.x != this.lastx || this.mouse.y != this.lasty){
-			//this.frameconsoletext("new mouseguid:" + id + "  " + (this.mousecapture?"captured":"noncaptured"), vec4("white"));
 		
 			this.lastx = this.mouse.x
 			this.lasty = this.mouse.y
@@ -512,6 +540,11 @@ this.draw_calls = 0
 			
 		}
 		
+		if (this.dirty === true) {		
+			for(var a in this.predraw_registry){
+				this.predraw_registry[a].preDraw();
+			}
+		}
 		
 		this.time = time;
 		this.last_time = time;
@@ -533,7 +566,7 @@ this.draw_calls = 0
 		
 			var computed = this.computeBoundingRects(this);
 
-			for(a in this.dirtyNodes)
+			for(var a in this.dirtyNodes)
 			{			
 				var dn = this.dirtyNodes[a];
 				if (dn.layout) {
@@ -721,6 +754,10 @@ this.draw_calls = 0
 			this[key] = value
 		}
 	}
+	
+	this.state("free_guids");
+	this.state("predraw_registry");
+	
 	this.state('pic_tex','debug_tex','device','buf','mouse','keyboard','debugtextshader',
 		'utilityrectangle','debugrectangle','utilityframe','_init')
 
@@ -916,8 +953,9 @@ this.draw_calls = 0
 		this.debug_tex = GLTexture.rgba_depth_stencil(16, 16)	
 		this.buf = new Uint8Array(4);
 		this.device = new GLDevice()
-
-		this.modal_stack = []
+		this.free_guids = [];
+		this.predraw_registry = [];
+		this.modal_stack = [];
 
 		this.debugtextshader = new GLText();
 		this.debugtextshader.has_guid = false;

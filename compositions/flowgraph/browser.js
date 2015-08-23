@@ -5,7 +5,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 
 	this.title = "Flowgraph Builder"
 	
-	this.attribute("dataset", {type: Object});
+	//this.attribute("dataset", {type: Object});
 	
 	this.state("xmlstring");
 	this.state("xmljson");
@@ -182,10 +182,11 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		
 		this.linecolor = vec4("black");
 
-		this.atDraw = function(){
-			
-			this.update()
-			
+		this.preDraw = function(){
+			this.update();
+		}
+		
+		this.atDraw = function(){	
 			if (this.hovered > 0){				
 				this.linecolor1 = vec4.vec4_mul_float32(vec4(this.from.data.basecolor),1.5);
 				this.linecolor2 = vec4.vec4_mul_float32(vec4(this.to.data.basecolor),1.5);

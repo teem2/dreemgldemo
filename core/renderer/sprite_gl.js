@@ -247,12 +247,19 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.matrixdirty = false;
 	}
 	
+	
+	
 	this.reinit = function(){
-		this.interfaceguid = this.screen.interfaceguid++;
-//		console.log(this.interfaceguid)
-		this.screen.guidmap[this.interfaceguid] = this;
+		this.interfaceguid = this.screen.allocGuid(this);
+		if (this.preDraw) this.screen.registerPredraw(this);
 		this.effectiveguid = this.interfaceguid;
 	}
+	
+	this.destroy = function(){
+		if (this.preDraw) this.screen.unregisterPredraw(this);
+		this.screen.freeGuid(this.interfaceguid);		
+	}
+	
 	this.orientation = {};
 	this.orientation.worldmatrix = mat4.identity();
 	
