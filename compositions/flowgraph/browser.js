@@ -121,7 +121,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 					var view = Xml.childByTagName(scr, 'view')
 
 					data.screens.push({name:scr.attr.name, 
-								basecolor: (scr.attr.basecolor)?scr.attr.basecolor: vec4('#d0d0d0'), linkables:
+								basecolor: (scr.attr.basecolor)?scr.attr.basecolor: vec4('#d0d0a0'), linkables:
 						Xml.childrenByTagName(view, 'attribute').map(function(each){
 							return {
 								name: each.attr.name,
@@ -167,6 +167,10 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 	var connection = spline.extend(function connection(){
 		this.state("from")
 		this.state("to");
+		
+		this.state("fromattr");
+		this.state("toattr");
+		
 		this.position = "absolute" 
 		this.linewidth = 10;
 		
@@ -184,17 +188,14 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			
 			this.update()
 			
-			if (this.hovered > 0){
-				
+			if (this.hovered > 0){				
 				this.linecolor1 = vec4.vec4_mul_float32(vec4(this.from.data.basecolor),1.5);
 				this.linecolor2 = vec4.vec4_mul_float32(vec4(this.to.data.basecolor),1.5);
-			}
-			else{
+			}else{
 				this.linecolor1 = this.from.data.basecolor;
 				this.linecolor2 = this.to.data.basecolor;				
 			}
-			
-			
+
 			spline.prototype.atDraw.call(this)
 		}
 
@@ -204,13 +205,21 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			if (to === undefined) to = this.to;
 			
 			
+			var fromoff = from.outputsdict[this.fromattr].lastdrawnboundingrect.top - from.lastdrawnboundingrect.top ;
+			var tooff = to.inputsdict[this.toattr].lastdrawnboundingrect.top- to.lastdrawnboundingrect.top ;
+			
+			
 			var br1 = from.lastdrawnboundingrect;
 			var w = br1.right - br1.left;
 			var fx = from._pos[0];
-			var fy = from._pos[1] + 8;
+			var fy = from._pos[1] + 13 + fromoff;
 			var tx = to._pos[0];
-			var ty = to._pos[1] + 8;
-
+			var ty = to._pos[1] + 13 + tooff;
+			
+			
+			console.log(fromoff, tooff);
+			//debugger;
+			
 			this.p0 = vec2(fx + w, fy);
 			this.p1 = vec2(fx+ w +100, fy );
 			this.p2 = vec2(tx-100,  ty);
@@ -323,7 +332,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 				var b2 = this.blokjes[c.to.node];
 				if (b1 && b2)
 				{
-					var newcon = connection({from: b1, to: b2});
+					var newcon = connection({from: b1, fromattr: c.from.output, to: b2, toattr: c.to.input});
 					this.connections.push(newcon);
 					all.push(newcon);
 				}
@@ -429,36 +438,31 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 				this.bg.bordercolor = vec4("darkgray");				
 			}
 		}
-		
-				this.inputsdict = [];
-		this.outputsdict = [];
-		this.inputs = [];
-		this.outputs = [];
-
+	
 		
 		this.render = function(){
 			
-		this.inputsdict = [];
-		this.outputsdict = [];
-		this.inputs = [];
-		this.outputs = [];
-				
-		if (this.data.linkables){
-			for (var i in this.data.linkables){
-				var L = this.data.linkables[i];				
-				if (L.input == true)	{
-					var newinput = connectorbutton({text:L.name,input: true, target: this.parent, targetscreen: this.data.name, attrib:L.name})
-					this.inputsdict[L.name] = newinput;
-					this.inputs.push(newinput);
-				}
-				else{
-					var newoutput = connectorbutton({text:L.name,input: false,target: this.parent, targetscreen: this.data.name, attrib:L.name})
-					this.outputsdict[L.name] = newoutput;
-					this.outputs.push(newoutput);					
+			this.inputsdict = [];
+			this.outputsdict = [];
+			this.inputs = [];
+			this.outputs = [];
+					
+			if (this.data.linkables){
+				for (var i in this.data.linkables){
+					var L = this.data.linkables[i];				
+					if (L.input == true)	{
+						var newinput = connectorbutton({text:L.name,input: true, target: this.parent, targetscreen: this.data.name, attrib:L.name})
+						this.inputsdict[L.name] = newinput;
+						this.inputs.push(newinput);
+					}
+					else{
+						var newoutput = connectorbutton({text:L.name,input: false,target: this.parent, targetscreen: this.data.name, attrib:L.name})
+						this.outputsdict[L.name] = newoutput;
+						this.outputs.push(newoutput);					
+					}
 				}
 			}
-		}
-					
+						
 					
 			var root = this;
 		//console.log("blokjedata: " ,this.data);
