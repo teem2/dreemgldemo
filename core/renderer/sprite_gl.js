@@ -130,7 +130,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.getLastDrawnBoundingRect = function(){
 		return this.lastdrawnboundingrect;
 	}
-	this.getBoundingRect = function(force){
+	
+	this.getBoundingRect = function(force){	
 		if (this.dirty || !this.boundingRectCache || force === true){
 			this.boundingRectCache = this.calculateBoundingRect(force);
 		}

@@ -22,6 +22,23 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			],
 			
 		})
+		
+		this.dataset.atChange  = function(){
+			console.log("data set changed!");
+			console.log(this.xmljson)
+			var newxml = this.BuildXML(this.xmljson, this.dataset.data);
+			
+			if (newxml != this.xmlstring){
+				console.log("need to save new version...");
+				this.teem.fileio.writefile('../dreem2/' + this.composition, newxml).then(function(result){				
+					console.log("saved composition to server!");
+					this.xmlstring = newxml;
+				}.bind(this));		
+			}else{
+				console.log("no notable changes.. not saving file to server");
+			}
+		}.bind(this);
+	
 
 		this.appstate = datatracker({
 			selected: "composition/screens/default"
@@ -92,21 +109,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		return res;
 	}
 	
-	this.dataset = function(){
-		console.log("data set changed!");
-		console.log(this.xmljson)
-		var newxml = this.BuildXML(this.xmljson, this.dataset.data);
-		
-		if (newxml != this.xmlstring){
-			console.log("need to save new version...");
-			this.teem.fileio.writefile('../dreem2/' + this.composition, newxml).then(function(result){				
-				console.log("saved composition to server!");
-				this.xmlstring = newxml;
-			}.bind(this));		
-		}else{
-			console.log("no notable changes.. not saving file to server");
-		}
-	}
 	
 	this.init = function(){
 		this.teem.fileio.readfile('../dreem2/' + this.composition).then(function(result){
@@ -118,11 +120,13 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 					var scr = screens.child[i]
 					var view = Xml.childByTagName(scr, 'view')
 
-					data.screens.push({name:scr.attr.name, 
+					data.screens.push({name:scr.attr.name, icon: scr.attr.icon, title:scr.attr.title,
 								basecolor: (scr.attr.basecolor)?scr.attr.basecolor: vec4('#d0d0a0'), linkables:
 						Xml.childrenByTagName(view, 'attribute').map(function(each){
 							return {
 								name: each.attr.name,
+								icon: each.attr.icon,
+								title: each.attr.title,
 								type: each.attr.type,
 								input: each.attr.input === 'true'
 							}
@@ -166,6 +170,8 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.state("from")
 		this.state("to");
 		
+		
+		
 		this.state("fromattr");
 		this.state("toattr");
 		
@@ -173,11 +179,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.linewidth = 10;
 		
 		this.init = function(){
-			this.update();
-			this.to.postLayout = 
-			this.from.postLayout = function(){
-				this.update()
-			}.bind(this)		
+			this.setDirty();
 		}
 		
 		this.linecolor = vec4("black");
@@ -203,17 +205,22 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			if (from === undefined) from = this.from;
 			if (to === undefined) to = this.to;
 			
+			var fromrect = from.getBoundingRect(true);
+			var fromattrrect =  from.outputsdict[this.fromattr].getBoundingRect(true);
+		//	console.log(fromrect, fromattrrect);
 			
-			var fromoff = from.outputsdict[this.fromattr].lastdrawnboundingrect.top - from.lastdrawnboundingrect.top ;
+			var fromoff = fromattrrect.top - fromrect.top ;
 			var tooff = to.inputsdict[this.toattr].lastdrawnboundingrect.top- to.lastdrawnboundingrect.top ;
 			
 			
-			var br1 = from.lastdrawnboundingrect;
-			var w = br1.right - br1.left;
+			var br1 = from.getBoundingRect();
+			var w =   br1.right - br1.left;
 			var fx = from._pos[0];
 			var fy = from._pos[1] + 13 + fromoff;
 			var tx = to._pos[0];
 			var ty = to._pos[1] + 13 + tooff;
+			
+		//	console.log(fx, tx, br1);
 			
 			
 			this.p0 = vec2(fx + w, fy);
@@ -253,12 +260,30 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		
 		this.click = function(){
 			console.log("spline click")
-			//this.screen.openModal(screenoverlay({}))
+			
+			this.dataset.fork(function(data){
+				
+				console.log(this.to.data.name , this.from.data.name)
+				for(var a in data.connections){
+					var con = data.connections[a];
+					if (con.from.node == this.from.data.name &&
+						con.to.node == this.to.data.name &&
+						con.to.input == this.toattr &&
+						con.from.output == this.fromattr)
+						{
+							data.connections.splice(a, 1);
+							return;
+						}
+				}
+					
+			}.bind(this))
 		}
 	});
 	
+	
 	var blokjesgrid = cadgrid.extend(function blokjesgrid(){
 		this.attribute("dataset", {type: Object, value: {}});
+		
 		this.connections = [];
 		
 		
@@ -328,7 +353,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 				var b2 = this.blokjes[c.to.node];
 				if (b1 && b2)
 				{
-					var newcon = connection({from: b1, fromattr: c.from.output, to: b2, toattr: c.to.input});
+					var newcon = connection({from: b1, fromattr: c.from.output, to: b2, toattr: c.to.input, dataset: this.dataset});
 					this.connections.push(newcon);
 					all.push(newcon);
 				}
@@ -338,10 +363,12 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 	})
 	
 	var connectorbutton = view.extend(function connectorbutton(){
-		this.margin = 0;
+		this.margin = vec4(0,4,0,0);
 		this.padding = 0;
 		this.attribute("text", {type:String, value:""});
+		this.attribute("title", {type:String, value:""});
 		this.attribute("input", {type:boolean, value:""});
+		this.attribute("icon", {type:string, value:"flask"});
 		this.attribute("targetscreen", {type:String, value:""});
 		this.attribute("attrib", {type:String, value:""});
 		
@@ -364,10 +391,10 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		
 		this.render =function(){		
 			if (this.input){
-				return [icon({icon: "forward", fontsize: 14}),text({text:this.text,margin: vec4(10,0,10,4), fontsize: 14, bgcolor:"transparent", fgcolor:"black"})];
+				return [icon({icon: this.icon, margin: vec4(10,0,10,0), fontsize: 14}),text({text:this.title,margin: vec4(10,0,10,4), fontsize: 14, bgcolor:"transparent", fgcolor:"black"})];
 			}
 			else{
-				return [text({text:this.text, margin: vec4(10,0,10,4), fontsize: 14, bgcolor:"transparent", fgcolor:"#404040"}), icon({icon: "forward", fontsize: 14})];
+				return [text({text:this.title, margin: vec4(10,0,10,4), fontsize: 14, bgcolor:"transparent", fgcolor:"#404040"}), icon({icon: this.icon,margin:vec4(10,0,10,0), fontsize: 14})];
 			}
 		}
 	})
@@ -388,7 +415,14 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.attribute("data", {type: Object});
 		
 		this.mouseleftdown = function(){
+			 console.log("down");
 			 
+			 	this.dataset.silent(function(){
+					this.data.x = this.x;
+					this.data.y = this.y;					
+				}.bind(this))
+			
+			
 			this.start = {mousex:this.mouse.x, mousey:this.mouse.y,startx: this.x, starty: this.y}
 			this.mousemove = function(){
 				var dx = this.mouse.x - this.start.mousex;
@@ -399,7 +433,12 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 
 				nx = Math.floor(nx/10) * 10;
 				ny = Math.floor(ny/10) * 10;
+				
+				this.data.x = nx;
+				this.data.y = ny;					
+				
 				this.pos = vec2(nx,ny);
+				
 				//this.parent.updateConnections(this.name, this.pos);
 			
 			}
@@ -436,6 +475,8 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		}
 	
 		
+		this.width = 300;
+		
 		this.render = function(){
 			
 			this.inputsdict = [];
@@ -447,25 +488,37 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 				for (var i in this.data.linkables){
 					var L = this.data.linkables[i];				
 					if (L.input == true)	{
-						var newinput = connectorbutton({text:L.name,input: true, target: this.parent, targetscreen: this.data.name, attrib:L.name})
+						var newinput = connectorbutton({title: L.title, icon: L.icon, text:L.name,input: true, target: this.parent, targetscreen: this.data.name, attrib:L.name})
 						this.inputsdict[L.name] = newinput;
 						this.inputs.push(newinput);
 					}
 					else{
-						var newoutput = connectorbutton({text:L.name,input: false,target: this.parent, targetscreen: this.data.name, attrib:L.name})
+						var newoutput = connectorbutton({title: L.title, icon: L.icon, text:L.name,input: false,target: this.parent, targetscreen: this.data.name, attrib:L.name})
 						this.outputsdict[L.name] = newoutput;
 						this.outputs.push(newoutput);					
 					}
 				}
 			}
-						
-					
+			
 			var root = this;
+			
 		//console.log("blokjedata: " ,this.data);
 			var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#ffc030") ;
 			return [				
-				view({ bgcolor: basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4},
-					text({text: this.data.name, margin: 4, fontsize:16, bgcolor: "transparent", fgcolor: "#404040"})
+				view({ bgcolor: basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4, flex:1},
+					icon({icon:this.data.icon, fontsize: 20, margin:vec4(10,0,10,0)}),text({margin:vec4(4,4,24,4),text: this.data.title,  fontsize:16, bgcolor: "transparent", fgcolor: "#404040"})
+				),
+				view({position:"relative", bgcolor: basecolor,justifycontent:"space-between", aligncontent: "flex-end", alignitems: "flex-end",  flexdirection:"row", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));},margin:0, padding:0}
+					
+					,	view({position:"relative", flexdirection:"column",margin:0, padding:vec4(0,10,0,10),flex: 1  , bgcolor:"transparent"},this.inputs), 
+						view({position:"relative", flexdirection:"column",alignitems: "flex-end",margin:0, padding:vec4(0,10,0,10), flex: 1, bgcolor:"transparent"}, this.outputs)
+					
+					
+				)
+			]
+		}
+	})
+	
 	/*				,button({text:"change color",margin:0, padding:0,  click: function(){
 	
 							var br = this.getBoundingRect();
@@ -490,16 +543,8 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 						}
 					}
 					)*/
-				),
-				view({bgcolor: basecolor, flexdirection:"column", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));},margin:0, padding:0}
-					,view({flexdirection:"row",margin:0, padding:0 }, view({flexdirection:"column",margin:0, padding:0},this.inputs), view({flexdirection:"column",margin:0, padding:0}, this.outputs))
+
 					
-				)
-			]
-		}
-	})
-	
-	
 	var flowgraphtreeview = treeview.extend(function flowgraphtreeview(){
 		
 		this.attribute("appstate", {type:Object});
@@ -580,7 +625,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 							)
 							,blokjesgrid({dataset: this.dataset})
 						))
-							/*,view({flex:1,mode:'DOM', src:'http://127.0.0.1:8080/'+this.composition+'?edit=1'})*/
+						/*,view({flex:1,mode:'DOM', src:'http://127.0.0.1:8080/'+this.composition+'?edit=1'})*/
 				
 						
 					)

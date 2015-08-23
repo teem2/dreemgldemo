@@ -22,12 +22,21 @@ define.class(function(require, node){
 		this.notifyAssignedAttributes();
 	}
 
+	this.silent = function(callback){
+		this.undo_stack.push(JSON.stringify(this.data))
+		this.redo_stack.length = 0
+		callback(this.data)		
+		if (this.atChange) this.atChange();
+	}
+
 	// cause objects that have us assigned to reload
 	this.notifyAssignedAttributes = function(){
 		for(var i = 0; i < this.connected_objects.length; i++){
 			var o = this.connected_objects[i]
 			o.obj[o.key] = this
 		}
+		
+		if (this.atChange) this.atChange();
 	}
 	
 	
