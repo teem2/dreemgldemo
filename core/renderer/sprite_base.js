@@ -139,8 +139,10 @@ define.class('$base/nodeworker', function(require, exports, self){
 	//	}
 	}
 	this.setDirty = function(){		
+	
 		if (this.screen) 
 		{
+			if (this.screen.rendering === true) return;
 			this.screen.addDirtyNode(this);
 		}
 		if (this.dirty === true) return;

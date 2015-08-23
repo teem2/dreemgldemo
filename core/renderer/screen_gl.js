@@ -19,7 +19,8 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	this.totaldirtyrect = {};
 	this.dirtyrectset = false;
 	this.debugshader = false
-	//this.debug = true;
+	this.debug = false;
+	this.debugalldirtyrects = true;
 	this.showdebugtext = true;
 	this.renderstructure = false;
 	
@@ -334,8 +335,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		this.renderstate.drawmode = 0;
 		
 		if (this.renderstructure){
-
-		this.device.clear(vec4("black"))
+			this.device.clear(vec4("black"))
 
 			for (var i = 0; i < this.children.length; i++){
 				this.renderBoundingBox(this.children[i],0)
@@ -354,89 +354,79 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 			for (var i = 0; i < this.children.length; i++){
 				this.children[i].draw(this.renderstate)
 			}
-		
 
 			if (clippedrect){
 				this.device.gl.disable(this.device.gl.SCISSOR_TEST);
 			}
-
 		}
-		
-		//if (clippedrect) this.renderstate.popClip();
+				
 		if (this.debug)
 		{
 			this.utilityframe.viewmatrix = this.renderstate.viewmatrix;
 			this.utilityframe.matrix = mat4.identity();
-			if (this.dirtyrectset)
-			{
 			
-			this.utilityframe.width = this.totaldirtyrect.right - this.totaldirtyrect.left;
-			this.utilityframe.height = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
-			this.utilityframe.x =  this.totaldirtyrect.left;
-			this.utilityframe.y = this.totaldirtyrect.top;
-			this.utilityframe.draw(this.device);
-			}
-			//console.log("dirtyrect", this.totaldirtyrect);
-			
-		//	this.utilityframe.viewmatrix = this.renderstate.viewmatrix;
-		//	this.utilityframe.matrix = mat4.identity();
-			this.utilityframe.frame = this.renderstate.frame;			
-			
-			if (false){for (var i in this.dirtyrects){
-				var bb = this.dirtyrects[i];
-				
-				
-				this.utilityframe.width = bb.right - bb.left;
-				this.utilityframe.height = bb.bottom - bb.top;
-				this.utilityframe.x = bb.left;
-				this.utilityframe.y = bb.top;
-				this.utilityframe.depth = i;
+			if (this.dirtyrectset){			
+				this.utilityframe.width = this.totaldirtyrect.right - this.totaldirtyrect.left;
+				this.utilityframe.height = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
+				this.utilityframe.x =  this.totaldirtyrect.left;
+				this.utilityframe.y = this.totaldirtyrect.top;
 				this.utilityframe.draw(this.device);
 			}
+
+			this.utilityframe.frame = this.renderstate.frame;			
+			
+			if (this.debugalldirtyrects){
+				for (var i in this.dirtyrects){
+					var bb = this.dirtyrects[i];
+					this.utilityframe.width = bb.right - bb.left;
+					this.utilityframe.height = bb.bottom - bb.top;
+					this.utilityframe.x = bb.left;
+					this.utilityframe.y = bb.top;
+					this.utilityframe.depth = i;
+					this.utilityframe.draw(this.device);
+				}
 			}
+			
 			if (this.debuglabels.length > 0 ){
 				this.renderstate.setup(this.device);
 		
-			this.device.gl.clearStencil(0);
-			if (this.renderstate.scissor) this.device.gl.disable(this.device.gl.SCISSOR_TEST);
-			
-			this.debugtextshader.viewmatrix = this.renderstate.viewmatrix;
+				this.device.gl.clearStencil(0);
+				if (this.renderstate.scissor) this.device.gl.disable(this.device.gl.SCISSOR_TEST);
 				
-				if(this.showdebugtext == true){
+				this.debugtextshader.viewmatrix = this.renderstate.viewmatrix;
+				
+				if(this.showdebugtext == true){			
+					for (var a in this.debuglabels){
+						var label = this.debuglabels[a];
+						var textbuf = this.debugtextshader.newText()
+						textbuf.font_size = 12;
+						textbuf.fgcolor = label.color;
+						textbuf.bgcolor = label.color;
+						textbuf.clear()
+						textbuf.add(label.text)
 					
-				for (var a in this.debuglabels){
-					var label = this.debuglabels[a];
-					var textbuf = this.debugtextshader.newText()
-					textbuf.font_size = 12;
-					textbuf.fgcolor = label.color;
-					textbuf.bgcolor = label.color;
-					textbuf.clear()
-					textbuf.add(label.text)
-				
-					var ofx = [-1, 0, 1,-1,1,-1,0,1,0];
-					var ofy = [-1,-1,-1, 0,0,1,1,1,0];
-					this.debugtextshader.mesh = textbuf;
-					this.debugtextshader.bgcolor = vec4("white");
-					this.debugtextshader.fgcolor =vec4("black");
+						var ofx = [-1, 0, 1,-1,1,-1,0,1,0];
+						var ofy = [-1,-1,-1, 0,0,1,1,1,0];
+						this.debugtextshader.mesh = textbuf;
+						this.debugtextshader.bgcolor = vec4("white");
+						this.debugtextshader.fgcolor =vec4("black");
 
-					for (var i =0 ;i<9;i++)
-					{
-						var t = mat4.identity();
-						mat4.translate(t, vec3(label.x + ofx[i], label.y + ofy[i] + 10, 0), t);
-						mat4.transpose(t,t);
-						this.debugtextshader.matrix = t;
-						if (i == 8) this.debugtextshader.fgcolor = label.color;									
-						this.debugtextshader.draw(this.device);
-					}					
+						for (var i =0 ;i<9;i++)
+						{
+							var t = mat4.identity();
+							mat4.translate(t, vec3(label.x + ofx[i], label.y + ofy[i] + 10, 0), t);
+							mat4.transpose(t,t);
+							this.debugtextshader.matrix = t;
+							if (i == 8) this.debugtextshader.fgcolor = label.color;									
+							this.debugtextshader.draw(this.device);
+						}					
+					}
 				}
+				this.debuglabels = [];				
 			}
-			this.debuglabels = [];
-			//this.frameconsolecounter = 0;
-		}
 		}
 		
-		this.dirtyrects = [];
-		
+		this.dirtyrects = [];		
 	}
 
 	this.readGuidTimeout = function(){
@@ -508,7 +498,7 @@ this.draw_calls = 0
 			if (dn.layout) {
 				var dr = dn.getLastDrawnBoundingRect();
 				var dr2 = dn.getBoundingRect();
-				console.log("dirty!", dn.constructor.name,  dr2);
+//				console.log("dirty!", dn.constructor.name,  dr2);
 				this.addDirtyRect(dr);
 				this.addDirtyRect(dr2);
 				}
@@ -530,7 +520,10 @@ this.draw_calls = 0
 			this.moved = false
 			if (!this.pic_tex.frame_buf) this.pic_tex.allocRenderTarget(this.device)
 			this.device.setTargetFrame(this.pic_tex)
+			
+			this.rendering = true;
 			this.drawGuid()
+			this.rendering = false;
 			// make sure reading the texture is delayed otherwise framerate is destroyed
 			this.readGuidTimeout()			
 		}
@@ -556,14 +549,16 @@ this.draw_calls = 0
 				}
 			}
 			
-			this.dirtyNodes = [];
 			
 			this.device.setTargetFrame()
 
 			this.node_timers = []
 
+			this.rendering = true;
 			this.drawColor();
+			this.rendering = false;
 
+			
 			this.dirty = false
 
 			if (this.dirtyrectset){
@@ -597,6 +592,8 @@ this.draw_calls = 0
 	this.dirtyNodes = [];
 	
 	this.addDirtyNode =function(node){
+		if (this.rendering === true) return;
+		
 		this.dirtyNodes.push(node);	
 		node.dirtynode = true;
 		node.bubbleDirty();
@@ -668,14 +665,18 @@ this.draw_calls = 0
 	}
 	
 	this.bubbleDirty = function(){
+		
+		if (this.screen.rendering) return;
+		
 		this.dirty = true;
 		this.moved = true;
 		if (this.device) this.device.redraw();
 	}
 	
 	this.requestLayout = function(){
-		if (this.layoutRequested === true)  return
+		if (this.layoutRequested === true )  return
 		this.layoutRequested = true;
+		if (this.screen.rendering) return;
 		this.bubbleDirty();
 	}
 	
@@ -683,7 +684,7 @@ this.draw_calls = 0
 		this.requestLayout();
 	}
 	
-	this.setDirty = function(){
+	this.setDirty = function(){		
 		this.bubbleDirty();
 //		this.device.redraw();
 	}

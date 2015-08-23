@@ -215,7 +215,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			var ty = to._pos[1] + 13 + tooff;
 			
 			
-			
 			this.p0 = vec2(fx + w, fy);
 			this.p1 = vec2(fx+ w +100, fy );
 			this.p2 = vec2(tx-100,  ty);
@@ -311,7 +310,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			var all = [];			
 			var connecties = {};
 			var i = 0;
-			for(a in this.dataset.data.screens)
+			for(var a in this.dataset.data.screens)
 			{
 				
 				var d = this.dataset.data.screens[a];
@@ -321,7 +320,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 				all.push(this.blokjes[d.name]);			
 			}
 			this.connections = []
-			for(a in this.dataset.data.connections)
+			for(var a in this.dataset.data.connections)
 			{
 				var c = this.dataset.data.connections[a];
 				var b1 = this.blokjes[c.from.node];
