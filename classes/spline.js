@@ -24,17 +24,18 @@ define.class(function(sprite, text, view, button, icon){
 	this.bg.linebordercolor = vec4(0,0,1,1);	
 	this.bg.fromcol = vec4("red");
 	this.bg.tocol = vec4("blue");
-	this.bg.lineborderwidth = 10.0
+	this.bg.lineborderwidth =1.8
 	this.bg.color = function(){
 		
 		var hm = sin(mesh.side*PI+ PI/2)
 		
-		var border = (abs(mesh.side)*(linewidth/2.0)> ((linewidth/2.0) - lineborderwidth*2) ) ? 1.0:0.0;
+		var borderval = clamp((abs(mesh.side)*(linewidth/2.0) -  ((linewidth/2.0) - lineborderwidth*2.0) ),0.0,1.0);
 		
 		var col = mix(fromcol, tocol, mesh.pos) * (1 + sin(mesh.pos * PI)*0.2);
 	
-
-		return vec4(col.rgb, col.a * hm);
+		//return mix(vec4("red"), vec4("blue"), borderval);
+		var col2 = mix(col, linebordercolor, borderval)
+		return vec4(col2.rgb, col2.a * hm);
 		
 	}
 

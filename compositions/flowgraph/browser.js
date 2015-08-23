@@ -134,9 +134,9 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 
 				this.xmlstring = this.BuildXML(this.xmljson, data);
 			}.bind(this))
-			this.dataset.fork(function(data){
-				data.connections.push({from:{node:"default", output:'sldvalue'}, to: {node:"mobile", input:'sldinput'}})
-			})
+	//		this.dataset.fork(function(data){
+//				data.connections.push({from:{node:"default", output:'sldvalue'}, to: {node:"mobile", input:'sldinput'}})
+		//	})
 		}.bind(this))
 	}
 	
@@ -185,8 +185,9 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			this.update()
 			
 			if (this.hovered > 0){
-				this.linecolor1 = vec4("white");
-				this.linecolor2 = this.to.data.basecolor;
+				
+				this.linecolor1 = vec4.vec4_mul_float32(vec4(this.from.data.basecolor),1.5);
+				this.linecolor2 = vec4.vec4_mul_float32(vec4(this.to.data.basecolor),1.5);
 			}
 			else{
 				this.linecolor1 = this.from.data.basecolor;
@@ -239,13 +240,15 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			this.hovered++;
 			this.setDirty();
 		}
+		
 		this.mouseout = function(){
 			if (this.hovered > 0) this.hovered--;
 			this.setDirty();
 		}
 		
 		this.click = function(){
-			this.screen.openModal(screenoverlay({}))
+			console.log("spline click")
+			//this.screen.openModal(screenoverlay({}))
 		}
 	});
 	
@@ -271,7 +274,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 																			input: this.connectionend.input,
 																	}
 																})
-				})
+				}.bind(this))
 				this.connectionstart = undefined;
 				this.connectionend = undefined;			
 			}			
@@ -334,6 +337,8 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.padding = 0;
 		this.attribute("text", {type:String, value:""});
 		this.attribute("input", {type:boolean, value:""});
+		this.attribute("targetscreen", {type:String, value:""});
+		this.attribute("attrib", {type:String, value:""});
 		
 		this.mouseover = function(){
 			this.setDirty();
@@ -344,7 +349,12 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		}
 		
 		this.click = function(){
-			
+			if (this.input){
+					this.target.setConnectionEnd(this.targetscreen, this.attrib);
+			}
+			else{
+					this.target.setConnectionStart(this.targetscreen, this.attrib);
+			}
 		}
 		
 		this.render =function(){		
@@ -437,12 +447,12 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			for (var i in this.data.linkables){
 				var L = this.data.linkables[i];				
 				if (L.input == true)	{
-					var newinput = connectorbutton({text:L.name,input: true})
+					var newinput = connectorbutton({text:L.name,input: true, target: this.parent, targetscreen: this.data.name, attrib:L.name})
 					this.inputsdict[L.name] = newinput;
 					this.inputs.push(newinput);
 				}
 				else{
-					var newoutput = connectorbutton({text:L.name,input: false})
+					var newoutput = connectorbutton({text:L.name,input: false,target: this.parent, targetscreen: this.data.name, attrib:L.name})
 					this.outputsdict[L.name] = newoutput;
 					this.outputs.push(newoutput);					
 				}

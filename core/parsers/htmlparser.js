@@ -45,6 +45,7 @@ define.class(function(require, exports, self){
 
 	exports.childrenByTagName = function(node, name, res){
 		if(!res) res = []
+		if (!node) return res;
 		if(node.child){
 			var idx = name.indexOf('/')
 			var rest
