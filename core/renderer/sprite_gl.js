@@ -509,7 +509,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 			fg.screen = this.screen
 			bg.screen = this.screen
-this.dirty = false;
 			if(renderstate.drawmode === 2){
 				var type = bg.drawDebug(this.screen.device)
 				if(type) renderstate.debugtypes.push(type)
@@ -533,6 +532,7 @@ this.dirty = false;
 				
 				this.doDraw(renderstate)
 			}
+			this.dirty = false;
 		} 
 		else {
 			console.log("Drawing cached content");
