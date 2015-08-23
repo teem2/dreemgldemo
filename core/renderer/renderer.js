@@ -90,6 +90,9 @@ define.class(function(require, exports, module){
 			var name = new_child.name || new_child.constructor.name
 			if(name !== undefined && !(name in object)) object[name] = new_child
 		}
+		if(old_children) for(;i<old_children.length;i++){
+			old_children[i].emit('destroy')
+		}
 
 		if(init_wires){
 			for(var i = 0; i < wireinits.length; i++){
