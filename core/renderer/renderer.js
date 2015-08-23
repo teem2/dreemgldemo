@@ -6,6 +6,7 @@ define.class(function(require, exports, module){
 	var Node = require('$base/node')
 
 	module.exports = function renderer(new_version, old_version, globals, skip_old, wireinits){
+		console.trace("RENDERING", new_version)
 		var init_wires = false
 		if(!wireinits){
 			wireinits = []
@@ -39,6 +40,14 @@ define.class(function(require, exports, module){
 			object[key] = globals[key]
 		}
 
+		object.connectWires(wireinits)
+		
+		// lets call init only when not already called
+		if(!object._init) object.emit('init', 1)
+		object.emit('reinit')
+
+		// then call render
+
 		// store the attribute dependencies
 		object.atAttributeGet = function(key){
 			// lets find out if we already have a listener on it
@@ -51,14 +60,6 @@ define.class(function(require, exports, module){
 				}
 			}
 		}
-
-		object.connectWires(wireinits)
-		
-		// lets call init only when not already called
-		if(!object._init) object.emit('init', 1)
-		object.emit('reinit')
-
-		// then call render
 		object.children = object.render()
 		object.atAttributeGet = undefined
 
