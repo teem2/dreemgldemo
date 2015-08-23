@@ -20,7 +20,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			],
 			connections:[
 			],
-			
 		})
 		
 		this.dataset.atChange  = function(){
@@ -70,9 +69,16 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			Xml.childrenByTagName(view, 'attribute').forEach(function(attrib){
 				// check if we are in connections
 				var to = "screens_"  + screen.attr.name + "_" + attrib.attr.name
+				// lets find the right data
+				for(var i = 0; i < dataset.screens.length; i++)if(dataset.screens[i].name === screen.attr.name){
+					screen.attr.editx = ''+dataset.screens[i].x
+					screen.attr.edity = ''+dataset.screens[i].y
+					//data.screens.push({name:scr.attr.name,
+				}
+
 				if(attrib.attr.input == 'true'){
 					if(server_output[to]){
-						attrib.attr.value = "${dr.teem.flowserver."+to+"}"
+						attrib.attr.value = "${dr.teem.flowserver." + to + "}"
 					}
 					else delete attrib.attr.value
 				}
@@ -114,7 +120,8 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 					var scr = screens.child[i]
 					var view = Xml.childByTagName(scr, 'view')
 
-					data.screens.push({name:scr.attr.name, icon: scr.attr.icon?scr.attr.icon:"tv", title:scr.attr.title?scr.attr.title:scr.attr.name,
+					data.screens.push({name:scr.attr.name, icon: scr.attr.icon?scr.attr.icon:"tv", title:scr.attr.title?scr.attr.title:scr.attr.name,					
+								x:parseFloat(scr.attr.editx || 0), y:parseFloat(scr.attr.edity || 0),
 								basecolor: (scr.attr.basecolor)?scr.attr.basecolor: vec4('#d0d0a0'), linkables:
 						Xml.childrenByTagName(view, 'attribute').map(function(each){
 							return {
@@ -141,7 +148,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 					var fromoutput = fromnode.slice(fromnode.indexOf('_')+1)
 					fromnode = fromnode.slice(0,fromnode.indexOf('_'))
 
-					console.log(tonode, toinput, fromnode, fromoutput)
 					data.connections.push({from:{node:fromnode, output:fromoutput},to:{node:tonode,input:toinput}})
 				})
 
