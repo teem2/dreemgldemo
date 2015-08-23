@@ -72,6 +72,8 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 					})
 				}
 				data.connections.push({from:{node:"default"}, to: {node:"mobile"}})
+				data.connections.push({from:{node:"remote"}, to: {node:"default"}})
+				data.connections.push({from:{node:"remote"}, to: {node:"mobile"}})
 				
 				this.xmlstring = this.BuildXML(this.xmljson, data);
 			}.bind(this))
@@ -119,7 +121,19 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.linecolor = vec4("black");
 
 		this.atDraw = function(){
+			
 			this.update()
+			
+			if (this.hovered > 0){
+				this.linecolor1 = vec4("white");
+				this.linecolor2 = this.to.data.basecolor;
+			}
+			else{
+				this.linecolor1 = this.from.data.basecolor;
+				this.linecolor2 = this.to.data.basecolor;				
+			}
+			
+			
 			spline.prototype.atDraw.call(this)
 		}
 
@@ -128,9 +142,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			if (from === undefined) from = this.from;
 			if (to === undefined) to = this.to;
 			
-			this.linecolor1 = from.data.basecolor;
-			this.linecolor2 = to.data.basecolor;
-
+			
 			var br1 = from.lastdrawnboundingrect;
 			var w = br1.right - br1.left;
 			var fx = from._pos[0];
@@ -161,9 +173,19 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			
 			//this.setDirty();
 		}
+		this.hovered =0;
+		this.mouseover = function()
+		{
+			this.hovered++;
+			this.setDirty();
+		}
+		this.mouseout = function(){
+			if (this.hovered > 0) this.hovered--;
+			this.setDirty();
+		}
 		
-		this.arender = function(){
-			return [button({text:"x"})]
+		this.click = function(){
+			this.screen.openModal(screenoverlay({}))
 		}
 	});
 	
@@ -211,6 +233,21 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			}
 			return all;
 		}	
+	})
+	
+	var connectorbutton = view.extend(function connectorbutton(){
+		this.margin = 0;
+		this.padding = 0;
+		this.attribute("text", {type:String, value:""});
+		this.attribute("input", {type:boolean, value:""});
+		this.render =function(){		
+			if (this.input){
+				return [icon({icon: "forward", fontsize: 20}),text({text:this.text,margin: vec4(10,0,10,4), fontsize: 20, bgcolor:"transparent", fgcolor:"black"})];
+			}
+			else{
+				return [text({text:this.text, margin: vec4(10,0,10,4), fontsize: 20, bgcolor:"transparent", fgcolor:"black"}), icon({icon: "forward", fontsize: 20})];
+			}
+		}
 	})
 	
 	var blokje = view.extend(function blokje(){
@@ -275,18 +312,33 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 				this.bg.bordercolor = vec4("darkgray");				
 			}
 		}
+		
+				this.inputsdict = [];
+		this.outputsdict = [];
+		this.inputs = [];
+		this.outputs = [];
+
+		
 		this.render = function(){
 			
-			var inputs = [];
-			var outputs = [];
+		this.inputsdict = [];
+		this.outputsdict = [];
+		this.inputs = [];
+		this.outputs = [];
+		
 		if (this.data.linkables){
 			for (var i in this.data.linkables){
 				var L = this.data.linkables[i];				
 				if (L.input == true)	{
-					inputs.push(button({text:L.name}));
+					var newinput = connectorbutton({text:L.name,input: true})
+					this.inputsdict[L.name] = newinput;
+					this.inputs.push(newinput);
 				}
 				else{
-					outputs.push(button({text:L.name}));
+					var newoutput = connectorbutton({text:L.name,input: false})
+					this.outputsdict[L.name] = newoutput;
+					this.outputs.push(newoutput);
+					
 				}
 			}
 		}
@@ -323,13 +375,15 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 					}
 					)*/
 				),
-				view({bgcolor: basecolor, flexdirection:"column", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));}}
-					,view({flexdirection:"row" }, view({flexdirection:"column"},inputs), view({flexdirection:"column"}, outputs))
+				view({bgcolor: basecolor, flexdirection:"column", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));},margin:0, padding:0}
+					,view({flexdirection:"row",margin:0, padding:0 }, view({flexdirection:"column",margin:0, padding:0},this.inputs), view({flexdirection:"column",margin:0, padding:0}, this.outputs))
 					
 				)
 			]
 		}
 	})
+	
+	
 	var flowgraphtreeview = treeview.extend(function flowgraphtreeview(){
 		
 		this.attribute("appstate", {type:Object});
@@ -343,13 +397,11 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			return { 
 				name:"Composition", id: "comp", children:[
 					{name:"Screens" , id:"screens", children: data.screens.map(function(d) {
-							return {name: d.name, id: d.name, children: d.linkables?d.linkables.map(function(c){
-									return {name: c.name, id: c.name}
-								}):[]
+							return {name: d.name, id: d.name, children: []
 							}
 						})
 					},
-					{name:"Connections", id:"conns"}
+					{name:"Connections", id:"conns", children:data.connections.map(function(d){return {name:d.from.node + " -> " + d.to.node  }}) }
 				] 
 			};
 			
