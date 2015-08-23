@@ -152,9 +152,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		}
 		if (this.matrixdirty || force === true) this.recomputeMatrix();
 		var x1 = 0;
-		var x2 = this._width;
+		var x2 = this._size[0];
 		var y1 = 0;
-		var y2 = this._height;
+		var y2 = this._size[1];
 
 		if(this.layout){
 			x2 = this.layout.width;
@@ -191,7 +191,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		var ret = {left: minx, top: miny, right: maxx, bottom: maxy};
 		if (ret.left === 0 && ret.right === 0 && ret.top === 0 && ret.bottom === 0)
 		{
-			debugger;
+//			debugger;
 		}
 		return ret
 	}
@@ -219,23 +219,22 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			var r = o.rotation;
 			var t = vec3(this.layout.left, this.layout.top, 0);
 			if (this._position === "absolute"){
-				t[0] = this._x;
-				t[1] = this._y;
+				t[0] = this._pos[0];
+				t[1] = this._pos[1];
 			}
 			var hw = ( this.layout.width !== undefined? this.layout.width: this._width ) /  2;
 			var hh = ( this.layout.height !== undefined ? this.layout.height: this._height) / 2;
 			mat4.TSRT(-hw, -hh, 0, s[0], s[1], s[2], r[0], r[1], r[2], t[0] + hw * s[0], t[1] + hh * s[1], t[2], this.orientation.matrix);
 					
-			//	for (var i =0 ;i<16;i++) if (isNaN(this.orientation.matrix[i] )) debugger;
-			
+			//for (var i =0 ;i<16;i++) if (isNaN(this.orientation.matrix[i] )) debugger;	
 			//console.log(this.layout)
 		}
 		else {
 			var s = o.scale;
 			var r = o.rotation;
 			var t = o.translation;
-			var hw = this._width / 2;
-			var hh = this._height / 2;
+			var hw = this._size[0] / 2;
+			var hh = this._size[1] / 2;
 			mat4.TSRT(-hw, -hh, 0, s[0], s[1], s[2], r[0], r[1], r[2], t[0] + hw * s[0], t[1] + hh * s[1], t[2], this.orientation.matrix);
 				//for (var i =0 ;i<16;i++) if (isNaN(this.orientation.matrix[i] )) debugger;
 		}
@@ -252,6 +251,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 					}
 				}
 		} else {
+			console.log("ehhhm");
 			this.orientation.worldmatrix = this.orientation.matrix;			
 		}
 		
@@ -583,8 +583,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			if (this.layout.bottom != this.lastLayout.bottom) { changed = true;}
 		}
 		if (changed){
-			this.layoutchanged();
-			this.setDirty();
+//			this.layoutchanged();
+//			this.setDirty();
 			//this.setDirty(true, this.lastLayout)
 		}
 		if (this.layout) this.lastLayout= {left:this.layout.left, top:this.layout.top, width:this.layout.width, height:this.layout.height, right: this.layout.right, bottom:this.layout.bottom};

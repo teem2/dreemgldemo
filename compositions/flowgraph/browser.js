@@ -25,7 +25,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		
 		this.dataset.atChange  = function(){
 			console.log("data set changed!");
-			console.log(this.xmljson)
 			var newxml = this.BuildXML(this.xmljson, this.dataset.data);
 			
 			if (newxml != this.xmlstring){
@@ -102,8 +101,6 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			})
 		})
 		var res = Xml.reserialize(this.xmljson);
-		console.log(res)
-//
 		return res;
 	}
 	
@@ -117,13 +114,13 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 					var scr = screens.child[i]
 					var view = Xml.childByTagName(scr, 'view')
 
-					data.screens.push({name:scr.attr.name, icon: scr.attr.icon, title:scr.attr.title,
+					data.screens.push({name:scr.attr.name, icon: scr.attr.icon?scr.attr.icon:"tv", title:scr.attr.title?scr.attr.title:scr.attr.name,
 								basecolor: (scr.attr.basecolor)?scr.attr.basecolor: vec4('#d0d0a0'), linkables:
 						Xml.childrenByTagName(view, 'attribute').map(function(each){
 							return {
 								name: each.attr.name,
-								icon: each.attr.icon,
-								title: each.attr.title,
+								icon: each.attr.icon?each.attr.icon:"chevron-right",
+								title: each.attr.title?each.attr.title:each.attr.name,
 								type: each.attr.type,
 								input: each.attr.input === 'true'
 							}
@@ -138,6 +135,8 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 					var toinput = tonode.slice(tonode.indexOf('_')+1)
 					tonode = tonode.slice(0,tonode.indexOf('_'))
 					var from = each.attr.from
+					if (!from) return;
+					
 					var fromnode = from.slice(from.indexOf('_')+1)
 					var fromoutput = fromnode.slice(fromnode.indexOf('_')+1)
 					fromnode = fromnode.slice(0,fromnode.indexOf('_'))
@@ -218,20 +217,24 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			if (from === undefined) from = this.from;
 			if (to === undefined) to = this.to;
 			
-			var fromrect = from.getBoundingRect(true);
-			var fromattrrect =  from.outputsdict[this.fromattr].getBoundingRect(true);
-		//	console.log(fromrect, fromattrrect);
+			var fromrect = from.getBoundingRect();
+			var fromattrrect =  from.outputsdict[this.fromattr].getBoundingRect();
+		//	console.log(this.fromattr, fromrect, fromattrrect);
+			var torect = to.getBoundingRect();
+			var toattrrect =  to.inputsdict[this.toattr].getBoundingRect();
+	
+	//	console.log(fromrect, fromattrrect);
 			
 			var fromoff = fromattrrect.top - fromrect.top ;
-			var tooff = to.inputsdict[this.toattr].lastdrawnboundingrect.top- to.lastdrawnboundingrect.top ;
+			var tooff = toattrrect.top - torect.top;
 			
 			
-			var br1 = from.getBoundingRect();
+			var br1 = fromrect;
 			var w =   br1.right - br1.left;
 			var fx = from._pos[0];
-			var fy = from._pos[1] + 13 + fromoff;
+			var fy = fromrect.top;
 			var tx = to._pos[0];
-			var ty = to._pos[1] + 13 + tooff;
+			var ty = torect.top+ tooff+ 13;
 			
 		//	console.log(fx, tx, br1);
 			
@@ -389,17 +392,26 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.alignself = "stretch"
 		this.flexdirection = "row"
 		
+		this.hovered = 0;
+		
+		
+		this.mouseover = function(){
+				this.hovered++;
+			this.setDirty();		
+		}
+		
+		this.mouseout = function(){
+			if (this.hovered>0) this.hovered--;
+			this.setDirty();					
+		}
+		
 		this.bg.basecolor = vec4();
 		this.bg.direction  = 1;
 		this.bg.offset  = 0;
-		this.bg.bgcolorfn = function(a,b){
-
-			
-			
-			
+		this.bg.bgcolorfn = function(a,b){ 
+		
+			//dump = a.x*2;
 			return mix(vec4(1,1,1,0), basecolor,  offset +  a.x * direction);
-		
-		
 		}
 		
 		this.atDraw = function(){
@@ -410,17 +422,16 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 				this.bg.direction = -1;
 				this.bg.offset = 1;
 			}
-			
-			this.bg.basecolor = this.basecolor;
+			if (this.hovered  > 0)
+			{
+				this.bg.basecolor = vec4.vec4_mul_float32(this.basecolor, 1.6);
+			}
+			else{
+				this.bg.basecolor = this.basecolor;
+			}
 		}
 		
-		this.mouseover = function(){
-			this.setDirty();
-		}
-		
-		this.mouseout = function(){
-			this.setDirty();
-		}
+	
 		
 		this.click = function(){
 			if (this.input){
