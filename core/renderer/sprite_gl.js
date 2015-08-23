@@ -431,7 +431,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		if(this.bg.shader && this.bg.shader.unilocs.time || 
 			this.fg.shader && this.fg.shader.unilocs.time){
 			//console.log('here')
-			this.setDirty(true)
+			this.screen.node_timers.push(this)
 		}
 	}
 

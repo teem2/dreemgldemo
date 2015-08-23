@@ -558,26 +558,35 @@ this.draw_calls = 0
 			
 			this.dirtyNodes = [];
 			
-			
 			this.device.setTargetFrame()
-			this.dirty = false
+
+			this.node_timers = []
 
 			this.drawColor();
-			
+
+			this.dirty = false
+
 			if (this.dirtyrectset){
-					this.lastdrawnboundingrect = this.totaldirtyrect;
-			}else{
-					this.lastdrawnboundingrect = this.getBoundingRect();
+				this.lastdrawnboundingrect = this.totaldirtyrect;
+			}
+			else{
+				this.lastdrawnboundingrect = this.getBoundingRect();
 			}
 			
 			this.totaldirtyrect = {};
 			this.dirtyrectset = false;	
+
+			if(this.has_timers) this.setDirty(true)
 		}
 
 		if (this.debugshader === true) {
 			if (!this.debug_tex.frame_buf) this.debug_tex.allocRenderTarget(this.device)
 			this.device.setTargetFrame(this.debug_tex)
 			this.drawDebug()
+		}
+
+		for(var i = 0; i < this.node_timers.length; i++){
+			this.node_timers[i].setDirty(true)
 		}
 
 		if(anim || this.hasListeners('time')) {
@@ -594,8 +603,6 @@ this.draw_calls = 0
 	}
 	
 	this.dirtyrects = [];
-	
-	
 	
 	this.lastdrawnboundingrect = {left:0, right: 0, top:0, bottom:0};
 	this.getLastDrawnBoundingRect = function(){
