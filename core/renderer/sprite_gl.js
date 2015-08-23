@@ -132,7 +132,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 	
 	this.getBoundingRect = function(force){	
-		if (this.dirty || !this.boundingRectCache || force === true){
+		if (!this.boundingRectCache || force === true){
 			this.boundingRectCache = this.calculateBoundingRect(force);
 		}
 		return this.boundingRectCache;
@@ -150,7 +150,11 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			debugger;
 			return{left:0,right:0, top:0, bottom: 0};
 		}
-		if (this.matrixdirty || force === true) this.recomputeMatrix();
+		if (this.matrixdirty || force === true)
+		{
+			//console.trace(" dirty matrix!");
+			this.recomputeMatrix();
+		}
 		var x1 = 0;
 		var x2 = this._size[0];
 		var y1 = 0;

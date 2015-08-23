@@ -223,9 +223,10 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			if (from === undefined) from = this.from;
 			if (to === undefined) to = this.to;
 			
+			var parentrect = this.parent.getBoundingRect();
 			var fromrect = from.getBoundingRect();
 			var fromattrrect =  from.outputsdict[this.fromattr].getBoundingRect();
-		//	console.log(this.fromattr, fromrect, fromattrrect);
+		
 			var torect = to.getBoundingRect();
 			var toattrrect =  to.inputsdict[this.toattr].getBoundingRect();
 	
@@ -238,9 +239,9 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			var br1 = fromrect;
 			var w =   br1.right - br1.left;
 			var fx = from._pos[0];
-			var fy = fromrect.top;
+			var fy = fromrect.top  + fromoff+ - parentrect.top  + 8;
 			var tx = to._pos[0];
-			var ty = torect.top+ tooff+ 13;
+			var ty = torect.top+ tooff- parentrect.top  + 8;
 			
 		//	console.log(fx, tx, br1);
 			
@@ -265,7 +266,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			this.pos = vec2(minx-11, miny-11);
 			this.size = vec3(maxx-minx + 22, maxy-miny +22);
 			this.off = vec4(minx-11,miny-11,0,0);
-			
+			//this.getBoundingRect(true);
 			//this.setDirty();
 		}
 		this.hovered =0;

@@ -19,7 +19,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	this.totaldirtyrect = {};
 	this.dirtyrectset = false;
 	this.debugshader =false;
-	this.debug = false;
+	//this.debug = true;
 	this.debugalldirtyrects = true;
 	this.showdebugtext = true;
 	this.renderstructure = false;
@@ -517,33 +517,24 @@ this.draw_calls = 0
 		
 	this.draw = function (time) {
 		var anim = this.doAnimation(time)
-		this.draw_calls ++;
-		
-//		console.log(this.draw_calls);
-		if(false)for(a in this.dirtyNodes)
-		{
-			var dn = this.dirtyNodes[a];
-			if (dn.layout) {
-				var dr = dn.getLastDrawnBoundingRect();
-				var dr2 = dn.getBoundingRect();
-//				console.log("dirty!", dn.constructor.name,  dr2);
-				this.addDirtyRect(dr);
-				this.addDirtyRect(dr2);
-				}
-		}
-
+		this.draw_calls ++;	
 		
 		if (this.layoutRequested)  {
 			this.performLayout();
 			this.layoutRequested = false;
-			
-			
 		}
 		
 		if (this.dirty === true) {		
+			this.rendering = false;
+
+			var computed = this.computeBoundingRects(this);
+
 			for(var a in this.predraw_registry){
-				this.predraw_registry[a].preDraw();
+				
+				this.predraw_registry[a].preDraw();				
 			}
+			
+
 		}
 		
 		this.time = time;
@@ -564,23 +555,7 @@ this.draw_calls = 0
 		if (this.dirty === true) {
 		//	console.clear();
 		
-			var computed = this.computeBoundingRects(this);
 
-			for(var a in this.dirtyNodes)
-			{			
-				var dn = this.dirtyNodes[a];
-				if (dn.layout) {
-					var dr = dn.getBoundingRect();
-				//	this.addDirtyRect(dr);
-				}
-				else{
-				//	console.log(dn.constructor.name);
-				//	console.log(dn.parent.layout);
-				//	console.log(dn.parent.orientation);
-				//	console.log(dn.constructor.name);
-			//		debugger;
-				}
-			}
 			
 			
 			this.device.setTargetFrame()
