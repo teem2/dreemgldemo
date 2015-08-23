@@ -58,7 +58,7 @@ define.class(function(require, constructor){
 			}
 			else if(arg !== undefined && typeof arg === 'object'){
 				this.instance_children.push(arg)
-				var name = arg.name || arg.constructor && arg.constructor.classname
+				var name = arg.name || arg.constructor && arg.constructor.name
 				if(name !== undefined && !(name in this)) this[name] = arg
 			}
 		}		

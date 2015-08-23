@@ -87,7 +87,7 @@ define.class(function(require, exports, module){
 			new_child = new_children[i] = renderer(new_child, old_child, globals)
 	
 			// set the childs name
-			var name = new_child.name || new_child.constructor.classname
+			var name = new_child.name || new_child.constructor.name
 			if(name !== undefined && !(name in object)) object[name] = new_child
 		}
 

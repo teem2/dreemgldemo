@@ -69,7 +69,7 @@ define.class('$base/node', function(require, exports, self, baseclass){
 		for(var i = 0; i < this.children.length; i++){
 			// create child name shortcut
 			var child = this.children[i]
-			var name = child.name || child.constructor.classname
+			var name = child.name || child.constructor.name
 			if(name !== undefined && !(name in this)) this[name] = child
 		}
 
