@@ -14,38 +14,28 @@ define.class(function(sprite, text, view, button, icon){
 
 	this.bg.draw_type = 'TRIANGLE_STRIP'
 	
-	this.bg.time = 0
-	this.bg.linewidth = 10;
+	this.bg.linewidth = 10.0;
 	this.bg.off = vec4(0);
 	this.bg.p0 = vec2(0,0);
 	this.bg.p1 = vec2(100,0);
 	this.bg.p2 = vec2(0,100);
 	this.bg.p3 = vec2(100,100);
 	this.bg.linecolor = vec4(1,1,1,1);	
+	this.bg.linebordercolor = vec4(0,0,1,1);	
 	this.bg.fromcol = vec4("red");
 	this.bg.tocol = vec4("blue");
-	
+	this.bg.lineborderwidth = 10.0
 	this.bg.color = function(){
 		
 		var hm = sin(mesh.side*PI+ PI/2)
 		
+		var border = (abs(mesh.side)*(linewidth/2.0)> ((linewidth/2.0) - lineborderwidth*2) ) ? 1.0:0.0;
+		
 		var col = mix(fromcol, tocol, mesh.pos) * (1 + sin(mesh.pos * PI)*0.2);
-		return vec4(col.rgb * pow(hm, 2.0), col.a * hm);
+	
+
+		return vec4(col.rgb, col.a * hm);
 		
-		var norm = vec2(dFdx(hm),  dFdy(hm))
-		norm = math.rotate2d(norm, -time+timephase)
-		var lightdot = dot(norm, gl_FragCoord.xy*0.015) 
-		var sw = sin(bezierlen*8-time*3*timedir+timephase*PI - 2.*cos(mesh.side*3.1415))
-		if(sw<0.5)
-		{
-			sw = 1.
-		}
-		else
-		{
-			if(sw>0.5) sw = 0.
-		}
-		
-		return linecolor * mix(mix(vec4(1.0,1.0,1.0,1.0),vec4(0.4,0.4,0.4,1.0 ), sw), vec4(1.0,1.0,1.0,1.0),1.- cos(mesh.side*3.1415));
 	}
 
 	this.bg.shapefn = function(v){
@@ -55,7 +45,7 @@ define.class(function(sprite, text, view, button, icon){
 	this.bg.scale = function(){
 		return 4.5
 	}
-
+/*
 	this.bg.color3 = function(){
 		var flowxy= vec2(bezierlen, mesh.side)
 		var slide = bezierlen*2.+4*time 
@@ -103,6 +93,8 @@ define.class(function(sprite, text, view, button, icon){
 		return col
 	}
 	//this.bg.dump = 1
+	
+	*/
 	this.bg.position = function(){
 		var npos = math.bezier2d(p0, p1, p2, p3, mesh.pos) - off;
 
@@ -125,15 +117,15 @@ define.class(function(sprite, text, view, button, icon){
 	}
 	
 	this.atDraw = function(){
-		this.bg.time = (Date.now() - this.time_start)*0.001
-		this.bg.linewidth = this.linewidth;
-		this.bg.fromcol = this.linecolor1;
-		this.bg.tocol = this.linecolor2;
-		this.bg.p0 = this.p0;
-		this.bg.p1 = this.p1;
-		this.bg.p2 = this.p2;
-		this.bg.p3 = this.p3;
-		this.bg.off = this.off;
+		//this.bg.time = (Date.now() - this.time_start)*0.001
+		this.bg.linewidth = this._linewidth;
+		this.bg.fromcol = this._linecolor1;
+		this.bg.tocol = this._linecolor2;
+		this.bg.p0 = this._p0;
+		this.bg.p1 = this._p1;
+		this.bg.p2 = this._p2;
+		this.bg.p3 = this._p3;
+		this.bg.off = this._off;
 		
 		//console.log(this.p0, this.p1, this.p2, this.p3, this.off);
 	//	this.dirty = true

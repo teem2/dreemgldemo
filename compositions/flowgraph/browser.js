@@ -148,7 +148,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 			this.size = vec3(maxx-minx + 22, maxy-miny +22);
 			this.off = vec4(minx-11,miny-11,0,0);
 			
-			this.setDirty();
+			//this.setDirty();
 		}
 		
 		this.arender = function(){
@@ -213,8 +213,11 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.attribute("applicationstate", {type:Object})
 		this.applicationstate = function()
 		{
-			this.selected = this.applicationstate.data.selected === ( "composition/screens" + this.data.name);
+			var newsel = this.applicationstate.data.selected === ( "composition/screens" + this.data.name);
+			if (newsel !== this._selected)
+			this.selected = newsel;
 		}
+		
 		this.attribute("data", {type: Object});
 		
 		this.mouseleftdown = function(){
@@ -243,10 +246,7 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.bgcolor = vec4("#ffff60");
 		this.bg.basecolor = vec4();
 
-		this.atDraw = function()
-		{
-			this.bg.basecolor = this.basecolor;
-		}
+		
 
 		this.bg.bgcolorfn = function(a,b)
 		{
@@ -259,23 +259,38 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 		this.bordercolor = vec4("darkgray");
 	
 		this.atDraw = function(){
-			if (this.dataset.selected == "screen_" + this.data.name){
-				this.borderwidth = 20;
-				this.bordercolor = vec4("blue");
+			if (this._selected){
+				this.bg.borderwidth = 20;
+				this.bg.bordercolor = vec4("blue");
 			}else{
-				this.borderwidth =1;
-				this.bordercolor = vec4("darkgray");
-				
+				this.bg.borderwidth =1;
+				this.bg.bordercolor = vec4("darkgray");				
 			}
 		}
 		this.render = function(){
+			
+			var inputs = [];
+			var outputs = [];
+		if (this.data.linkables){
+			for (var i in this.data.linkables){
+				var L = this.data.linkables[i];				
+				if (L.input == true)	{
+					inputs.push(button({text:L.name}));
+				}
+				else{
+					outputs.push(button({text:L.name}));
+				}
+			}
+		}
+					
+					
 			var root = this;
 		//console.log("blokjedata: " ,this.data);
 			var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#ffc030") ;
 			return [				
 				view({ bgcolor: basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4},
 					text({text: this.data.name, margin: 4, fontsize:20, bgcolor: "transparent", fgcolor: "black"})
-					,button({text:"change color",margin:0, padding:0,  click: function(){
+	/*				,button({text:"change color",margin:0, padding:0,  click: function(){
 	
 							var br = this.getBoundingRect();
 							var setcolor = function(color){
@@ -298,12 +313,10 @@ define.browserClass(function(require,screen, node, datatracker, spline, cadgrid,
 							);
 						}
 					}
-					)
+					)*/
 				),
 				view({bgcolor: basecolor, flexdirection:"column", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));}}
-					,this.data.linkables?this.data.linkables.map(function(d){
-						return button({text:d.name, itemalign: d.input?"flex-start":"flex-end"});
-					}):[]
+					,view({flexdirection:"row" }, view({flexdirection:"column"},inputs), view({flexdirection:"column"}, outputs))
 					
 				)
 			]

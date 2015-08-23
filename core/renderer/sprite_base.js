@@ -142,6 +142,7 @@ define.class('$base/nodeworker', function(require, exports, self){
 		{
 			this.screen.addDirtyNode(this);
 		}
+		if (this.dirty === true) return;
 		//console.log("dirty?");
 		this.bubbleDirty();
 		

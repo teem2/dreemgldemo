@@ -19,7 +19,7 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 	this.totaldirtyrect = {};
 	this.dirtyrectset = false;
 	this.debugshader = false
-	this.debug = false;
+	//this.debug = true;
 	this.showdebugtext = true;
 	this.renderstructure = false;
 	
@@ -365,21 +365,21 @@ define.class('./screen_base', function (require, exports, self, baseclass) {
 		//if (clippedrect) this.renderstate.popClip();
 		if (this.debug)
 		{
-			this.debugrectangle.viewmatrix = this.renderstate.viewmatrix;
-			this.debugrectangle.matrix = mat4.identity();
+			this.utilityframe.viewmatrix = this.renderstate.viewmatrix;
+			this.utilityframe.matrix = mat4.identity();
 			if (this.dirtyrectset)
 			{
 			
-			this.debugrectangle.width = this.totaldirtyrect.right - this.totaldirtyrect.left;
-			this.debugrectangle.height = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
-			this.debugrectangle.x =  this.totaldirtyrect.left;
-			this.debugrectangle.y = this.totaldirtyrect.top;
-			this.debugrectangle.draw(this.device);
+			this.utilityframe.width = this.totaldirtyrect.right - this.totaldirtyrect.left;
+			this.utilityframe.height = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
+			this.utilityframe.x =  this.totaldirtyrect.left;
+			this.utilityframe.y = this.totaldirtyrect.top;
+			this.utilityframe.draw(this.device);
 			}
 			//console.log("dirtyrect", this.totaldirtyrect);
 			
-			this.utilityframe.viewmatrix = this.renderstate.viewmatrix;
-			this.utilityframe.matrix = mat4.identity();
+		//	this.utilityframe.viewmatrix = this.renderstate.viewmatrix;
+		//	this.utilityframe.matrix = mat4.identity();
 			this.utilityframe.frame = this.renderstate.frame;			
 			
 			if (false){for (var i in this.dirtyrects){
@@ -611,9 +611,9 @@ this.draw_calls = 0
 		// round to visible pixels.. round up.
 		var w = rect.right - rect.left;
 		var h = rect.bottom - rect.top;
-		if (w > 1998) 
+		if (w > 100) 
 		{
-			if (window.dbg) debugger;
+			if (window.dbg) console.log(rect);
 		}
 		if (rect.width !== undefined)
 		{
@@ -641,7 +641,7 @@ this.draw_calls = 0
 		}
 		
 		if (this.debug){
-			//this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );	
+		//	this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );	
 		}
 		
 		if (this.dirtyrectset === true){	
@@ -958,14 +958,14 @@ this.draw_calls = 0
 		
 		this.debugrectangle = new GLShader();
 		this.debugrectangle.has_guid = false;
-		this.debugrectangle.bgcolor1 = vec4(0.3,0.3,1.3,1.0);
+		this.debugrectangle.bgcolor1 = vec4(0.3,0.3,1.0,1.0);
 		this.debugrectangle.bgcolor2 = vec4(0.0,0.0,1.0,1.0);
 		this.debugrectangle.x = 10;
 		this.debugrectangle.y = 10;
 		this.debugrectangle.width = 100;
 		this.debugrectangle.frame = 0;
 		this.debugrectangle.height = 100;
-		this.debugrectangle.alpha = 0.9;
+		this.debugrectangle.alpha = 0.4;
 		this.debugrectangle.color = function(){var t = (bgcolor1 + mesh.y  * (bgcolor2 - bgcolor1));return vec4( t.xyz, 1.0 * alpha);};
 		this.debugrectangle.mesh = vec2.array();
 		this.debugrectangle.mesh.length = 0;
