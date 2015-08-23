@@ -92,7 +92,7 @@ define.class(function(require, exports, module){
 			if(name !== undefined && !(name in object)) object[name] = new_child
 		}
 		if(old_children) for(;i<old_children.length;i++){
-			console.log('emitting destroy!')
+			//console.log('emitting destroy!')
 			old_children[i].emitRecursive('destroy')
 		}
 
