@@ -271,6 +271,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		//	this.screen.freeGuid(this.interfaceguid);		
 		//	this.interfaceguid = 0
 		//}
+		//else debugger
 	}
 	
 	this.orientation = {};

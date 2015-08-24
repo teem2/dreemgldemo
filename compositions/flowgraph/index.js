@@ -4,7 +4,7 @@ define.class(function(teem, screens, fileio, browser){
 		return [
 			fileio(),
 			screens(
-				browser( {})
+				browser({})
 			)
 		]
 	}

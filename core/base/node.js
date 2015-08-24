@@ -212,11 +212,14 @@ define.class(function(require, constructor){
 
 	}
 	
-	this.emitRecursive = function(key, value){
-			this.emit(key,value);
-			for(var a in this.children){
-				this.children[a].emitRecursive(key, value)
-			}
+	this.emitRecursive = function(key, value, block){
+
+		if(block && block.indexOf(child)!== -1) return
+		this.emit(key,value);
+		for(var a in this.children){
+			var child = this.children[a]
+			child.emitRecursive(key, value)
+		}
 	}
 	
 	this.emit = function(key, value){

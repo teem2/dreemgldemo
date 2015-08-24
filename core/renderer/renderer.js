@@ -11,7 +11,9 @@ define.class(function(require, exports, module){
 			wireinits = []
 			init_wires = true
 		}
-
+		if(!allchildren){
+			allchildren = []
+		}
 		var object = new_version
 		var old_children
 		var last_children
@@ -42,7 +44,9 @@ define.class(function(require, exports, module){
 		for(var key in globals){
 			object[key] = globals[key]
 		}
-
+		
+		allchildren.push(object)
+		
 		object.connectWires(wireinits)
 		
 		// lets call init only when not already called
@@ -107,9 +111,9 @@ define.class(function(require, exports, module){
 		if(last_children) for(var i = 0; i < last_children.length; i++){
 			var last_child = last_children[i]
 
-			if(new_children.indexOf(last_child) === -1){
-				last_child.emitRecursive('destroy')
-			}
+			//if(object.instance_children.indexOf(last_child) === -1 && allchildren.indexOf(last_child) === -1 && new_children.indexOf(last_child) === -1){
+			last_child.emitRecursive('destroy', 1, allchildren)
+			//}
 		}
 
 		if(init_wires){

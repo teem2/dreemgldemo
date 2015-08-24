@@ -72,22 +72,37 @@ define.class(function(require){
 		// ok, we will need to compute the local classes thing
 		define.system_classes = system_classes
 
-		// lets scan for the composition name in our external
-		// compositions directory
-		this.index_mapped =
-		this.index_real = '$compositions/' +this.name + '/index.js'
+		// lets figure out if we are a direct .js file or a 
+		// directory with an index.js 
+		var scan = [
+			{
+				mapped:'$compositions/' + this.name + '/index.js',
+				real:'$compositions/' + this.name + '/index.js'
+			},
+			{
+				mapped:'/_external_/' + this.name + '/index.js',
+				real:'$external/' + this.name + '/index.js'
+			},
+			{
+				mapped:'$compositions/' + this.name + '.js',
+				real:'$compositions/' + this.name + '.js'
+			},
+			{
+				mapped:'/_external_/' + this.name + '.js',
+				real:'$external/' + this.name + '.js'
+			},
+		]
 
-		var ext_real =  '$external/' + this.name + '/index.js'
-		var ext_mapped = '/_external_/' + this.name + '/index.js'
-
-		if(fs.existsSync(define.expandVariables(ext_real))){
-			this.index_mapped = ext_mapped
-			this.index_real = ext_real
+		for(var i = 0; i < scan.length;i++){
+			if(fs.existsSync(define.expandVariables(scan[i].real))){
+				this.index_mapped = scan[i].mapped
+				this.index_real = scan[i].real
+				break
+			}
 		}
 
 		// lets load up the teem nodejs part
 		var TeemServer = require(this.index_real)
-		
 		this.teem = new TeemServer(this.busserver)
 	}
 
