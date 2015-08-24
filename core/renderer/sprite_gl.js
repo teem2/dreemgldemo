@@ -267,10 +267,10 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	
 	this.destroy = function(){
 		if (this.preDraw) this.screen.unregisterPredraw(this);
-		if(this.interfaceguid){
-			this.screen.freeGuid(this.interfaceguid);		
-			this.interfaceguid = 0
-		}
+		//if(this.interfaceguid){
+		//	this.screen.freeGuid(this.interfaceguid);		
+		//	this.interfaceguid = 0
+		//}
 	}
 	
 	this.orientation = {};
