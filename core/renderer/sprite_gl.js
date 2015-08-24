@@ -262,17 +262,15 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.matrixdirty = false;
 	}
 	
-	
-	
-	this.reinit = function(){
-		this.interfaceguid = this.screen.allocGuid(this);
-		if (this.preDraw) this.screen.registerPredraw(this);
-		this.effectiveguid = this.interfaceguid;
-	}
+	//this.init = function(){
+	//}
 	
 	this.destroy = function(){
 		if (this.preDraw) this.screen.unregisterPredraw(this);
-		this.screen.freeGuid(this.interfaceguid);		
+		if(this.interfaceguid){
+			this.screen.freeGuid(this.interfaceguid);		
+			this.interfaceguid = 0
+		}
 	}
 	
 	this.orientation = {};
@@ -368,6 +366,10 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		else if(this.mode === 'Dali'){
 			this.drawContent = this.drawContentDali
 		}
+
+		this.interfaceguid = this.screen.allocGuid(this);
+		if (this.preDraw) this.screen.registerPredraw(this);
+		this.effectiveguid = this.interfaceguid;
 	}
 
 	this.renderQuad = function(texture, rect) {}

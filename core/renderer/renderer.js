@@ -5,7 +5,7 @@ define.class(function(require, exports, module){
 
 	var Node = require('$base/node')
 
-	module.exports = function renderer(new_version, old_version, globals, skip_old, wireinits){
+	module.exports = function renderer(new_version, old_version, globals, skip_old, wireinits, allchildren){
 		var init_wires = false
 		if(!wireinits){
 			wireinits = []
@@ -31,6 +31,8 @@ define.class(function(require, exports, module){
 					for(var key in new_version._state){
 						new_version[key] = old_version[key]
 					}
+					console.log("OLD VERSION DESTROY")
+
 					old_version.emit('destroy')
 				}
 			}
@@ -99,10 +101,12 @@ define.class(function(require, exports, module){
 			if(name !== undefined && !(name in object)) object[name] = new_child
 		}
 		if(old_children) for(;i<old_children.length;i++){
-			old_children[i].emitRecursive('destroy')
+			var child = old_children[i]
+			child.emitRecursive('destroy')
 		}
 		if(last_children) for(var i = 0; i < last_children.length; i++){
 			var last_child = last_children[i]
+
 			if(new_children.indexOf(last_child) === -1){
 				last_child.emitRecursive('destroy')
 			}

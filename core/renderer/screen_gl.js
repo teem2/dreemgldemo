@@ -201,10 +201,8 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	
 	
 	this.allocGuid = function(node){
-		if (this.free_guids.length > 0) 
-		{
-			var reusedguid = this.free_guids.pop();;
-			
+		if (this.free_guids.length > 0){
+			var reusedguid = this.free_guids.pop();
 			this.guidmap[reusedguid] = node;
 			return reusedguid;
 		}
@@ -215,13 +213,13 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	}
 
 	this.freeGuid = function(guid){
+		var node = this.guidmap[guid]
 		this.guidmap[guid] = undefined;
-		this.free_guids.push(guid);		
+		this.free_guids.push(guid);
 	}
 	
-
 	this.setguid = function(id){
-		
+
 		var screenw = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
 		var screenh = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
 		

@@ -29,7 +29,7 @@ define.browserClass(function(require, screen, icon,view, edit, text,scrollbar,  
 				),
 				tabcontrol({bgcolor: "#f0f0f0" , flexdirection:"column" }
 					,tabcontrol({tabname:"tests", tabicon:"hand-lizard" }, 
-					view({tabicon:"film", tabname: "Movie Grid Test", flex: 1, flexdirection: "column" }	,
+					view({tabicon:"film", tabdebug:true, tabname: "Movie Grid Test", flex: 1, flexdirection: "column" }	,
 					grid({cols: 10},this.buildmoviegrid())
 					),
 					view({tabicon:"th", tabname: "Grid Test", flex: 1, flexdirection: "column" }	
