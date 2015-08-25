@@ -1187,6 +1187,7 @@
 					}
 					script.onload = onLoad
 					script.onreadystatechange = function(){
+						console.log(s.readyState)
 						if(s.readyState == 'loaded' || s.readyState == 'complete') onLoad()
 					}
 					define.in_body_exec = false
@@ -1391,6 +1392,117 @@ Object.defineProperty(Function.prototype, 'wired', {get:function(){
 	return this
 }, set:function(){throw new Error('cant set wired')}})
 
+define.startLoader = function(){
+	window.onload = function(){
+		var cvs = document.createElement('canvas')
+		var div = document.body
+		define.loaderDiv = cvs
+		define.whileLoader = true
+		div.appendChild(cvs)
+		cvs.width  = div.offsetWidth, cvs.height = div.offsetHeight
+
+		window.onresize = function(){
+			cvs.width  = div.offsetWidth, cvs.height = div.offsetHeight      
+		}
+		var options = {
+			antialias:true, 
+			premultipliedAlpha: false,
+			alpha: true, 
+			preserveDrawingBuffer: true 
+		}
+		var gl = cvs.getContext('experimental-webgl', options) ||  cvs.getContext('webgl', options)
+
+		if(!gl){
+		}
+
+		// make texture
+		var tcvs = document.createElement( "canvas" )
+		var cv2d = tcvs.getContext( "2d" )
+
+		cv2d.width = 512
+		cv2d.height = 512
+
+		cv2d.fillStyle = 'white'
+		cv2d.fillRect(0, 0, 512,512)
+
+		var tex = gl.createTexture()
+		gl.bindTexture(gl.TEXTURE_2D, tex)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false)
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tcvs)
+		gl.bindTexture(gl.TEXTURE_2D, null)
+
+		// build shaders
+		var vertex = 
+		'attribute vec2 c;'+
+		'varying vec2 c_;'+
+		'void main(void){'+
+		' c_ = c;'+
+		' gl_Position = vec4(c.x, c.y,0.,1.);'+
+		'}'
+
+		var fragment = 
+		'precision mediump float;'+
+		'uniform sampler2D _0;'+
+		'uniform float time;'+
+		'varying vec2 c_;'+
+		'void main(void){'+
+		' gl_FragColor = vec4(1.);'+
+		' gl_FragColor.a = 1.-length(c_)*4.*abs(2.+sin(time))-(sin(4.*atan(c_.x,c_.y)+time)) - sin(length(c_)*32.-time);'+
+		'}'
+
+		var fs = gl.createShader(gl.FRAGMENT_SHADER)
+		gl.shaderSource(fs, fragment)
+		gl.compileShader(fs)
+		if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(fs))
+
+		var vs = gl.createShader(gl.VERTEX_SHADER)
+		gl.shaderSource(vs, vertex)
+		gl.compileShader(vs)
+		if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(vs))
+
+		var sp = gl.createProgram()
+		gl.attachShader(sp, vs)
+		gl.attachShader(sp, fs)
+		gl.linkProgram(sp)
+
+		// create a 2 tri quad
+		var b = gl.createBuffer()
+		var a = new Float32Array(12)
+		a[0] = -1,  a[1] = -1, a[2] = -1,  a[3] =  1, a[4] =  1,  a[5] = -1, a[6] =  1,  a[7] = -1, a[8] =  1,  a[9] =  1,a[10] = -1, a[11] = 1
+
+		var cl = gl.getAttribLocation(sp, 'c')
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, b)
+		gl.bufferData(gl.ARRAY_BUFFER, a, gl.STATIC_DRAW)
+		gl.vertexAttribPointer(cl, 2, gl.FLOAT, false, 0, 0);
+
+		gl.useProgram(sp)
+		gl.uniform1i(gl.getUniformLocation(sp, '_0'), 0)
+		//gl.activeTexture(gl.TEXTURE0)
+		//gl.bindTexture(gl.TEXTURE_2D, tex)
+		gl.enableVertexAttribArray(cl)
+
+		var d = Date.now()
+		var i = 0
+		function render(){
+			gl.viewport(0, 0, cvs.width, cvs.height) // however framerate drops 
+			gl.uniform1f(gl.getUniformLocation(sp, 'time'), (Date.now()-d) / 1000)
+			gl.drawArrays(gl.TRIANGLES, 0, 6)
+			if(!define.whileLoader)return
+			window.requestAnimationFrame(render)
+		}
+		window.requestAnimationFrame(render)
+	}
+}
+
+define.endLoader = function(){	
+	define.whileLoader = 0
+	define.loaderDiv.parentNode.removeChild(define.loaderDiv)
+}
+
 define.promiseLib = function(exports){
 	// Use polyfill for setImmediate for performance gains
 	var asap = Promise.immediateFn || (typeof setImmediate === 'function' && setImmediate) ||
@@ -1561,3 +1673,5 @@ define.promiseLib = function(exports){
 	exports.Promise = Promise
 }
 if(typeof Promise === 'undefined') define.promiseLib(typeof process !== 'undefined'? global: window)
+if(define.atEnd) define.atEnd()
+	console.log('here')

@@ -121,7 +121,7 @@ define.class(function(require){
   			'		-moz-user-select: none;\n'+
   			'		-user-select: none;\n'+
   			'    }\n'+
-			'    body {background-color:black;margin:0;padding:0;height:100%;overflow:hidden;}\n'+
+			'    body {background-color:darkgray;margin:0;padding:0;height:100%;overflow:hidden;}\n'+
 			'  </style>'+
 			'  <script type="text/javascript">\n'+
 			'    window.define = {\n'+
@@ -129,9 +129,13 @@ define.class(function(require){
 			'      system_classes:' + JSON.stringify(this.system_classes) + ',\n' + 
 			'      main:["$base/math", "' + boot + '"],\n'+
 			'      atMain:function(require, modules){\n'+
+			'        define.endLoader()\n'+
 			'		 define.global(require(modules[0]))\n'+
 			'		 var TeemClient = require(modules[1])\n'+
 			'        define.rootTeemClient = new TeemClient(define.rootTeemClient)\n'+
+			'      },\n'+
+			'	   atEnd:function(){\n'+
+			'         define.startLoader()\n'+
 			'      }\n'+
 			'    }\n'+
 			'  </script>\n'+
