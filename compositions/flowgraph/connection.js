@@ -1,5 +1,5 @@
 "use strict";
-define.browser(function(require,spline){
+define.class(function(require,spline){
 
 	this.state("from")
 	this.state("to");

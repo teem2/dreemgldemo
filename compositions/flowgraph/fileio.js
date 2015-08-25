@@ -1,8 +1,7 @@
-define.nodejsClass(function(require, server){
+define.class(function(require, server){
 
 	var nodehttp = require('$server/nodehttp')
 	var fs = require('fs')
-	var RpcProxy = require('$rpc/rpcproxy')
 	var path = require('path')
 
 	this.init = function(){

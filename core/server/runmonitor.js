@@ -4,6 +4,7 @@
 
 define.class(function(require, exports, self){
 	var FileWatcher = require('$server/filewatcher')
+
 	var ExternalApps = require('$server/externalapps')
 	var child_process = require('child_process')
 

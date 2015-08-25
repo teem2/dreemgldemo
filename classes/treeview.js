@@ -1,7 +1,6 @@
 "use strict";
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // view class
-
 define.class(function(module, sprite, text, view, button, icon){
 	var testdata = {name:'test Node', children:[
 		{name:'Child 1000', children:[
@@ -131,7 +130,7 @@ define.class(function(module, sprite, text, view, button, icon){
 		
 		
 		this.render = function(){
-			return [text({text: this.text, bgcolor: "transparent", fgcolor: "black", fontsize: 16, fgcolor: "#404040", margin: 2})];
+			return [text({text: this.text, bgcolor: "transparent", fontsize: 16, fgcolor: "#404040", margin: 2})];
 		}
 	})
 

@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.browserClass(function(require, cadgrid){
+define.class(function(require, cadgrid){
 	this.init = function(){
 		// we need to map 'screen' to something else
 		define.atLookupClass = function(cls){

@@ -1,9 +1,9 @@
 // this is the teem object for the composition
-define.class(function(teem, screens, browser){
+define.class(function(teem, screens, minidialog){
 	this.render = function(){
 		return [
 			screens(
-				browser( {})
+				minidialog( {})
 			)
 		]
 	}

@@ -1,5 +1,5 @@
 "use strict";
-define.browser(function(require, cadgrid, blokje, connection){	
+define.class(function(require, cadgrid, blokje, connection){	
 
 	this.attribute("dataset", {type: Object, value: {}})
 	

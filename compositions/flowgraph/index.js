@@ -1,10 +1,10 @@
 // this is the teem object for the composition
-define.class(function(teem, screens, fileio, browser){
+define.class(function(teem, screens, fileio, flowgraph){
 	this.render = function(){
 		return [
 			fileio(),
 			screens(
-				browser({})
+				flowgraph({})
 			)
 		]
 	}

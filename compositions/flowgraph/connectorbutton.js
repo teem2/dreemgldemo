@@ -1,5 +1,5 @@
 "use strict";
-define.browser(function(view, icon, text){
+define.class(function(view, icon, text){
 
 	this.margin = vec4(0,4,0,0)
 	this.padding = 0

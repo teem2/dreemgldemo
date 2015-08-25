@@ -1,5 +1,5 @@
 "use strict";
-define.browser(function(view, connectorbutton, icon, text){
+define.class(function(view, connectorbutton, icon, text){
 
 	this.position = "absolute" ;
 	this.attribute("dataset", {type: Object});

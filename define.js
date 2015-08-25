@@ -40,6 +40,7 @@
 	define.$animation = '$core/animation'
 
 	define.local_classes = {}
+	define.local_require_stack = []
 
 	define.partial_reload = true
 	define.reload_id = 0
@@ -116,6 +117,7 @@
 
 	define.localRequire = function(base_path, from_file){
 		function require(dep_path){
+			// skip nodejs style includes
 			var abs_path = define.joinPath(base_path, define.expandVariables(dep_path))
 			if(!define.fileExt(abs_path)) abs_path = abs_path + '.js'
 
@@ -125,6 +127,12 @@
 
 			// otherwise lets initialize the module
 			var factory = define.factory[abs_path]
+
+			if(!factory && dep_path.indexOf('$') === -1 && dep_path.charAt(0) !== '.'){
+				console.log('skipping', dep_path)
+				return null
+			}
+
 			module = {exports:{}, factory:factory, id:abs_path, filename:abs_path}
 			define.module[abs_path] = module
 
@@ -133,7 +141,17 @@
 
 			// call the factory
 			if(typeof factory == 'function'){
-				var ret = factory.call(module.exports, define.localRequire(define.filePath(abs_path), abs_path), module.exports, module)
+				var localreq = define.localRequire(define.filePath(abs_path), abs_path)
+
+				localreq.module = module
+
+				define.local_require_stack.push(localreq)
+				try{
+					var ret = factory.call(module.exports, localreq, module.exports, module)
+				}
+				finally{
+					define.local_require_stack.pop()
+				}
 				if(ret !== undefined) module.exports = ret
 			}
 			else module.exports = factory
@@ -261,13 +279,13 @@
 			}
 			else if(arg){
 				if(!require) throw new Error('Can only use fast-require classes on a file-class for arg:' + arg)
-				if(body.stubbed){
-					args[i] = define.StubbedClass
-				}
-				else{
-					args[i] = require(define.atLookupClass(arg))
-					args[i].nested_module = Constructor.module
-				}
+				//if(body.stubbed){
+				//args[i] = define.StubbedClass
+				//}
+				//else{
+				args[i] = require(define.atLookupClass(arg))
+				args[i].nested_module = Constructor.module
+				//}
 			}
 		}
 
@@ -280,13 +298,13 @@
 
 	define.makeClass = function(baseclass, body, require, module, nested_module){
 
-		var stubbed
+		/*var stubbed
 		if(body && body.environment !== undefined && body.environment !== define.$environment){
 			// turn require into a no-op internally
 			require = function(dep){ return new define.EnvironmentStub(dep) }
 			require.async = function(dep){ return new Promise(function(res, rej){res(null)})}
 			stubbed = body.stubbed = true
-		}
+		}*/
 
 		function MyConstructor(){
 			// if called without new, just do a new
@@ -305,7 +323,7 @@
 			}
 
 			// call atConstructor if defined
-			if(MyConstructor.stubbed) return obj
+			//if(MyConstructor.stubbed) return obj
 			if(obj._atConstructor) obj._atConstructor.apply(obj, arguments)
 
 			if(obj.atConstructor){
@@ -317,8 +335,8 @@
 		
 		if(define.debug){
 			var fnname
-			if(body && body.name){
-				fnname = body.name
+			if(body && (body.classname || body.name)){
+				fnname = (body.classname || body.name)
 			}
 			else if(module){
 				 fnname = define.fileBase(module.filename).replace(/\./g,'_')//.replace(/\.js/g,'').replace(/\./g,'_').replace(/\//g,'_')
@@ -357,8 +375,7 @@
 		}
 
 		Object.defineProperty(Constructor, 'extend', {value:function(body){
-			if(this.prototype.constructor === define.StubbedClass) return define.StubbedClass
-
+			//if(this.prototype.constructor === define.StubbedClass) return define.StubbedClass
 			return define.makeClass(this, body, require, undefined, this.nested_module)
 		}})
 
@@ -366,7 +383,16 @@
 			return define.applyBody(body, this, baseclass)
 		}})
 
-		if(stubbed) Object.defineProperty(Constructor, 'stubbed', {value:true})
+		Object.defineProperty(Constructor, 'mixin', {value:function(body){
+			var obj = body
+			if(typeof body === 'function') obj = body.prototype
+			var out = this.prototype
+			for(var key in obj){
+				out[key] = obj[key]
+			}
+		}})
+
+		//if(stubbed) Object.defineProperty(Constructor, 'stubbed', {value:true})
 
 		Object.defineProperty(Constructor, 'nest', {value:function(name, cls){
 			if(!Constructor.nested) Object.defineProperty(Constructor, 'nested', {value:cls})
@@ -411,9 +437,25 @@
 	}
 
 	define.buildArgMap = function(fn){
-		var map = fn.toString().match(/function\s*[\w]*\s*\(([\w,\s]*)\)/)[1].split(/\s*,\s*/)
-		for(var i = 0; i<map.length; i++) map[i] = map[i].toLowerCase()
-		return map
+
+		var str = fn.toString()
+
+		str = str.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
+		
+		var result;
+		var output = []
+		var result = str.match(/function\s*[\w]*\s*\(([\w,\s]*)\)/)
+
+		var map = result[1].split(/\s*,\s*/)
+		for(var i = 0; i<map.length; i++) if(map[i] !== '') output.push(map[i].toLowerCase())
+
+		var matchrx = new RegExp(/define\.(?:render|class)\s*\(\s*function\s*[\w]*\s*\(([\w,\s]*)\)\s*{/g)
+		while((result = matchrx.exec(str)) !== null) {
+			var map = result[1].split(/\s*,\s*/)
+			for(var i = 0; i<map.length; i++)if(map[i] !== '') output.push(map[i].toLowerCase())
+		}
+
+		return output
 	}
 
 	define.atLookupClass =
@@ -422,42 +464,62 @@
 		if(luc !== undefined) return luc
 		return './' + cls
 	}
-
+/*
 	// defining a class as environment specific
-	define.browser =
-	define.browserClass = function(body, body2){
+	define.browser = function(body, body2){
 		if(typeof body2 === 'function') body = body2
 		body.environment = 'browser'
-		define.class.apply(define, arguments)
-	}
-	define.nodejs = 
-	define.nodejsClass = function(body, body2){
-		if(typeof body2 === 'function') body = body2
-		body.environment = 'nodejs'
-		define.class.apply(define, arguments)
+		return define.class.apply(define, arguments)
 	}
 
-	define.StubbedClass = define.makeClass(undefined, function StubbedClass(){}, undefined, undefined)
+	define.nodejs = function(body, body2){
+		if(typeof body2 === 'function') body = body2
+		body.environment = 'nodejs'
+		return define.class.apply(define, arguments)
+	}
+*/
+	//define.StubbedClass = define.makeClass(undefined, function StubbedClass(){}, undefined, undefined)
 
 	// a class which just defines the render function
 	define.render = function(render){
-		// we need to define a class where the body is the render function.
-		function body(){
-			this.render = render.bind.apply(render, arguments)
+
+		var base_class
+		if(arguments.length > 1){ // class with baseclass
+			base_class = arguments[0]
+			render = arguments[1]
 		}
+		else{
+			render = arguments[0]
+		}
+
+		// we need to define a class where the body is the render function.
+		var body = function(){
+			var args = Array.prototype.slice.call(arguments)
+			args.unshift(0)
+			var parentAtConstructor = this._atConstructor
+			this._atConstructor = function(){
+				args[0] = this
+				this.render = render.bind.apply(render, args)
+				parentAtConstructor.apply(this,arguments)
+			}
+		}
+		body.classname = render.name
 		var argmap = body.argmap = define.buildArgMap(render)
 		// validate args
 		for(var i = 0; i < argmap.length; i++){
 			var arg = argmap[i]
 			if(arg in define.builtinClassArgs) throw new Error('Cannot use builtin arg ' + arg + ' in render class, use a normal class please')
+			if(!base_class) base_class = define.atLookupClass(arg)
 		}
-		define.class(body)
+
+		if(!base_class) throw new Error('Cannot define render class without baseclass')
+		return define.class(base_class, body)
 	}
 
 	define.mixin = function(body, body2){
 		if(typeof body2 === 'function') body = body2
 		body.mixin = true
-		define.class.apply(define, arguments)
+		return define.class.apply(define, arguments)
 	}
 
 	// class module support
@@ -465,7 +527,7 @@
 		// lets make a class
 		var base_class
 		var body
-		if(typeof arguments[0] === 'string'){ // class with baseclass
+		if(arguments.length > 1){ // class with baseclass
 			base_class = arguments[0]
 			body = arguments[1]
 		}
@@ -474,7 +536,10 @@
 		}
 
 		function moduleFactory(require, exports, module){
-			define.makeClass(base_class? require(base_class): null, body, require, module)
+			var base
+			if(typeof base_class === 'string') base = require(base_class)
+			else if (base_class) base = base_class
+			define.makeClass(base, body, require, module)
 		}
 
 		// make an argmap
@@ -482,11 +547,11 @@
 		// lets parse the named argument pattern for the body
 		moduleFactory.body = body
 		// put the baseclass on the deps
-		if(base_class) moduleFactory.depstring = 'require("' + base_class + '")'
+		if(base_class && typeof base_class === 'string') moduleFactory.depstring = 'require("' + base_class + '")'
 
 		// add automatic requires
 		if(body.argmap){
-			for(var i = 0; i <body.argmap.length; i++){
+			for(var i = 0; i < body.argmap.length; i++){
 				var arg = body.argmap[i]
 				if(!(arg in define.builtinClassArgs)){
 					var luttedclass = define.atLookupClass(arg)
@@ -495,6 +560,16 @@
 					if(!base_class) base_class = luttedclass
 				}
 			}
+		}
+
+		// if we have a local_require_stack we are a define inside a class or module body
+		// so then treat it as a local class
+		if(define.local_require_stack.length){
+			var outer_require = define.local_require_stack[define.local_require_stack.length - 1]
+			var outer_module = outer_require.module
+			var module = {exports:{}, filename:outer_module.filename, factory:outer_module.factory}
+			moduleFactory(outer_require, module.exports, module)
+			return module.exports
 		}
 
 		if(typeof arguments[arguments.length - 1] == 'string'){ // packaged
@@ -1089,7 +1164,11 @@
 						if(factory.depstring) search += '\n' + factory.depstring.toString()
 
 						Promise.all(define.findRequires(search).map(function(path){
-							// Make path absolute and process variables
+							// ignore nodejs style module requires
+							if(path.indexOf('$') === -1 && path.charAt(0) !== '.'){
+								return null
+							}
+
 							var dep_path = define.joinPath(base_path, define.expandVariables(path))
 
 							return loadResource(dep_path, url, true, module_deps)
@@ -1110,6 +1189,7 @@
 					script.onreadystatechange = function(){
 						if(s.readyState == 'loaded' || s.readyState == 'complete') onLoad()
 					}
+					define.in_body_exec = false
 					document.getElementsByTagName('head')[0].appendChild(script)
 				})
 			}
@@ -1252,26 +1332,43 @@
 				if(arguments.length != 1) throw new Error("Unsupported require style")
 
 				name = define.expandVariables(name)
-
-				var full_name = Module._resolveFilename(name, module)
-
+				try{
+					var full_name = Module._resolveFilename(name, module)
+				}
+				catch(e){
+					console.log("Cannot find module " + name + ' in module ' + module.filename)
+					throw e
+				}
 				if (full_name instanceof Array) full_name = full_name[0]
 
 				if(define.atRequire && full_name.charAt(0) == '/'){
 					define.atRequire(full_name)
 				}
-
-				return require(full_name)
+				var old_stack = define.local_require_stack
+				define.local_require_stack = []
+				try{
+					var ret = require(full_name)
+				}
+				finally{
+					define.local_require_stack = old_stack
+				}
+				return ret
 			}
 
 			localRequire.clearCache = function(name){
 				Module._cache = {}
 			}
-
+			localRequire.module = module
 			module.factory = factory
 			if (typeof factory !== "function") return module.exports = factory
 
-			var ret = factory.call(module.exports, localRequire, module.exports, module)
+			define.local_require_stack.push(localRequire)
+			try{
+				var ret = factory.call(module.exports, localRequire, module.exports, module)
+			}
+			finally{
+				define.local_require_stack.pop()
+			}
 
 			if(ret !== undefined) module.exports = ret
 

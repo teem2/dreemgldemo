@@ -175,7 +175,10 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		this.renderComposition()
 
 		// alright now we find the screen we wanna render somehow
-		this.screen = this.screens.browser
+		if(!this.screens.browser){
+			this.screen = this.screens.instance_children[0]			
+		}
+		else this.screen = this.screens.browser
 
 		if(previous || parent) this.doRender(previous, parent)
 	}

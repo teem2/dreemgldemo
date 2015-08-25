@@ -2,4 +2,6 @@
 // Plain server node
 
 define.class(function(node){
+	this.environment = 'nodejs'
+
 })
