@@ -202,8 +202,25 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 			};
 			
 		}
-	})
-
+	})	
+	
+	var drawerbutton = define.class(function drawerbutton(button){
+		this.margin= 2;
+		this.padding= 6;
+		this.cornerradius = 9
+		this.bgcolor= vec4("blue");
+		this.borderwidth = 1.5
+		this.bordercolor = vec4(0.5,0.5,0.5,0.1);
+		this.fontsize = 16;
+		this.alignself = "stretch"
+		
+		//this.buttoncolor1 = vec4(1,1,1,0.8);
+		//this.buttoncolor2 = vec4(1,1,1,0.8);
+		this.labelcolor = vec4("black");
+//		this.alignitems = "flex-end"
+		//this.justifycontent = "flex-end"
+	});
+	
 	this.render = function(){
 
 		return[
@@ -217,12 +234,11 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 							,menuitem({text: "Revert"})
 						)
 						,menuitem({text: "Edit"}
-							,menuitem({text: "Copy", enabled: false})
-							
+							,menuitem({text: "Copy", enabled: false})							
 							,menuitem({text: "Paste", enabled: false})
 							,menuitem({text: "Undo", click:function(){this.dataset.undo()}.bind(this)})
 							,menuitem({text: "Redo", click:function(){this.dataset.redo()}.bind(this)})
-							,menuitem({text: "Options", enabled: false})		
+							,menuitem({text: "Options", enabled: false})															
 						)
 						,menuitem({text: "Help"}
 							,menuitem({text: "Manual", enabled: false})
@@ -237,32 +253,78 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 								));
 							}})
 						)
+						
+						,menuitem({text: "new block", click:function(){
+							this.dataset.fork(function(data){
+								data.screens.push({name:"new screen", basecolor:vec4("green")})
+							})
+						}.bind(this)})
+						,menuitem({text: "Undo", click:function(){this.dataset.undo()}.bind(this)})
+						,menuitem({text: "Redo", click:function(){this.dataset.redo()}.bind(this)})
+
 					)					
 				)
-				,splitcontainer({name:"mainsplitter", vertical: false}
-					,flowgraphtreeview({flex:0.2, 
-						dataset: this.dataset, appstate: this.appstate
-						}
-					)
-					,splitcontainer({flex: 0.8, vertical: true}
-						,scrollcontainer({}
+				,splitcontainer({name:"mainsplitter", vertical: true}
+					,splitcontainer({flex: 0.8, vertical: false}
+						,splitcontainer({vertical:false, splittercolor: "#c0c0c0"}
 						,view({flexdirection: "column" , flex:1},
-							menubar({}
-								,menuitem({text: "new block", click:function(){
-									this.dataset.fork(function(data){
-										data.screens.push({name:"new screen", basecolor:vec4("green")})
-									})
-								}.bind(this)})
-								,menuitem({text: "Undo", click:function(){this.dataset.undo()}.bind(this)})
-								,menuitem({text: "Redo", click:function(){this.dataset.redo()}.bind(this)})
+							
+							blokjesgrid({dataset: this.dataset})
+						)
+						,view({flex:0.2, flexdirection: "column", flexwrap: "none"}
+							,foldcontainer({icon:"sitemap",title:"Layouts", basecolor: "#8080ff", alignitems: "stretch" }
+								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"transparent"}
+									,drawerbutton({text:"Grid",icon:"table" })
+									,drawerbutton({text:"List",icon:"reorder"})
+									,drawerbutton({text:"Graph", icon:"sitemap" })
+								)
+							)
+							,foldcontainer({icon:"server",title:"Services" , basecolor:"#80ffff" , alignitems: "stretch" }
+								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"transparent"}
+							
+								,drawerbutton({text:"Rovi", icon:"film"})
+								,drawerbutton({text:"Vimeo", icon:"vimeo"})
+								,drawerbutton({text:"Soundcloud", icon:"soundcloud"})
+								,drawerbutton({text:"Email", icon:"envelope"})
+								,drawerbutton({text:"Facebook",icon:"facebook" })
+								,drawerbutton({text:"Twitter",icon:"twitter"})
+								,drawerbutton({text:"Tumblr", icon:"tumblr"})
+								,drawerbutton({text:"Pinterest", icon:"pinterest"})
+								,drawerbutton({text:"Weather", icon:"cloud"})
+								,drawerbutton({text:"Maps",icon:"map"})
+								)
 
 							)
-							,blokjesgrid({dataset: this.dataset})
-						))
-						,view({flex:1,mode:'DOM', src:'http://127.0.0.1:8080/'+this.composition+''})
-				
+							,foldcontainer({icon:"toggle-on",title:"Controllers", basecolor: "#ff80ff" , alignitems: "stretch" }
+								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"transparent"}
+								,drawerbutton({text:"D-pad", icon:"gamepad" })
+								,drawerbutton({text:"Gyro",icon:"dot-circle"})
+								,drawerbutton({text:"Trackpad", icon:"square"})
+								,drawerbutton({text:"Keyboard", icon:"keyboard" })
+								,drawerbutton({text:"Mouse",icon:"mouse-pointer"})
+								
+								)
+							)
+							
+							,foldcontainer({icon:"tv",title:"Devices", basecolor: "#ffffb0", alignitems: "stretch" }
+								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"transparent"}
+
+								,drawerbutton({text:"Phone", icon:"phone" })
+								,drawerbutton({text:"Server",icon:"server"})
+								,drawerbutton({text:"Tab", icon:"tablet"})
+								,drawerbutton({text:"TV", icon:"tv"})
+								,drawerbutton({text:"PC", icon:"desktop" })
+								,drawerbutton({text:"Watch", icon:"clock"})
+								,drawerbutton({text:"Fit", icon:"heart"})
+								)
+							)
+							
+						)
 						
-					)
+						
+						)
+						)
+			//			,view({flex:1,mode:'DOM', src:'http://127.0.0.1:8080/'+this.composition+''})
 				)
 			)
 	]}
