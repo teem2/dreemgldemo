@@ -6,6 +6,8 @@ define.class(function(sprite, text, icon, view){
 	this.title = "folding thing";
 	this.position ="relative";
 	this.borderwidth = 1;
+	this.margin = 2;
+	
 	this.bordercolor = vec4("gray");
 	
 	this.alignitems = "stretch";
@@ -15,12 +17,7 @@ define.class(function(sprite, text, icon, view){
 
 	this.attribute("icon", {type: String, value: 'times'});
 	
-	this.attribute("buttoncolor1", {type: vec4, value: vec4("#303060")});
-	this.attribute("buttoncolor2", {type: vec4, value: vec4("#303060")});	
-	this.attribute("hovercolor1", {type: vec4, value: vec4("#404080")});
-	this.attribute("hovercolor2", {type: vec4, value: vec4("#5050a0")});
-	this.attribute("pressedcolor1", {type: vec4, value: vec4("#3b5898")});
-	this.attribute("pressedcolor2", {type: vec4, value: vec4("#637aad")});
+	this.attribute("basecolor", {type: vec4, value: vec4("#8080c0")});
 	
 	this.toggle = function(){
 		this.collapsed = !this.collapsed;		
@@ -42,7 +39,7 @@ define.class(function(sprite, text, icon, view){
 		this.padding = 6;
 			
 		this.render = function(){			
-			return [icon({fontsize:16, icon:this.icon, fgcolor: "white" }), text({marginleft:5,fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })];
+			return [icon({fontsize:16, icon:this.icon, fgcolor: "#303030" }), text({marginleft:5,fgcolor:"#303030", fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })];
 		}
 		
 		this.pressed = 0;
@@ -72,17 +69,18 @@ define.class(function(sprite, text, icon, view){
 		{
 			if (this.hovered > 0){
 				if (this.pressed > 0){
-					this.bg.col1 = this.parent.pressedcolor1;
-					this.bg.col2 = this.parent.pressedcolor2;
+					this.bg.col1 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.3);
+					this.bg.col2 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.0);
 				}
 				else{
-					this.bg.col1 = this.parent.hovercolor1;
-					this.bg.col2 = this.parent.hovercolor2;
+					this.bg.col1 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.0);
+					this.bg.col2 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.2);
 				}
 			}
 			else{
-					this.bg.col1 = this.parent.buttoncolor1;
-					this.bg.col2 = this.parent.buttoncolor2;
+					this.bg.col2 = vec4.vec4_mul_float32_rgb(vec4(this.parent.basecolor), 0.9);
+//					this.bg.col1 = this.parent.basecolor;
+					this.bg.col1 = this.parent.basecolor;
 			}
 		}			
 	});
@@ -94,7 +92,7 @@ define.class(function(sprite, text, icon, view){
 		this.bar.click = this.toggle.bind(this);
 		var res = [this.bar];
 		if (this.collapsed == false) {
-			this.container = view({bgcolor: "#202040",  padding: 15,position:"relative"} ,this.instance_children) 
+			this.container = view({"bg.bgcolorfn":function(a,b){return mix(bgcolor*1.7, vec4("white"), (a.y/8));} , bgcolor: this.basecolor,  padding: 4,position:"relative"} ,this.instance_children) 
 			res.push(this.container)
 		}
 		this.children = [];

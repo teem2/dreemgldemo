@@ -31,7 +31,7 @@ define.class(function(view, icon, text){
 	this.bg.offset  = 0
 	this.bg.bgcolorfn = function(a,b){ 
 		//dump = a.x*2;
-		return mix(vec4(1,1,1,0), basecolor,  offset +  a.x * direction)
+		return mix(vec4(1,1,1,0), basecolor*1.6,  offset +  a.x * direction)
 	}
 	
 	this.atDraw = function(){

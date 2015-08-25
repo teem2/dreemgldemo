@@ -630,6 +630,15 @@ define(function(require, exports){
 		return o
 	}
 
+	exports.vec4.vec4_mul_float32_rgb = function(a, b, o){
+		if(!o) o = exports.vec4()
+		o[0] = a[0] * b
+		o[1] = a[1] * b
+		o[2] = a[2] * b
+		o[3] = a[3] 
+		return o
+	}
+
 	exports.vec4.add = 
 	exports.vec4.vec4_add_vec4 = function(a, b, o){
 		if(!o) o = exports.vec4()
