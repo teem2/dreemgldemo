@@ -26,7 +26,6 @@ define.class(function(module, sprite, text, view, button, icon){
 	this.attribute("dataset", {type: Object, value:{}});
 	this.attribute("selected", {type: String, value:""});
 
-	
 	var flatbutton = button.extend(function flatbutton(){
 		this.borderwidth = 0;
 		this.padding =  4;
@@ -44,7 +43,6 @@ define.class(function(module, sprite, text, view, button, icon){
 		this.bgcolor = "transparent";
 		this.flex = undefined;
 		this.alignself = "flex-start" 	
-		
 	})
 	
 	var newitemheading = view.extend(function newitemheading(){

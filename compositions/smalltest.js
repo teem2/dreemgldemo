@@ -1,4 +1,4 @@
-//a JS based composition
+//Pure JS based composition
 define.class(function(teem, screens, screen, view, text){
 
 	var fileio = define.class(function fileio(server){
@@ -11,7 +11,7 @@ define.class(function(teem, screens, screen, view, text){
 	})
 
 	var myview = define.render(function myname(view){
-		return text({x:0, y:0, bgcolor:'blue', text:'HELLO WORLD'})
+		return text({x:0, y:0, bgcolor:'blue', text:'Its definitely a live coding widget'})
 	})
 
 	this.render = function(){ return [
