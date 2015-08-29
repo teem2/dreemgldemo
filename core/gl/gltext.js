@@ -796,6 +796,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		mesh.distance = glyphy_sdf(pos, nominal_size, atlas_pos) //+ noise.noise3d(vec3(glyph.x, glyph.y, time))*0.6
 		
 		dbg = mesh.distance
+		
 		mesh.scaling = m
 		//dump = mesh.distance
 		//return mix(vec4(0.),'green',1.-mesh.distance)

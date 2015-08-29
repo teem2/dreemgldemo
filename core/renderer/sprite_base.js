@@ -91,6 +91,7 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.event("postLayout")
 
 	this.event("click")
+	this.event("dblclick")
 	this.event("miss")
 	this.event("mouseout")
 	this.event("mouseover")

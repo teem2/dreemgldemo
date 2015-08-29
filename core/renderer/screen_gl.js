@@ -712,6 +712,17 @@ this.draw_calls = 0
 		}
 	}
 
+	this.dblclick = function(){
+		if (this.lastmouseguid > 0) {
+			if (this.uieventdebug){
+				console.log(" clicked: " + this.guidmap[this.lastmouseguid].constructor.name);
+			}
+			var overnode = this.guidmap[this.lastmouseguid];
+			if (this.inModalChain(overnode) && overnode && overnode.emit) overnode.emit('dblclick')
+		}
+	}
+
+
 	this.copyProps = function(other){
 		// lets copy the old props
 		var keys = Object.keys(other)
@@ -897,6 +908,16 @@ this.draw_calls = 0
 			}			
 			this.click();
 		}.bind(this)
+
+		this.mouse.dblclick = function () {
+			if(this.modal_miss){
+				this.modal_miss = false
+				return
+			}			
+			this.dblclick();
+		}.bind(this)
+
+
 
 		this.device.atResize = function(){
 			this.layoutRequested = true;

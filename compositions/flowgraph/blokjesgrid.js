@@ -44,16 +44,22 @@ define.class(function(require, cadgrid, blokje, connection){
 	//}
 	
 	this.blokjes = {}
-	
+
+	this.dblclick = function(){
+
+	}
+
 	this.render = function(){
-			
+		var outer = this
 		this.blokjes = {};
 		var all = [];			
 		var connecties = {};
 		var i = 0;
 		for(var a in this.dataset.data.screens){
 			var d = this.dataset.data.screens[a]
-			this.blokjes[d.name] = blokje({dataset:this.dataset, data: d, x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 })
+			this.blokjes[d.name] = blokje({dataset:this.dataset, dblclick:function(){
+				outer.emit('dblclick',this)
+			},data: d, x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 })
 			i++
 			
 			all.push(this.blokjes[d.name])

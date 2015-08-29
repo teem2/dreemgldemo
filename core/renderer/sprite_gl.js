@@ -389,6 +389,11 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		}
 		this.bg.draw(renderstate.device);
 	}
+
+	this.show = function(){
+		if(!this.dom) return
+		this.dom.style.display = 'block'
+	}
 	
 	this.drawContentDOM = function(renderstate){
 		if (this.matrixdirty) this.recomputeMatrix()
@@ -400,6 +405,10 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			var parent = this.screen.device.canvas.parentNode
 			parent.appendChild(this.dom)
 			if(this.src) dom.src = this.src
+
+			dom.style.position = 'absolute' 
+			dom.style.display = 'none'
+			dom.style.border = '0px'
 		}
 
 		var r = this.getBoundingRect();
@@ -422,10 +431,17 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			dom.style.width = this._width
 			dom.style.height = this._height
 		}
-		dom.style.position = 'absolute' 
-		dom.style.display = 'block'
-		dom.style.border = '0px'
 
+
+		dom.onload = function(){
+			window.addEventListener("message", function(msg){
+				// we received a closewindow from msg
+				if(msg.data.type === 'closewindow'){
+					// lets hide it
+					dom.style.display = 'none'
+				}
+			}, false);
+		}
 		var bg = this._bgcolor
 		if(bg){
 			dom.style.backgroundColor = 'rgba('+parseInt(255*bg[0])+','+parseInt(255*bg[1])+','+parseInt(255*bg[2])+','+parseInt(255*bg[3])+')'

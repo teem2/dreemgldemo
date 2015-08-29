@@ -1393,6 +1393,7 @@ Object.defineProperty(Function.prototype, 'wired', {get:function(){
 }, set:function(){throw new Error('cant set wired')}})
 
 define.startLoader = function(){
+	return
 	window.onload = function(){
 		var cvs = document.createElement('canvas')
 		var div = document.body
@@ -1499,6 +1500,7 @@ define.startLoader = function(){
 }
 
 define.endLoader = function(){	
+	return
 	define.whileLoader = 0
 	define.loaderDiv.parentNode.removeChild(define.loaderDiv)
 }

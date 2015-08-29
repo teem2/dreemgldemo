@@ -222,9 +222,9 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 	});
 	
 	this.render = function(){
-
+		var displays = {}
 		return[
-			view({name:"toplevel",flexdirection: "column", bgcolor: "darkgray" , flex:1}
+			view({rotation:0,name:"toplevel",flexdirection: "column", bgcolor: "darkgray" , flex:1}
 				,view({name:"menubarholder", bgcolor:"lightgray"}
 					,menubar({flex:1}
 						,menuitem({text: "File"}
@@ -269,7 +269,11 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 						,splitcontainer({vertical:false, splittercolor: "#c0c0c0"}
 						,view({flexdirection: "column" , flex:1},
 							
-							blokjesgrid({dataset: this.dataset})
+							blokjesgrid({dataset: this.dataset, dblclick:function(blokje){
+								var display = displays[blokje.data.name]
+								console.log(blokje.data.name)
+								display.show()
+							}})
 						)
 						,view({flex:0.2, flexdirection: "column", flexwrap: "none"}
 							,foldcontainer({icon:"sitemap",title:"Layouts", basecolor: "#8080ff", alignitems: "stretch" }
@@ -302,7 +306,6 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 								,drawerbutton({text:"Trackpad", icon:"square"})
 								,drawerbutton({text:"Keyboard", icon:"keyboard" })
 								,drawerbutton({text:"Mouse",icon:"mouse-pointer"})
-								
 								)
 							)
 							
@@ -324,9 +327,13 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 						
 						)
 						)
-			//			,view({flex:1,mode:'DOM', src:'http://127.0.0.1:8080/'+this.composition+''})
+						
 				)
 			)
+			,displays.default = view({name:'frame1', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload&edit=1'})
+			,displays.mobile1= view({name:'frame1', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload&edit=1'})
+			,displays.mobile2 = view({name:'frame2', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload&edit=1'})
+
 	]}
 });
 
