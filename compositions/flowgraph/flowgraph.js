@@ -80,7 +80,7 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 	}
 	
 	this.init = function(){
-		this.composition = location.hash.slice(1) || 'compositions/example/editor.dre'
+		this.composition = location.hash.slice(1) || 'compositions/demo/tvdemo.dre'
 		this.dataset = datatracker({
 			screens:[
 			],
@@ -114,8 +114,8 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 			this.dataset.fork(function(data){
 				for(var i = 0; i < screens.child.length; i++){
 					var scr = screens.child[i]
+					if(scr.tag !=='screen') continue
 					var view = Xml.childByTagName(scr, 'view')
-
 					data.screens.push({name:scr.attr.name, icon: scr.attr.icon?scr.attr.icon:"tv", title:scr.attr.title?scr.attr.title:scr.attr.name,					
 								x:parseFloat(scr.attr.editx || 0), y:parseFloat(scr.attr.edity || 0),
 								basecolor: (scr.attr.basecolor)?scr.attr.basecolor: vec4('#d0d0a0'), linkables:
@@ -331,8 +331,7 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 				)
 			)
 			,displays.default = view({name:'frame1', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload&edit=1'})
-			,displays.mobile1= view({name:'frame1', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload&edit=1'})
-			,displays.mobile2 = view({name:'frame2', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload&edit=1'})
+			,displays.mobile= view({name:'frame1', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload&edit=1'})
 
 	]}
 });
