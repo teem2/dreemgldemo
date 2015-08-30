@@ -97,7 +97,8 @@ function main(){
 			new DaliClient(args)
 		}
 		else if(args['-test']){
-			require('$core/acornserializer')
+			require('$core/server/test.js')
+
 		}
 		else{
 			var TeemServer = require('$core/dreem/dreemserver')

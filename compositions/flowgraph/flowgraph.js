@@ -89,7 +89,7 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 		})
 		
 		this.dataset.atChange  = function(){
-			console.log("data set changed!");
+			//console.log("data set changed!");
 			var newxml = this.BuildXML(this.xmljson, this.dataset.data);
 			
 			if (newxml != this.xmlstring){
@@ -99,7 +99,7 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 					this.xmlstring = newxml;
 				}.bind(this));		
 			}else{
-				console.log("no notable changes.. not saving file to server");
+			//	console.log("no notable changes.. not saving file to server");
 			}
 		}.bind(this);
 	
@@ -116,10 +116,14 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 					var scr = screens.child[i]
 					if(scr.tag !=='screen') continue
 					var view = Xml.childByTagName(scr, 'view')
-					data.screens.push({name:scr.attr.name, icon: scr.attr.icon?scr.attr.icon:"tv", title:scr.attr.title?scr.attr.title:scr.attr.name,					
-								x:parseFloat(scr.attr.editx || 0), y:parseFloat(scr.attr.edity || 0),
-								basecolor: (scr.attr.basecolor)?scr.attr.basecolor: vec4('#d0d0a0'), linkables:
-						Xml.childrenByTagName(view, 'attribute').map(function(each){
+					data.screens.push({
+						name:scr.attr.name, 
+						icon: scr.attr.icon?scr.attr.icon:"tv", 
+						title:scr.attr.title?scr.attr.title:scr.attr.name,					
+						iframeurl: 'http://127.0.0.1:8080/' + this.composition + '?noreload',
+						x:parseFloat(scr.attr.editx || 0), y:parseFloat(scr.attr.edity || 0),
+						basecolor: (scr.attr.basecolor)?scr.attr.basecolor: vec4('#d0d0a0'), 
+						linkables: Xml.childrenByTagName(view, 'attribute').map(function(each){
 							return {
 								name: each.attr.name,
 								icon: each.attr.icon?each.attr.icon:"chevron-right",
@@ -330,7 +334,7 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 						
 				)
 			)
-			,displays.default = view({name:'frame1', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload'})
+			//,displays.default = 
 //			,displays.mobile= view({name:'frame1', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload&edit=1'})
 
 	]}

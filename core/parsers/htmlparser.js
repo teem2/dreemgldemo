@@ -48,6 +48,7 @@ define.class(function(require, exports, self){
 			else if(node.tag == '$cdata') ret += indent + '<![CDATA['+node.value+']]>\n'
 			else if(node.tag == '$comment') ret += indent + '<!--' + node.value+'-->\n'
 			else if(node.tag == '$root') ret += child
+			else if(node.tag == '$empty') ret += Array(node.value - 1).join('\n')
 		}
 		return ret
 	}
@@ -136,6 +137,11 @@ define.class(function(require, exports, self){
 		if(!value.match(isempty)){
 			var node = this.createNode('$text', start)
 			node.value = this.processEntities(value, start)
+			this.appendChild(this.node,node)
+		}
+		else{
+			var node = this.createNode('$empty', start)
+			node.value = value.split(/\n/).length
 			this.appendChild(this.node,node)
 		}
 	}
@@ -358,7 +364,9 @@ define.class(function(require, exports, self){
 					next == 35 || next == 36 || next == 92 || next == 94 || 
 					(next >=48 && next <= 57)) continue
 				// lets emit textnode since last
-				if(start != pos - 1) this.atText(source.slice(start, pos - 1), start, pos - 1)
+				if(start != pos - 1){
+					this.atText(source.slice(start, pos - 1), start, pos - 1)
+				}
 				if(next == 33){ // <!
 					after = source.charCodeAt(pos+1)
 					if(after == 45){ // <!- comment
@@ -370,7 +378,7 @@ define.class(function(require, exports, self){
 									source.charCodeAt(pos + 1) == 62){
 								pos += 2
 								this.atComment(source.slice(start + 1, pos - 3), start, pos)
-								console.log(source.slice(start + 1, pos - 3))
+								//console.log(source.slice(start + 1, pos - 3))
 								break
 							}
 							else if(pos == len) this.atError("Unexpected end of files while reading <!--", start)

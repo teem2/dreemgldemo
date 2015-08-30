@@ -420,7 +420,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			dom.style.left = Math.floor(r.left);
 			dom.style.top = Math.floor(r.top);		
 		} else
+
 		if(this.layout){
+			console.log(this.layout)
 			dom.style.width = this.layout.width? this.layout.width: this._width
 			dom.style.height = this.layout.height? this.layout.height: this._height
 			dom.style.left = this.layout.left

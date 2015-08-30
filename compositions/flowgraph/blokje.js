@@ -110,12 +110,11 @@ define.class(function(view, connectorbutton, icon, text){
 				icon({icon:this.data.icon, fontsize: 20, margin:vec4(10,0,10,0)}),text({margin:vec4(4,4,24,4),text: this.data.title,  fontsize:16, bgcolor: "transparent", fgcolor: "#404040"})
 			),
 			view({position:"relative", bgcolor: basecolor,justifycontent:"space-between", aligncontent: "flex-end", alignitems: "flex-end",  flexdirection:"row", "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), 1-(a.y*0.2));},margin:0, padding:0}
-				
-				,	view({position:"relative", flexdirection:"column",margin:0, padding:vec4(0,10,0,10),flex: 1  , bgcolor:"transparent"},this.inputs), 
-					view({position:"relative", flexdirection:"column",alignitems: "flex-end",margin:0, padding:vec4(0,10,0,10), flex: 1, bgcolor:"transparent"}, this.outputs)
-				
-				
+				,view({position:"relative", flexdirection:"column",margin:0, padding:vec4(0,10,0,10),flex: 1  , bgcolor:"transparent"},this.inputs)
+				,view({position:"relative", flexdirection:"column",alignitems: "flex-end",margin:0, padding:vec4(0,10,0,10), flex: 1, bgcolor:"transparent"}, this.outputs)
 			)
+			,view({position:'relative', flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
+
 		]
 	}
 });
