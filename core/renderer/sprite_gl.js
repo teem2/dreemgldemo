@@ -407,19 +407,24 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			if(this.src) dom.src = this.src
 
 			dom.style.position = 'absolute' 
-			dom.style.display = 'none'
+			dom.style.display = 'block'
 			dom.style.border = '0px'
 		}
 
 		var r = this.getBoundingRect();
-//		console.log(r);
+	console.log(r);
 		
 		if (r){
-			dom.style.width = Math.floor(r.right - r.left);
-			dom.style.height = Math.floor(r.bottom - r.top);
+			var scalex = 5
+			dom.style.transformOrigin = '0px 0px'
+			dom.style.transform = 'scaleX('+(1/scalex)+') scaleY('+(1/scalex)+')'
+			//dom.style.rotateY = '90degrees'
+			dom.style.width = (Math.floor(r.right - r.left))*scalex;
+			dom.style.height = (Math.floor(r.bottom - r.top))*scalex;
 			dom.style.left = Math.floor(r.left);
-			dom.style.top = Math.floor(r.top);		
-		} else
+			dom.style.top = Math.floor(r.top);	
+			console.log(r)	
+		} /*else
 
 		if(this.layout){
 			console.log(this.layout)
@@ -432,7 +437,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			//console.log(this.layout.width);
 			dom.style.width = this._width
 			dom.style.height = this._height
-		}
+		}*/
 
 
 		dom.onload = function(){
@@ -440,7 +445,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 				// we received a closewindow from msg
 				if(msg.data.type === 'closewindow'){
 					// lets hide it
-					dom.style.display = 'none'
+				//	dom.style.display = 'none'
 				}
 			}, false);
 		}

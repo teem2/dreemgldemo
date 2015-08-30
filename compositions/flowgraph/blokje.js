@@ -113,7 +113,7 @@ define.class(function(view, connectorbutton, icon, text){
 				,view({position:"relative", flexdirection:"column",margin:0, padding:vec4(0,10,0,10),flex: 1  , bgcolor:"transparent"},this.inputs)
 				,view({position:"relative", flexdirection:"column",alignitems: "flex-end",margin:0, padding:vec4(0,10,0,10), flex: 1, bgcolor:"transparent"}, this.outputs)
 			)
-			,view({position:'relative', flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
+			,view({position:'relative',init:function(){}, flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
 
 		]
 	}
