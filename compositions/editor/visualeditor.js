@@ -4,7 +4,11 @@ define.class(function(require, screen, view,menuitem, menubar, edit, text, icon,
 
 		return[
 		view({rotation:0,position: "relative",   flexdirection: "column", height: 20, bgcolor: "black", flex:1},[
-			view({position: "relative",  cornerradius:"vec4(0,0,0,14)" , borderwidth:1,  flexdirection: "row", bgcolor: "#404080",'bg.bgcolorfn':function(a,b){return vec4(mesh.x * bgcolor.rgb, 1.0)} , alignitems:"stretch", alignself: "stretch" , flex: undefined}
+			view({position: "relative",  cornerradius:"vec4(0,0,0,14)" , borderwidth:1,  flexdirection: "row", bgcolor2: "#404080",
+				'bg.bgcolorfn':function(pos,b){
+					return demos.highdefblirpy(pos*vec2(2.,0.1), time * 2, 1.) * vec4(mesh.x * bgcolor.rgb, 1.0)
+					//'red'//vec4(mesh.x * bgcolor.rgb, 1.0)
+				} , alignitems:"stretch", alignself: "stretch" , flex: undefined}
 				,icon({icon:"windows", fgcolor:"white", marginleft: 15, fontsize:18})
 				,text({fontsize: 20, text:"Visionary Studio 3016", width: 200, bgcolor: "transparent" , marginbottom:10, marginleft:15})
 			)

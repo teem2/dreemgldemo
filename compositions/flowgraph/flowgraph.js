@@ -330,8 +330,8 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 						
 				)
 			)
-			,displays.default = view({name:'frame1', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload&edit=1'})
-			,displays.mobile= view({name:'frame1', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload&edit=1'})
+			,displays.default = view({name:'frame1', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload'})
+//			,displays.mobile= view({name:'frame1', position:'absolute',width:1920, height:1080,flex:1,mode:'DOM', src:'http://127.0.0.1:8080/' + this.composition + '?noreload&edit=1'})
 
 	]}
 });

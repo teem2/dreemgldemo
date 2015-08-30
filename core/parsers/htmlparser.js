@@ -8,36 +8,45 @@ define.class(function(require, exports, self){
 		if(spacing === undefined) spacing = '\t'
 		var ret = ''
 		var child = ''
+		var nontextchild = false;
 		if(node.child){
 			for(var i = 0, l = node.child.length; i<l; i++){
 				var sub = node.child[i]
-				child += this.reserialize(node.child[i], spacing, indent === undefined?'': indent + spacing)
+				if(sub.tag !== '$text') nontextchild = true
+				child += this.reserialize(sub, spacing, indent === undefined?'': indent + spacing)
 			}
 		}
 		if(!node.tag) return child
 		if(node.tag.charAt(0) !== '$'){
 			ret += indent + '<' + node.tag
 			var attr = node.attr
-			if(attr) for(var k in attr){
-				var val = attr[k]
-				if(ret[ret.length - 1] != ' ') ret += ' '
-				ret += k
-				var delim = "'"
-				if(val !== 1){
-					if(val.indexOf(delim) !== -1) delim = '"'
-					ret += '=' + delim + val + delim
+			if(attr) {
+				for(var k in attr){
+					var val = attr[k]
+					if(ret[ret.length - 1] != ' ') ret += ' '
+					ret += k
+					var delim = "'"
+					if(val !== 1){
+						if(typeof val === 'string' && val.indexOf(delim) !== -1) delim = '"'
+						ret += '=' + delim + val + delim
+					}
 				}
 			}
-			if(child) ret += '>\n' + child + indent + '</' + node.tag + '>\n'
-			else ret += '/>\n'
+
+			if(child) {
+				if (!nontextchild) {
+					ret += '>' + child + '</' + node.tag + '>\n'
+				} else {
+					ret += '>\n' + child + indent + '</' + node.tag + '>\n'
+				}
+			} else {
+				ret += '/>\n'
+			}
 		}
 		else{
-			if(node.tag == '$text'){
-				// lets strip all empty whitespace above a value and replace it with a \n
-				ret += indent + node.value.trim() + '\n' 
-			}
+			if(node.tag == '$text') ret += node.value
 			else if(node.tag == '$cdata') ret += indent + '<![CDATA['+node.value+']]>\n'
-			else if(node.tag == '$comment') ret += indent + '<!--'+node.value+'-->\n'
+			else if(node.tag == '$comment') ret += indent + '<!--' + node.value+'-->\n'
 			else if(node.tag == '$root') ret += child
 		}
 		return ret
@@ -354,12 +363,14 @@ define.class(function(require, exports, self){
 					after = source.charCodeAt(pos+1)
 					if(after == 45){ // <!- comment
 						pos += 2
+						start = pos
 						while(pos < len){
 							ch = source.charCodeAt(pos++)
 							if(ch == 45 && source.charCodeAt(pos) == 45 &&
 									source.charCodeAt(pos + 1) == 62){
 								pos += 2
-								this.atComment(source.slice(start + 4, pos - 3), start, pos)
+								this.atComment(source.slice(start + 1, pos - 3), start, pos)
+								console.log(source.slice(start + 1, pos - 3))
 								break
 							}
 							else if(pos == len) this.atError("Unexpected end of files while reading <!--", start)

@@ -129,7 +129,7 @@
 			var factory = define.factory[abs_path]
 
 			if(!factory && dep_path.indexOf('$') === -1 && dep_path.charAt(0) !== '.'){
-				console.log('skipping', dep_path)
+				//console.log('skipping', dep_path)
 				return null
 			}
 
@@ -1676,4 +1676,3 @@ define.promiseLib = function(exports){
 }
 if(typeof Promise === 'undefined') define.promiseLib(typeof process !== 'undefined'? global: window)
 if(define.atEnd) define.atEnd()
-	console.log('here')
