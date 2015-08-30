@@ -440,7 +440,16 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			dom.style.left = Math.floor(r.left);
 			dom.style.top = Math.floor(r.top);	
 		//	console.log(r)	
-		} /*else
+		}
+		else if(this._domfullscreen){
+			dom.style.width = document.body.offsetWidth
+			dom.style.height = document.body.offsetHeight
+			dom.style.left = 0
+			dom.style.top = 0
+		}
+		 /*else
+		}
+
 
 		if(this.layout){
 			console.log(this.layout)

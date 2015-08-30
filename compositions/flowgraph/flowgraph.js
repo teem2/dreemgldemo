@@ -120,7 +120,7 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 						name:scr.attr.name, 
 						icon: scr.attr.icon?scr.attr.icon:"tv", 
 						title:scr.attr.title?scr.attr.title:scr.attr.name,					
-						iframeurl: 'http://127.0.0.1:8080/' + this.composition + '?noreload',
+						iframeurl: 'http://127.0.0.1:8080/' + this.composition + '?noreload&screen='+scr.attr.name,
 						x:parseFloat(scr.attr.editx || 0), y:parseFloat(scr.attr.edity || 0),
 						basecolor: (scr.attr.basecolor)?scr.attr.basecolor: vec4('#d0d0a0'), 
 						linkables: Xml.childrenByTagName(view, 'attribute').map(function(each){

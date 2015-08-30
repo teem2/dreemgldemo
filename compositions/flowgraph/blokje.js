@@ -117,6 +117,7 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 			,view({bgcolor: basecolor,clipping:true,flexdirection:'row'}
 				,button({text:'Edit',click:function(){
 					myiframe.setDomFullscreen(true)
+					myiframe.dom.src += '&edit=1' 
 				}})
 				,button({fontsize:12,clipping:true, width:200, 
 					myurl:this.data.iframeurl,
