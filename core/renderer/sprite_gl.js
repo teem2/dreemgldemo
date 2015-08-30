@@ -395,6 +395,22 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.dom.style.display = 'block'
 	}
 	
+	var lastindex = 1000
+	this.setDomFullscreen = function(set){
+		this._domfullscreen = set
+		if(set === false) return
+		var dom = this.dom
+		dom.style.zIndex = lastindex++
+		dom.style.transformOrigin = '0px 0px'
+		dom.style.transform = ''
+		dom.style.width = document.body.offsetWidth
+		dom.style.height = document.body.offsetHeight
+		dom.style.left = 0
+		dom.style.top = 0
+	}
+
+	var all_dom_nodes = []
+
 	this.drawContentDOM = function(renderstate){
 		if (this.matrixdirty) this.recomputeMatrix()
 		// lets check if we have a div
@@ -402,6 +418,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		var dom = this.dom
 		if(!dom){
 			dom = this.dom = document.createElement(this.tag || 'iframe')
+			all_dom_nodes.push(this)
 			var parent = this.screen.device.canvas.parentNode
 			parent.appendChild(this.dom)
 			if(this.src) dom.src = this.src
@@ -412,10 +429,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		}
 
 		var r = this.getBoundingRect();
-	console.log(r);
 		
-		if (r){
-			var scalex = 5
+		if (!this._domfullscreen && r){
+			var scalex = this.domscale || 1
 			dom.style.transformOrigin = '0px 0px'
 			dom.style.transform = 'scaleX('+(1/scalex)+') scaleY('+(1/scalex)+')'
 			//dom.style.rotateY = '90degrees'
@@ -423,7 +439,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			dom.style.height = (Math.floor(r.bottom - r.top))*scalex;
 			dom.style.left = Math.floor(r.left);
 			dom.style.top = Math.floor(r.top);	
-			console.log(r)	
+		//	console.log(r)	
 		} /*else
 
 		if(this.layout){
@@ -444,7 +460,11 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			window.addEventListener("message", function(msg){
 				// we received a closewindow from msg
 				if(msg.data.type === 'closewindow'){
-					// lets hide it
+					console.log('CLOSEWINDOW')
+					for(var i = 0; i < all_dom_nodes.length; i++){
+						all_dom_nodes[i].setDomFullscreen(false)
+						all_dom_nodes[i].setDirty(true)
+					}
 				//	dom.style.display = 'none'
 				}
 			}, false);

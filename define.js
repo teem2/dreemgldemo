@@ -1030,6 +1030,7 @@
 		return define
 	}
 	else if(typeof window !== 'undefined')(function(){ // browser implementation
+		
 		// if define was already defined use it as a config store
 		// storage structures
 		define.download_queue = {}

@@ -1,5 +1,5 @@
 "use strict";
-define.class(function(view, connectorbutton, icon, text){
+define.class(function(view, connectorbutton, icon, text, edit, button){
 
 	this.position = "absolute" ;
 	this.attribute("dataset", {type: Object});
@@ -105,7 +105,8 @@ define.class(function(view, connectorbutton, icon, text){
 		
 	//console.log("blokjedata: " ,this.data);
 		var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#ffc030") ;
-		return [				
+		var myiframe
+		return [
 			view({ bgcolor: basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4, flex:1},
 				icon({icon:this.data.icon, fontsize: 20, margin:vec4(10,0,10,0)}),text({margin:vec4(4,4,24,4),text: this.data.title,  fontsize:16, bgcolor: "transparent", fgcolor: "#404040"})
 			),
@@ -113,8 +114,20 @@ define.class(function(view, connectorbutton, icon, text){
 				,view({position:"relative", flexdirection:"column",margin:0, padding:vec4(0,10,0,10),flex: 1  , bgcolor:"transparent"},this.inputs)
 				,view({position:"relative", flexdirection:"column",alignitems: "flex-end",margin:0, padding:vec4(0,10,0,10), flex: 1, bgcolor:"transparent"}, this.outputs)
 			)
-			,view({position:'relative',init:function(){}, flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
-
+			,view({bgcolor: basecolor,clipping:true,flexdirection:'row'}
+				,button({text:'Edit',click:function(){
+					myiframe.setDomFullscreen(true)
+				}})
+				,button({fontsize:12,clipping:true, width:200, 
+					myurl:this.data.iframeurl,
+					text:define.fileName(this.data.iframeurl),
+					click:function(){
+						window.open(this.myurl)
+					}
+				})
+			)
+			,myiframe = view({position:'relative',domscale:5,init:function(){}, flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
+			//,view({position:'relative',init:function(){}, flex:1, h:200, src:this.data.iframeurl})
 		]
 	}
 });
