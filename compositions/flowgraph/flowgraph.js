@@ -53,7 +53,7 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 				}
 				if(attrib.attr.input == 'false'){
 					var handler = Xml.childByAttribute(view, 'event', 'on'+attrib.attr.name, 'handler');
-					var handlerValue;
+					var handlerValue = '';
 					for(var j = 0; j < dataset.connections.length; j++){
 						var con = dataset.connections[j];
 						if(con.from.node === screen.attr.name &&
@@ -73,7 +73,7 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 						//check if it's the one we created, if so, remove it
 						if (child && child.tag == '$text' && child.value == handlerValue) {
 							var index = view.child.indexOf(handler);
-							if (index >= 0 ) {
+							if (index >= 0) {
 								view.child.splice(index, 1)
 							}
 						}
