@@ -410,6 +410,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 
 	var all_dom_nodes = []
+	// we need to reuse them iframes on 
 
 	this.drawContentDOM = function(renderstate){
 		if (this.matrixdirty) this.recomputeMatrix()
@@ -417,15 +418,27 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 		var dom = this.dom
 		if(!dom){
-			dom = this.dom = document.createElement(this.tag || 'iframe')
-			all_dom_nodes.push(this)
-			var parent = this.screen.device.canvas.parentNode
-			parent.appendChild(this.dom)
-			if(this.src) dom.src = this.src
+			if(this.domid !== undefined){
+				var cache_parent = this
+				while(cache_parent && !cache_parent.dom_node_cache) cache_parent = cache_parent.parent
+			}
+			if(cache_parent && cache_parent.dom_node_cache){
+				dom = this.dom = cache_parent.dom_node_cache[this.domid]
+			}
+			if(!dom){
+				dom = this.dom = document.createElement(this.tag || 'iframe')
+				all_dom_nodes.push(this)
 
-			dom.style.position = 'absolute' 
-			dom.style.display = 'block'
-			dom.style.border = '0px'
+				var parent = this.screen.device.canvas.parentNode
+				parent.appendChild(this.dom)
+				if(this.src) dom.src = this.src
+
+				dom.style.position = 'absolute' 
+				dom.style.display = 'block'
+				dom.style.border = '0px'
+
+				if(cache_parent) cache_parent.dom_node_cache[this.domid] = dom
+			}
 		}
 
 		var r = this.getBoundingRect();

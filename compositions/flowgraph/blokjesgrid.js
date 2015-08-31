@@ -7,6 +7,11 @@ define.class(function(require, cadgrid, blokje, connection){
 	this.connectionstart = undefined
 	this.connectionend = undefined
 
+	// reuse em iframes
+	this.atConstructor = function(){
+		this.dom_node_cache = []
+	}
+
 	this.tryToBuildConnection = function(){
 		if(this.connectionstart && this.connectionend){
 			this.dataset.fork(function(data){
@@ -57,7 +62,7 @@ define.class(function(require, cadgrid, blokje, connection){
 		var i = 0;
 		for(var a in this.dataset.data.screens){
 			var d = this.dataset.data.screens[a]
-			this.blokjes[d.name] = blokje({dataset:this.dataset, dblclick:function(){
+			this.blokjes[d.name] = blokje({dataset:this.dataset, blokid:a, dblclick:function(){
 				outer.emit('dblclick',this)
 			},data: d, x:(d.x!==undefined)?d.x:20 + i *30 , y:(d.y!==undefined)?d.y:20 + i *30 })
 			i++

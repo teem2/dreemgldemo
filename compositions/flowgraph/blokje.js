@@ -16,8 +16,6 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 	this.attribute("data", {type: Object});
 	
 	this.mouseleftdown = function(){
-		 console.log("down");
-		 
 		 	this.dataset.silent(function(){
 				this.data.x = this.x;
 				this.data.y = this.y;					
@@ -103,7 +101,6 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 		
 		var root = this;
 		
-	//console.log("blokjedata: " ,this.data);
 		var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#ffc030") ;
 		var myiframe
 		return [
@@ -127,7 +124,7 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 					}
 				})
 			)
-			,myiframe = view({position:'relative',domscale:5,init:function(){}, flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
+			,myiframe = view({position:'relative',domid:this.blokid, domscale:5,init:function(){}, flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
 			//,view({position:'relative',init:function(){}, flex:1, h:200, src:this.data.iframeurl})
 		]
 	}
