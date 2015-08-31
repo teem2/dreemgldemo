@@ -71,12 +71,14 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 					} else if (handler && handler.child && handler.child.length) {
 						var child = handler.child[0];
 						//check if it's the one we created, if so, remove it
-						if (child && child.tag == '$text' && child.value == handlerValue) {
+						if (child && child.tag == '$text' && child.value && child.value.startsWith('dr.teem.flowserver')) {
 							var index = view.child.indexOf(handler);
 							if (index >= 0) {
 								view.child.splice(index, 1)
 							}
 						}
+					}
+					else{ // try to remove one
 					}
 					// handler
 				}
