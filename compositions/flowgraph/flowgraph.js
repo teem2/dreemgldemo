@@ -53,19 +53,19 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 				}
 				if(attrib.attr.input == 'false'){
 					var handler = Xml.childByAttribute(view, 'event', 'on'+attrib.attr.name, 'handler');
-					var handlerValue = '';
-					for(var j = 0; j < dataset.connections.length; j++){
-						var con = dataset.connections[j];
-						if(con.from.node === screen.attr.name &&
-							con.from.output === attrib.attr.name) {
-							handlerValue = "dr.teem.flowserver.screens_" + con.to.node + '_' + con.to.input + ' = this.' + attrib.attr.name + ';'
-						}
-					}
 					if (server_input[to]){ // add-make one
 						if(!handler){
 							handler = Xml.createChildNode('handler', view);
 							handler.attr = {event:'on'+attrib.attr.name};
 							var txt = Xml.createChildNode('$text', handler);
+							var handlerValue = '';
+							for(var j = 0; j < dataset.connections.length; j++){
+								var con = dataset.connections[j];
+								if(con.from.node === screen.attr.name &&
+									con.from.output === attrib.attr.name) {
+									handlerValue = "dr.teem.flowserver.screens_" + con.to.node + '_' + con.to.input + ' = this.' + attrib.attr.name + ';'
+								}
+							}
 							txt.value = handlerValue;
 						}
 					} else if (handler && handler.child && handler.child.length) {
