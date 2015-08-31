@@ -114,9 +114,13 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 			,view({bgcolor: basecolor,clipping:true,flexdirection:'row'}
 				,button({text:'Edit',click:function(){
 					myiframe.setDomFullscreen(true)
+					console.log(myiframe.dom.src)
 					myiframe.dom.src += '&edit=1' 
 				}})
-				,button({fontsize:12,clipping:true, width:200, 
+				,button({text:'Rld',click:function(){
+					myiframe.dom.src = myiframe.dom.src//'&edit=1' 
+				}})
+				,button({fontsize:12,clipping:true, width:180, 
 					myurl:this.data.iframeurl,
 					text:define.fileName(this.data.iframeurl),
 					click:function(){
