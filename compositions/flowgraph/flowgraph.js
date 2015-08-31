@@ -30,7 +30,7 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 				type:'string'
 			}
 			server_output[attr.attr.name] = 1
-			server_input[attr.attr.to] = 1
+			server_input[attr.attr.from] = 1
 		}
 
 		Xml.childrenByTagName(this.xmljson, 'composition/screens/screen').forEach(function(screen){
@@ -52,23 +52,31 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 					else delete attrib.attr.value
 				}
 				if(attrib.attr.input == 'false'){
-					var handler = Xml.childByAttribute(view,'event', 'on'+attrib.attr.name, 'handler')
-					if(server_input[to]){ // add-make one
-						if(!handler){
-							handler = Xml.createChildNode('handler', view)
-							handler.attr = {event:'on'+attrib.attr.name}
-							var txt = Xml.createChildNode('$text', handler)
-							txt.value = ''
-							for(var i = 0; i < dataset.connections.length; i++){
-								var con = dataset.connections[i]
-								if(con.from.node === screen.attr.name &&
-									con.from.output === attrib.attr.name){
-									txt.value += "dr.teem.flowserver.screens_" + con.to.node + '_' + con.to.input + ' = this.' + attrib.attr.name + '\n'
-								}
-							}
+					var handler = Xml.childByAttribute(view, 'event', 'on'+attrib.attr.name, 'handler');
+					var handlerValue;
+					for(var j = 0; j < dataset.connections.length; j++){
+						var con = dataset.connections[j];
+						if(con.from.node === screen.attr.name &&
+							con.from.output === attrib.attr.name) {
+							handlerValue = "dr.teem.flowserver.screens_" + con.to.node + '_' + con.to.input + ' = this.' + attrib.attr.name + ';'
 						}
 					}
-					else{ // try to remove one
+					if (server_input[to]){ // add-make one
+						if(!handler){
+							handler = Xml.createChildNode('handler', view);
+							handler.attr = {event:'on'+attrib.attr.name};
+							var txt = Xml.createChildNode('$text', handler);
+							txt.value = handlerValue;
+						}
+					} else if (handler && handler.child && handler.child.length) {
+						var child = handler.child[0];
+						//check if it's the one we created, if so, remove it
+						if (child && child.tag == '$text' && child.value == handlerValue) {
+							var index = view.child.indexOf(handler);
+							if (index >= 0 ) {
+								view.child.splice(index, 1)
+							}
+						}
 					}
 					// handler
 				}
