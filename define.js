@@ -555,7 +555,11 @@
 				var arg = body.argmap[i]
 				if(!(arg in define.builtinClassArgs)){
 					var luttedclass = define.atLookupClass(arg)
-					moduleFactory.depstring += 'require("' + luttedclass + '")'
+					if(moduleFactory.depstring)
+						moduleFactory.depstring += 'require("' + luttedclass + '")'
+					else
+						moduleFactory.depstring = 'require("' + luttedclass + '")'
+
 					// the first non builtin argument is the baseclass if we dont have one
 					if(!base_class) base_class = luttedclass
 				}
