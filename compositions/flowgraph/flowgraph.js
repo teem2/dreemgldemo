@@ -182,7 +182,6 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 			//console.log("I HAZ FILECHANGE")
 			if(file.indexOf("with='editable'") === -1) {
 				console.log("RELOADING FILE BECAUSE OF FILE SWITCHING BACK FROM EDIT MODE")
-				document.title = Math.random()
 				this.loadfile(filepath)
 			} // skip it
 			//else console.log("FILECHANGE IS FUCKED")
