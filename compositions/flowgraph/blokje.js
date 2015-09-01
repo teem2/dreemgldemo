@@ -75,34 +75,41 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 
 	
 	this.width = 300;
-	
+
+
+	this.reloadIFrame = function() {
+		if (this.myiframe && this.myiframe.dom && this.myiframe.dom.src) {
+			this.myiframe.dom.src = this.myiframe.dom.src
+		}
+	};
+
+
 	this.render = function(){
-		
+
 		this.inputsdict = [];
 		this.outputsdict = [];
 		this.inputs = [];
 		this.outputs = [];
-				
+
 		if (this.data.linkables){
 			for (var i in this.data.linkables){
-				var L = this.data.linkables[i];				
+				var L = this.data.linkables[i];
 				if (L.input == true)	{
-					var newinput = connectorbutton({basecolor: this.data.basecolor, title: L.title, icon: L.icon, text:L.name,input: true, target: this.parent, targetscreen: this.data.name, attrib:L.name})
+					var newinput = connectorbutton({basecolor: this.data.basecolor, title: L.title, icon: L.icon, text:L.name,input: true, target: this.parent, targetscreen: this.data.name, attrib:L.name, blok: this})
 					this.inputsdict[L.name] = newinput;
 					this.inputs.push(newinput);
 				}
 				else{
-					var newoutput = connectorbutton({basecolor: this.data.basecolor,title: L.title, icon: L.icon, text:L.name,input: false,target: this.parent, targetscreen: this.data.name, attrib:L.name})
+					var newoutput = connectorbutton({basecolor: this.data.basecolor,title: L.title, icon: L.icon, text:L.name,input: false,target: this.parent, targetscreen: this.data.name, attrib:L.name, blok: this})
 					this.outputsdict[L.name] = newoutput;
-					this.outputs.push(newoutput);					
+					this.outputs.push(newoutput);
 				}
 			}
 		}
-		
+
 		var root = this;
-		
+
 		var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#ffc030") ;
-		var myiframe
 		return [
 			view({ bgcolor: basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4, flex:1},
 				icon({icon:this.data.icon, fontsize: 20, margin:vec4(10,0,10,0)}),text({margin:vec4(4,4,24,4),text: this.data.title,  fontsize:16, bgcolor: "transparent", fgcolor: "#404040"})
@@ -113,14 +120,14 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 			)
 			,view({bgcolor: basecolor,clipping:true,flexdirection:'row'}
 				,button({text:'Edit',click:function(){
-					myiframe.setDomFullscreen(true)
-					console.log(myiframe.dom.src)
-					myiframe.dom.src += '&edit=1' 
+					root.myiframe.setDomFullscreen(true)
+					console.log(root.myiframe.dom.src)
+					root.myiframe.dom.src += '&edit=1'
 				}})
 				,button({text:'Rld',click:function(){
-					myiframe.dom.src = myiframe.dom.src//'&edit=1' 
+					root.reloadIFrame();
 				}})
-				,button({fontsize:12,clipping:true, width:180, 
+				,button({fontsize:12,clipping:true, width:180,
 					myurl:this.data.iframeurl,
 					text:define.fileName(this.data.iframeurl),
 					click:function(){
@@ -128,7 +135,7 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 					}
 				})
 			)
-			,myiframe = view({position:'relative',domid:this.blokid, domscale:5,init:function(){}, flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
+			,root.myiframe = view({position:'relative',domid:this.blokid, domscale:5,init:function(){}, flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
 			//,view({position:'relative',init:function(){}, flex:1, h:200, src:this.data.iframeurl})
 		]
 	}

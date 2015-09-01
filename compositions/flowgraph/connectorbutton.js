@@ -53,10 +53,10 @@ define.class(function(view, icon, text){
 	
 	this.click = function(){
 		if (this.input){
-			this.target.setConnectionEnd(this.targetscreen, this.attrib);
+			this.target.setConnectionEnd(this.targetscreen, this.attrib, this.blok);
 		}
 		else{
-			this.target.setConnectionStart(this.targetscreen, this.attrib);
+			this.target.setConnectionStart(this.targetscreen, this.attrib, this.blok);
 		}
 	}
 
