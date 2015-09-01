@@ -79,39 +79,14 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 		return res;
 	}
 	
-	this.init = function(){
-		this.composition = location.hash.slice(1) || 'compositions/demo/tvdemo.dre'
-		this.dataset = datatracker({
-			screens:[
-			],
-			connections:[
-			],
-		})
-		
-		this.dataset.atChange  = function(){
-			//console.log("data set changed!");
-			var newxml = this.BuildXML(this.xmljson, this.dataset.data);
-			
-			if (newxml != this.xmlstring){
-				console.log("need to save new version...");
-				this.teem.fileio.writefile('../dreem2/' + this.composition, newxml).then(function(result){				
-					console.log("saved composition to server!");
-					this.xmlstring = newxml;
-				}.bind(this));		
-			}else{
-			//	console.log("no notable changes.. not saving file to server");
-			}
-		}.bind(this);
-	
-		this.appstate = datatracker({
-			selected: "composition/screens/default"
-		})
-		
-		this.teem.fileio.readfile('../dreem2/' + this.composition).then(function(result){
+	this.loadfile = function(filepath){
+		this.teem.fileio.readfile(filepath).then(function(result){
 			this.xmljson = Xml(result)			
 
 			var screens = Xml.childByTagName(this.xmljson, 'composition/screens')
 			this.dataset.fork(function(data){
+				data.screens = []
+				data.connections = []
 				for(var i = 0; i < screens.child.length; i++){
 					var scr = screens.child[i]
 					if(scr.tag !=='screen') continue
@@ -154,10 +129,57 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 
 				this.xmlstring = this.BuildXML(this.xmljson, data);
 			}.bind(this))
+
 	//		this.dataset.fork(function(data){
 //				data.connections.push({from:{node:"default", output:'sldvalue'}, to: {node:"mobile", input:'sldinput'}})
 		//	})
 		}.bind(this))
+	}
+
+	this.init = function(){
+		this.composition = location.hash.slice(1) || 'compositions/demo/tvdemo.dre'
+		this.dataset = datatracker({
+			screens:[
+			],
+			connections:[
+			],
+		})
+		
+		this.dataset.atChange  = function(){
+			//console.log("data set changed!");
+			var newxml = this.BuildXML(this.xmljson, this.dataset.data);
+			
+			if (newxml != this.xmlstring){
+				console.log("need to save new version...");
+				this.teem.fileio.writefile('../dreem2/' + this.composition, newxml).then(function(result){				
+					console.log("saved composition to server!");
+					this.xmlstring = newxml;
+				}.bind(this));		
+			}else{
+			//	console.log("no notable changes.. not saving file to server");
+			}
+		}.bind(this);
+	
+		this.appstate = datatracker({
+			selected: "composition/screens/default"
+		})
+		
+		var filepath = '../dreem2/' + this.composition
+		// lets hook the file change watcher
+		this.loadfile(filepath)
+
+		this.teem.fileio.filechange(filepath).then(function filechange(file){
+			//console.log("I HAZ FILECHANGE")
+			if(file.indexOf("with='editable'") === -1) {
+				console.log("RELOADING FILE BECAUSE OF FILE SWITCHING BACK FROM EDIT MODE")
+				document.title = Math.random()
+				this.loadfile(filepath)
+			} // skip it
+			//else console.log("FILECHANGE IS FUCKED")
+			this.teem.fileio.filechange(filepath).then(filechange.bind(this))
+		}.bind(this))
+			
+
 	}
 	
 	/*var dataset = datatracker({

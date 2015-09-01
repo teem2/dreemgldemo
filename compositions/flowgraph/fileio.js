@@ -8,6 +8,21 @@ define.class(function(require, server){
 		
 	}
 
+	this.filechange = function(name){
+		var filepath = path.join(define.expandVariables(define.$root), name)
+		return new Promise(function(resolve){
+			// lets wait for a  filechange, then resolve it
+			var stat = JSON.stringify(fs.statSync(filepath))
+			var myitv = setInterval(function mytimeout(){
+				var newstat = JSON.stringify(fs.statSync(filepath))
+				if(stat !== newstat){
+					clearInterval(myitv)
+					resolve(fs.readFileSync(filepath).toString())
+				}
+			}, 100)
+		})
+	}
+
 	this.readfile = function(name){
 		try{
 			return fs.readFileSync(path.join(define.expandVariables(define.$root), name)).toString()
