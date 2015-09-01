@@ -431,7 +431,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 				var parent = this.screen.device.canvas.parentNode
 				parent.appendChild(this.dom)
-				if(this.src) dom.src = this.src
+				
 
 				dom.style.position = 'absolute' 
 				dom.style.display = 'block'
@@ -439,6 +439,8 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 				if(cache_parent) cache_parent.dom_node_cache[this.domid] = dom
 			}
+			if(dom.src !== this.src) dom.src = this.src
+			//if(this.src) dom.src = this.src
 		}
 
 		var r = this.getBoundingRect();
