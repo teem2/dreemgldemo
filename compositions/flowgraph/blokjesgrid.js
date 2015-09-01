@@ -26,18 +26,32 @@ define.class(function(require, cadgrid, blokje, connection){
 					}
 				})
 			}.bind(this))
+
+			var sblk = this.connectionstart.bkje;
+			if (sblk) {
+				setTimeout(function() {
+					sblk.reloadIFrame()
+				}, 1500);
+			}
+			var eblk = this.connectionend.bkje;
+			if (eblk) {
+				setTimeout(function() {
+					eblk.reloadIFrame()
+				}, 1500);
+			}
+
 			this.connectionstart = undefined
 			this.connectionend = undefined		
 		}
 	}
 	
-	this.setConnectionStart = function(blok, output){
-		this.connectionstart = {screen: blok, output: output}
+	this.setConnectionStart = function(blok, output, bkje){
+		this.connectionstart = {screen: blok, output: output, bkje: bkje}
 		this.tryToBuildConnection();
 	}
 
-	this.setConnectionEnd = function(blok, input){
-		this.connectionend = {screen: blok, input: input}
+	this.setConnectionEnd = function(blok, input, bkje){
+		this.connectionend = {screen: blok, input: input, bkje: bkje}
 		this.tryToBuildConnection()
 	}
 	
