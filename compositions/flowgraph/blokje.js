@@ -95,12 +95,12 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 			for (var i in this.data.linkables){
 				var L = this.data.linkables[i];
 				if (L.input == true)	{
-					var newinput = connectorbutton({basecolor: this.data.basecolor, title: L.title, icon: L.icon, text:L.name,input: true, target: this.parent, targetscreen: this.data.name, attrib:L.name, blok: this})
+					var newinput = connectorbutton({basecolor: this.data.basecolor, title: L.title, icon: L.icon, text:L.name,input: true, target: this.parent, targetscreen: this.data.name, attrib:L.name, blok: this, value: L.value})
 					this.inputsdict[L.name] = newinput;
 					this.inputs.push(newinput);
 				}
 				else{
-					var newoutput = connectorbutton({basecolor: this.data.basecolor,title: L.title, icon: L.icon, text:L.name,input: false,target: this.parent, targetscreen: this.data.name, attrib:L.name, blok: this})
+					var newoutput = connectorbutton({basecolor: this.data.basecolor,title: L.title, icon: L.icon, text:L.name,input: false,target: this.parent, targetscreen: this.data.name, attrib:L.name, blok: this, value: L.value})
 					this.outputsdict[L.name] = newoutput;
 					this.outputs.push(newoutput);
 				}
