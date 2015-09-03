@@ -72,15 +72,6 @@ define.class(function(require){
 		req.end()
 	}
 
-	this.head = function(){
-		var se = this.expected
-		while(this.expected > 0 && this.read < this.input.length && this.written < this.header.length){
-			this.header[this.written++] = this.input[this.read++], this.expected--
-		}
-		if(this.written > this.header.length) return this.err("unexpected data in header"+ se + s.toString())
-		return this.expected != 0
-	}
-
 	this.initServer = function(req, socket){
 		var version = req.headers['sec-websocket-version']
 		if(version != 13){
@@ -147,19 +138,28 @@ define.class(function(require){
 		}.bind(this))
 	}
 
-	this.onMessage = function(message){
+	this.atMessage = function(message){
 	}
 
-	this.onClose = function(){
+	this.atClose = function(){
 	}
 
-	this.onError = function(error){
+	this.atError = function(error){
 	}
 
 	this.error = function(t){
 		console.log("Error on websocket " + t)
-		this.onError(t)
+		this.atError(t)
 		this.close()
+	}
+
+	this.head = function(){
+		var se = this.expected
+		while(this.expected > 0 && this.read < this.input.length && this.written < this.header.length){
+			this.header[this.written++] = this.input[this.read++], this.expected--
+		}
+		if(this.written > this.header.length) return this.err("unexpected data in header"+ se + s.toString())
+		return this.expected != 0
 	}
 
 	this.send = function(data){
@@ -203,7 +203,7 @@ define.class(function(require){
 
 	this.close = function(){
 		if(this.socket){
-			this.onClose()
+			this.atClose()
 			this.socket.destroy()
 			clearInterval(this.ping_interval)
 			this.readyState = 3
@@ -226,7 +226,10 @@ define.class(function(require){
 		}
 
 		if(this.expected) return false
-		this.onMessage(this.output.toString('utf8', this.masked?0:this.mask_correct, this.written))
+	
+		console.log(this.masked?0:this.mask_correct)
+
+		this.atMessage(this.output.toString('utf8', this.masked?0:this.mask_correct, this.written))
 		this.expected = 1
 		this.written = 0
 		this.state = this.opcode
@@ -283,6 +286,7 @@ define.class(function(require){
 	this.len1 = function(){
 		if(this.head()) return false
 		// set masked flag
+
 		if(!(this.header[this.written - 1] & 128)){
 			this.masked = false
 		}
