@@ -227,8 +227,6 @@ define.class(function(require){
 
 		if(this.expected) return false
 	
-		console.log(this.masked?0:this.mask_correct)
-
 		this.atMessage(this.output.toString('utf8', this.masked?0:this.mask_correct, this.written))
 		this.expected = 1
 		this.written = 0
