@@ -103,7 +103,8 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 					if(scr.tag !=='screen') continue
 					var view = Xml.childByTagName(scr, 'view')
 					data.screens.push({
-						name:scr.attr.name, 
+						name:scr.attr.name,
+						type:scr.attr.type,
 						icon: scr.attr.icon?scr.attr.icon:"tv", 
 						title:scr.attr.title?scr.attr.title:scr.attr.name,					
 						iframeurl: 'http://127.0.0.1:8080/' + this.composition + '?noreload&screen='+scr.attr.name,

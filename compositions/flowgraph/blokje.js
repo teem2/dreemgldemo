@@ -110,7 +110,7 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 		var root = this;
 
 		var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#ffc030") ;
-		return [
+		var blokout = [
 			view({ bgcolor: basecolor, "bg.bgcolorfn": function(a,b){return mix(bgcolor, vec4("white"), a.y*0.3);}, padding: 4, flex:1},
 				icon({icon:this.data.icon, fontsize: 20, margin:vec4(10,0,10,0)}),text({margin:vec4(4,4,24,4),text: this.data.title,  fontsize:16, bgcolor: "transparent", fgcolor: "#404040"})
 			),
@@ -118,11 +118,16 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 				,view({position:"relative", flexdirection:"column",margin:0, padding:vec4(0,10,0,10),flex: 1  , bgcolor:"transparent"},this.inputs)
 				,view({position:"relative", flexdirection:"column",alignitems: "flex-end",margin:0, padding:vec4(0,10,0,10), flex: 1, bgcolor:"transparent"}, this.outputs)
 			)
-			,view({bgcolor: basecolor,clipping:true,flexdirection:'row'}
+			//,view({position:'relative',init:function(){}, flex:1, h:200, src:this.data.iframeurl})
+		];
+		if (this.data.type != 'datasource') {
+			blokout.push(view({bgcolor: basecolor,clipping:true,flexdirection:'row'}
 				,button({text:'Edit',click:function(){
-					root.myiframe.setDomFullscreen(true)
-					console.log(root.myiframe.dom.src)
-					root.myiframe.dom.src += '&edit=1'
+					if (root.myiframe) {
+						root.myiframe.setDomFullscreen(true)
+						console.log(root.myiframe.dom.src)
+						root.myiframe.dom.src += '&edit=1'
+					}
 				}})
 				,button({text:'Rld',click:function(){
 					root.reloadIFrame();
@@ -134,10 +139,12 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 						window.open(this.myurl)
 					}
 				})
-			)
-			,root.myiframe = view({position:'relative',domid:this.blokid, domscale:5,init:function(){}, flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
-			//,view({position:'relative',init:function(){}, flex:1, h:200, src:this.data.iframeurl})
-		]
+			));
+			root.myiframe = view({position:'relative',domid:this.blokid, domscale:5,init:function(){}, flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
+			blokout.push(root.myiframe);
+		}
+
+		return blokout;
 	}
 });
 
