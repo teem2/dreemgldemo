@@ -109,6 +109,12 @@ define.class(function(require,spline){
 					con.from.output == this.fromattr)
 					{
 						data.connections.splice(a, 1);
+						if (this.from && this.from.reloadIFrame) {
+							this.from.reloadIFrame();
+						}
+						if (this.to && this.to.reloadIFrame) {
+							this.to.reloadIFrame();
+						}
 						return;
 					}
 			}
