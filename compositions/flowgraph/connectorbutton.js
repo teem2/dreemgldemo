@@ -15,7 +15,7 @@ define.class(function(view, icon, text){
 	this.flexdirection = "row"
 	
 	this.hovered = 0;
-	
+
 	this.mouseover = function(){
 		this.hovered++;
 		this.setDirty();		
@@ -29,26 +29,15 @@ define.class(function(view, icon, text){
 	this.bg.basecolor = vec4()
 	this.bg.direction  = 1
 	this.bg.offset  = 0
+
 	this.bg.bgcolorfn = function(a,b){ 
 		//dump = a.x*2;
-		return mix(vec4(1,1,1,0), basecolor*1.6,  offset +  a.x * direction)
+		return mix(vec4(1,1,1,0), vec4('white'),  offset +  a.x*3 * direction)
 	}
 	
 	this.atDraw = function(){
-		if (this.input === false){
-			this.bg.direction = 1
-			this.bg.offset = 0
-		}
-		else {
-			this.bg.direction = -1
-			this.bg.offset = 1
-		}
-		if (this.hovered  > 0){
-			this.bg.basecolor = vec4.vec4_mul_float32(this.basecolor, 1.6);
-		}
-		else{
-			this.bg.basecolor = this.basecolor;
-		}
+
+		this.bg.basecolor = this.basecolor;
 	}
 	
 	this.click = function(){
@@ -60,31 +49,46 @@ define.class(function(view, icon, text){
 		}
 	}
 
-	this.borderwidth = 2
+	this.borderwidth = 0
 	this.bordercolor = "white"
-	
-	this.render =function(){		
+
+	this.render =function(){
+
+
 		if (this.input){
+
+			this.bg.bgcolorfn = function(a,b){
+				//dump = a.x*2;
+				return mix(vec4('white'), vec4(1,1,1,0),   offset +  a.x*0.9 * direction)
+			}
+
+
 			this.justifycontent = "flex-start"
 			this.cornerradius = vec4(12,12,0,0)
-	
+
+
 			return [
-				view({bgcolor: "white", padding: vec4(4,0,4,2), cornerradius: 10,borderwidth: 2,bordercolor:"white",margin: vec4(3,3,0,3)}
-					,icon({icon: this.icon, fontsize: 14})
-				)
-				,text({text:this.title,margin:vec4(4,2,0,0),fontsize: 14, bgcolor:"transparent", fgcolor:"#404040"})
+				view({ bgcolor: "transparent", cornerradius: 8.6,borderwidth: 3,bordercolor: this.basecolor ,width:16, height:16, margin: vec4(3,5,0,3)})
+				,icon({marginleft:4,margintop:2,icon: this.icon, fontsize: 12})
+				,text({text:this.title,margin:vec4(4,0,0,0),fontsize: 14, bgcolor:"transparent", fgcolor:"#404040"})
 			]
 		}
 		else{
+			this.bg.bgcolorfn = function(a,b){
+				//dump = a.x*2;
+				return mix(vec4(1,1,1,0), vec4('white'),  offset +  a.x*3 * direction)
+			}
+
+
+
 			this.justifycontent = "flex-end"
 			this.cornerradius = vec4(0,0,12,12);
 	
 			return [
-				text({text:this.title, margin: vec4(4,2,16,0), fontsize: 14, bgcolor:"transparent", fgcolor:"#404040"})
-				,view({bgcolor: "white", padding: vec4(4,0,4,2), cornerradius: 10,borderwidth: 2,bordercolor:"white" ,  margin: vec4(0,3, 3,3)}
-					,icon({icon: this.icon, fontsize: 14})
-				)
-			]
+				icon({icon: this.icon, fontsize: 14})
+				,text({text:this.title, margin: vec4(4,0,0,0), fontsize: 14, bgcolor:"transparent", fgcolor:"#404040"})
+				,view({ bgcolor: "transparent", cornerradius: 8,borderwidth: 3,bordercolor: this.basecolor ,width:16, height:16, margin: vec4(3,5,0,3)})
+							]
 		}
 	}
 })
