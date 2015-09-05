@@ -1,5 +1,5 @@
 "use strict";
-define.class(function(view, connectorbutton, icon, text, edit, button,textinput){
+define.class(function(view, connectorbutton, icon, text, edit, button){
 
 	this.position = "absolute" ;
 	this.attribute("dataset", {type: Object});
