@@ -109,7 +109,8 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 							target: this.parent,
 							targetscreen: this.data.name,
 							attrib:L.name,
-							blok: this
+							blok: this,
+						    value: L.value
 						})
 					this.inputsdict[L.name] = newinput;
 					this.inputs.push(newinput);
@@ -127,7 +128,9 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 							target: this.parent,
 							targetscreen: this.data.name,
 							attrib:L.name,
-							blok: this})
+							blok: this,
+							value: L.value
+						})
 					this.outputsdict[L.name] = newoutput;
 					this.outputs.push(newoutput);
 				}
@@ -136,8 +139,9 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 
 		var root = this;
 
-		var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#00c030") ;
-		return [
+		var basecolor  = this.data.basecolor? this.data.basecolor:vec4("#00c030");
+
+		var blockout = [
 			view({
 					cornerradius:0,
 					bgcolor: basecolor,
@@ -154,8 +158,10 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 					position:"relative", bgcolor: basecolor,justifycontent:"space-between", aligncontent: "flex-end", alignitems: "flex-end",  flexdirection:"row", "bg.bgcolorfn": function(a,b){ return vec4('#d0d0d0') + bgcolor * 0.16	;},margin:0, padding:0}
 				,view({position:"relative", flexdirection:"column",margin:0, padding:vec4(0,10,0,10),flex: 1  , bgcolor:"transparent"},this.inputs)
 				,view({position:"relative", flexdirection:"column",alignitems: "flex-end",margin:0, padding:vec4(0,10,0,10), flex: 1, bgcolor:"transparent"}, this.outputs)
-			)
-			,view({
+			)];
+		
+		if (this.data.type != 'datasource') {
+			blockout.push(view({
 					borderwidth:0,
 					bgcolor: basecolor,clipping:true,flexdirection:'row'}
 				,button({
@@ -168,10 +174,10 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 					margin : vec4(0,0,0,0),
 					borderwidth :0,
 					text:'Edit',click:function(){
-					root.myiframe.setDomFullscreen(true)
-					console.log(root.myiframe.dom.src)
-					root.myiframe.dom.src += '&edit=1'
-				}})
+						root.myiframe.setDomFullscreen(true)
+						console.log(root.myiframe.dom.src)
+						root.myiframe.dom.src += '&edit=1'
+					}})
 				,button({
 					hovercolor1:'transparent',
 					hovercolor2:'transparent',
@@ -182,12 +188,12 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 					margin : vec4(0,0,0,0),
 					borderwidth :0,
 					text:'Rld',click:function(){
-					root.reloadIFrame();
-				}})
+						root.reloadIFrame();
+					}})
 				,view({
-					bgcolor : 'transparent',
-					flexdirection: "column", flexwrap: "none"
-				},
+						bgcolor : 'transparent',
+						flexdirection: "column", flexwrap: "none"
+					},
 					button({
 						fontsize:12,clipping:true, width:180,
 						hovercolor1:'transparent',
@@ -212,13 +218,14 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 						borderwidth :0
 					})
 				)
-
-			)
-			,root.myiframe = view({
+			));
+			root.myiframe = view({
 				borderwidth:0,
 				position:'relative',domid:this.blokid, domscale:5,init:function(){}, flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
-			//,view({position:'relative',init:function(){}, flex:1, h:200, src:this.data.iframeurl})
-		]
+			blockout.push(root.myiframe);
+		}
+
+		return blockout;
 
 
 
