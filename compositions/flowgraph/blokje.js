@@ -221,7 +221,7 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 			));
 			root.myiframe = view({
 				borderwidth:0,
-				position:'relative',domid:this.blokid, domscale:5,init:function(){}, flex:1, h:200 ,mode:'DOM', src:this.data.iframeurl})
+				position:'relative',domid:this.blokid, domscale:5,init:function(){}, flex:1, h:170 ,mode:'DOM', src:this.data.iframeurl})
 			blockout.push(root.myiframe);
 		}
 
