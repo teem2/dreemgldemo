@@ -8,8 +8,44 @@ define.class(function(require,spline){
 	this.state("toattr");
 	
 	this.position = "absolute" 
-	this.linewidth = 10;
-	
+	this.linewidth = 4;
+	this.bg.linewidth = 0.1;
+	this.bg.lineborderwidth = 0;
+
+
+	this.bg.color = function(){
+
+		var hm = sin(mesh.side*PI+ PI/2)
+
+		var borderval = clamp((abs(mesh.side)*(linewidth/2.0) -  ((linewidth/2.0) - lineborderwidth*2.0) ),0.0,1.0);
+
+		var col = mix(fromcol, tocol, mesh.pos) * (1 + sin(mesh.pos * PI)*0.2);
+
+		var col2 = mix(col, linebordercolor, borderval)
+		return vec4(col2.rgb, col2.a * hm);
+	}
+
+
+	this.bg.position = function(){
+		var npos = math.bezier2d(p0, p1, p2, p3, mesh.pos) - off;
+
+		//	var last = math.bezier2d(p0, p1, p2, p3, 0.) - off;
+		//	bezierlen = 0.
+		//	var step = int(mesh.pos * 100.)
+		/*for(var i = 1; i < 100; i++){
+		 var mypos = math.bezier2d(p0, p1, p2, p3, float(i) / 100.)
+		 bezierlen += 0.05*length(mypos - last)
+		 last = mypos
+		 if(i >= step) break
+		 }*/
+
+		//linewidth*=sin(time + bezierlen*0.4)*10.
+		var rx = (npos.x + mesh.side * -npos.w * linewidth);
+		var ry = (npos.y + mesh.side * npos.z * linewidth)+9;
+
+		return vec4(rx,ry, 0, 1) * matrix  * viewmatrix
+	}
+
 	this.init = function(){
 		this.setDirty();
 	}
@@ -21,15 +57,27 @@ define.class(function(require,spline){
 	}
 	
 	this.atDraw = function(){	
-		if (this.hovered > 0){				
+/*
+		if (this.hovered > 0){
 			this.linecolor1 = vec4.vec4_mul_float32(vec4(this.from.data.basecolor),1.5);
 			this.linecolor2 = vec4.vec4_mul_float32(vec4(this.to.data.basecolor),1.5);
 		}else{
+
 			this.linecolor1 = this.from.data.basecolor;
 			this.linecolor2 = this.to.data.basecolor;				
 		}
+*/
+		this.linecolor1 = this.from.data.basecolor;
+		this.linecolor2 = this.to.data.basecolor;
 
-		spline.prototype.atDraw.call(this)
+		this.bg.linewidth = this.linewidth;
+		this.bg.fromcol = this.linecolor1;
+		this.bg.tocol = this.linecolor2;
+		this.bg.p0 = this._p0;
+		this.bg.p1 = this._p1;
+		this.bg.p2 = this._p2;
+		this.bg.p3 = this._p3;
+		this.bg.off = this._off;
 	}
 
 	this.update = function(from, to){
@@ -52,10 +100,10 @@ define.class(function(require,spline){
 		
 		var br1 = fromrect;
 		var w =   br1.right - br1.left;
-		var fx = from._pos[0];
-		var fy = fromrect.top  + fromoff+ - parentrect.top  + 8;
-		var tx = to._pos[0];
-		var ty = torect.top+ tooff- parentrect.top  + 8;
+		var fx = from._pos[0]-4;
+		var fy = fromrect.top  + fromoff+ - parentrect.top  + 4;
+		var tx = to._pos[0]+4;
+		var ty = torect.top+ tooff- parentrect.top  + 4;
 		
 	//	console.log(fx, tx, br1);
 		

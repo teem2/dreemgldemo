@@ -244,42 +244,134 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 	})	
 	
 	var drawerbutton = define.class(function drawerbutton(button){
-		this.margin= 2;
+
+		this.margin= 6;
 		this.padding= 6;
-		this.cornerradius = 9
-		this.bgcolor= vec4("blue");
-		this.borderwidth = 1.5
+		this.cornerradius = 0
+		this.bgcolor= vec4("#ffffff");
+		this.borderwidth = 0
 		this.bordercolor = vec4(0.5,0.5,0.5,0.1);
 		this.fontsize = 16;
 		this.alignself = "stretch"
-		
+
+		this.bg.col1 = this.bg.col2 = this.bgcolor
+
+		this.attribute("hovercolor1", {type: vec4, value: vec4("#ffffff")});
+		this.attribute("hovercolor2", {type: vec4, value: vec4("#ffffff")});
+
+		this.atDraw = function(){
+			this.bg.col2 = this.bgcolor;
+			this.bg.col1 = this.bgcolor;
+			this.labelcolor = vec4("black");
+			this.buttonres.fgcolor = this._labelcolor;
+		}
+
 		//this.buttoncolor1 = vec4(1,1,1,0.8);
 		//this.buttoncolor2 = vec4(1,1,1,0.8);
 		this.labelcolor = vec4("black");
 //		this.alignitems = "flex-end"
 		//this.justifycontent = "flex-end"
+
+		this.render = function(){
+			if(this.backcolor)
+				this.bgcolor = vec4(this.backcolor)
+
+			this.buttonres =  text({rotation: 0, bgcolor:"transparent",fgcolor:"white", marginleft: 4,fontsize: this.fontsize, position: "relative", text: this.text})
+			if (!this.icon || this.icon.length == 0)
+			{
+				this.iconres = undefined;
+				return [this.buttonres];
+			}
+			else{
+				this.iconres =icon({fontsize: this.fontsize, icon: this.icon});
+				return [this.iconres,this.buttonres];
+			}
+		}
 	});
+
+	var drawerfoldcontainer = define.class(function drawerfoldcontainer(foldcontainer){
+		this.margin= 0;
+
+		this.clickablebar = view.extend(function(){
+
+			this.bggradient = function(a,b){
+				var fill = mix(col1, col2,  (a.y)/0.8);
+				return fill;
+			}
+			this.toggle = function(){console.log("nothing happens")}
+			this.attribute("title", {type:String});
+			this.position = "relative" ;
+
+			this.bg.col2 = vec4("yellow");
+			this.bg.col1 = vec4("yellow");
+			this.bg.bgcolorfn = this.bggradient;
+			this.padding = 6;
+
+
+			this.render = function(){
+
+				return [icon({fontsize:16, icon:this.icon, fgcolor: "#303030" }),
+					text({marginleft:5,fgcolor:"#303030", fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" }),
+					icon({icon: (this.parent.collapsed) ? 'plus' : 'minus', margintop:4,flex:0.06})
+				];
+			}
+
+			this.atDraw = function()
+			{
+				this.bg.col1 = vec4(this.parent.basecolor)
+				this.bg.col2 = vec4(this.parent.basecolor)
+			}
+		});
+
+
+		this.render = function(){
+
+			this.bar = this.clickablebar({icon:this.icon, title: this.title});
+
+			this.bar.click = this.toggle.bind(this);
+
+			var res = [this.bar]
+
+//			this.expander.text = (this.collapsed == false) ? '+' : '-'
+
+			if (this.collapsed == false) {
+				this.container = view({
+					"bg.bgcolorfn":function(a,b){
+						return mix(bgcolor,bgcolor, (a.y/8));
+					} ,
+					bgcolor: this.bgcolor,
+					padding: 4,
+					position:"relative"}
+					,this.instance_children)
+				res.push(this.container)
+			}
+			this.children = [];
+
+			return res;
+		}
+	})
+
 	
 	this.render = function(){
 		var displays = {}
 		return[
 			view({rotation:0,name:"toplevel",flexdirection: "column", bgcolor: "darkgray" , flex:1}
-				,view({name:"menubarholder", bgcolor:"lightgray"}
-					,menubar({flex:1}
-						,menuitem({text: "File"}
+				,view({name:"menubarholder", bgcolor:"lightgray",flexdirection:'column'}
+					,menubar({flex:1,bgcolor:'#f1f1f1'}
+						,menuitem({text: "File",bgcolor:'#f1f1f1'}
 							,menuitem({text: "Load"})
 							,menuitem({text: "Save"})
 							,menuitem({text: "Save as"})
 							,menuitem({text: "Revert"})
 						)
-						,menuitem({text: "Edit"}
+						,menuitem({text: "Edit",bgcolor:'#f1f1f1'}
 							,menuitem({text: "Copy", enabled: false})							
 							,menuitem({text: "Paste", enabled: false})
 							,menuitem({text: "Undo", click:function(){this.dataset.undo()}.bind(this)})
 							,menuitem({text: "Redo", click:function(){this.dataset.redo()}.bind(this)})
 							,menuitem({text: "Options", enabled: false})															
 						)
-						,menuitem({text: "Help"}
+						,menuitem({text: "Help",bgcolor:'#f1f1f1'}
 							,menuitem({text: "Manual", enabled: false})
 							,menuitem({text: "About", click: function(){
 								this.screen.openModal(screenoverlay({click:function(){this.screen.closeModal()}}
@@ -293,37 +385,38 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 							}})
 						)
 						
-						,menuitem({text: "new block", click:function(){
+						,menuitem({text: "new block",bgcolor:'#f1f1f1', click:function(){
+							/*
 							this.dataset.fork(function(data){
 								data.screens.push({name:"new screen", basecolor:vec4("green")})
 							})
+							*/
 						}.bind(this)})
-						,menuitem({text: "Undo", click:function(){this.dataset.undo()}.bind(this)})
-						,menuitem({text: "Redo", click:function(){this.dataset.redo()}.bind(this)})
+						,menuitem({text: "Undo",bgcolor:'#f1f1f1', click:function(){this.dataset.undo()}.bind(this)})
+						,menuitem({text: "Redo",bgcolor:'#f1f1f1', click:function(){this.dataset.redo()}.bind(this)})
 
-					)					
+					)
+					,view({flex:1,height:1,bgcolor:'#d6d6d6'})
 				)
 				,splitcontainer({name:"mainsplitter", vertical: true}
 					,splitcontainer({flex: 0.8, vertical: false}
-						,splitcontainer({vertical:false, splittercolor: "#c0c0c0"}
+						,splitcontainer({vertical:false, splitsize :{type :float, value : 0}}
 						,view({flexdirection: "column" , flex:1},
-							
 							blokjesgrid({dataset: this.dataset, dblclick:function(blokje){
 								var display = displays[blokje.data.name]
-								console.log(blokje.data.name)
 								display.show()
 							}})
 						)
-						,view({flex:0.2, flexdirection: "column", flexwrap: "none"}
-							,foldcontainer({icon:"sitemap",title:"Layouts", basecolor: "#8080ff", alignitems: "stretch" }
-								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"transparent"}
-									,drawerbutton({text:"Grid",icon:"table" })
-									,drawerbutton({text:"List",icon:"reorder"})
-									,drawerbutton({text:"Graph", icon:"sitemap" })
+						,view({flex:0.22, flexdirection: "column", flexwrap: "none"}
+							,drawerfoldcontainer({icon:"sitemap",title:"Layouts", basecolor: "#b0b0b0",bgcolor:'#e6e6e6', alignitems: "stretch" }
+								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"#e6e6e6"}
+									,drawerbutton({text:"Grid",icon:"table",backcolor: "#ffffff" })
+									,drawerbutton({text:"List",icon:"reorder",backcolor: "#ffffff" })
+									,drawerbutton({text:"Graph", icon:"sitemap" ,backcolor: "#ffffff" })
 								)
 							)
-							,foldcontainer({icon:"server",title:"Services" , basecolor:"#80ffff" , alignitems: "stretch" }
-								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"transparent"}
+							,drawerfoldcontainer({icon:"server",title:"Services" , basecolor:"#77b5ff",bgcolor:'#cee9ff' , alignitems: "stretch" }
+								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"#cee9ff"}
 							
 								,drawerbutton({text:"Rovi", icon:"film"})
 								,drawerbutton({text:"Vimeo", icon:"vimeo"})
@@ -338,8 +431,8 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 								)
 
 							)
-							,foldcontainer({icon:"toggle-on",title:"Controllers", basecolor: "#ff80ff" , alignitems: "stretch" }
-								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"transparent"}
+							,drawerfoldcontainer({icon:"toggle-on",title:"Controllers", basecolor: "#6ec1ae",bgcolor:'#b8dbd3' , alignitems: "stretch" }
+								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"#b8dbd3"}
 								,drawerbutton({text:"D-pad", icon:"gamepad" })
 								,drawerbutton({text:"Gyro",icon:"dot-circle"})
 								,drawerbutton({text:"Trackpad", icon:"square"})
@@ -348,8 +441,8 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 								)
 							)
 							
-							,foldcontainer({icon:"tv",title:"Devices", basecolor: "#ffffb0", alignitems: "stretch" }
-								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"transparent"}
+							,drawerfoldcontainer({icon:"tv",title:"Devices", basecolor: "#fdda9d",bgcolor:'#fceacb', alignitems: "stretch" }
+								,view({flexdirection:"column", flex: 1, alignself: "stretch", bgcolor:"#fceacb"}
 
 								,drawerbutton({text:"Phone", icon:"phone" })
 								,drawerbutton({text:"Server",icon:"server"})
@@ -362,11 +455,13 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 							)
 							
 						)
-						
-						
+
+
 						)
+
 						)
-						
+
+
 				)
 			)
 			//,displays.default = 
