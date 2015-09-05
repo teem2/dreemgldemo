@@ -226,4 +226,3 @@ define.class(function(view, connectorbutton, icon, text, edit, button,textinput)
 });
 
 
-

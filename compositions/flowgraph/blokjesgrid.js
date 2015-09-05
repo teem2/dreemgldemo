@@ -18,11 +18,14 @@ define.class(function(require, cadgrid, blokje, connection){
 				data.connections.push({
 					from:{
 							node: this.connectionstart.screen, 
-							output: this.connectionstart.output
+							output: this.connectionstart.output,
+						    value: this.connectionstart.value
+
 					}
 					,to:{
 							node: this.connectionend.screen,
 							input: this.connectionend.input,
+  						    value: this.connectionend.value
 					}
 				})
 			}.bind(this))
@@ -45,13 +48,13 @@ define.class(function(require, cadgrid, blokje, connection){
 		}
 	}
 	
-	this.setConnectionStart = function(blok, output, bkje){
-		this.connectionstart = {screen: blok, output: output, bkje: bkje}
+	this.setConnectionStart = function(blok, output, bkje, value){
+		this.connectionstart = {screen: blok, output: output, bkje: bkje, value:value}
 		this.tryToBuildConnection();
 	}
 
-	this.setConnectionEnd = function(blok, input, bkje){
-		this.connectionend = {screen: blok, input: input, bkje: bkje}
+	this.setConnectionEnd = function(blok, input, bkje, value){
+		this.connectionend = {screen: blok, input: input, bkje: bkje, value:value}
 		this.tryToBuildConnection()
 	}
 	

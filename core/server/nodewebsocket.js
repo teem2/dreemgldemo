@@ -1,15 +1,20 @@
-// Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
-// simple NodeJS websocket client and server
+/*
+ The MIT License (see LICENSE)
+ Copyright (C) 2014-2015 Teem2 LLC
+*/
 
-define.class(function(require, exports, self){
+/**
+ * @class NodeWebSocket {Internal}
+ * Clean and simple websocket implementation for node
+ */
+
+define.class(function(require){
 
 	var crypto = require('crypto')
 	var url = require('url')
 	var http = require('http')
 
-	self.__trace__ = 3
-
-	self.atConstructor = function(req, socket){
+	this.atConstructor = function(req, socket){
 		if(typeof req == 'string'){
 			this.initClient(req)
 		}
@@ -18,7 +23,7 @@ define.class(function(require, exports, self){
 		}
 	}
 
-	self.initClient = function(server_url){
+	this.initClient = function(server_url){
 
 		this.url = url.parse(server_url)
 		// ok lets connect to a server
@@ -67,7 +72,7 @@ define.class(function(require, exports, self){
 		req.end()
 	}
 
-	self.initServer = function(req, socket){
+	this.initServer = function(req, socket){
 		var version = req.headers['sec-websocket-version']
 		if(version != 13){
 			console.log("Incompatible websocket version requested (need 13) " + version)
@@ -91,7 +96,7 @@ define.class(function(require, exports, self){
 		this.first_queue = []
 	}
 
-	self.initState = function(){
+	this.initState = function(){
 
 		this.max = 100000000 // maximum receive buffer size (10 megs)
 		this.header = new Buffer(14) // header
@@ -133,25 +138,31 @@ define.class(function(require, exports, self){
 		}.bind(this))
 	}
 
-	// message receive hook
-	self.atMessage = function(message){
+	this.atMessage = function(message){
 	}
 
-	// socket closed hook
-	self.atClose = function(){
+	this.atClose = function(){
 	}
 
-	// socket error hook
-	self.atError = function(error){
+	this.atError = function(error){
 	}
 
-	self.error = function(t){
+	this.error = function(t){
 		console.log("Error on websocket " + t)
 		this.atError(t)
 		this.close()
 	}
 
-	self.send = function(data){
+	this.head = function(){
+		var se = this.expected
+		while(this.expected > 0 && this.read < this.input.length && this.written < this.header.length){
+			this.header[this.written++] = this.input[this.read++], this.expected--
+		}
+		if(this.written > this.header.length) return this.err("unexpected data in header"+ se + s.toString())
+		return this.expected != 0
+	}
+
+	this.send = function(data){
 		if(this.first_queue){
 			// put a tiny gap between a server connect and first data send
 			if(!this.first_queue.length){
@@ -190,7 +201,7 @@ define.class(function(require, exports, self){
 		this.socket.write(buf)
 	}
 
-	self.close = function(){
+	this.close = function(){
 		if(this.socket){
 			this.atClose()
 			this.socket.destroy()
@@ -200,16 +211,7 @@ define.class(function(require, exports, self){
 		this.socket = undefined
 	}
 
-	self.head = function(){
-		var se = this.expected
-		while(this.expected > 0 && this.read < this.input.length && this.written < this.header.length){
-			this.header[this.written++] = this.input[this.read++], this.expected--
-		}
-		if(this.written > this.header.length) return this.err("unexpected data in header"+ se + s.toString())
-		return this.expected != 0
-	}
-
-	self.data = function(){
+	this.data = function(){
 		if(this.masked){
 			while(this.expected > 0 && this.read < this.input.length){
 				this.output[this.written++] = this.input[this.read++] ^ this.header[this.maskoff + (this.maskcount++&3)]
@@ -224,14 +226,15 @@ define.class(function(require, exports, self){
 		}
 
 		if(this.expected) return false
-		this.atMessage(this.output.toString('utf8', this.masked?0:2, this.written))
+	
+		this.atMessage(this.output.toString('utf8', this.masked?0:this.mask_correct, this.written))
 		this.expected = 1
 		this.written = 0
 		this.state = this.opcode
 		return true
 	}
 
-	self.mask = function(){
+	this.mask = function(){
 		if(this.head()) return false
 		if(!this.paylen){
 			this.expected = 1
@@ -248,39 +251,59 @@ define.class(function(require, exports, self){
 		return true
 	}
 
-	self.len8 = function(){
+	this.len8 = function(){
 		if(this.head()) return false
 		this.paylen = this.header.readUInt32BE(this.written - 4)
-		this.expected = 4
-		this.state = this.mask
+		if(this.masked){
+			this.expected = 4
+			this.state = this.mask
+		}
+		else{
+			this.mask_correct = 8
+			this.expected = this.paylen
+			this.state = this.data
+		}
 		return true
 	}
 
-	self.len2 = function(){
+	this.len2 = function(){
 		if(this.head()) return 
 		this.paylen = this.header.readUInt16BE(this.written - 2)
-		this.expected = 4
-		this.state = this.mask
+		if(this.masked){
+			this.expected = 4
+			this.state = this.mask
+		}
+		else{
+			this.mask_correct = 4
+			this.expected = this.paylen
+			this.state = this.data
+		}
 		return true
 	}
 
-	self.len1 = function(){
+	this.len1 = function(){
 		if(this.head()) return false
-		// we get plain data back
-		if(!(this.header[this.written  - 1] & 128)){
+		// set masked flag
+
+		if(!(this.header[this.written - 1] & 128)){
 			this.masked = false
-			this.state = this.data
-			this.expected = this.header[this.written  - 1]
-			return true
 		}
 		else{
 			this.masked = true
 		}
+
 		var type = this.header[this.written - 1] & 127
 		if(type < 126){
 			this.paylen = type
 			this.expected = 4
-			this.state = this.mask
+			if(!this.masked){
+				this.mask_correct = 2
+				this.state = this.data
+				this.expected = this.header[this.written - 1]
+			}
+			else{
+				this.state = this.mask
+			}
 		}
 		else if(type == 126){
 			this.expected = 2
@@ -293,7 +316,7 @@ define.class(function(require, exports, self){
 		return true
 	}
 
-	self.ping = function(){
+	this.ping = function(){
 		if(this.head()) return false
 		if(this.header[this.written - 1] & 128){
 			this.expected = 4
@@ -308,7 +331,7 @@ define.class(function(require, exports, self){
 		return true
 	}
 
-	self.pong = function(){
+	this.pong = function(){
 		if(this.head()) return false
 		if(this.header[this.written - 1] & 128){
 			this.expected = 4
@@ -322,7 +345,7 @@ define.class(function(require, exports, self){
 		return true
 	}
 
-	self.opcode = function(){
+	this.opcode = function(){
 		if(this.head()) return
 		var frame = this.header[0] & 128
 		var type = this.header[0] & 15
@@ -345,5 +368,4 @@ define.class(function(require, exports, self){
 		}
 		return this.error("opcode not supported " + type)
 	}
-
 })

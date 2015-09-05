@@ -27,7 +27,8 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 			attr.attr = {
 				name:'screens_' + con.to.node + '_' + con.to.input,
 				from:'screens_' + con.from.node + '_' + con.from.output,
-				type:'string'
+				type:'string',
+				value: con.from.value
 			}
 			server_output[attr.attr.name] = 1
 			server_input[attr.attr.from] = 1
@@ -102,7 +103,8 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 					if(scr.tag !=='screen') continue
 					var view = Xml.childByTagName(scr, 'view')
 					data.screens.push({
-						name:scr.attr.name, 
+						name:scr.attr.name,
+						type:scr.attr.type,
 						icon: scr.attr.icon?scr.attr.icon:"tv", 
 						title:scr.attr.title?scr.attr.title:scr.attr.name,					
 						iframeurl: 'http://127.0.0.1:8080/' + this.composition + '?noreload&screen='+scr.attr.name,
@@ -114,7 +116,8 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 								icon: each.attr.icon?each.attr.icon:"chevron-right",
 								title: each.attr.title?each.attr.title:each.attr.name,
 								type: each.attr.type,
-								input: each.attr.input === 'true'
+								input: each.attr.input === 'true',
+								value: each.attr.value
 							}
 						}.bind(this))
 					})
@@ -132,8 +135,9 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 					var fromnode = from.slice(from.indexOf('_')+1)
 					var fromoutput = fromnode.slice(fromnode.indexOf('_')+1)
 					fromnode = fromnode.slice(0,fromnode.indexOf('_'))
+					var v = each.attr.value;
 
-					data.connections.push({from:{node:fromnode, output:fromoutput},to:{node:tonode,input:toinput}})
+					data.connections.push({from:{node:fromnode, output:fromoutput, value:v},to:{node:tonode, input:toinput, value:v}})
 				})
 
 
