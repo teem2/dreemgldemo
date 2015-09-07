@@ -10,7 +10,9 @@ define.class('./sprite_gl', function(require, exports, self){
 	this.attribute('font', {type:Object, value: undefined});
 	this.attribute('color', {type:vec4, value: vec4(1,1,1,1)});
 	
-	exports.nest('Fg', GLText.extend(function(exports, self){}))
+	define.class(this, 'fg', GLText, function(){
+	})
+
 	//this.fg.dump =1 
 	this.text = function(){
 		this.dirty = true;
@@ -23,7 +25,7 @@ define.class('./sprite_gl', function(require, exports, self){
 	this.lazyInit = function(){
 		if(this.rendered_text !== this.text){
 			this.rendered_text = this.text
-			var textbuf = this.fg.newText()
+			var textbuf = this.fg_shader.newText()
 
 			if(this.font) textbuf.font = this.font
 
@@ -34,17 +36,17 @@ define.class('./sprite_gl', function(require, exports, self){
 			textbuf.clear()
 			textbuf.add(this.text)
 			//this.fg.textcolor = this.color;
-			this.fg.mesh = textbuf
+			this.fg_shader.mesh = textbuf
 		}
 	}
 
 	this.sizetocontent = function(width){
 		this.lazyInit()
-		return {width: this.fg.mesh.bound_w, height: this.fg.mesh.bound_h};
+		return {width: this.fg_shader.mesh.bound_w, height: this.fg_shader.mesh.bound_h};
 	}
 
 	this.atDraw = function(renderstate){
-		this.fg.viewmatrix = renderstate.viewmatrix;
+		this.fg_shader.viewmatrix = renderstate.viewmatrix;
 		this.lazyInit()
 	}
 })

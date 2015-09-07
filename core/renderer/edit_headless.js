@@ -3,8 +3,8 @@
 
 define.class('$renderer/sprite_base', function(require, exports, self){
 	var node = require('$base/node')
-	exports.nest('Bg', node.extend())
-	exports.nest('Fg', node.extend())
+	define.class(this, 'bg', function(node){})
+	define.class(this, 'fg', function(node){})
 
 	this.atConstructor = function(){
 	}

@@ -117,8 +117,7 @@ define.class(function(require, constructor){
 			for(var key in obj){
 				// copy over getters and setters
 				if(obj.__lookupGetter__(key) || obj.__lookupSetter__(key)){
-					// lets copy over this thing
-
+					// ignore it
 				}
 				else{
 					// other
@@ -126,6 +125,34 @@ define.class(function(require, constructor){
 				}
 			}
 		}	
+	}
+
+	// find node by name
+	this.findChild = function(name, ignore){
+		// ok so first we go down all children
+		for(var i = 0; i < this.children.length; i ++){
+			var child = this.children[i]
+			if(child === ignore) continue
+			if(child.name === name){
+				return child
+			}
+		}
+		for(var i = 0; i < this.children.length; i ++){
+			var child = this.children[i]
+			if(child === ignore) continue
+			var ret = child.findChild(name)
+			if(ret !== undefined) return ret
+		}
+	}
+
+	this.find = function(name, ignore){
+		var ret = this.findChild(name)
+		var node = this
+		while(ret === undefined && node.parent){
+			ret = node.parent.findChild(name, node)
+			node = node.parent
+		}
+		return ret
 	}
 
 	// finds overload of property me on key

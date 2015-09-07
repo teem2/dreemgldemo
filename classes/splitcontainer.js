@@ -19,9 +19,9 @@ define.class(function(sprite,  view){
 		this.flexdirection = this.vertical?"column":"row" ;
 	}
 	
-	
-	this.splitter = view.extend(function(){
-		this.bgcolor = vec4("red");
+	define.class(this, 'splitter', function(view){
+
+		this.bgcolor = vec4("gray");
 		this.alignitem = "stretch";
 		this.attribute("vertical", {type: Boolean, value: false});
 		this.attribute("splitsize", {type: float, value: 10});

@@ -248,7 +248,7 @@
 	}
 
 	define.builtinClassArgs = {
-		exports:1, module:2, require:3, self:4, proto:4, constructor:1, baseclass:5
+		exports:1, module:2, require:3, self:4, proto:4, constructor:1, baseclass:5, outer:6
 	}
 
 	define.applyBody = function(body, Constructor, baseclass, require){
@@ -276,6 +276,7 @@
 				}
 				else if(builtin === 4) args[i] = Constructor.prototype
 				else if(builtin === 5) args[i] = baseclass
+				else if(builtin === 6) args[i] = body.outer
 			}
 			else if(arg){
 				if(!require) throw new Error('Can only use fast-require classes on a file-class for arg:' + arg)
@@ -316,20 +317,27 @@
 			}
 
 			// instance all nested classes
+			/*
 			var nested = MyConstructor.nested
 			if(nested) for(var name in nested){
 				var nest = obj[name.toLowerCase()] = new nested[name]()
 				Object.defineProperty(nest, 'parent', {value:obj})
-			}
+			}*/
 
 			// call atConstructor if defined
 			//if(MyConstructor.stubbed) return obj
+			var classroot = MyConstructor.classroot
 			if(obj._atConstructor) obj._atConstructor.apply(obj, arguments)
 
 			if(obj.atConstructor){
 				var res = obj.atConstructor.apply(obj, arguments)
 				if(res !== undefined) return res
 			}
+			// pass on the root property
+			if(classroot !== undefined){
+				if(obj.classroot === undefined) obj.classroot = classroot
+			}
+
 			return obj
 		}
 		
@@ -362,6 +370,7 @@
 		if(baseclass){
 			Constructor.prototype = Object.create(baseclass.prototype)
 			Object.defineProperty(Constructor.prototype, 'constructor', {value:Constructor})
+			/*
 			if(baseclass.nested){
 				var nested = Object.create(baseclass.nested)
 				Object.defineProperty(Constructor, 'nested', {value:nested})
@@ -371,7 +380,7 @@
 					Object.defineProperty(Constructor.prototype, name.toLowerCase(), {value:cls.prototype, writable:true})
 					Object.defineProperty(Constructor, name, {value:cls, writable:true})
 				}
-			}
+			}*/
 		}
 
 		Object.defineProperty(Constructor, 'extend', {value:function(body){
@@ -393,13 +402,13 @@
 		}})
 
 		//if(stubbed) Object.defineProperty(Constructor, 'stubbed', {value:true})
-
+		/*
 		Object.defineProperty(Constructor, 'nest', {value:function(name, cls){
 			if(!Constructor.nested) Object.defineProperty(Constructor, 'nested', {value:cls})
 			Constructor.nested[name] = cls
 			Object.defineProperty(Constructor.prototype, name.toLowerCase(), {value: cls.prototype, writable:true})
 			Object.defineProperty(Constructor, name, {value:cls, writable:true})
-		}})
+		}})*/
 
 		if(Array.isArray(body)){
 			if(Constructor.prototype.atExtend) body.push(Constructor.prototype)
@@ -449,7 +458,7 @@
 		var map = result[1].split(/\s*,\s*/)
 		for(var i = 0; i<map.length; i++) if(map[i] !== '') output.push(map[i].toLowerCase())
 
-		var matchrx = new RegExp(/define\.(?:render|class)\s*\(\s*function\s*[\w]*\s*\(([\w,\s]*)\)\s*{/g)
+		var matchrx = new RegExp(/define\.(?:render|class)\s*\(\s*(?:this\s*,\s*['"]\w+['"]\s*,\s*(?:\w+\s*,\s*){0,1}){0,1}function\s*[\w]*\s*\(([\w,\s]*)\)\s*{/g)
 		while((result = matchrx.exec(str)) !== null) {
 			var map = result[1].split(/\s*,\s*/)
 			for(var i = 0; i<map.length; i++)if(map[i] !== '') output.push(map[i].toLowerCase())
@@ -527,7 +536,38 @@
 		// lets make a class
 		var base_class
 		var body
-		if(arguments.length > 1){ // class with baseclass
+		if(arguments.length >= 3){ // embedded class
+			var embed_this = arguments[0]
+			var embed_name = arguments[1]
+			Object.defineProperty(embed_this, embed_name, {
+				get:function(){
+					var cls = this['_' + embed_name]
+					cls.classroot = this 
+					return cls
+				},
+				set:function(value){
+					// if its a class, replace it
+					if(typeof value === 'function' && Object.getPrototypeOf(value.prototype) !== Object.prototype){
+						this['_' + embed_name] = value
+						return
+					}
+					// otherwise use it as an extend 
+					this['_' + embed_name] = this['_' + embed_name].extend(value)
+				}
+			})
+			if(arguments.length>3){
+				base_class = arguments[2]
+				body = arguments[3]
+			}
+			else{
+				body = arguments[2]
+			}
+			if(typeof body === 'function'){
+				body.classname = embed_name
+				body.outer = embed_this
+			}
+		}
+		else if(arguments.length > 1){ // class with baseclass
 			base_class = arguments[0]
 			body = arguments[1]
 		}
@@ -569,6 +609,9 @@
 			var outer_module = outer_require.module
 			var module = {exports:{}, filename:outer_module.filename, factory:outer_module.factory}
 			moduleFactory(outer_require, module.exports, module)
+			if(embed_this){
+				embed_this['_' + embed_name] = module.exports
+			}
 			return module.exports
 		}
 

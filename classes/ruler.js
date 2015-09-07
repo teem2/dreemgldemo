@@ -19,7 +19,7 @@ define.class(function(sprite, text, view){
 				}
 			}
 		}
-		return bgcolor;
+		return bgcolor
 	}
 	
 	this.vruler = function(){
@@ -33,35 +33,34 @@ define.class(function(sprite, text, view){
 				}
 			}
 		}
-		return bgcolor;
+		return bgcolor
 	}
-
-		this.bgcolor = "#8080b0";
-			this.flexdirection ="column";
-		this.alignself = "stretch" ;
+		
+	this.bgcolor = "#8080b0"
+	this.flexdirection = "column"
+	this.alignself = "stretch"
 	
 	this.render = function(){
 		if (this.vertical == false){
-			this.bg.color = this.ruler;
-		this.bg.offset = this.offset;			
-	
+			this.bg_shader.color = this.ruler
+			this.bg_shader.offset = this.offset			
 						
 			var rulerres = [
 				text({position: "absolute", text: this.from.toString(),width:100,height:20, bgcolor:"transparent", left: this.from+this.offset})
 				,text({position: "absolute", text: this.to.toString(),width:100,height:20, bgcolor:"transparent", left: this.to+this.offset})	
-				]			
+			]			
 				
-			return rulerres;
+			return rulerres
 		}
 		else{
-			this.bg.color = this.vruler;
-		this.bg.offset = this.offset;			
+			this.bg_shader.color = this.vruler
+			this.bg_shader.offset = this.offset			
 	
 			var rulerres = [
 				text({rotation: -90, bgcolor:"transparent",width: 100, height: 20,position: "absolute", text: this.from.toString(), left:-45,top: this.from+this.offset})
 				,text({rotation: -90, bgcolor:"transparent",width: 100, height: 20,position: "absolute", text: this.to.toString(), left:-45,top: this.to+this.offset})
-				]
-		return rulerres;
+			]
+			return rulerres;
 		}
 	}
 })

@@ -1,13 +1,13 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Sprite class
 
-define.class('./sprite_base', function (require, exports, self, baseclass) {
+define.class('./sprite_base', function(require, exports){
 
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')
 	var GLText = require('$gl/gltext')
 
-	var Sprite = self
+	var Sprite = this
 	this.dump = 1
 
 	exports.interfaceguid = 1
@@ -31,7 +31,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		return bgcolor
 	}
 
-	exports.nest('Bg', GLShader.extend(function(exports, self){
+	define.class(this, 'bg', GLShader, function(){
+		this.has_guid = true
+
 		this.texture = new GLTexture()
 
 		this.mesh = vec2.quad(0, 0, 1, 0, 0, 1, 1, 1)
@@ -52,6 +54,7 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.time = 0.1
 
 		this.bgcolorfn = Sprite.plaincolor 
+
 		this.color = function(){
 			var dist = shape.roundedrectdistance(sized, width, height, radius.r, radius.a, radius.g, radius.b)
 			//dump = dist*0.01
@@ -74,11 +77,10 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			sized = vec2(mesh.x * width, mesh.y * height)
 			return vec4(sized.x, sized.y, 0, 1) * matrix * viewmatrix
 		}
-	}))
+	})
 	
-	exports.nest('Fg', GLText.extend(function(exports, self){
-		this.no_guid = 1
-	}))
+	define.class(this, 'fg', GLText, function(){
+	})
 	
 	this.layoutchanged = function(){
 	}
@@ -318,13 +320,17 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 		this.backgroundTexture = false;
 		this.texturecache = false;
 		this.effectiveopacity = this.opacity;
+
+		this.bg_shader = new this.bg()
+		this.fg_shader = new this.fg()
+
 		// if we have a bgimage, we have to set our bgimage function to something
 		if(this.bgimage){
 			// lets make the thing fetch a texture
-			this.bg.texture = new GLTexture()
+			this.bg_shader.texture = new GLTexture()
 			
-			if(this.bg.bgcolorfn === this.plaincolor){
-				this.bg.bgcolorfn = function(pos, dist){
+			if(this.bg_shader.bgcolorfn === this.plaincolor){
+				this.bg_shader.bgcolorfn = function(pos, dist){
 					var aspect = texture.size.y / texture.size.x
 					var center = (1. - aspect) * .5
 					var sam = vec2(pos.x * aspect + center, pos.y)
@@ -335,9 +341,9 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			}
 
 			require.async(this.bgimage).then(function(result){
-				this.bg.texture = GLTexture.fromImage(result)
-				if(isNaN(this.width)) this.width = this.bg.texture.size[0]
-				if(isNaN(this.height)) this.height = this.bg.texture.size[1]
+				this.bg_shader.texture = GLTexture.fromImage(result)
+				if(isNaN(this.width)) this.width = this.bg_shader.texture.size[0]
+				if(isNaN(this.height)) this.height = this.bg_shader.texture.size[1]
 				this.reLayout()
 				this.setDirty(true)
 			}.bind(this))
@@ -376,18 +382,18 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	this.renderQuad = function(texture, rect) {}
 
 	this.drawStencil = function (renderstate) {
-		this.bg.matrix = renderstate.matrix;
-		this.bg.viewmatrix = renderstate.viewmatrix;
+		this.bg_shader.matrix = renderstate.matrix;
+		this.bg_shader.viewmatrix = renderstate.viewmatrix;
 		
 		if (this.layout){
-			this.bg.width = this.layout.width? this.layout.width:this.width;
-			this.bg.height = this.layout.height? this.layout.height:this.height;
+			this.bg_shader.width = this.layout.width? this.layout.width:this.width;
+			this.bg_shader.height = this.layout.height? this.layout.height:this.height;
 		}
 		else{
-			this.bg.width = this.width;
-			this.bg.height = this.height;
+			this.bg_shader.width = this.width;
+			this.bg_shader.height = this.height;
 		}
-		this.bg.draw(renderstate.device);
+		this.bg_shader.draw(renderstate.device);
 	}
 
 	this.show = function(){
@@ -513,29 +519,29 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 	}
 
 	this.doDraw = function(renderstate){
-		this.bg._time = this.screen.time
-		this.fg._time = this.screen.time
+		this.bg_shader._time = this.screen.time
+		this.fg_shader._time = this.screen.time
 
-		this.bg.draw(this.screen.device)
-		this.fg.draw(this.screen.device)
+		this.bg_shader.draw(this.screen.device)
+		this.fg_shader.draw(this.screen.device)
 
 		// lets check if we have a reference on time
-		if(this.bg.shader && this.bg.shader.unilocs.time || 
-			this.fg.shader && this.fg.shader.unilocs.time){
+		if(this.bg_shader.shader && this.bg_shader.shader.unilocs.time || 
+			this.fg_shader.shader && this.fg_shader.shader.unilocs.time){
 			//console.log('here')
 			this.screen.node_timers.push(this)
 		}
 	}
 
 	this.doDrawGuid = function(renderstate){
-		this.bg._viewmatrix = renderstate.viewmatrix;		
-		this.bg.drawGuid(this.screen.device)
+		this.bg_shader._viewmatrix = renderstate.viewmatrix;		
+		this.bg_shader.drawGuid(this.screen.device)
 	}
 
 	this.drawContentGL = function(renderstate){
 		//mat4.debug(this.orientation.matrix);
-			var bg = this.bg
-			var fg = this.fg
+			var bg = this.bg_shader
+			var fg = this.fg_shader
 			bg._viewmatrix = renderstate.viewmatrix;
 			fg._viewmatrix = renderstate.viewmatrix;
 			
@@ -553,13 +559,13 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 			fg._matrix = bg._matrix = renderstate.matrix
 
 			if(this.layout){
-				this.bg._width = this.layout.width? this.layout.width: this._width
-				this.bg._height = this.layout.height? this.layout.height: this._height
+				this.bg_shader._width = this.layout.width? this.layout.width: this._width
+				this.bg_shader._height = this.layout.height? this.layout.height: this._height
 			}
 			else{
 				//console.log(this.layout.width);
-				this.bg._width = this._width
-				this.bg._height = this._height
+				this.bg_shader._width = this._width
+				this.bg_shader._height = this._height
 			}
 	
 			if (this._texturecache == false){
@@ -715,6 +721,6 @@ define.class('./sprite_base', function (require, exports, self, baseclass) {
 
 	this.spawn = function (parent) {}
 
-	this.hideProperty(Object.keys(self))
+	this.hideProperty(Object.keys(this))
 
 })

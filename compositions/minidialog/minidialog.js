@@ -43,7 +43,8 @@ define.class(function(require, screen, icon,view, edit, text,scrollbar,  treevie
 							
 							)
 							,view({flexdirection: "row"}
-								,icon({fontsize: 40, icon:"flask" })
+								,icon({fontsize: 40, icon:"flask" }
+							)
 							,icon({fontsize: 40, icon:"hand-spock" })
 							,icon({fontsize: 40, icon:"hand-lizard" })
 							,icon({fontsize: 40, icon:"hand-paper" })

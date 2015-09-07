@@ -24,26 +24,32 @@ define.class(function(sprite, text, icon, view){
 	}
 	
 	
-	this.clickablebar = view.extend(function(){
+	define.class(this, 'clickablebar', function(view){
 
 		this.bggradient = function(a,b){	
 			var fill = mix(col1, col2,  (a.y)/0.8);
 			return fill;
 		}
+
 		this.toggle = function(){console.log("nothing happens")}
-		this.attribute("title", {type:String});
-		this.position = "relative" ;
-		this.bg.col2 = vec4("yellow");
-		this.bg.col1 = vec4("yellow");
-		this.bg.bgcolorfn = this.bggradient;
-		this.padding = 6;
+
+		this.attribute("title", {type:String})
+		this.position = "relative"
+
+		this.bg = {
+			col2: vec4("yellow"),
+			col1: vec4("yellow"),
+			bgcolorfn: this.bggradient
+		}
+
+		this.padding = 6
 			
 		this.render = function(){			
 			return [icon({fontsize:16, icon:this.icon, fgcolor: "#303030" }), text({marginleft:5,fgcolor:"#303030", fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })];
 		}
 		
-		this.pressed = 0;
-		this.hovered = 0;
+		this.pressed = 0
+		this.hovered = 0
 		
 		this.mouseover  = function(){
 			this.hovered++;
@@ -69,18 +75,18 @@ define.class(function(sprite, text, icon, view){
 		{
 			if (this.hovered > 0){
 				if (this.pressed > 0){
-					this.bg.col1 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.3);
-					this.bg.col2 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.0);
+					this.bg_shader.col1 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.3);
+					this.bg_shader.col2 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.0);
 				}
 				else{
-					this.bg.col1 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.0);
-					this.bg.col2 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.2);
+					this.bg_shader.col1 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.0);
+					this.bg_shader.col2 = vec4.vec4_mul_float32(vec4(this.parent.basecolor), 1.2);
 				}
 			}
 			else{
-					this.bg.col2 = vec4.vec4_mul_float32_rgb(vec4(this.parent.basecolor), 0.9);
+					this.bg_shader.col2 = vec4.vec4_mul_float32_rgb(vec4(this.parent.basecolor), 0.9);
 //					this.bg.col1 = this.parent.basecolor;
-					this.bg.col1 = this.parent.basecolor;
+					this.bg_shader.col1 = this.parent.basecolor;
 			}
 		}			
 	});
@@ -92,7 +98,7 @@ define.class(function(sprite, text, icon, view){
 		this.bar.click = this.toggle.bind(this);
 		var res = [this.bar];
 		if (this.collapsed == false) {
-			this.container = view({"bg.bgcolorfn":function(a,b){return mix(bgcolor*1.7, vec4("white"), (a.y/8));} , bgcolor: this.basecolor,  padding: 4,position:"relative"} ,this.instance_children) 
+			this.container = view({bg:{bgcolorfn:function(a,b){return mix(bgcolor*1.7, vec4("white"), (a.y/8))}} , bgcolor: this.basecolor,  padding: 4,position:"relative"} ,this.instance_children) 
 			res.push(this.container)
 		}
 		this.children = [];

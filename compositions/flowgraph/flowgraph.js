@@ -1,5 +1,5 @@
 "use strict";
-define.class(function(require, screen, node, datatracker, spline, blokjesgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
+define.class(function(require, screen, node, dataset, spline, blokjesgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 
 	var Xml = require('$parsers/htmlparser')
 
@@ -151,7 +151,7 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 
 	this.init = function(){
 		this.composition = location.hash.slice(1) || 'compositions/demo/tvdemo.dre'
-		this.dataset = datatracker({
+		this.dataset = dataset({
 			screens:[
 			],
 			connections:[
@@ -173,7 +173,7 @@ define.class(function(require, screen, node, datatracker, spline, blokjesgrid, m
 			}
 		}.bind(this);
 	
-		this.appstate = datatracker({
+		this.appstate = dataset({
 			selected: "composition/screens/default"
 		})
 		

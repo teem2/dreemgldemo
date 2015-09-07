@@ -19,42 +19,42 @@ define.class('./sprite_gl', function(require, exports, self){
 
 	this.attribute("cursorcolor", {type:vec4, value: vec4("black")});
 	
-	exports.nest('Fg', GLText.extend(function(exports, self){}))
-	exports.nest('Cursor', GLCursor.extend(function(exports, self){}))
-	exports.nest('Markers', GLMarker.extend(function(exports, self){}))
+	define.class(this, 'fg', GLText, function(){})
+	define.class(this, 'cursor', GLCursor, function(){})
+	define.class(this, 'marker', GLMarker, function(){})
 
-	exports.nest('Debug', GLDebug.extend(function(exports, self){}))
+	this.bg = {
+		color: 'vec4(0.6)'
+	}
 
-
-	this.bg.color = 'vec4(0.6)'
 	this.text = function(){
 		this.dirty = true;
 	}
 
 	this.clearMarkers = function(){
-		this.markers.mesh.length = 0
+		this.marker_shader.mesh.length = 0
 	}
 
 	this.clearCursors = function(){
-		this.cursor.mesh.length = 0
+		this.cursor_shader.mesh.length = 0
 	}
 
 	this.addMarkers = function(start, end){
-		var markers = this.markers.markergeom.getMarkersFromText(this.textbuf, start, end, 0)
+		var markers = this.marker_shader.markergeom.getMarkersFromText(this.textbuf, start, end, 0)
 		// lets add all markers
 		for(var i = 0;i<markers.length;i++){
-			this.markers.mesh.addMarker(markers[i-1], markers[i], markers[i+1], this.textbuf.font_size, 0)
+			this.marker_shader.mesh.addMarker(markers[i-1], markers[i], markers[i+1], this.textbuf.font_size, 0)
 		}
 	}
 
 	this.addCursor = function(start){
-		this.cursor.mesh.addCursor(this.textbuf, start)
+		this.cursor_shader.mesh.addCursor(this.textbuf, start)
 		this.setDirty(true)
 	}
 
 	this.init = function(){
 
-		this.textbuf = this.fg.newText()
+		this.textbuf = this.fg_shader.newText()
 		this.textbuf.font_size = this.fontsize;
 		//this.textbuf.fgcolor = vec4('white')
 		
@@ -63,16 +63,19 @@ define.class('./sprite_gl', function(require, exports, self){
 		this.textbuf.add(this.text)
 
 		//this.cursors.moveRight()
-		if(this.debug){
-			this.debug.mesh = this.debug.debuggeom.array()
-			this.textbuf.debug = this.debug.mesh
+		if(this.debug_shader){
+			this.debug_shader.mesh = this.debug_shader.debuggeom.array()
+			this.textbuf.debug_mesh = this.debug_shader.mesh
 		}
 
 		//console.log(this.textbuf.charCoords(0))
-		this.fg.mesh = this.textbuf
-		
-		this.cursor.mesh = this.cursor.cursorgeom.array()
-		this.markers.mesh = this.markers.markergeom.array()
+		this.fg_shader.mesh = this.textbuf
+
+		this.cursor_shader = new this.cursor()
+		this.marker_shader = new this.marker()
+
+		this.cursor_shader.mesh = this.cursor_shader.cursorgeom.array()
+		this.marker_shader.mesh = this.marker_shader.markergeom.array()
 		this.initEditImpl()
 		//this.cursors.moveRight()
 		this.focus()
@@ -89,37 +92,37 @@ define.class('./sprite_gl', function(require, exports, self){
 
 	this.doDraw = function(renderstate){
 		//this.bg._matrix = renderstate.matrix
-		this.bg.width = this.textbuf.bound_w;
-		this.bg._viewmatrix = renderstate.viewmatrix;
+		this.bg_shader.width = this.textbuf.bound_w;
+		this.bg_shader._viewmatrix = renderstate.viewmatrix;
 		
-		this.bg.height = this.textbuf.bound_h
-		this.bg.draw(this.screen.device)
+		this.bg_shader.height = this.textbuf.bound_h
+		this.bg_shader.draw(this.screen.device)
 		
-		this.markers._matrix = this.bg._matrix;
-		this.markers._viewmatrix = this.bg._viewmatrix;
+		this.marker_shader._matrix = this.bg_shader._matrix;
+		this.marker_shader._viewmatrix = this.bg_shader._viewmatrix;
 
 		if(this.hasfocus){
-			this.markers.fgcolor = this.markerfocuscolor;
+			this.marker_shader.fgcolor = this.markerfocuscolor;
 		}
 		else{
-			this.markers.fgcolor = this.markercolor;
+			this.marker_shader.fgcolor = this.markercolor;
 		}
-		this.markers.draw(this.screen.device)
+		this.marker_shader.draw(this.screen.device)
 
 		if(this.hasfocus){
-			this.cursor._matrix = this.bg._matrix
-			this.cursor._viewmatrix = this.bg._viewmatrix
+			this.cursor_shader._matrix = this.bg_shader._matrix
+			this.cursor_shader._viewmatrix = this.bg_shader._viewmatrix
 
-			this.cursor.fgcolor = this.cursorcolor;
+			this.cursor_shader.fgcolor = this.cursorcolor;
 			
-			this.cursor.draw(this.screen.device)
+			this.cursor_shader.draw(this.screen.device)
 		}
-		this.fg.viewmatrix = renderstate.viewmatrix;
-		this.fg.draw(this.screen.device)
+		this.fg_shader.viewmatrix = renderstate.viewmatrix;
+		this.fg_shader.draw(this.screen.device)
 
-		if(this.debug){
-			this.debug._matrix = this.bg._matrix
-			this.debug.draw(this.screen.device)
+		if(this.debug_shader){
+			this.debug_shader._matrix = this.bg_shader._matrix
+			this.debug_shader.draw(this.screen.device)
 		}
 	}
 
@@ -136,10 +139,10 @@ define.class('./sprite_gl', function(require, exports, self){
 	}
 
 	this.doDrawGuid = function(renderstate){
-		this.bg.viewmatrix = renderstate.viewmatrix;
-		this.bg.width = this.textbuf.text_w
-		this.bg.height = this.textbuf.text_h
-		this.bg.drawGuid(this.screen.device)
+		this.bg_shader.viewmatrix = renderstate.viewmatrix;
+		this.bg_shader.width = this.textbuf.text_w
+		this.bg_shader.height = this.textbuf.text_h
+		this.bg_shader.drawGuid(this.screen.device)
 	}
 
 })

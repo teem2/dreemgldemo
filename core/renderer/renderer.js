@@ -73,7 +73,12 @@ define.class(function(require, exports, module){
 		}
 
 		object.reRender = __atAttributeGet
-		object.children = object.render()
+		// lets check if object.constructor  a module, ifso 
+		if(object.classroot === undefined){
+			object.classroot = object
+			//console.log(object)
+ 		}
+ 		object.children = object.render()
 		object.atAttributeGet = undefined
 
 		if(!Array.isArray(object.children) && object.children) object.children = [object.children]

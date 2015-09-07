@@ -1,50 +1,48 @@
 define.class(function(require, screen, view,menuitem, menubar, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){
 	
-	this.render = function(){
-
-		return[
-		view({rotation:0,position: "relative",   flexdirection: "column", height: 20, bgcolor: "black", flex:1},[
-			view({position: "relative",  cornerradius:"vec4(0,0,0,14)" , borderwidth:1,  flexdirection: "row", bgcolor2: "#404080",
-				'bg.bgcolorfn':function(pos,b){
-					return demos.highdefblirpy(pos*vec2(2.,0.1), time * 2, 1.) * vec4(mesh.x * bgcolor.rgb, 1.0)
-					//'red'//vec4(mesh.x * bgcolor.rgb, 1.0)
-				} , alignitems:"stretch", alignself: "stretch" , flex: undefined}
+	this.render = function(){ return [
+		view({rotation:0,position: "relative", flexdirection: "column", height: 20, bgcolor:"black", flex:1},
+			view({position: "relative", cornerradius:"vec4(0,0,0,14)", borderwidth:1, flexdirection: "row",
+				bg:{
+					bgcolor2: vec4("#404080"),
+					bgcolorfn:function(pos,b){
+					//	return demos.highdefblirpy(pos*vec2(2.,0.1), time * 2, 1.) * vec4(mesh.x * bgcolor.rgb, 1.0)
+						return vec4(mesh.x * bgcolor2.rgb, 1.0)
+					}
+				},alignitems:"stretch", alignself: "stretch", flex: undefined}
 				,icon({icon:"windows", fgcolor:"white", marginleft: 15, fontsize:18})
 				,text({fontsize: 20, text:"Visionary Studio 3016", width: 200, bgcolor: "transparent" , marginbottom:10, marginleft:15})
 			)
 			,menubar({}
-						,menuitem({text: "File"}
-							,menuitem({text: "Load"})
-							,menuitem({text: "Save"})
-							,menuitem({text: "Save as"})
-							,menuitem({text: "Revert"})
-						)
-						,menuitem({text: "Edit"}
-							,menuitem({text: "Copy"})
-							,menuitem({text: "Paste"})
-							,menuitem({text: "Undo"})
-							,menuitem({text: "Redo"})
-							,menuitem({text: "Options"})		
-						)
-						,menuitem({text: "Help"}
-									,menuitem({text: "Manual"})
-									,menuitem({text: "About"})
-						)
-					)					
-					
+				,menuitem({text: "File"}
+					,menuitem({text: "Load"})
+					,menuitem({text: "Save"})
+					,menuitem({text: "Save as"})
+					,menuitem({text: "Revert"})
+				)
+				,menuitem({text: "Edit"}
+					,menuitem({text: "Copy"})
+					,menuitem({text: "Paste"})
+					,menuitem({text: "Undo"})
+					,menuitem({text: "Redo"})
+					,menuitem({text: "Options"})		
+				)
+				,menuitem({text: "Help"}
+					,menuitem({text: "Manual"})
+					,menuitem({text: "About"})
+				)
+			)
 			,splitcontainer({vertical:false, position: "relative",   flexdirection: "row", bgcolor: "black", alignitems:"stretch", alignself: "stretch" , flex:1}
 				,view({position: "relative", flex: 0.2,  flexdirection: "column", bgcolor: "#b0b0b0", alignself: "stretch", borderwidth: 1,cornerradius: "vec4(0,14,0,0)" , bordercolor: "gray" }
 					,treeview({})
-					)
+				)
 				,view({position: "relative", flex:0.34,  flexdirection: "column", bgcolor: "darkgray",padding: 1, cornerradius: 0, clipping: true}
 					,ruler({height: 20})
 					,view({position: "relative", flex: 1.0, padding: 0, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection: "row" }
 						,ruler({width: 20, vertical: true, offset:0})
 						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"row" ,clipping: false}
-						,editlayout({flex:1.0,padding:10,  composition:'minidialog', clipping: true})
-						
-						,scrollbar({width:15, position:'relative'})
-						
+							,editlayout({flex:1.0,padding:10,  composition:'minidialog', clipping: true})
+							,scrollbar({width:15, position:'relative'})
 						)
 					)
 				)
@@ -78,25 +76,24 @@ define.class(function(require, screen, view,menuitem, menubar, edit, text, icon,
 					)
 					,foldcontainer({title:"Split Test", alignself: "stretch", marginbottom: 2}				
 						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"column" }
-						,splitcontainer({vertical: false, margin: 4},[
-						text({fontsize: 26, text:"A", bgcolor: "transparent" , fgcolor:"black", margin: 2})
-						,text({fontsize: 26, text:"B", bgcolor: "transparent" ,fgcolor:"black", margin: 2})
-						,text({fontsize: 26, text:"C", bgcolor: "transparent" , fgcolor:"black",margin: 2})
-						,text({fontsize: 26, text:"D", bgcolor: "transparent" , fgcolor:"black",margin: 2})
-						]
+							,splitcontainer({vertical: false, margin: 4},
+								text({fontsize: 26, text:"A", bgcolor: "transparent" , fgcolor:"black", margin: 2})
+								,text({fontsize: 26, text:"B", bgcolor: "transparent" ,fgcolor:"black", margin: 2})
+								,text({fontsize: 26, text:"C", bgcolor: "transparent" , fgcolor:"black",margin: 2})
+								,text({fontsize: 26, text:"D", bgcolor: "transparent" , fgcolor:"black",margin: 2})
+							)
+							,splitcontainer({vertical: true, margin: 4},
+								text({fontsize: 26, text:"A", bgcolor: "transparent" , fgcolor:"black", margin: 2})
+								,text({fontsize: 26, text:"B", bgcolor: "transparent" ,fgcolor:"black", margin: 2})
+								,text({fontsize: 26, text:"C", bgcolor: "transparent" , fgcolor:"black",margin: 2})
+								,text({fontsize: 26, text:"D", bgcolor: "transparent" , fgcolor:"black",margin: 2})
+							)
 						)
-						,splitcontainer({vertical: true, margin: 4},[
-						text({fontsize: 26, text:"A", bgcolor: "transparent" , fgcolor:"black", margin: 2})
-						,text({fontsize: 26, text:"B", bgcolor: "transparent" ,fgcolor:"black", margin: 2})
-						,text({fontsize: 26, text:"C", bgcolor: "transparent" , fgcolor:"black",margin: 2})
-						,text({fontsize: 26, text:"D", bgcolor: "transparent" , fgcolor:"black",margin: 2})
-						]
-						))
 					)
 					
 				)
 			)
-		])
+		)
 	]}
 });
 

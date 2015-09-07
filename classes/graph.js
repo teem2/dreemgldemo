@@ -1,47 +1,46 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Sprite class
 
-define.class('$renderer/sprite_$rendermode', function(require, self){
+define.class('$renderer/sprite_$rendermode', function(require){
 	var AnimTrack = require('$animation/animtrack')
 
-	self.attribute("linewidth", {type: float, value: 5});
-	self.attribute("linecolor", {type: vec4, value: vec4(1,1,0,1)});
-	self.bg.draw_type = 'TRIANGLE_STRIP'
-	self.bg.time = 0
-	self.bg.linewidth = 10;
-	self.bg.linecolor = vec4(1,1,1,1);
-	self.bg.color = function(){
-		//dump = cos(mesh.pos.x*8-time)*sin(time+8*mesh.pos.x*mesh.pos.y)
-		return mix(linecolor,bgcolor,cos(mesh.side*6.283)*0.5 + 0.5);
+	this.attribute("linewidth", {type: float, value: 5});
+	this.attribute("linecolor", {type: vec4, value: vec4(1,1,0,1)});
+
+	this.bg = {
+		draw_type:'TRIANGLE_STRIP',
+		time: 0,
+		linewidth: 10,
+		linecolor: vec4(1,1,1,1),
+		color: function(){
+			//dump = cos(mesh.pos.x*8-time)*sin(time+8*mesh.pos.x*mesh.pos.y)
+			return mix(linecolor,bgcolor,cos(mesh.side*6.283)*0.5 + 0.5);
+		},
+		position: function() {
+			var rx = (mesh.pos.x * width) + ( mesh.norm.x * mesh.side*linewidth);
+			var ry = (mesh.pos.y * height) + ( mesh.norm.y * mesh.side*linewidth);
+			
+			return vec4(rx,ry, 0, 1) * matrix
+		}
 	}
 
-	self.bg.position = function() {
-		
-		var rx = (mesh.pos.x * width) + ( mesh.norm.x * mesh.side*linewidth);
-		var ry = (mesh.pos.y * height) + ( mesh.norm.y * mesh.side*linewidth);
-		
-		return vec4(rx,ry, 0, 1) * matrix
+	this.atDraw = function(){
+		this.bg_shader.time = (Date.now() - this.time_start)*0.001
+		this.bg_shader.linewidth = this.linewidth;
+		this.bg_shader.linecolor = this.linecolor;
 	}
 	
-	self.atDraw = function(){
-		this.bg.time = (Date.now() - this.time_start)*0.001
-		this.bg.linewidth = this.linewidth;
-		this.bg.linecolor = this.linecolor;
-	//	this.dirty = true
-	}
-	// ok lets do some awesome geometry
-	
-	self.vertexstruct = define.struct({
+	this.vertexstruct = define.struct({
 		pos:vec2,
 		norm:vec2,
 		side: float,
 	})
 	
-	self.bg.mesh = self.vertexstruct.array();
+	this.bg_shader.mesh = this.vertexstruct.array();
 
-	self.init = function(){
+	this.init = function(){
 		this.time_start = Date.now()
-		this.bg.mesh = this.vertexstruct.array();
+		this.bg_shader.mesh = this.vertexstruct.array();
 		
 		var track = new AnimTrack({
 			motion:ease.linear, 

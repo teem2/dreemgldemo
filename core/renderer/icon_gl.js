@@ -689,8 +689,14 @@ define.class('./text_gl', function(require, exports, self){
 		this.text = table[this.icon]
 	}
 	
-	this.bgcolor = vec4("transparent");
-	this.fgcolor = vec4("black");
-	this.bg.color = undefined
-	this.fg.font = glfontParser(require('$fonts/fontawesome.glf'))
+	//this.bgcolor = vec4("transparent");
+	//this.fgcolor = vec4("black");
+	//this.color = vec4('red')
+	this.bg = {
+		color:undefined
+	}
+
+	this.fg = {
+		font:glfontParser(require('$fonts/fontawesome.glf'))
+	}
 })

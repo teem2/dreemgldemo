@@ -20,14 +20,16 @@ define.class(function(sprite, text, view, icon){
 		var fill = mix(col1, col2, (a.y)/0.8);
 		return fill;
 	}
-	
-	this.bg.wobbleamount = 0.0;
+
+	this.bg = {
+		wobbleamount: 0.0,
+		bgcolorfn: this.buttonfill,
+		col1: vec4("yellow"),
+		col2: vec4("yellow")
+	}
+
 	this.padding = 8;
 	this.cornerradius = 3;
-	this.bg.bgcolorfn = this.buttonfill;
-	
-	this.bg.col1 = vec4("yellow");
-	this.bg.col2 = vec4("yellow");
 	this.borderwidth  = 2;
 	this.margin = 4;
 	this.bordercolor = vec4("lightgray");
@@ -36,6 +38,10 @@ define.class(function(sprite, text, view, icon){
 	this.pressed = 0;
 	this.hovered = 0;
 		
+	define.class(this, 'icon_class', function(icon){
+
+	})
+
 	this.mouseover  = function(){
 		this.hovered++;
 		this.setDirty(true)
@@ -62,38 +68,37 @@ define.class(function(sprite, text, view, icon){
 		this.drawcount ++;
 	//	console.log("atdraw button", this.drawcount);
 		if (this.pressed > 0){
-			this.bg.col2 = this._pressedcolor2;
-			this.bg.col1 = this._pressedcolor1;
+			this.bg_shader.col2 = this._pressedcolor2;
+			this.bg_shader.col1 = this._pressedcolor1;
 			this.buttonres.fgcolor = this._labelactivecolor;		
 			
 				if (this.iconres) this.iconres.fgcolor = this._labelactivecolor;
 		}
 		else{
 			if (this.hovered > 0){
-				this.bg.col2 = this._hovercolor2;
-				this.bg.col1 = this._hovercolor1;
+				this.bg_shader.col2 = this._hovercolor2;
+				this.bg_shader.col1 = this._hovercolor1;
 				this.buttonres.fgcolor = this._labelactivecolor;
 				if (this.iconres) this.iconres.fgcolor = this._labelactivecolor;
 			}
 			else{
 				this.buttonres.fgcolor = this._labelcolor;
 				if (this.iconres) this.iconres.fgcolor = this._labelcolor;
-				this.bg.col2 = this._buttoncolor2;
-				this.bg.col1 = this._buttoncolor1;
+				this.bg_shader.col2 = this._buttoncolor2;
+				this.bg_shader.col1 = this._buttoncolor1;
 			}
 		}
 	}
 
 	this.render = function(){
 		this.buttonres =  text({rotation: 0, bgcolor:"transparent",fgcolor:"white", marginleft: 4,fontsize: this.fontsize, position: "relative", text: this.text})
-		if (!this.icon || this.icon.length == 0)
-		{
+		if (!this.icon || this.icon.length == 0){
 			this.iconres = undefined;
-		return [this.buttonres];
+			return [this.buttonres];
 		}
 		else{
-				this.iconres =icon({fontsize: this.fontsize, icon: this.icon}); 
-		return [this.iconres,this.buttonres];
+			this.iconres = this.icon_class({fontsize: this.fontsize,color:vec4('red'), icon: this.icon}); 
+			return [this.iconres,this.buttonres];
 		}
 	}
 	

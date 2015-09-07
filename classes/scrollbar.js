@@ -9,11 +9,7 @@ define.class(function(sprite, text, view){
 	this.attribute("vertical", {type: Boolean, value: true});
 	this.attribute("offset", {type:float, value:0})
 	this.attribute("page", {type:float, value:0.3})
-
-	this.bg.draggercolor = vec4();
-	this.bg.offset = 0
-	this.bg.page = 0.3
-
+	
 	this.hslider = function(){
 		// we have a rectangle
 		var rel = vec2(mesh.x*width, mesh.y*height)
@@ -33,21 +29,26 @@ define.class(function(sprite, text, view){
 		var fg = vec4(draggercolor.rgb, smoothstep(edge, -edge, field)*draggercolor.a)
 		var bg = vec4(0.,0.,0.,0.05)
 		return mix(bg.rgba, fg.rgba, fg.a)
-	}	
-	
-	this.bg.color = this.vslider;
-	
-	this.render = function()
-	{
-		if (this.vertical){
-			this.bg.color = this.vslider;
-		}else{
-			this.bg.color = this.hslider;	
-		}
-		
 	}
-	this.bg.col1 = vec4("yellow");
-	this.bg.col2 = vec4("yellow");
+
+	this.bg = {
+		draggercolor: vec4(),
+		offset: 0,
+		page: 0.3,
+		color: this.vslider,
+		col1: vec4("yellow"),
+		col2: vec4("yellow")
+	}
+	
+	this.render = function(){
+		if (this.vertical){
+			this.bg_shader.color = this.vslider;
+		}
+		else {
+			this.bg_shader.color = this.hslider;	
+		}		
+	}
+
 	this.borderwidth  = 2;
 	this.margin = 1;
 	this.bordercolor = vec4("#303060");
@@ -107,19 +108,19 @@ define.class(function(sprite, text, view){
 	this.drawcount = 0;
 	this.atDraw = function(){
 		this.drawcount ++;
-		this.bg._offset = this._offset
-		this.bg._page = this._page
+		this.bg_shader._offset = this._offset
+		this.bg_shader._page = this._page
 
 	//	console.log("atdraw button", this.drawcount);
 		if (this.pressed > 0){
-				this.bg._draggercolor = this.activecolor;
+				this.bg_shader._draggercolor = this.activecolor;
 		}
 		else{
 			if (this.hovered > 0){
-				this.bg._draggercolor = this.hovercolor;
+				this.bg_shader._draggercolor = this.hovercolor;
 			}
 			else{
-				this.bg._draggercolor = this.draggercolor;
+				this.bg_shader._draggercolor = this.draggercolor;
 			}
 		}
 	}

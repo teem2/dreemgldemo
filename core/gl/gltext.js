@@ -182,11 +182,13 @@ define.class('$gl/glshader', function(require, exports, self){
 					var hx = (tl_x+tr_x)/2
 
 					// lets debug paint these 2
-					this.debug.length = 0
-					this.debug.add(tl_x, y1, 3, 3, 0.)
-					this.debug.add(tr_x, y2, 3, 3, 1.)				
-					this.debug.add(x, y, 3, 3, 2.)				
-
+					if(this.debug_mesh){
+						this.debug_mesh.length = 0
+						this.debug_mesh.add(tl_x, y1, 3, 3, 0.)
+						this.debug_mesh.add(tr_x, y2, 3, 3, 1.)				
+						this.debug_mesh.add(x, y, 3, 3, 2.)				
+					}
+					
 					if(this.charCodeAt(o-1) == 10 && x< tl_x){
 						return o 
 					}

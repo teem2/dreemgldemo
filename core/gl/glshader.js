@@ -390,7 +390,7 @@ define.class('$base/node', function(require, exports, self){
 	this.alpha = ''
 	this.color = vec4(0,1,0,1)
 
-	this.has_guid = true
+	this.has_guid = false
 
 	this.monitorCompiledProperty = function(name, init){
 		var get = '_' + name
