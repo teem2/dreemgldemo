@@ -1,0 +1,143 @@
+<composition>
+    <screens>
+        <screen name="default">
+            <view width="100%" height="100%" bgcolor="#efefef" clip="true">
+                <class name="ego">
+                    <handler event="oninit">
+                        this.setOriSize(this.width,this.height);
+                        
+                    </handler>
+                    <method name="setOriSize" args="width, height">
+                        this.oriWidth = width;
+                        this.oriHeight = height;
+                        this.set_cornerradius(width/2);
+                    </method>
+                    <method name="doMove" args="x, y, r">
+
+                        var rootView = this.target || this.getRoot();
+                        
+                        
+                        var root = {
+                            x : rootView.x,
+                            y : rootView.y,
+                            w : rootView.width,
+                            h : rootView.height
+                        }
+
+                        var getLength = function(x1,x2,y1,y2){ return Math.sqrt(Math.pow(x1 - x2,2) + Math.pow(y1 - y2,2)) }
+
+                        var lt = getLength(this.x, root.x, this.y, root.y)
+                        var lb = getLength(this.x, root.x, this.y, root.y+root.h)
+                        var rt = getLength(this.x, root.x+root.w, this.y, root.y)
+                        var rb = getLength(this.x, root.x+root.w, this.y, root.y+root.h)
+
+                        var targetRadius = lt;
+                        if(targetRadius < lb)
+                            targetRadius = lb;
+                        if(targetRadius < rt)
+                            targetRadius = rt;
+                        if(targetRadius < rb)
+                            targetRadius = rb;
+
+                        targetRadius += this.width/2
+
+                        var origin = {
+                            radius : this.cornerradius,
+                            width  : this.width,
+                            x : this.x,
+                            y : this.y
+                        }
+
+                        var targetValue = (targetRadius - origin.radius) ;
+                        var targetX = x, targetY = y;
+                        var ego = this;
+
+
+                        ego.animate({duration:300, motion : function(t){
+                            var easingFunc =  function(n){return Math.pow( n - 1, 3 ) + 1}
+
+                            var currValue = targetValue* easingFunc(t);
+
+                            ego.set_cornerradius(currValue + origin.radius);
+
+                            ego.set_width(currValue*2 + origin.width);
+                            ego.set_height(currValue*2 + origin.width);
+
+                            ego.set_x(origin.x-currValue)
+                            ego.set_y(origin.y-currValue)
+                        }}).next(function(){
+                            ego.animate({duration:200})
+                                .next(function(){
+                                    var lt = getLength(targetX, root.x, targetY, root.y)
+                                    var lb = getLength(targetX, root.x, targetY, root.y+root.h)
+                                    var rt = getLength(targetX, root.x+root.w, targetY, root.y)
+                                    var rb = getLength(targetX, root.x+root.w, targetY, root.y+root.h)
+
+                                    var maxLen = lt;
+                                    if(maxLen < lb)
+                                        maxLen = lb;
+                                    if(maxLen < rt)
+                                        maxLen = rt;
+                                    if(maxLen < rb)
+                                        maxLen = rb;
+
+                                    ego.set_width(maxLen*2)
+                                    ego.set_height(maxLen*2)
+                                    ego.set_cornerradius(maxLen)
+
+                                    var targetRadius = r
+
+                                    var easingFunc =  function(n){return Math.pow( n - 1, 3 ) + 1}
+                                    var targetValue = targetRadius - ego.cornerradius;
+
+                                    var currRadius = ego.cornerradius;
+                                    var currWidth = ego.width;
+
+                                    var currX = ego.x;
+                                    var currY = ego.y;
+                                    var mX = targetX - currX - targetRadius
+                                    var mY = targetY - currY - targetRadius
+
+                                    ego.animate({
+                                        duration : 300,
+                                        motion : function(t){
+                                            var currValue = targetValue* easingFunc(t);
+
+                                            ego.set_cornerradius(currValue + currRadius);
+
+                                            ego.set_width(currValue*2 + currWidth);
+                                            ego.set_height(currValue*2 + currWidth);
+
+                                            ego.set_x(currX + mX* easingFunc(t))
+                                            ego.set_y(currY + mY* easingFunc(t))
+                                        }
+                                    })
+                                })
+
+                        })
+
+
+
+                    </method>
+                </class>
+
+
+                <ego name="myego" width="40" height="40" bgcolor="#f53666" x="${this.parent.width/2 - this.width/2}" y="1240">
+                    <handler event="onclick">
+
+                        this.doMove(this.parent.width/2,this.parent.height/2+50 ,40);
+                    </handler>
+                </ego>
+
+                <view width="500" height="500" bgcolor="#fff0f0" clip="true">
+                    <ego name="myego" width="40" height="40" target="${this.parent}" bgcolor="#f536ff" x="${this.parent.width/2 - this.width/2}" y="50">
+                        <handler event="onclick">
+                            this.doMove(this.parent.width/2,this.parent.height/2 ,20);
+                        </handler>
+                    </ego>
+                </view>
+            </view>
+
+        </screen>
+    </screens>
+</composition>
