@@ -88,7 +88,7 @@ define.class(function(sprite,view, require, text){
 	this.render = function(){	
 		var functions = [];
 		var res = [];
-		var R = 	require("$classes/dataset")
+		var R = this.model// 	require("$classes/dataset")
 		var P = new Parser();
 		var proto = R.prototype;
 		

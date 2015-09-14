@@ -385,7 +385,7 @@ define.class(function(require, constructor){
 			
 			setter = function(value){
 				if(this[set_key] !== undefined) value = this[set_key](value)
-				if(typeof value === 'function'){
+				if(typeof value === 'function' && (!value.prototype || Object.getPrototypeOf(value.prototype) === Object.prototype)){
 					if(value.isWired) this.setWiredAttribute(key, value)
 					this[on_key] = value
 					return
@@ -419,7 +419,7 @@ define.class(function(require, constructor){
 		else if(config.type.primitive){
 			setter = function(value){
 				if(this[set_key] !== undefined) value = this[set_key](value)
-				if(typeof value === 'function'){
+				if(typeof value === 'function' && (!value.prototype || Object.getPrototypeOf(value.prototype) === Object.prototype)){
 					if(value.isWired) this.setWiredAttribute(key, value)
 					this[on_key] = value
 					return
@@ -440,7 +440,7 @@ define.class(function(require, constructor){
 		else{
 			setter = function(value){
 				if(this[set_key] !== undefined) value = this[set_key](value)
-				if(typeof value === 'function'){
+				if(typeof value === 'function' && (!value.prototype || Object.getPrototypeOf(value.prototype) === Object.prototype)){
 					if(value.isWired) this.setWiredAttribute(key, value)
 					this[on_key] = value
 					return
