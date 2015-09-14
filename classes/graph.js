@@ -7,6 +7,12 @@ define.class('$renderer/sprite_$rendermode', function(require){
 	this.attribute("linewidth", {type: float, value: 5});
 	this.attribute("linecolor", {type: vec4, value: vec4(1,1,0,1)});
 
+	this.vertexstruct = define.struct({
+		pos:vec2,
+		norm:vec2,
+		side: float,
+	})
+
 	this.bg = {
 		draw_type:'TRIANGLE_STRIP',
 		time: 0,
@@ -21,7 +27,8 @@ define.class('$renderer/sprite_$rendermode', function(require){
 			var ry = (mesh.pos.y * height) + ( mesh.norm.y * mesh.side*linewidth);
 			
 			return vec4(rx,ry, 0, 1) * matrix
-		}
+		},
+		mesh:this.vertexstruct.array()
 	}
 
 	this.atDraw = function(){
@@ -30,14 +37,6 @@ define.class('$renderer/sprite_$rendermode', function(require){
 		this.bg_shader.linecolor = this.linecolor;
 	}
 	
-	this.vertexstruct = define.struct({
-		pos:vec2,
-		norm:vec2,
-		side: float,
-	})
-	
-	this.bg_shader.mesh = this.vertexstruct.array();
-
 	this.init = function(){
 		this.time_start = Date.now()
 		this.bg_shader.mesh = this.vertexstruct.array();
