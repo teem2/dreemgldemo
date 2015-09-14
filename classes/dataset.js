@@ -67,7 +67,7 @@ define.class(function(require, node){
 				return lookup.apply(null, node.data);
 			}
 			else{
-				for(key in node){
+				for(var key in node){
 					node[key] = recursiveCleanup(node[key]);
 				}				
 			}
