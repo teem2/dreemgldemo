@@ -31,8 +31,8 @@ define.class(function(sprite,view, require, text){
 		}
 	});
 		
-	function testfunc(name){
-		return {name:name, bodytext:"Tadaa, dit is een ding\nyeeeey \n\nHurrah!", params:[{name:"param1", type: "Object"}, {name:"param2", type: "var"}]}
+	function funcstruct(name, params){
+		return {name:name, bodytext:"Tadaa, dit is een ding\nyeeeey \n\nHurrah!", params:params}
 	}
 	
 	this.render = function(){	
@@ -40,18 +40,40 @@ define.class(function(sprite,view, require, text){
 		var res = [];
 		var R = 	require("$classes/dataset")
 		var P = new Parser();
-		
-		for (a in R.prototype)
-		{
-			var proto = R.prototype[a];
-			if(typeof(proto) === "function")
-			{
-				console.log(P.parse(proto.toString()));
-				functions.push(testfunc(a));
-			}else{
-				console.log(R.prototype[a]);
-			}
-		}
+		var proto = R.prototype;
+		//console.log( );
+		console.log(P.parse(R.module.factory.body.toString()));
+		while(proto){
+			var keys = Object.keys(proto);
+			for(i in keys){
+				var key = keys[i];
+				if (proto.__lookupSetter__(key)){
+					continue;
+				}
+				
+				if (proto.__lookupGetter__(key)){
+					continue;
+				}
+				
+				var prop = proto[key];
+				
+				if (typeof(prop) === "function"){
+					var params = [];
+					var ast = P.parse(prop.toString());
+					//console.log(prop.toString());
+					for (param in ast.steps[0].params)
+					{
+						var p = ast.steps[0].params[param];
+						params.push({name:p.id.name});
+					}
+					//console.log(params);
+					functions.push(funcstruct(key, params));
+				}else{
+					
+				}
+			 }
+			 proto = Object.getPrototypeOf(proto);
+		 }
 		
 		console.log(R.prototype);
 		
