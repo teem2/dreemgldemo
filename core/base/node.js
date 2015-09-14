@@ -133,7 +133,7 @@ define.class(function(require, constructor){
 		for(var i = 0; i < this.children.length; i ++){
 			var child = this.children[i]
 			if(child === ignore) continue
-			if(child.name === name){
+			if(child.name === name || child.name === undefined && child.constructor.name === name){
 				return child
 			}
 		}
