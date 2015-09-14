@@ -297,6 +297,25 @@
 
 	define.EnvironmentStub = function(dep){ this.dep = dep }
 
+	define.example =
+	define.renderExample = function(pthis, example){
+		if(!pthis.constructor.examples) pthis.constructor.examples = []
+		example.type = 'render'
+		pthis.constructor.examples.push(example)
+	}
+
+	define.consoleExample = function(pthis, example){
+		if(!pthis.constructor.examples) pthis.constructor.examples = []
+		example.type = 'console'
+		pthis.constructor.examples.push(example)
+	}
+
+	define.compositionExample = function(pthis, example){
+		if(!pthis.constructor.examples) pthis.constructor.examples = []
+		example.type = 'composition'
+		pthis.constructor.examples.push(example)
+	}
+
 	define.makeClass = function(baseclass, body, require, module, nested_module){
 
 		/*var stubbed
