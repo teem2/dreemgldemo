@@ -21,7 +21,6 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 		var cb = (type == 'input') ? inputsdict[name] : outputsdict[name];
 
 		if(cb && cb.indicate_circle) {
-			console.log(cb.indicate_circle.bgcolor)
 			cb.indicate_circle.bgcolor = (isOn) ? cb.bg.basecolor : 'transparent';
 		}
 	}

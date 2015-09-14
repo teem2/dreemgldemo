@@ -57,7 +57,43 @@ define.class(function(require, cadgrid, blokje, connection){
 
 		if(this.connectionstart && this.connectionstart.bkje)
 		{
+			for(var i in this.connections)
+			{
+				var this_ = this.connections[i];
+				if((this_.from === bkje) && (this_.fromattr == output)){
+					this.dataset.fork(function(data){
+
+
+						for(var a in data.connections){
+							var con = data.connections[a];
+							if (con.from.node == this.from.data.name &&
+								con.to.node == this.to.data.name &&
+								con.to.input == this.toattr &&
+								con.from.output == this.fromattr)
+							{
+								data.connections.splice(a, 1);
+								if (this.from && this.from.reloadIFrame) {
+									this.from.reloadIFrame();
+								}
+								if (this.to && this.to.reloadIFrame) {
+									this.to.reloadIFrame();
+								}
+								return;
+							}
+						}
+
+					}.bind(this_))
+				}
+
+			}
+
 			this.connectionstart.bkje.setConnectorState('output',this.connectionstart.output,false);
+
+
+			if( (this.connectionstart.bkje === bkje) && (this.connectionstart.output == output)){
+				this.connectionstart = undefined;
+				return;
+			}
 		}
 
 		this.connectionstart = {screen: blok, output: output, bkje: bkje, value:value}
@@ -67,7 +103,47 @@ define.class(function(require, cadgrid, blokje, connection){
 	}
 
 	this.setConnectionEnd = function(blok, input, bkje, value){
+		if(this.connectionend && this.connectionend.bkje)
+		{
+			for(var i in this.connections)
+			{
+				var this_ = this.connections[i];
+				if((this_.to === bkje) && (this_.toattr == input)){
+					this.dataset.fork(function(data){
+
+
+						for(var a in data.connections){
+							var con = data.connections[a];
+							if (con.from.node == this.from.data.name &&
+								con.to.node == this.to.data.name &&
+								con.to.input == this.toattr &&
+								con.from.output == this.fromattr)
+							{
+								data.connections.splice(a, 1);
+								if (this.from && this.from.reloadIFrame) {
+									this.from.reloadIFrame();
+								}
+								if (this.to && this.to.reloadIFrame) {
+									this.to.reloadIFrame();
+								}
+								return;
+							}
+						}
+
+					}.bind(this_))
+				}
+
+			}
+
+			this.connectionend.bkje.setConnectorState('input',this.connectionend.input,false);
+			if((this.connectionend.bkje === bkje) && (this.connectionend.input == input)){
+				this.connectionend = undefined;
+				return;
+			}
+		}
+
 		this.connectionend = {screen: blok, input: input, bkje: bkje, value:value}
+		this.connectionend.bkje.setConnectorState('input',this.connectionend.input,true);
 		this.tryToBuildConnection()
 	}
 	
@@ -90,7 +166,7 @@ define.class(function(require, cadgrid, blokje, connection){
 		var all = [];			
 		var connecties = {};
 		var i = 0;
-		console.log('check');
+
 		for(var a in this.dataset.data.screens){
 			var d = this.dataset.data.screens[a]
 			this.blokjes[d.name] = blokje({dataset:this.dataset, blokid:a, dblclick:function(){
@@ -118,6 +194,7 @@ define.class(function(require, cadgrid, blokje, connection){
 
 
 				var newcon = connection({from: b1, fromattr: c.from.output, to: b2, toattr: c.to.input, dataset: this.dataset})
+
 				this.connections.push(newcon)
 				all.push(newcon)
 			}
