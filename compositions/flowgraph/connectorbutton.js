@@ -67,11 +67,14 @@ define.class(function(view, icon, text){
 			this.cornerradius = vec4(12,12,0,0)
 
 
+			//shin --start--
+			this.indicate_circle = view({ bgcolor: "transparent", cornerradius: 8.6,borderwidth: 3,bordercolor: this.basecolor ,width:16, height:16, margin: vec4(3,5,0,3)});
 			return [
-				view({ bgcolor: "transparent", cornerradius: 8.6,borderwidth: 3,bordercolor: this.basecolor ,width:16, height:16, margin: vec4(3,5,0,3)})
+				this.indicate_circle
 				,icon({marginleft:4,margintop:2,icon: this.icon, fontsize: 12})
 				,text({text:this.title,margin:vec4(4,0,0,0),fontsize: 14, bgcolor:"transparent", fgcolor:"#404040"})
 			]
+			//shin --end--
 		}
 		else{
 			this.bg.bgcolorfn = function(a,b){
@@ -83,12 +86,15 @@ define.class(function(view, icon, text){
 
 			this.justifycontent = "flex-end"
 			this.cornerradius = vec4(0,0,12,12);
-	
+
+			//shin --start--
+			this.indicate_circle = view({ bgcolor: "transparent", cornerradius: 8.6,borderwidth: 3,bordercolor: this.basecolor ,width:16, height:16, margin: vec4(3,5,0,3)});
 			return [
 				icon({icon: this.icon, fontsize: 14})
 				,text({text:this.title, margin: vec4(4,0,0,0), fontsize: 14, bgcolor:"transparent", fgcolor:"#404040"})
-				,view({ bgcolor: "transparent", cornerradius: 8,borderwidth: 3,bordercolor: this.basecolor ,width:16, height:16, margin: vec4(3,5,0,3)})
-							]
+				,this.indicate_circle
+			]
+			//shin --end--
 		}
 	}
 })

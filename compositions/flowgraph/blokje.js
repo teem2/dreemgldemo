@@ -12,7 +12,21 @@ define.class(function(view, connectorbutton, icon, text, edit, button){
 		if (newsel !== this._selected)
 		this.selected = newsel;
 	}
-	
+
+	//shin --start--
+	this.setConnectorState = function(type,name,isOn){
+		var inputsdict = this.inputsdict || [];
+		var outputsdict = this.outputsdict || [];
+
+		var cb = (type == 'input') ? inputsdict[name] : outputsdict[name];
+
+		if(cb && cb.indicate_circle) {
+			console.log(cb.indicate_circle.bgcolor)
+			cb.indicate_circle.bgcolor = (isOn) ? cb.bg.basecolor : 'transparent';
+		}
+	}
+	//shin --end--
+
 	this.attribute("data", {type: Object});
 	
 	this.mouseleftdown = function(){
