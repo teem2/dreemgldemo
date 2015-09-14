@@ -1,5 +1,5 @@
 //Pure JS based composition
-define.class(function(teem, fileio, screens, screen, dataset, splitcontainer, treeview, view, text){
+define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitcontainer, treeview, view, text, require){
 
 	this.render = function(){ 
 		return [
@@ -20,7 +20,7 @@ define.class(function(teem, fileio, screens, screen, dataset, splitcontainer, tr
 					,treeview({
 						name:'filetree', flex:0.5, w:100
 					})
-					,view({flex:1})
+					,view({flex:1}, docviewer({model: require("$classes/dataset") }))
 				)
 			)
 		)
