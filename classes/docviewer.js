@@ -105,11 +105,11 @@ define.class(function(sprite,view, require, text){
 		
 		try{
 			var totalAST = P.parse(R.module.factory.body.toString());
-			console.log(totalAST);
+			//console.log(totalAST);
 				
 			var ClassBody = totalAST.steps[0];
 			
-			console.log(ClassBody);
+			//console.log(ClassBody);
 			
 			var ClassComment = ClassBody.body.steps[0].cmu;
 			var last1 = false;
@@ -166,7 +166,7 @@ define.class(function(sprite,view, require, text){
 					
 						
 						ClassDoc.Methods.push(method);						
-						console.log(method);
+						//console.log(method);
 					}
 				}
 			}			

@@ -19,11 +19,17 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 				}},
 				splitcontainer({vertical:false, position: "relative",   flexdirection: "row", bgcolor: "black", alignitems:"stretch", alignself: "stretch" , flex:1}
 					,treeview({
-						name:'filetree', flex:0.5, w:100
+						name:'filetree', flex:0.5, w:100, selectclick:function(node){
+							// lets load that thing up 
+							require.async('$classes/' + node.name).then(function(module){
+								//console.log(this.find('docviewer'))
+								this.find('docviewer').model = module
+							}.bind(this))
+						}
 					})
 					,view({flex:1},
 						scrollcontainer({},
-							docviewer({model: require('$classes/dataset')})
+							docviewer({name:'docviewer', model: require('$classes/dataset')})
 						)
 					)
 				)

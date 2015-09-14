@@ -27,6 +27,8 @@ define.class(function(module, sprite, text, view, button, icon){
 	this.attribute("dataset", {type: Object, value:{}});
 	this.attribute("selected", {type: String, value:""});
 
+	this.event('selectclick')
+
 	// define a nested class
 	define.class(this, 'foldbutton', function(button){
 		this.borderwidth = 0
@@ -67,11 +69,13 @@ define.class(function(module, sprite, text, view, button, icon){
 		this.flex = undefined;
 		this.alignself = "flex-start"
 		
+
+
 		this.render = function(){
 			return [
 				this.haschildren?this.classroot.foldbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2,width:14,height:16,click: this.toggleclick}):[], 
 				//flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}),
-				this.classroot.foldbutton({text: this.text})
+				this.classroot.foldbutton({text: this.text, click:this.selectclick.bind(this)})
 			];
 		}
 	});
@@ -165,7 +169,7 @@ define.class(function(module, sprite, text, view, button, icon){
 		};
 		
 		this.selectclick = function(){
-			console.log("hmm");
+			this.classroot.emit('selectclick', this.item)
 		}
 		
 		this.bgcolor = vec4("transparent");
