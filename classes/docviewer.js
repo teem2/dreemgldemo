@@ -136,6 +136,7 @@ define.class(function(sprite,view, require, text){
 			{				
 				var step = class_body.body.steps[a];
 				var stepleft = step.left;
+				console.log(step.left, step.right);
 				if (stepleft)	{
 					if (stepleft.type==="Key" && stepleft.object.type ==="This"){ 
 						var method = {name:stepleft.key.name, params:[]};
