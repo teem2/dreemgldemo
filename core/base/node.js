@@ -351,6 +351,9 @@ define.class(function(require, constructor){
 	}
 
 	this.attribute = function(key, config){
+		if(!this.hasOwnProperty('_attributes')){
+			this._attributes = this._attributes?Object.create(this._attributes):{}
+		}
 		// lets create an attribute
 		var value_key = '_' + key
 		var on_key = 'on' + key
@@ -365,6 +368,7 @@ define.class(function(require, constructor){
 			for(var prop in config){
 				obj[prop] = config[prop]
 			}
+			this._attributes[key] = this[config_key]
 			return
 		}
 
@@ -373,7 +377,7 @@ define.class(function(require, constructor){
 			if(typeof init_value === 'function') this[init_value.isWired? wiredfn_key: on_key] = init_value
 			else this[value_key] = config.type(init_value)
 		}
-		this[config_key] = config
+		this._attributes[key] = this[config_key] = config
 		
 		if(config.wired) this[wiredfn_key] = config.wired
 
