@@ -8,22 +8,31 @@ define.class(function(sprite,  view, scrollbar){
 	this.flexwrap = "none" ;
 	this.alignitems = "stretch";
 	this.flex = 1;
+
 	this.attribute("scrollbarwidth", {type: int, value: 16});
+	this.attribute("has_hscroll", {type: boolean, value: true});
+	this.attribute("has_vscroll", {type: boolean, value: true});
 	
 	this.updatescrollbars = function(view){
 		var rect = view.getUnclippedBoundingRect()
-
-		if(view.layout.height > rect.bottom){
-			this.vscroll.page = 1
+		if(this.vscroll){
+			if(view.layout.height > rect.bottom){
+				this.vscroll.page = 1
+			}
+			else{
+				this.vscroll.page = view.layout.height / rect.bottom
+				this.scaled_height = (rect.bottom - view.layout.height) / (1 - this.vscroll.page)
+			}
 		}
-		else{
-			// offset (0.. 1-pagesize)
-			// pagesize (0-1)
-			this.vscroll.page = view.layout.height / rect.bottom
-			this.computed_height = (rect.bottom - view.layout.height) / (1 - this.vscroll.page)
+		if(this.hscroll){
+			if(view.layout.width > rect.right){
+				this.hscroll.page = 1
+			}
+			else{
+				this.hscroll.page = view.layout.width / rect.right
+				this.scaled_width = (rect.right - view.layout.width) / (1 - this.hscroll.page)
+			}
 		}
-
-		//console.log("SCROLLBARH")
 	}
 
 	this.render = function(){		
@@ -41,14 +50,16 @@ define.class(function(sprite,  view, scrollbar){
 						)
 					)
 				),
-				this.vscroll = scrollbar({width:this.scrollbarwidth, offset:function(){
-					pthis.move_view.y = this.offset * pthis.computed_height * -1
+				this.has_vscroll && (this.vscroll = scrollbar({width:this.scrollbarwidth, offset:function(){
+					pthis.move_view.y = this.offset * pthis.scaled_height * -1
 					//console.log(this.offset)
-				}})	
+				}}))	
 			),
 			view({flexdirection :"row" },
 				view({width:this.scrollbarwidth}),
-				this.hscroll = scrollbar({vertical:false, height:this.scrollbarwidth, flex:1,})
+				this.has_hscroll &&	(this.hscroll = scrollbar({vertical:false, height:this.scrollbarwidth, flex:1, offset:function(){
+					pthis.move_view.x = this.offset * pthis.scaled_width * -1
+				}}))
 			)
 		]
 	}

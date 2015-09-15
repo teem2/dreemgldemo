@@ -39,7 +39,7 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 						})
 					)
 					,view({flex:1},
-						scrollcontainer({}
+						scrollcontainer({has_hscroll:false}
 							//,view({w:1000, h:1000, bgcolor:'red'})
 							//,text({text:'HELLO',fgcolor:'red',fontsize:1000})
 							,docviewer({model: require('$classes/docviewer')})
