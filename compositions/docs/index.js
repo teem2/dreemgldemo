@@ -32,7 +32,7 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 					)
 					,view({flex:1},
 						scrollcontainer({},
-							docviewer({name:'docviewer', model: require('$classes/dataset')})
+							docviewer({name:'docviewer', model: require('$classes/treeview')})
 						)
 					)
 				)
