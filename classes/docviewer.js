@@ -80,7 +80,7 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 						}
 					}
 				}
-				console.log(this.func);
+				
 				var title = text({margin:vec4(2),text: this.item.name, fontsize: 20, fgcolor: "black"})
 				//res.push();
 				
@@ -157,7 +157,6 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 	// Build a documentation structure for a given constructor function
 	function BuildDoc(constructor){
 		var proto = constructor.prototype;
-		console.log(proto.constructor.name);
 		var class_doc = BlankDoc();
 		class_doc.class_name = proto.constructor.name;
 		//try{
@@ -168,7 +167,6 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 				
 			var class_body = total_ast.steps[0];
 			
-			//console.log(ClassBody);
 			var stepzero = class_body.body.steps[0];
 			if (!stepzero) return class_doc;
 			
@@ -201,21 +199,17 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 						if (step.fn.key.name === "attribute"){
 							var attrname = step.args[0].value;
 							var attr = proto._attributes[attrname];
-							console.log(attrname,attr );
 							
 							var defvaluename = undefined;
 							if (attr.value){	
-							console.log(typeof(attr.value));
 								if (typeof(attr.value ) === "Function"){
-										console.log(" function1!!");
+									console.log(attr.value.name);
 								}
 								else{
-									console.log(attr.value);
 									defvaluename = attr.value;
 								}
 }
 							var attrdoc = {name: attrname, type:attr.type.name.toString(), defvalue: defvaluename, body_text: WalkCommentUp(step.cmu)}
-							console.log(attrdoc);
 							class_doc.attributes.push(attrdoc)
 							
 						} else if (step.fn.key.name === "event"){							
