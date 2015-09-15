@@ -366,7 +366,10 @@ define.class('./sprite_base', function(require, exports){
 			}.bind(this))
 		}
 
-		if (this.hasListeners('click') || this.hasListeners('mouseleftdown') || this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| this.hasListeners('mouseup') || this.hasListeners('mousemove') ||this.hasListeners('scroll')){
+		if (this.hasListeners('click') || this.hasListeners('mouseleftdown') || 
+			this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| 
+			this.hasListeners('mouseup') || this.hasListeners('mousemove') ||
+			this.hasListeners('mousewheelx') || this.hasListeners('mousewheely')){
 			this.has_mouse_interaction = true
 		}
 		else{

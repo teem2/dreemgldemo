@@ -17,7 +17,9 @@ define.class('$base/node', function (require, exports, self){
 	this.attribute('leftup', {type:int})
 	this.attribute('rightdown', {type:int})
 	this.attribute('rightup', {type:int})
-	
+	this.attribute('wheelx', {type:int})
+	this.attribute('wheely', {type:int})
+
 	this.ratio = 0
 	
 	this.activedown = 0;
@@ -44,6 +46,11 @@ define.class('$base/node', function (require, exports, self){
 
 		window.addEventListener('dblclick', function(e){
 			this.dblclick = 1
+		}.bind(this))
+
+		window.addEventListener('wheel', function(e){
+			if(e.deltaX !== 0) this.wheelx = e.deltaX
+			if(e.deltaY !== 0) this.wheely = e.deltaY
 		}.bind(this))
 
 		var click_count = 0

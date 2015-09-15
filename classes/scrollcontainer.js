@@ -13,6 +13,23 @@ define.class(function(sprite,  view, scrollbar){
 	this.attribute("has_hscroll", {type: boolean, value: true});
 	this.attribute("has_vscroll", {type: boolean, value: true});
 	this.attribute("move_view_bgcolor", {type: vec4, value: vec4("white")});
+	
+	this.mousewheelx = function(){
+		if(this.hscroll && this.mouse_height){
+			var off = this.hscroll.offset
+			off = clamp(off + value / this.mouse_width, 0, 1 - this.hscroll.page)
+			if(off !== this.hscroll.offset) this.hscroll.offset = off
+		}
+	}
+
+	this.mousewheely = function(value){
+		if(this.vscroll && this.mouse_height){
+			var off = this.vscroll.offset
+			off = clamp(off + value / this.mouse_height, 0, 1 - this.vscroll.page)
+			if(off !== this.vscroll.offset) this.vscroll.offset = off
+		}
+	}
+
 	this.updatescrollbars = function(view){
 		var rect = view.getUnclippedBoundingRect()
 		if(this.vscroll){
@@ -22,6 +39,7 @@ define.class(function(sprite,  view, scrollbar){
 			else{
 				this.vscroll.page = view.layout.height / rect.bottom
 				this.scaled_height = (rect.bottom - view.layout.height) / (1 - this.vscroll.page)
+				this.mouse_height = rect.bottom
 			}
 		}
 		if(this.hscroll){
@@ -31,6 +49,7 @@ define.class(function(sprite,  view, scrollbar){
 			else{
 				this.hscroll.page = view.layout.width / rect.right
 				this.scaled_width = (rect.right - view.layout.width) / (1 - this.hscroll.page)
+				this.mouse_width = rect.bottom
 			}
 		}
 	}

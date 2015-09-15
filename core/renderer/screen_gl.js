@@ -878,7 +878,7 @@ this.draw_calls = 0
 			}
 			var overnode = this.guidmap[this.lastmouseguid]
 			// lets give this thing focus
-			if (overnode && overnode.emit){
+			if (overnode){
 				if(this.inModalChain(overnode)){
 					this.setFocus(overnode)
 					overnode.emit('mouseleftdown', this.remapMouse(overnode))
@@ -894,7 +894,7 @@ this.draw_calls = 0
 			this.mousecapturecount--;
 			var overnode = this.guidmap[this.lastmouseguid]
 
-			if (this.inModalChain(overnode) && overnode && overnode.emit) overnode.emit('mouseleftup')
+			if (overnode && this.inModalChain(overnode)) overnode.emit('mouseleftup')
 			if (this.mousecapturecount === 0) {
 				this.mousecapture = false;
 				this.setguid(this.lastidundermouse);
@@ -917,7 +917,31 @@ this.draw_calls = 0
 			this.dblclick();
 		}.bind(this)
 
+		this.mouse.wheelx = function(){
+			var overnode = this.guidmap[this.lastmouseguid]
+			if(overnode && this.inModalChain(overnode)){
+				while(overnode){
+					if(overnode.hasListeners('mousewheelx')){
+						overnode.emit('mousewheelx', this.mouse.wheelx)
+						break
+					}
+					overnode = overnode.parent
+				}
+			}
+		}.bind(this)
 
+		this.mouse.wheely = function(){
+			var overnode = this.guidmap[this.lastmouseguid]
+			if(overnode && this.inModalChain(overnode)){
+				while(overnode){
+					if(overnode.hasListeners('mousewheely')){
+						overnode.emit('mousewheely', this.mouse.wheely)
+						break
+					}
+					overnode = overnode.parent
+				}
+			}
+		}.bind(this)
 
 		this.device.atResize = function(){
 			this.layoutRequested = true;
