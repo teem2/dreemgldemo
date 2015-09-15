@@ -3,7 +3,7 @@
 
 
 define.class(function(sprite,view){
-// *** CADGrid
+
 // The CADGrid class provides a simple way to fill a frame with a classic engineering grid. 
 // todo:
 // - support zooming with incremental subdivision lines
@@ -13,6 +13,7 @@ define.class(function(sprite,view){
 	this.flexdirection = "column"
 	this.alignitem = "stretch"
 	this.alignself = "stretch"
+
 	this.bgcolor = vec4("#d0d0d0")
 
 	// CADGrid shader - used various floored modulo functions to find out if either a major or minor gridline is being touched.

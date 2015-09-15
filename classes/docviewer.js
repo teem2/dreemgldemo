@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite,view, require, text,foldcontainer){
+define.class(function(sprite,view, require, text,foldcontainer,icon){
 	
 	this.bgcolor = vec4("#f0f0f0" );	
 	this.attribute("model", {type:Object})
@@ -13,14 +13,16 @@ define.class(function(sprite,view, require, text,foldcontainer){
 	
 	// A single documentation block with name and bodytext.
 	define.class(this, 'ClassDocItem', function(view, text){
-		
-		this.attribute("func", {type: Object});
+		// the item to display. 
+		// An "attribute" item can have name, body_text, defvalue and type properties.
+		// A "function" item can have name, params and body_text properties.
+		this.attribute("item", {type: Object});
 		this.bgcolor = vec4("#ffffff");
 		this.margin = 4;
 		this.padding = 4;
 		this.flexdirection = "column" ;
 		this.flexwrap = "none"
-		// the type of this display block. Accepted values: function, attribute
+		// the type of this display block. Accepted values: "function", "attribute"
 		this.attribute("blocktype", {type:String, value:"function"});
 		this.render = function()
 		{	
@@ -30,32 +32,32 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			if (this.blocktype === "function")
 			{
 				var functionsig = "()"
-				if (this.func.params && this.func.params.length > 0) { 
-					functionsig = "(" + this.func.params.map(function(a){return a.name}).join(", ") + ")";
+				if (this.item.params && this.item.params.length > 0) { 
+					functionsig = "(" + this.item.params.map(function(a){return a.name}).join(", ") + ")";
 				}
-				res.push(text({margin:vec4(2),text: this.func.name + functionsig , fontsize: 20, fgcolor: "black"}));
+				res.push(text({margin:vec4(2),text: this.item.name + functionsig , fontsize: 20, fgcolor: "black"}));
 			}
 			else{
 				
 				var sub = [];
-				if (this.func.type)
+				if (this.item.type)
 				{
 					sub.push(
-						text({margin:vec4(2),text: "type: "+ this.func.type, fontsize: 15, fgcolor: "#404040"}));
+						text({margin:vec4(2),text: "type: "+ this.item.type, fontsize: 15, fgcolor: "#404040"}));
 				}
-				if (this.func.defvalue !== undefined)
+				if (this.item.defvalue !== undefined)
 				{
 					
-					if (this.func.type === "vec4")
+					if (this.item.type === "vec4")
 					{
-						console.log(this.func.defvalue);
-						var labeltext = (Math.round(this.func.defvalue[0]*100)/100) + ", " + 
-						(Math.round(this.func.defvalue[1]*100)/100) + ", " + 
-						(Math.round(this.func.defvalue[2]*100)/100) + ", " + 
-						(Math.round(this.func.defvalue[3]*100)/100) ;
+						console.log(this.item.defvalue);
+						var labeltext = (Math.round(this.item.defvalue[0]*100)/100) + ", " + 
+						(Math.round(this.item.defvalue[1]*100)/100) + ", " + 
+						(Math.round(this.item.defvalue[2]*100)/100) + ", " + 
+						(Math.round(this.item.defvalue[3]*100)/100) ;
 						
-						var zwartdiff = this.func.defvalue[0] + this.func.defvalue[1] + this.func.defvalue[2];
-						var witdiff = (1-this.func.defvalue[0]) + (1-this.func.defvalue[1]) + (1-this.func.defvalue[2]);
+						var zwartdiff = this.item.defvalue[0] + this.item.defvalue[1] + this.item.defvalue[2];
+						var witdiff = (1-this.item.defvalue[0]) + (1-this.item.defvalue[1]) + (1-this.item.defvalue[2]);
 						var color = "black";
 						if (witdiff > zwartdiff) color = "white";
 						
@@ -63,39 +65,39 @@ define.class(function(sprite,view, require, text,foldcontainer){
 							view({},
 								[
 									text({margin:vec4(2),text: "default:", fontsize: 15, fgcolor: "#404040"}),
-									view({bordercolor: "#808080", borderwidth: 1, cornerradius:4, bgcolor: this.func.defvalue, padding: vec4(8,3,8,3)},
+									view({bordercolor: "#808080", borderwidth: 1, cornerradius:4, bgcolor: this.item.defvalue, padding: vec4(8,3,8,3)},
 										text({fgcolor: color , bgcolor:"transparent" , text:labeltext})
 									)
 								]
 							));
 					}
 					else{
-						if (this.func.type === "String"){
-							sub.push(text({margin:vec4(2),text: "default: \""+ this.func.defvalue.toString() + "\"" , fontsize: 15, fgcolor: "#404040"}))
+						if (this.item.type === "String"){
+							sub.push(text({margin:vec4(2),text: "default: \""+ this.item.defvalue.toString() + "\"" , fontsize: 15, fgcolor: "#404040"}))
 						}
 						else
 						{
-							sub.push(text({margin:vec4(2),text: "default: "+ this.func.defvalue.toString(), fontsize: 15, fgcolor: "#404040"}))
+							sub.push(text({margin:vec4(2),text: "default: "+ this.item.defvalue.toString(), fontsize: 15, fgcolor: "#404040"}))
 						}
 					}
 				}
 				console.log(this.func);
-				var title = text({margin:vec4(2),text: this.func.name, fontsize: 20, fgcolor: "black"})
+				var title = text({margin:vec4(2),text: this.item.name, fontsize: 20, fgcolor: "black"})
 				//res.push();
 				
 				res.push(view({flex: 1},[title,view({flex: 1, flexdirection:"column", alignitems:"flex-end" },sub)]));
 			}
 			
-			if (this.func.body_text){
-				for(var t in this.func.body_text){
-					res.push(text({text: this.func.body_text[t], fgcolor: "gray", fontsize: 14, margin: vec4(10)}));
+			if (this.item.body_text){
+				for(var t in this.item.body_text){
+					res.push(text({text: this.item.body_text[t], fgcolor: "gray", fontsize: 14, margin: vec4(10,0,10,5)}));
 				}
 			}
 			
-			if (this.func.params && this.func.params.length > 0){
+			if (this.item.params && this.item.params.length > 0){
 				res.push(text({ fgcolor:"#5050dd", margin:vec4(2,0,4,4), text:"parameters:" }));
-				for (var a in this.func.params){	
-					var parm = this.func.params[a];
+				for (var a in this.item.params){	
+					var parm = this.item.params[a];
 					var left = text({ fgcolor:"black", margin:vec4(10,0,4,4), text:parm.name});
 					var right;
 					
@@ -307,7 +309,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 		var class_doc = this.class_doc;
 		
 		if (!this.collapsible ){
-			body.push(text({width: 500, text:class_doc.class_name,fontsize: 30,margin: vec4(10,10,0,20), fgcolor: "black" }));
+			body.push(view({},[icon({fontsize: 30, icon:"cube", fgcolor: "black" }),text({width: 500, text:class_doc.class_name,fontsize: 30,margin: vec4(10,10,0,20), fgcolor: "black" })]));
 		}
 		if (class_doc.body_text.length > 0)
 		{
@@ -322,20 +324,20 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			var attributes = []
 
 			for (var a in class_doc.attributes){
-				attributes.push(this.classroot.ClassDocItem({blocktype:"attribute", func: class_doc.attributes[a]}))
+				attributes.push(this.classroot.ClassDocItem({blocktype:"attribute", item: class_doc.attributes[a]}))
 				attributes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
 			}
-			res.push(foldcontainer({collapsed:false, basecolor:"#f0f0c0", icon:"table", title:"Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, attributes)));
+			res.push(foldcontainer({collapsed:false, basecolor:"#f0f0c0", icon:"gears", title:"Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, attributes)));
 		}
 		
 		if(class_doc.state_attributes.length >0){
 			var state_attributes = []
 
 			for (var a in class_doc.state_attributes){
-				state_attributes.push(this.classroot.ClassDocItem({blocktype:"attribute",func: class_doc.state_attributes[a]}))
+				state_attributes.push(this.classroot.ClassDocItem({blocktype:"attribute",item: class_doc.state_attributes[a]}))
 				state_attributes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
 			}
-			res.push(foldcontainer({collapsed:true, basecolor:"#f0c0c0", icon:"table", title:"State Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, state_attributes)));
+			res.push(foldcontainer({collapsed:true, basecolor:"#f0c0c0", icon:"archive", title:"State Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, state_attributes)));
 		}
 		
 		if (class_doc.inner_classes.length > 0){
@@ -343,9 +345,9 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			//console.log(class_doc.methods);
 			for (var a in class_doc.inner_classes){
 				classes.push(this.classroot.ClassDocView({collapsible:true, class_doc: class_doc.inner_classes[a]}))
-				classes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
+				classes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,0,0,0)}));
 			}
-			res.push(foldcontainer({collapsed:true,  basecolor:"#c0f0c0", icon:"table", title:"Inner classes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, classes)));
+			res.push(foldcontainer({collapsed:true,  basecolor:"#c0f0c0", icon:"cubes", title:"Inner classes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, classes)));
 		}
 	
 	
@@ -353,15 +355,15 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			var methods = []
 			//console.log(class_doc.methods);
 			for (var a in class_doc.methods){
-				methods.push(this.classroot.ClassDocItem({blocktype:"function",func: class_doc.methods[a]}))
+				methods.push(this.classroot.ClassDocItem({blocktype:"function",item: class_doc.methods[a]}))
 				
 			}
-			res.push(foldcontainer({collapsed:true,  basecolor:"#c0c0f0", icon:"table", title:"Methods" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, methods)));
+			res.push(foldcontainer({collapsed:true,  basecolor:"#c0c0f0", icon:"paw", title:"Methods" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, methods)));
 		}
 		
 		if (this.collapsible){
 			
-			return foldcontainer({basecolor:"#c0f0c0",collapsed:true,icon:"flask", title:class_doc.class_name},view({flexdirection:"column", flex:1},res));
+			return foldcontainer({basecolor:"#c0f0c0",collapsed:true,icon:"cube", title:class_doc.class_name},view({flexdirection:"column", flex:1},res));
 		}
 		
 		return res;
