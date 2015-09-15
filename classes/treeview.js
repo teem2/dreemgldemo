@@ -143,6 +143,7 @@ define.class(function(module, sprite, text, view, button, icon){
 		}
 	})
 	
+	// the treeitem subclass contains 3 controls: a newitemheading, a set of treelines and an optional set of children treeitems in case the current node is expanded
 	define.class(this, 'treeitem', function(view){
 		this.flex = 1.0;	
 		
@@ -208,6 +209,7 @@ define.class(function(module, sprite, text, view, button, icon){
 		}
 	})
 	
+	// subclass to render the gridlines of the tree
 	define.class(this, 'treeline', function(view){
 		this.bg = {
 			fgcolor: vec4(0.5, 0.5, 0.5, 1.),
@@ -248,6 +250,7 @@ define.class(function(module, sprite, text, view, button, icon){
 
 	this.alignself="stretch" ;
 
+	// the renderfunction for the treeview recursively expands using treeitem subclasses.
 	this.render = function(){
 		var data;
 		if (this.buildtree) data = this.buildtree(this.dataset.data)
