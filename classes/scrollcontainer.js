@@ -10,6 +10,7 @@ define.class(function(sprite,  view, scrollbar){
 	
 	this.updatescrollbars = function(view){
 		//console.log(view.layout.width, view.layout.height);	
+		console.log("SCROLLBARH")
 	}	
 	
 	this.render = function(){		

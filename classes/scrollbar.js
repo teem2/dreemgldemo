@@ -19,7 +19,7 @@ define.class(function(sprite, text, view){
 		var bg = vec4(0.,0.,0.,0.05)
 		//dump = field*0.1 + time
 		return mix(bg.rgba, fg.rgba, fg.a)
-	}	
+	}
 	
 	this.vslider = function(){
 		// we have a rectangle

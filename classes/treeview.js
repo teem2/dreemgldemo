@@ -170,7 +170,19 @@ define.class(function(module, sprite, text, view, button, icon){
 		};
 		
 		this.selectclick = function(){
-			this.classroot.emit('selectclick', this.item)
+			function walk(stack, node){
+				if(stack === node) return [node]
+				if(stack.children) for(var i = 0; i < stack.children.length; i++){
+					var child = stack.children[i]
+					var ret = walk(child, node)
+					if(ret !== undefined){
+						ret.unshift(stack)
+						return ret
+					}
+				}
+			}
+			var path = walk(this.classroot.data, this.item)
+			this.classroot.emit('selectclick', {item:this.item, path:path})
 		}
 		
 		this.bgcolor = vec4("transparent");
@@ -240,23 +252,23 @@ define.class(function(module, sprite, text, view, button, icon){
 	this.bgcolor = vec4("white");
 	
 	this.bg = {
-		bgcolorfn: function(a,b){
-			return mix(bgcolor, bgcolor *0.8, a.y *a.y);
+		bgcolorfn: function(a, b){
+			return mix(bgcolor, bgcolor * 0.8, a.y * a.y);
 		}
 	}
 
-	this.flexdirection="row";
-	this.flex= 1;
+	this.flexdirection = "row";
+	this.flex = 1;
 
-	this.alignself="stretch" ;
+	this.alignself = "stretch" ;
 
 	// the renderfunction for the treeview recursively expands using treeitem subclasses.
 	this.render = function(){
-		var data;
-		if (this.buildtree) data = this.buildtree(this.dataset.data)
+		//var data;
+		if (this.atBuildTree) this.data = this.atBuildTree(this.dataset.data)
 		else{
-			data = this.dataset.data
+			this.data = this.dataset.data
 		}
-		return [this.treeitem({item:data})]
+		return [this.treeitem({item:this.data})]
 	}
 })
