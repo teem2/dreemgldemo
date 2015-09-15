@@ -19,7 +19,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 		this.padding = 4;
 		this.flexdirection = "column" ;
 		this.flexwrap = "none"
-		// the type of this display block. Accepted values: function, attribute
+		// the type of this display block. Accepted values: "function", "attribute"
 		this.attribute("blocktype", {type:String, value:"function"});
 		this.render = function()
 		{	

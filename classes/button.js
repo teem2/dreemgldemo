@@ -3,9 +3,15 @@
 
 define.class(function(sprite, text, view, icon){
 	
+	// the label for the button
 	this.attribute("text", {type: String, value: "button"});
+	// the icon for the button, see FontAwesome for the available icon-names.
 	this.attribute("icon", {type: String, value: ""});
+	
+	// font size in device-pixels.
 	this.attribute("fontsize", {type: float, value: 22});
+	
+	// color of the labeltext in neutral state
 	this.attribute("labelcolor", {type: vec4, value: vec4("#404040")});
 	this.attribute("labelactivecolor", {type: vec4, value: vec4("black")});
 	this.attribute("buttoncolor1", {type: vec4, value: vec4("#fffff0")});
@@ -38,6 +44,7 @@ define.class(function(sprite, text, view, icon){
 	this.pressed = 0;
 	this.hovered = 0;
 		
+	// The icon class used for the icon display. Exposed to allow overloading/replacing from the outside.
 	define.class(this, 'icon_class', function(icon){
 
 	})
