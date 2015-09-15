@@ -16,6 +16,8 @@ define.class(function(sprite, text, icon, view){
 	this.flexdirection = "column";
 	
 	this.attribute("collapsed", {type: Boolean, value: false});
+	this.state("collapsed");
+	
 	this.attribute("icon", {type: String, value: 'times'});	
 	this.attribute("basecolor", {type: vec4, value: vec4("#8080c0")});
 	

@@ -107,7 +107,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			
 			var parser = new Parser();
 		
-			var total_ast = parser.parse(constructor.module.factory.body.toString());
+			var total_ast = parser.parse(proto.constructor.body.toString());
 				
 			var class_body = total_ast.steps[0];
 			
@@ -224,7 +224,8 @@ define.class(function(sprite,view, require, text,foldcontainer){
 	
 	
 	define.class(this, 'ClassDocView', function(view, text){
-	
+		
+	this.attribute("buildcollapser", {type: Boolean, value:false});
 	this.flexdirection = "column"
 	this.flexwrap = "none" ;
 	this.attribute("class_doc", {type: Object});
@@ -232,8 +233,11 @@ define.class(function(sprite,view, require, text,foldcontainer){
 	this.render = function(){
 		var body = [];
 		var res =[];
-				var class_doc = this.class_doc;
-		body.push(text({width: 500, text:class_doc.class_name,fontsize: 30,margin: vec4(10,10,0,20), fgcolor: "black" }));
+		var class_doc = this.class_doc;
+		
+		if (!this.buildcollapser ){
+			body.push(text({width: 500, text:class_doc.class_name,fontsize: 30,margin: vec4(10,10,0,20), fgcolor: "black" }));
+		}
 		if (class_doc.body_text.length > 0)
 		{
 			for (var a in class_doc.body_text){
@@ -250,7 +254,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 				attributes.push(this.classroot.BuildDocDisp({func: class_doc.attributes[a]}))
 				attributes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
 			}
-			res.push(foldcontainer({collapsed:false, basecolor:"#f0f0c0", icon:"table", title:"Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, attributes)));
+			res.push(foldcontainer({collapsed:true, basecolor:"#f0f0c0", icon:"table", title:"Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, attributes)));
 		}
 		
 		if(class_doc.state_attributes.length >0){
@@ -267,7 +271,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			var classes = []
 			//console.log(class_doc.methods);
 			for (var a in class_doc.inner_classes){
-				classes.push(this.classroot.ClassDocView({class_doc: class_doc.inner_classes[a]}))
+				classes.push(this.classroot.ClassDocView({buildcollapser:true, class_doc: class_doc.inner_classes[a]}))
 				classes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
 			}
 			res.push(foldcontainer({collapsed:true,  basecolor:"#c0f0c0", icon:"table", title:"Inner classes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, classes)));
@@ -279,10 +283,16 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			//console.log(class_doc.methods);
 			for (var a in class_doc.methods){
 				methods.push(this.classroot.BuildDocDisp({func: class_doc.methods[a]}))
-				methods.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
+				
 			}
 			res.push(foldcontainer({collapsed:true,  basecolor:"#c0c0f0", icon:"table", title:"Methods" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, methods)));
 		}
+		
+		if (this.buildcollapser){
+			
+			return foldcontainer({basecolor:"#c0f0c0",collapsed:true,icon:"flask", title:class_doc.class_name},view({flexdirection:"column", flex:1},res));
+		}
+		
 		return res;
 		
 	}
