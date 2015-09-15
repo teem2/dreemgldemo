@@ -50,7 +50,6 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 					
 					if (this.item.type === "vec4")
 					{
-						console.log(this.item.defvalue);
 						var labeltext = (Math.round(this.item.defvalue[0]*100)/100) + ", " + 
 						(Math.round(this.item.defvalue[1]*100)/100) + ", " + 
 						(Math.round(this.item.defvalue[2]*100)/100) + ", " + 
