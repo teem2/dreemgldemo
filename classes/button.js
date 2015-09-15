@@ -4,12 +4,12 @@
 define.class(function(sprite, text, view, icon){
 	
 	// the label for the button
-	this.attribute("text", {type: String, value: "button"});
+	this.attribute("text", {type: String, value: ""});
 	// the icon for the button, see FontAwesome for the available icon-names.
 	this.attribute("icon", {type: String, value: ""});
 	
 	// font size in device-pixels.
-	this.attribute("fontsize", {type: float, value: 22});
+	this.attribute("fontsize", {type: float, value: 14});
 	
 	// color of the labeltext in neutral state
 	this.attribute("labelcolor", {type: vec4, value: vec4("#404040")});
@@ -54,7 +54,7 @@ define.class(function(sprite, text, view, icon){
 		this.setDirty(true)
 	}
 	
-	this.attribute("bgcolor", {type:vec4, duration: 1.0});
+	this.attribute("bgcolor", {duration: 1.0});
 	
 	this.mouseout = function(){
 		if(this.hovered>0)this.hovered--;

@@ -83,11 +83,9 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.attribute("alignself", {type:String, value:undefined});  // 	'flex-start', 'center', 'flex-end', 'stretch'
 	this.attribute("position", {type: String, value: "relative" });	//'relative', 'absolute'
 
-	this.attribute('text', {type:String, value: "" })
-	this.attribute('fontsize', {type:float, value: 12});
+	//this.attribute('fontsize', {type:float, value: 12});
 	this.attribute('fgcolor', {type:vec4, value: vec4(1,1,1,1)});
 
-	this.event("reinit")
 	this.event("postLayout")
 
 	this.event("click")

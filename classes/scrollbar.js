@@ -8,8 +8,13 @@ define.class(function(sprite, text, view){
 	this.attribute("activecolor", {type: vec4, value: vec4("#8080c0")});
 	this.attribute("vertical", {type: Boolean, value: true});
 	this.attribute("offset", {type:float, value:0})
-	this.attribute("page", {type:float, value:0.3})
-	
+	this.attribute("page", {type:float, value:0.6})
+
+
+	this.page = function(){
+		this.setDirty(true)
+	}
+
 	this.hslider = function(){
 		// we have a rectangle
 		var rel = vec2(mesh.x*width, mesh.y*height)
@@ -61,7 +66,7 @@ define.class(function(sprite, text, view){
 		this.setDirty(true)
 	}
 	
-	this.attribute("bgcolor", {type:vec4, duration: 1.0});
+	this.attribute("bgcolor", {duration: 1.0});
 	
 	this.mouseout = function(){
 		this.hovered--;
@@ -79,12 +84,18 @@ define.class(function(sprite, text, view){
 			var p = start[0] / this.layout.width
 		}
 		if(p < this.offset){
-			this.offset = clamp(p - 0.5 * this.page, 0, 1.-this.page)
-			this.setDirty(true)
+			var value = clamp(p - 0.5 * this.page, 0, 1.-this.page)
+			if(value != this.offset){
+				this.offset = value
+				this.setDirty(true)
+			}
 		}
 		else if (p > this.offset + this.page){
-			this.offset = clamp(p - 0.5*this.page, 0, 1.-this.page)
-			this.setDirty(true)
+			var value = clamp(p - 0.5*this.page, 0, 1.-this.page)
+			if(value != this.offset){
+				this.offset = value
+				this.setDirty(true)
+			}
 		}
 		var start_offset = this.offset
 		this.onmousemove = function(pos){
@@ -94,8 +105,11 @@ define.class(function(sprite, text, view){
 			else{
 				var p = start_offset + (pos[0] - start[0]) / this.layout.width
 			}
-			this.offset = clamp(p, 0, 1.-this.page)
-			this.setDirty(true)
+			var value = clamp(p, 0, 1.-this.page)
+			if(value != this.offset){
+				this.offset = value
+				this.setDirty(true)
+			}
 		}
 	}
 	
@@ -108,6 +122,7 @@ define.class(function(sprite, text, view){
 	this.drawcount = 0;
 	this.atDraw = function(){
 		this.drawcount ++;
+
 		this.bg_shader._offset = this._offset
 		this.bg_shader._page = this._page
 

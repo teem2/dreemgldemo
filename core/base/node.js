@@ -361,6 +361,7 @@ define.class(function(require, constructor){
 		var set_key = '_set_' + key
 
 		if(this.isAttribute(key)){ // extend the config
+			if('type' in config) throw new Error('Cannot redefine attribute '+key)
 			var obj = this[config_key] = Object.create(this[config_key])
 			for(var prop in config){
 				obj[prop] = config[prop]
@@ -369,7 +370,7 @@ define.class(function(require, constructor){
 			return
 		}
 
-		var init_value = this[key] || config.value
+		var init_value = key in this? this[key]:config.value
 		if(init_value !== undefined && init_value !== null){
 			if(typeof init_value === 'function') this[init_value.isWired? wiredfn_key: on_key] = init_value
 			else this[value_key] = config.type(init_value)

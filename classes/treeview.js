@@ -74,8 +74,6 @@ define.class(function(module, sprite, text, view, button, icon){
 		this.flex = undefined;
 		this.alignself = "flex-start"
 		
-
-
 		this.render = function(){
 			return [
 				this.haschildren?this.classroot.foldbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2,width:14,height:16,click: this.toggleclick}):[], 
@@ -157,9 +155,10 @@ define.class(function(module, sprite, text, view, button, icon){
 		this.attribute("text", {type:String, value:""});
 		
 		//this.attribute("collapsed", {type:Boolean, value:false});
-		this.attribute("bgcolor", {type:vec4, value:vec4("transparent")});
-		this.attribute("fgcolor", {type:vec4, value:vec4("black")});
-		this.attribute("fontsize", {type:float, value:12});
+		this.bgcolor = vec4('transparent')
+		this.fgcolor = vec4("black")
+
+		//this.attribute("fontsize", {type:float, value:12});
 		
 		this.attribute("item", {type:Object});
 
