@@ -146,8 +146,8 @@ define.class(function(sprite,view, require, text,foldcontainer){
 						var stepright = step.right;
 						if (stepright.type === "Function")
 						{
-						console.log("right:", stepright);
-						console.log("left", stepleft);
+						//console.log("right:", stepright);
+					//	console.log("left", stepleft);
 						method.body_text = WalkCommentUp(step.cmu);
 						
 						
