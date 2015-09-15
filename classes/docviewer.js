@@ -10,15 +10,13 @@ define.class(function(sprite,view, require, text,foldcontainer){
 	var Parser = require("$parsers/onejsparser");
 	//this.flex = 0.5;
 	define.class(this, 'BuildDocDisp', function(view, text){
+		
 		this.attribute("func", {type: Object});
 		this.bgcolor = vec4("#ffffff");
 		this.margin = 4;
 		this.padding = 4;
 		this.flexdirection = "column" ;
 		this.flexwrap = "none"
-		
-		
-
 		
 		this.render = function()
 		{	
@@ -29,24 +27,21 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			}
 			
 			res.push(text({margin:vec4(4),text: this.func.name + functionsig , fontsize: 20, fgcolor: "black"}));
-			if (this.func.body_text)
-			{
-				for(var t in this.func.body_text)
-				{
-				res.push(text({text: this.func.body_text[t], fgcolor: "gray", fontsize: 14, margin: vec4(10)}));
+			
+			if (this.func.body_text){
+				for(var t in this.func.body_text){
+					res.push(text({text: this.func.body_text[t], fgcolor: "gray", fontsize: 14, margin: vec4(10)}));
 				}
 			}
-			if (this.func.params && this.func.params.length > 0)
-			{
+			
+			if (this.func.params && this.func.params.length > 0){
 				res.push(text({ fgcolor:"#5050dd", margin:vec4(2,0,4,4), text:"parameters:" }));
-				for (var a in this.func.params)
-				{	
+				for (var a in this.func.params){	
 					var parm = this.func.params[a];
 					var left = text({ fgcolor:"black", margin:vec4(10,0,4,4), text:parm.name});
 					var right;
 					
-					if (parm.body_text && parm.body_text.length > 0)
-					{
+					if (parm.body_text && parm.body_text.length > 0){
 						right= view({flex: 0.8},parm.body_text.map(function(a){return text({fgcolor:"gray", text:a})}))
 					}
 					else{
@@ -56,7 +51,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 					res.push(view({ flexdirection:"row"},[left, right]));
 					
 				}
-					res.push(view({height:1, borderwidth: 1, bordercolor:"#e0e0e0", padding: 0}));
+				res.push(view({height:1, borderwidth: 1, bordercolor:"#e0e0e0", padding: 0}));
 			}
 			return res;
 		}
@@ -90,11 +85,8 @@ define.class(function(sprite,view, require, text,foldcontainer){
 		}
 		return res;
 	}
-	
-	function BuildDoc(module){
-		var proto = module.prototype;
-		
-		var class_doc =	{
+	function BlankDoc(){
+			return {
 			class_name:"",
 			body_text: [], // array with strings. each string = paragraph
 			examples: [],
@@ -102,14 +94,20 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			attributes: [],
 			state_attributes: [],
 			methods: [],
-			subclasses: []
+			inner_classes: []
 		}
+	}
+	
+	function BuildDoc(constructor){
+		var proto = constructor.prototype;
+		console.log(proto.constructor.name);
+		var class_doc = BlankDoc();
 		class_doc.class_name = proto.constructor.name;
 		//try{
 			
 			var parser = new Parser();
 		
-			var total_ast = parser.parse(module.module.factory.body.toString());
+			var total_ast = parser.parse(proto.constructor.body.toString());
 				
 			var class_body = total_ast.steps[0];
 			
@@ -144,7 +142,13 @@ define.class(function(sprite,view, require, text,foldcontainer){
 					
 					if (step.fn.object.type ==="This"){
 						if (step.fn.key.name === "attribute"){
-							class_doc.attributes.push({name: step.args[0].value})
+							var attrname = step.args[0].value;
+							var attr = proto._attributes[attrname];
+							console.log(attr, attrname);
+							var attrdoc = {name: attrname, type:attr.type.name.toString(), defvalue: attr.value, body_text: WalkCommentUp(step.cmu)}
+							console.log(attrdoc);
+							class_doc.attributes.push(attrdoc)
+							
 						} else if (step.fn.key.name === "event"){							
 							class_doc.events.push({name: step.args[0].value})
 						}
@@ -156,8 +160,11 @@ define.class(function(sprite,view, require, text,foldcontainer){
 						if (step.fn.object.type ==="Id"){
 							if (step.fn.object.name === "define"){
 								if (step.fn.key.name === "class"){
-													
-									class_doc.subclasses.push({name: step.args[1].value})
+									var innerclassname = step.args[1].value;
+										var NewClass = BuildDoc( proto[innerclassname]);
+										//NewClass.class_name = innerclassname;
+										NewClass.body_text = WalkCommentUp(step.cmu);
+										class_doc.inner_classes.push(NewClass);
 								};
 							}
 						}
@@ -215,20 +222,22 @@ define.class(function(sprite,view, require, text,foldcontainer){
 		return class_doc;
 	}
 	
-	this.render = function(){	
-		var functions = [];
-		var res = [];
-		var R = this.model// 	require("$classes/dataset")
+	
+	define.class(this, 'ClassDocView', function(view, text){
 		
-		//console.log( );
-		
-		var class_doc = BuildDoc(R)
-		
-		this.flexdirection = "column"
-		this.flexwrap = "none" ;
+	this.attribute("buildcollapser", {type: Boolean, value:false});
+	this.flexdirection = "column"
+	this.flexwrap = "none" ;
+	this.attribute("class_doc", {type: Object});
+	
+	this.render = function(){
 		var body = [];
-			
-		body.push(text({width: 500, text:class_doc.class_name,fontsize: 30,margin: vec4(10,10,0,20), fgcolor: "black" }));
+		var res =[];
+		var class_doc = this.class_doc;
+		
+		if (!this.buildcollapser ){
+			body.push(text({width: 500, text:class_doc.class_name,fontsize: 30,margin: vec4(10,10,0,20), fgcolor: "black" }));
+		}
 		if (class_doc.body_text.length > 0)
 		{
 			for (var a in class_doc.body_text){
@@ -242,7 +251,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			var attributes = []
 
 			for (var a in class_doc.attributes){
-				attributes.push(this.BuildDocDisp({func: class_doc.attributes[a]}))
+				attributes.push(this.classroot.BuildDocDisp({func: class_doc.attributes[a]}))
 				attributes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
 			}
 			res.push(foldcontainer({collapsed:true, basecolor:"#f0f0c0", icon:"table", title:"Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, attributes)));
@@ -252,21 +261,56 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			var state_attributes = []
 
 			for (var a in class_doc.state_attributes){
-				state_attributes.push(this.BuildDocDisp({func: class_doc.state_attributes[a]}))
+				state_attributes.push(this.classroot.BuildDocDisp({func: class_doc.state_attributes[a]}))
 				state_attributes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
 			}
 			res.push(foldcontainer({collapsed:true, basecolor:"#f0c0c0", icon:"table", title:"State Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, state_attributes)));
 		}
 		
+		if (class_doc.inner_classes.length > 0){
+			var classes = []
+			//console.log(class_doc.methods);
+			for (var a in class_doc.inner_classes){
+				classes.push(this.classroot.ClassDocView({buildcollapser:true, class_doc: class_doc.inner_classes[a]}))
+				classes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
+			}
+			res.push(foldcontainer({collapsed:true,  basecolor:"#c0f0c0", icon:"table", title:"Inner classes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, classes)));
+		}
+	
+	
 		if (class_doc.methods.length > 0){
 			var methods = []
 			//console.log(class_doc.methods);
 			for (var a in class_doc.methods){
-				methods.push(this.BuildDocDisp({func: class_doc.methods[a]}))
-				methods.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
+				methods.push(this.classroot.BuildDocDisp({func: class_doc.methods[a]}))
+				
 			}
-			res.push(foldcontainer({  basecolor:"#c0c0f0", icon:"table", title:"Methods" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, methods)));
+			res.push(foldcontainer({collapsed:true,  basecolor:"#c0c0f0", icon:"table", title:"Methods" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, methods)));
 		}
+		
+		if (this.buildcollapser){
+			
+			return foldcontainer({basecolor:"#c0f0c0",collapsed:true,icon:"flask", title:class_doc.class_name},view({flexdirection:"column", flex:1},res));
+		}
+		
 		return res;
+		
+	}
+	})
+	
+	this.flexdirection = "column"
+	this.flexwrap = "none" ;
+		
+		
+	this.render = function(){	
+		var functions = [];
+		var res = [];
+		var R = this.model// 	require("$classes/dataset")
+		
+		//console.log( );
+		
+		var class_doc = BuildDoc(R)
+		
+		return [this.ClassDocView({class_doc:class_doc})]
 	}
 })
