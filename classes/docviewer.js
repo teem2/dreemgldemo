@@ -2,7 +2,7 @@
 
 define.class(function(sprite,view, require, text,foldcontainer,icon){
 	
-	this.bgcolor = vec4("#f0f0f0" );	
+	this.bgcolor = vec4("transparent" );	
 	this.attribute("model", {type:Object})
 	this.state("model");
 	
