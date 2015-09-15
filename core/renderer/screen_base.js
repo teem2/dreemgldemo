@@ -80,4 +80,7 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.attribute("alignitems", {type:String, value:"stretch"});  // 	'flex-start', 'center', 'flex-end', 'stretch'
 	this.attribute("alignself", {type:String, value:"stretch"});  // 	'flex-start', 'center', 'flex-end', 'stretch'
 	this.attribute("position", {type: String, value: "relative" });	//'relative', 'absolute'
+
+	this.attribute("model", {type: Object})
+	this.state('model')
 })
