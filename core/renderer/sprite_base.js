@@ -98,7 +98,9 @@ define.class('$base/nodeworker', function(require, exports, self){
 	this.event("mouseleftup")
 	this.event("mouserightdown")
 	this.event("mouserightup")
-	this.event("scroll")
+	this.event("mousewheelx")
+	this.event("mousewheely")
+
 	this.event("keyup")
 	this.event("keydown")
 	this.event("keypress")
