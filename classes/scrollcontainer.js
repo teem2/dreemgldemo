@@ -2,11 +2,14 @@
 // ruler class
 
 define.class(function(sprite,  view, scrollbar){
+	// The scrollcontainer wraps all its children in a movable frame with 2 scrollbars around it.
+	
 	this.flexdirection = "column" ;
 	this.flexwrap = "none" ;
 	this.alignitems = "stretch";
 	this.flex = 1;
 	this.attribute("scrollbarwidth", {type: int, value: 16});
+	
 	
 	this.updatescrollbars = function(view){
 		//console.log(view.layout.width, view.layout.height);	
@@ -24,8 +27,7 @@ define.class(function(sprite,  view, scrollbar){
 						)
 					)
 				),
-				scrollbar({width:this.scrollbarwidth})
-				
+				scrollbar({width:this.scrollbarwidth})	
 			),
 			view({flexdirection :"row" },
 				view({width:this.scrollbarwidth}),

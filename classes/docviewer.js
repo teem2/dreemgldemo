@@ -98,9 +98,11 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			class_name:"",
 			body_text: [], // array with strings. each string = paragraph
 			examples: [],
-			attributes: [{name:"attr1", type:"Object", body_text:["tadaaa","this is another line"]}],
-			state_attributes: [{name:"attr1", type:"Object", body_text:["tadaaa","this is another line"]}],
-			methods: []
+			events: [],
+			attributes: [],
+			state_attributes: [],
+			methods: [],
+			subclasses: []
 		}
 		class_doc.class_name = proto.constructor.name;
 		//try{
@@ -138,43 +140,70 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			for (var a in class_body.body.steps)
 			{				
 				var step = class_body.body.steps[a];
-				var stepleft = step.left;
-				//console.log(step.left, step.right);
-				if (stepleft)	{
-					if (stepleft.type==="Key" && stepleft.object.type ==="This"){ 
-						var method = {name:stepleft.key.name, params:[]};
-						var stepright = step.right;
-						if (stepright.type === "Function")
-						{
-						//console.log("right:", stepright);
-					//	console.log("left", stepleft);
-						method.body_text = WalkCommentUp(step.cmu);
-						
-						
-						for(var p in stepright.params){							
-							var param = stepright.params[p];						
-							var paramname = param.id.name; 		
-							var paramtag = '<' + paramname  + '>';
-							var param = {name: paramname, body_text: []}
-							
-							var remaining = [];
-							for(var a in method.body_text){
-								var L = method.body_text[a];
-								if (L.indexOf(paramtag) === 0) {
-									param.body_text.push(L.substr(paramtag.length).trim());
-								}
-								else{
-									remaining.push(L);
-								}
-							}
-							method.params.push(param);
-						
-							method.body_text= remaining;
+				if (step.type ==="Call"){
+					
+					if (step.fn.object.type ==="This"){
+						if (step.fn.key.name === "attribute"){
+							class_doc.attributes.push({name: step.args[0].value})
+						} else if (step.fn.key.name === "event"){							
+							class_doc.events.push({name: step.args[0].value})
 						}
-						//console.log(method.name);
-						class_doc.methods.push(method);			
-						}						
+						else if (step.fn.key.name === "state"){								
+							class_doc.state_attributes.push({name: step.args[0].value})
+						}
+					}
+					else{
+						if (step.fn.object.type ==="Id"){
+							if (step.fn.object.name === "define"){
+								if (step.fn.key.name === "class"){
+													
+									class_doc.subclasses.push({name: step.args[1].value})
+								};
+							}
+						}
+					}
+					
+					
+				} else {
+					var stepleft = step.left;
+					//console.log(step.left, step.right);
+					if (stepleft)	{
+					//		console.log("left", stepleft.key.name, stepleft);
+						
+						if (stepleft.type==="Key" && stepleft.object.type ==="This"){ 
+							var method = {name:stepleft.key.name, params:[]};
+							var stepright = step.right;
+							if (stepright.type === "Function")
+							{
+						//	console.log("right:", stepright);
+							method.body_text = WalkCommentUp(step.cmu);
+							
+							
+							for(var p in stepright.params){							
+								var param = stepright.params[p];						
+								var paramname = param.id.name; 		
+								var paramtag = '<' + paramname  + '>';
+								var param = {name: paramname, body_text: []}
+								
+								var remaining = [];
+								for(var a in method.body_text){
+									var L = method.body_text[a];
+									if (L.indexOf(paramtag) === 0) {
+										param.body_text.push(L.substr(paramtag.length).trim());
+									}
+									else{
+										remaining.push(L);
+									}
+								}
+								method.params.push(param);
+							
+								method.body_text= remaining;
+							}
+							//console.log(method.name);
+							class_doc.methods.push(method);			
+							}						
 
+						}
 					}
 				}
 			}			
@@ -216,7 +245,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 				attributes.push(this.BuildDocDisp({func: class_doc.attributes[a]}))
 				attributes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
 			}
-			res.push(foldcontainer({ basecolor:"#f0f0c0", icon:"table", title:"Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, attributes)));
+			res.push(foldcontainer({collapsed:true, basecolor:"#f0f0c0", icon:"table", title:"Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, attributes)));
 		}
 		
 		if(class_doc.state_attributes.length >0){
@@ -226,7 +255,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 				state_attributes.push(this.BuildDocDisp({func: class_doc.state_attributes[a]}))
 				state_attributes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
 			}
-			res.push(foldcontainer({ basecolor:"#f0c0c0", icon:"table", title:"State Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, state_attributes)));
+			res.push(foldcontainer({collapsed:true, basecolor:"#f0c0c0", icon:"table", title:"State Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, state_attributes)));
 		}
 		
 		if (class_doc.methods.length > 0){
