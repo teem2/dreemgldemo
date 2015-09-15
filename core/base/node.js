@@ -130,14 +130,11 @@ define.class(function(require, constructor){
 	// find node by name
 	this.findChild = function(name, ignore){
 		// ok so first we go down all children
-		for(var i = 0; i < this.children.length; i ++){
-			var child = this.children[i]
-			if(child === ignore) continue
-			if(child.name === name || child.name === undefined && child.constructor.name === name){
-				return child
-			}
+		if(this === ignore) return
+		if(this.name === name || this.name === undefined && this.constructor.name === name){
+			return this
 		}
-		for(var i = 0; i < this.children.length; i ++){
+		if(this.children) for(var i = 0; i < this.children.length; i ++){
 			var child = this.children[i]
 			if(child === ignore) continue
 			var ret = child.findChild(name)

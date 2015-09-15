@@ -6,8 +6,7 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 		return [
 		fileio(),
 		screens(
-			screen(
-				{
+			screen({
 				init:function(){
 					// lets load the entire directory structure
 					this.teem.fileio.readalldir('',['gzcache','@/\\.','.git', '.gitignore']).then(function(result){
@@ -22,6 +21,9 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 					,view({flexdirection:"column",padding: 0, flex: 0.2}
 						,view({alignitems:"center", bgcolor:"#e0e0e0", flexdirection:"row" ,padding: 14},text({text:"DreemGL", fgcolor:"black", bgcolor:"transparent", fontsize: 30 }))
 						,treeview({
+						init:function(){
+							this.dataset = this.find('screen').model
+						},
 						name:'filetree', flex:1, selectclick:function(sel){
 							// we have to grab the last path set and concatenate a path
 							var path = ''

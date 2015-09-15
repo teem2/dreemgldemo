@@ -5,6 +5,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 	this.bgcolor = vec4("#f0f0f0" );	
 	this.attribute("model", {type:Object})
 	this.state("model");
+	
 	this.flex = 1.0
 	this.padding=20;
 	var Parser = require("$parsers/onejsparser");
