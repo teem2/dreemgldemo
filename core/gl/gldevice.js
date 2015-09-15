@@ -55,13 +55,14 @@ define.class(function(require, exports, self){
 			this.canvas.style.height = h + 'px'
 			this.gl.viewport(0, 0, sw, sh)
 			// store our w/h and pixelratio on our frame
-			this.main_frame.ratio = this.ratio || pixelRatio
+			this.main_frame.ratio = pixelRatio
 			this.main_frame.size = vec2(sw, sh) // actual size
 			this.size = vec2(w, h)
 			this.ratio = this.main_frame.ratio
 		}.bind(this)
 
 		window.onresize = function(){
+			console.log("RESIZE!", window.devicePixelRatio)
 			resize()
 			this.atResize()
 			this.redraw()
