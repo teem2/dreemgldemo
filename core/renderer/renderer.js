@@ -27,6 +27,8 @@ define.class(function(require, exports, module){
 				old_version.instance_children = new_version.instance_children
 			}
 			else{ // we are going to use new_version. lets copy _state properties
+				// so we should only copy state properties IF we are the same class filename as last time
+				console.log(new_version.constructor.module)
 				object = new_version
 				if(new_version !== old_version){
 					old_children = object.children
