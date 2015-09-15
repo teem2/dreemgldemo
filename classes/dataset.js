@@ -31,7 +31,7 @@ define.class(function(require, node){
 	}
 
 	// Fork starts a new modification on a dataset;
-	// <callback> this function will be called with a modifyable javascript object. DO NOT under any circumstances directly modify this data property!
+	// <callback> the function that will be called with a modifyable javascript object. DO NOT under any circumstances directly modify this data property!
 	this.fork = function(callback){
 		this.undo_stack.push(JSON.stringify(this.data))
 		this.redo_stack.length = 0
@@ -40,7 +40,7 @@ define.class(function(require, node){
 	}
 
 	// Silent operates much the same as <fork>, but does not notify listeners bound to this dataset. This can be used in case you are CERTAIN that this object is the only object in your application that listens to your changed property, but you still need to save the state to the undo stack
-	// <callback> this function will be called with a modifyable javascript object. DO NOT under any circumstances directly modify this data property!	
+	// <callback> the function that will be called with a modifyable javascript object. DO NOT under any circumstances directly modify this data property!	
 	this.silent = function(callback /*function*/){
 		this.undo_stack.push(JSON.stringify(this.data))
 		this.redo_stack.length = 0
@@ -88,6 +88,7 @@ define.class(function(require, node){
 		return JSON.stringify(data);
 	}
 	
+	// Go back to the previous state. All classes that have this dataset bound will get their assignment updated
 	this.undo = function(){
 		if(!this.undo_stack.length) return
 		this.redo_stack.push( this.JSONStringify(this.data))
@@ -95,6 +96,7 @@ define.class(function(require, node){
 		this.notifyAssignedAttributes();
 	}
 
+	// Go back to the previous state. All classes that have this dataset bound will get their assignment updated
 	this.redo = function(){
 		if(!this.redo_stack.length) return
 		this.undo_stack.push(JSON.stringify(this.data))

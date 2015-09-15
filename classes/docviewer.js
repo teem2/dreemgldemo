@@ -2,11 +2,11 @@
 
 define.class(function(sprite,view, require, text,foldcontainer){
 	
-	this.bgcolor = vec4("white" );	
+	this.bgcolor = vec4("#f0f0f0" );	
 	this.attribute("model", {type:Object})
-
+	this.state("model");
 	this.flex = 1.0
-	
+	this.padding=20;
 	var Parser = require("$parsers/onejsparser");
 	//this.flex = 0.5;
 	define.class(this, 'BuildDocDisp', function(view, text){
@@ -17,7 +17,9 @@ define.class(function(sprite,view, require, text,foldcontainer){
 		this.flexdirection = "column" ;
 		this.flexwrap = "none"
 		
-			
+		
+
+		
 		this.render = function()
 		{	
 			var res = [];
@@ -40,7 +42,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 				for (var a in this.func.params)
 				{	
 					var parm = this.func.params[a];
-					var left = text({flex:0.2, fgcolor:"black", margin:vec4(10,0,4,4), text:parm.name});
+					var left = text({ fgcolor:"black", margin:vec4(10,0,4,4), text:parm.name});
 					var right;
 					
 					if (parm.body_text && parm.body_text.length > 0)
@@ -50,10 +52,11 @@ define.class(function(sprite,view, require, text,foldcontainer){
 					else{
 						right = view({flex: 1.0});
 					}
-					res.push(view({ flexdirection:"row"},[left, right]));
 					res.push(view({height:1, borderwidth: 1, bordercolor:"#e0e0e0", padding: 0}));
+					res.push(view({ flexdirection:"row"},[left, right]));
 					
 				}
+					res.push(view({height:1, borderwidth: 1, bordercolor:"#e0e0e0", padding: 0}));
 			}
 			return res;
 		}
@@ -136,15 +139,15 @@ define.class(function(sprite,view, require, text,foldcontainer){
 			{				
 				var step = class_body.body.steps[a];
 				var stepleft = step.left;
-				console.log(step.left, step.right);
+				//console.log(step.left, step.right);
 				if (stepleft)	{
 					if (stepleft.type==="Key" && stepleft.object.type ==="This"){ 
 						var method = {name:stepleft.key.name, params:[]};
 						var stepright = step.right;
 						if (stepright.type === "Function")
 						{
-						console.log("right:", stepright);
-						console.log("left", stepleft);
+						//console.log("right:", stepright);
+						//console.log("left", stepleft);
 						method.body_text = WalkCommentUp(step.cmu);
 						
 						
@@ -168,7 +171,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 						
 							method.body_text= remaining;
 						}
-						console.log(method.name);
+						//console.log(method.name);
 						class_doc.methods.push(method);			
 						}						
 
@@ -194,12 +197,17 @@ define.class(function(sprite,view, require, text,foldcontainer){
 		
 		this.flexdirection = "column"
 		this.flexwrap = "none" ;
-		res.push(text({width: 100, text:class_doc.class_name,fontsize: 30,margin: vec4(10,0,0,0), fgcolor: "black" }));
-		
-		for (var a in class_doc.body_text){
-			var L = class_doc.body_text[a];
-			res.push(text({width: 100, text:L,fontsize: 14, margin: vec4(10,0,10,10), fgcolor: "#303030" }));
+		var body = [];
+			
+		body.push(text({width: 500, text:class_doc.class_name,fontsize: 30,margin: vec4(10,10,0,20), fgcolor: "black" }));
+		if (class_doc.body_text.length > 0)
+		{
+			for (var a in class_doc.body_text){
+				var L = class_doc.body_text[a];
+				body.push(text({width: 500, text:L,fontsize: 14, margin: vec4(10,0,10,10), fgcolor: "#303030" }));
+			}
 		}
+			res.push(view({flexdirection:"column", margin: vec4(10,0,0,20)}, body));
 
 		if(class_doc.attributes.length >0){
 			var attributes = []
@@ -223,7 +231,7 @@ define.class(function(sprite,view, require, text,foldcontainer){
 		
 		if (class_doc.methods.length > 0){
 			var methods = []
-			console.log(class_doc.methods);
+			//console.log(class_doc.methods);
 			for (var a in class_doc.methods){
 				methods.push(this.BuildDocDisp({func: class_doc.methods[a]}))
 				methods.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));

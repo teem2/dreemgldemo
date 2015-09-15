@@ -18,14 +18,17 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 					}.bind(this))
 				}},
 				splitcontainer({vertical:false, position: "relative",   flexdirection: "row", bgcolor: "black", alignitems:"stretch", alignself: "stretch" , flex:1}
-					,treeview({
-						name:'filetree', flex:0.5, w:100, selectclick:function(node, path){
+					,view({flexdirection:"column",padding: 0, flex: 0.2}
+						,view({alignitems:"center", bgcolor:"#e0e0e0", flexdirection:"row" ,padding: 14},text({text:"DreemGL", fgcolor:"black", bgcolor:"transparent", fontsize: 30 }))
+						,treeview({
+						name:'filetree', flex:1,  selectclick:function(node, path){
 							require.async('$classes/' + node.name).then(function(module){
 								//console.log(this.find('docviewer'))
 								this.find('docviewer').model = module
 							}.bind(this))
 						}
-					})
+						})
+					)
 					,view({flex:1},
 						scrollcontainer({},
 							docviewer({name:'docviewer', model: require('$classes/dataset')})
