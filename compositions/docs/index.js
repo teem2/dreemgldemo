@@ -9,7 +9,7 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 			screen(
 				{init:function(){
 					// lets load the entire directory structure
-					this.teem.fileio.readalldir('',['gzcache','@/\\.']).then(function(result){
+					this.teem.fileio.readalldir('',['gzcache','@/\\.','.git', '.gitignore']).then(function(result){
 						var filetree = this.find('filetree')
 						result.name = 'Documentation'
 						result.collapsed = false
