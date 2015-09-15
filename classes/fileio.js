@@ -1,13 +1,13 @@
 define.class(function(require, server){
-
+	//The fileio class provides an easy RPC mechanism to load/create/save/enumerate files and directories
+	
+	
 	var nodehttp = require('$server/nodehttp')
 	var fs = require('fs')
 	var path = require('path')
 
-	this.init = function(){
-		
-	}
-
+	// wait for a file to change - then resolve the promise. Returns a promise.
+	// <name> The file to read. File paths can use $-shortcuts to refer to various folders
 	this.filechange = function(name){
 		var filepath = path.join(define.expandVariables(define.$root), name)
 		return new Promise(function(resolve){
@@ -23,6 +23,8 @@ define.class(function(require, server){
 		})
 	}
 
+	// Return the full contents of a file as a string. Returns the result of node.js fs.readFileSync or null in case of exception
+	// <name> The file to read. File paths can use $-shortcuts to refer to various folders
 	this.readfile = function(name){
 		try{
 			return fs.readFileSync(path.join(define.expandVariables(define.$root), name)).toString()
@@ -32,6 +34,9 @@ define.class(function(require, server){
 		}
 	}
 
+	// writefile synchronously writes data to a file. Returns the result of node.js fs.writeFileSync or null in case of exception
+	// <name> The file to read. File paths can use $-shortcuts to refer to various folders
+	// <data> The data to write
 	this.writefile = function(name, data){
 		try{
 			return fs.writeFileSync(path.join(define.expandVariables(define.$root), name), data)
@@ -40,7 +45,8 @@ define.class(function(require, server){
 			return null
 		}
 	}
-
+	// reads a directory and returns its contents
+	// <name> the name of the directory to read
 	this.readdir = function(name){
 		// lets read the directory and return it
 		try{
@@ -83,6 +89,9 @@ define.class(function(require, server){
 		return out
 	}
 
+	// recursively read all directories starting from a base path
+	// <name> the base path to start reading
+	// <ignoreset> files and directories to ignore while recursively expanding
 	this.readalldir = function(name, ignoreset){
 		// lets read the directory and return it
 		try{

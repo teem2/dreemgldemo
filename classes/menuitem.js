@@ -1,8 +1,14 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 define.class(function(sprite, view, button, text,screenoverlay){
+	// menuitem provides standard "context menu" functionality, regularly found in menu's like the rightclick one. 
+	// if the menuitem has children - these children shall be shown as a modal popup on click. If the click function has been overridden, this functionality will not fire.
 	this.bgcolor = vec4("lightgray");
+	
+	// enable/disable the button
 	this.attribute("enabled", {type: boolean, value: true});
+	
+	// the menuclick is the default handler for the button click. 
 	this.menuclick = function(){
 		// ok now we have to do a modal view of our instance_children
 		if(this.hasListeners('click')){
@@ -20,6 +26,7 @@ define.class(function(sprite, view, button, text,screenoverlay){
 		)
 	}
 
+	// Render the button. 
 	this.render = function(){
 		if (this.enabled)
 		{

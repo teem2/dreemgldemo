@@ -3,6 +3,8 @@
 
 define.class(function(sprite, text, icon, view){
 
+	// the foldcontainer shows/hides all its children when the top bar is clicked
+	
 	this.title = "folding thing";
 	this.position ="relative";
 	this.borderwidth = 1;
@@ -11,19 +13,18 @@ define.class(function(sprite, text, icon, view){
 	this.bordercolor = vec4("gray");
 	
 	this.alignitems = "stretch";
-	
 	this.flexdirection = "column";
-	this.attribute("collapsed", {type: Boolean, value: false});
-
-	this.attribute("icon", {type: String, value: 'times'});
 	
+	this.attribute("collapsed", {type: Boolean, value: false});
+	this.attribute("icon", {type: String, value: 'times'});	
 	this.attribute("basecolor", {type: vec4, value: vec4("#8080c0")});
 	
+	// Function to change the open/closed state. Used by the click handler of the clickablebar.
 	this.toggle = function(){
 		this.collapsed = !this.collapsed;		
 	}
 	
-	
+	// subclass to lay out the clickable portion of the folding container 
 	define.class(this, 'clickablebar', function(view){
 
 		this.bggradient = function(a,b){	
@@ -91,6 +92,7 @@ define.class(function(sprite, text, icon, view){
 		}			
 	});
 	
+	// render the foldcontainer - using a clickablebar for the title nad a containerview for the children. 
 	this.render = function(){
 		
 		this.bar = this.clickablebar({icon:this.icon, title: this.title});
