@@ -23,13 +23,17 @@ define.class(function(module, sprite, text, view, button, icon){
 			]}
 		]}
 	]}
-	
+
+	// the dataset to use for tree expansion
+	// Livecoding docs works
 	this.attribute("dataset", {type: Object, value:{}});
+	
+	// the current selected value	
 	this.attribute("selected", {type: String, value:""});
 
 	this.event('selectclick')
 
-	// define a nested class
+	// The fold button is a very very flat button. 
 	define.class(this, 'foldbutton', function(button){
 		this.borderwidth = 0
 		this.padding =  4
@@ -50,6 +54,7 @@ define.class(function(module, sprite, text, view, button, icon){
 		this.alignself = "flex-start" 	
 	})
 
+	// newitemheading combines a few foldbuttons in to a full "item" in the tree
 	define.class(this, 'newitemheading', function(view){
 		this.borderwidth = 0;
 		this.attribute("folded", {type: boolean, value: false});
@@ -79,7 +84,7 @@ define.class(function(module, sprite, text, view, button, icon){
 			];
 		}
 	});
-	
+	/*
 	define.class(this, 'itemheading', function(view){
 		this.attribute("text", {type:String, value:""});
 		this.attribute("id", {type:String, value:""});
@@ -142,6 +147,8 @@ define.class(function(module, sprite, text, view, button, icon){
 			]
 		}
 	})
+	*/
+	
 	
 	// the treeitem subclass contains 3 controls: a newitemheading, a set of treelines and an optional set of children treeitems in case the current node is expanded
 	define.class(this, 'treeitem', function(view){
