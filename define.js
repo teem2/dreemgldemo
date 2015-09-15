@@ -420,6 +420,8 @@
 			}
 		}})
 
+		Object.defineProperty(Constructor, 'body', {value:body})
+
 		//if(stubbed) Object.defineProperty(Constructor, 'stubbed', {value:true})
 		/*
 		Object.defineProperty(Constructor, 'nest', {value:function(name, cls){
