@@ -15,10 +15,14 @@ define.class(function(sprite, text, icon, view){
 	this.alignitems = "stretch";
 	this.flexdirection = "column";
 	
+	// The current state of the foldcontainer. False = open, True = closed.
 	this.attribute("collapsed", {type: Boolean, value: false});
 	this.state("collapsed");
 	
+	// The icon to use in the top left of the foldcontainer. See the FontAwesome cheatsheet for acceptable icon names.
 	this.attribute("icon", {type: String, value: 'times'});	
+	
+	// The main color from which the foldcontainer will build some gradients.
 	this.attribute("basecolor", {type: vec4, value: vec4("#8080c0")});
 	
 	// Function to change the open/closed state. Used by the click handler of the clickablebar.
@@ -33,7 +37,8 @@ define.class(function(sprite, text, icon, view){
 			var fill = mix(col1, col2,  (a.y)/0.8);
 			return fill;
 		}
-
+		
+		// default click-handler - when not bound this write "nothing happens" to the console. 
 		this.toggle = function(){console.log("nothing happens")}
 
 		this.attribute("title", {type:String})
@@ -46,7 +51,7 @@ define.class(function(sprite, text, icon, view){
 		}
 
 		this.padding = 6
-			
+		// The clickable bar creates icon and a textfield children.
 		this.render = function(){			
 			return [icon({fontsize:16, icon:this.icon, fgcolor: "#303030" }), text({marginleft:5,fgcolor:"#303030", fontsize: 16, text:this.title, flex:1, bgcolor: "transparent" })];
 		}
