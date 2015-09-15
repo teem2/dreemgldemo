@@ -65,7 +65,7 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 								[
 									text({margin:vec4(2),text: "default:", fontsize: 15, fgcolor: "#404040"}),
 									view({bordercolor: "#808080", borderwidth: 1, cornerradius:4, bgcolor: this.item.defvalue, padding: vec4(8,3,8,3)},
-										text({fgcolor: color , bgcolor:"transparent" , text:labeltext})
+										text({fgcolor: color , fontsize: 15, bgcolor:"transparent" , text:labeltext})
 									)
 								]
 							));
@@ -286,6 +286,16 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 	}
 	
 	// This class will recursively expand a class_doc sturcture to an on-screen view.
+	
+	define.class(this, 'dividerline', function(view){
+			this.height = 1;
+		this.borderwidth = 1;
+		this. bordercolor = vec4("#c0c0e0");
+		this.padding = 0;
+		this.margin = vec4(0,10,0,0);
+	})
+	
+	
 	define.class(this, 'ClassDocView', function(view, text){
 	
 	// If collapsible is true, the render function will build a foldcontainer around this class. This is used for recursion levels > 0 of the docviewer class.	
@@ -316,29 +326,28 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 		if(class_doc.attributes.length >0){
 			var attributes = []
 
-			for (var a in class_doc.attributes){
-				attributes.push(this.classroot.ClassDocItem({blocktype:"attribute", item: class_doc.attributes[a]}))
-				attributes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
+			for (var i = 0;i< class_doc.attributes.length;i++){
+				attributes.push(this.classroot.ClassDocItem({blocktype:"attribute", item: class_doc.attributes[i]}))
+				if (i< class_doc.attributes.length -1 ) attributes.push(this.classroot.dividerline());
 			}
-			res.push(foldcontainer({collapsed:false, basecolor:"#f0f0c0", icon:"gears", title:"Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, attributes)));
+			res.push(foldcontainer({ collapsed:false, basecolor:"#f0f0c0", icon:"gears", title:"Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, attributes)));
 		}
 		
 		if(class_doc.state_attributes.length >0){
 			var state_attributes = []
 
-			for (var a in class_doc.state_attributes){
+			for (var a =0;a< class_doc.state_attributes.length;a++){
 				state_attributes.push(this.classroot.ClassDocItem({blocktype:"attribute",item: class_doc.state_attributes[a]}))
-				state_attributes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,30,0,0)}));
-			}
-			res.push(foldcontainer({collapsed:true, basecolor:"#f0c0c0", icon:"archive", title:"State Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, state_attributes)));
+				if (a< class_doc.state_attributes.length -1 ) attributes.push(this.classroot.dividerline());
+				}
+			res.push(foldcontainer({collapsed:true, basecolor:"#f0c0c0", icon:"archive", title:"State Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({margin:vec4(10), flexdirection: "column", flex: 1}, state_attributes)));
 		}
 		
 		if (class_doc.inner_classes.length > 0){
 			var classes = []
 			//console.log(class_doc.methods);
 			for (var a in class_doc.inner_classes){
-				classes.push(this.classroot.ClassDocView({collapsible:true, class_doc: class_doc.inner_classes[a]}))
-				classes.push(view({height:1, borderwidth: 1, bordercolor:"#c0c0e0", padding: 0, margin: vec4(0,0,0,0)}));
+				classes.push(this.classroot.ClassDocView({collapsible:true, class_doc: class_doc.inner_classes[a]}))				
 			}
 			res.push(foldcontainer({collapsed:true,  basecolor:"#c0f0c0", icon:"cubes", title:"Inner classes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, classes)));
 		}
@@ -347,9 +356,10 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 		if (class_doc.methods.length > 0){
 			var methods = []
 			//console.log(class_doc.methods);
-			for (var a in class_doc.methods){
+			for (var a =0;a<class_doc.methods.length;a++){
 				methods.push(this.classroot.ClassDocItem({blocktype:"function",item: class_doc.methods[a]}))
-				
+					if (a< class_doc.methods.length -1 ) attributes.push(this.classroot.dividerline());
+			
 			}
 			res.push(foldcontainer({collapsed:true,  basecolor:"#c0c0f0", icon:"paw", title:"Methods" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, methods)));
 		}

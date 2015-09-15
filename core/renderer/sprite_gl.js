@@ -56,7 +56,7 @@ define.class('./sprite_base', function(require, exports){
 		this.bgcolorfn = Sprite.plaincolor 
 
 		this.color = function(){
-			var dist = shape.roundedrectdistance(sized, width, height, radius.r, radius.a, radius.g, radius.b)
+			var dist = shape.roundedrectdistance(sized.xy + vec2( -1.,0.), width-1., height, radius.r, radius.a, radius.g, radius.b)
 			//dump = dist*0.01
 			//dist += noise.s2d(mesh*32)*5
 			var bgcolor =  bgcolorfn(mesh.xy, dist)

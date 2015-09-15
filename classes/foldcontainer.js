@@ -10,7 +10,7 @@ define.class(function(sprite, text, icon, view){
 	this.borderwidth = 1;
 	this.margin = 2;
 	
-	this.bordercolor = vec4("gray");
+	this.bordercolor = vec4("#c0c0c0");
 	
 	this.alignitems = "stretch";
 	this.flexdirection = "column";
@@ -92,7 +92,7 @@ define.class(function(sprite, text, icon, view){
 				}
 			}
 			else{
-					this.bg_shader.col2 = vec4.vec4_mul_float32_rgb(vec4(this.parent.basecolor), 0.9);
+					this.bg_shader.col2 = vec4.vec4_mul_float32_rgb(vec4(this.parent.basecolor), 1.1);
 //					this.bg.col1 = this.parent.basecolor;
 					this.bg_shader.col1 = this.parent.basecolor;
 			}
@@ -102,12 +102,17 @@ define.class(function(sprite, text, icon, view){
 	// render the foldcontainer - using a clickablebar for the title nad a containerview for the children. 
 	this.render = function(){
 		
-		this.bar = this.clickablebar({icon:this.icon, title: this.title});
+		this.bar = this.clickablebar({borderwidth: this.borderwidth, bordercolor:this.bordercolor,icon:this.icon, title: this.title});
 		
 		this.bar.click = this.toggle.bind(this);
 		var res = [this.bar];
 		if (this.collapsed == false) {
-			this.container = view({bg:{bgcolorfn:function(a,b){return mix(bgcolor*1.7, vec4("white"), (a.y/8))}} , bgcolor: this.basecolor,  padding: 4,position:"relative"} ,this.instance_children) 
+			this.container = view(
+									{bg:
+										{bgcolorfn:function(a,b){
+												return mix(bgcolor*1.7, vec4("white"), (a.y/8))
+											}
+										} , bgcolor: this.basecolor, borderwidth: this.borderwidth, bordercolor:this.bordercolor,  padding: vec4(5,5,5,5),position:"relative"} ,this.instance_children) 
 			res.push(this.container)
 		}
 		this.children = [];

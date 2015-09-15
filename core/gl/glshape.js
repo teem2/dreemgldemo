@@ -5,7 +5,7 @@
 define(function (require, exports) {
 	
 	
-	exports.roundedrectdistance = function(pixpos, width, height, topleftcorner, toprightcorner, bottomleftcorner, bottomrightcorner){
+	exports.roundedrectdistance = function(sized, width, height, topleftcorner, toprightcorner, bottomleftcorner, bottomrightcorner){
 
 		var c1 = vec2(topleftcorner-0.5 , topleftcorner -0.5);
 		var c2 = vec2(bottomleftcorner -0.5, height - bottomleftcorner -0.5);
