@@ -62,7 +62,6 @@ define.class(function(require, exports, self){
 		}.bind(this)
 
 		window.onresize = function(){
-			console.log("RESIZE!", window.devicePixelRatio)
 			resize()
 			this.atResize()
 			this.redraw()
