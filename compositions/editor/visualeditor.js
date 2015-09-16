@@ -11,7 +11,7 @@ define.class(function(require, screen, view,menuitem, menubar, edit, text, icon,
 					}
 				},alignitems:"stretch", alignself: "stretch", flex: undefined}
 				,icon({icon:"windows", fgcolor:"white", marginleft: 15, fontsize:18})
-				,text({fontsize: 20, text:"Visionary Studio 3016", width: 200, bgcolor: "transparent" , marginbottom:10, marginleft:15})
+				,text({fontsize: 20, text:"Dreem Editor Testing", width: 200, bgcolor: "transparent" , marginbottom:10, marginleft:15})
 			)
 			,menubar({}
 				,menuitem({text: "File"}
@@ -49,7 +49,7 @@ define.class(function(require, screen, view,menuitem, menubar, edit, text, icon,
 				,view({position: "relative", flex: 0.2,  flexdirection: "column", bgcolor: "#808090", alignself: "stretch" , borderwidth: 1, padding: 3,cornerradius: "vec4(0,0,14,0)" , bordercolor: "gray" , clipping: true}
 					,foldcontainer({title:"Class Library", icon:'files', alignself: "stretch",marginbottom: 2})
 					,foldcontainer({title:"Attributes", icon:'gears', alignself: "stretch",marginbottom: 2},
-						text({fontsize: 26, text:"Visionary Studio 3016",bgcolor: "transparent" , margin: 5})
+						text({fontsize: 26, text:"Dreem Editor Testing",bgcolor: "transparent" , margin: 5})
 					)
 					,foldcontainer({title:"Fancy buttons", icon:'gamepad', marginbottom: 2}
 						,view({ position:"relative", flexwrap:"wrap", alignitems: "stretch", bgcolor: "transparent"}
