@@ -30,12 +30,13 @@ define.class(function(sprite, view, button, text,screenoverlay){
 	this.render = function(){
 		if (this.enabled)
 		{
-		return button({borderwidth: 0, padding: 4,labelactivecolor: vec4("#303000"), bordercolor:"transparent" , click:this.menuclick.bind(this), buttoncolor1:vec4(1,1,1,0.0),buttoncolor2:vec4(1,1,1,0.0),pressedcolor1:vec4(0,0,0,0.14), pressedcolor2:vec4(0,0,0,0.05),  hovercolor1:vec4(1,1,1,0.3),  hovercolor2:vec4(1,1,1,0.3), cornerradius: 0, text: this.text, margin: 0, bgcolor:"transparent"})
+			return button({borderwidth: 0, padding: 4,labelactivecolor: vec4("#303000"), bordercolor:"transparent" , click:this.menuclick.bind(this), buttoncolor1:vec4(1,1,1,0.0),buttoncolor2:vec4(1,1,1,0.0),pressedcolor1:vec4(0,0,0,0.14), pressedcolor2:vec4(0,0,0,0.05),  hovercolor1:vec4(1,1,1,0.3),  hovercolor2:vec4(1,1,1,0.3), cornerradius: 0, text: this.text, margin: 0, bgcolor:"transparent"})
 		}
 		else{
 			return text({
 					borderwidth: 0, 
 					margin: 4,
+					fontsize: 14,
 					padding: 4,
 					marginleft: 4, 
 					labelactivecolor: vec4("#303000"), 
