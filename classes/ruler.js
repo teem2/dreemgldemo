@@ -2,13 +2,23 @@
 // ruler class
 
 define.class(function(sprite, text, view){
+	// the ruler shows a sideline every N ticks.
 	
-	this.vertical = false;
-	this.from = 100;
-	this.to = 200;
-	this.offset = 20;
+	// vertical or horizontal ruler.
+	this.attribute("vertical", {type:Boolean, value:false});
 	
-	this.ruler = function(){
+	// first "range" label
+	this.attribute("from", {type:Number, value: 100});
+	
+	// second "range" label
+	this.attribute("to", {type:Number, value: 200});
+	
+	// where to start counting - the first "offset" pixels will be ignored.
+	this.attribute("offset", {type:Number, value: 20});
+	
+	
+	// horizontal ruler shader
+	this.hruler = function(){
 		var dist =(mesh.x *	width) - offset;
 		if (dist > 0.){ 
 			if(floor(mod(dist  ,100.) ) < 1.) {
@@ -22,6 +32,7 @@ define.class(function(sprite, text, view){
 		return bgcolor
 	}
 	
+	// vertical ruler shader
 	this.vruler = function(){
 		var dist =(mesh.y *	height) - offset;
 		if (dist > 0.)	{ 		
@@ -39,16 +50,15 @@ define.class(function(sprite, text, view){
 	this.bgcolor = "#8080b0"
 	this.flexdirection = "column"
 	this.alignself = "stretch"
-	
+		
 	this.render = function(){
 		if (this.vertical == false){
-			this.bg_shader.color = this.ruler
+			this.bg_shader.color = this.hruler
 			this.bg_shader.offset = this.offset			
 						
-			var rulerres = [
-				text({position: "absolute", text: this.from.toString(),width:100,height:20, bgcolor:"transparent", left: this.from+this.offset})
-				,text({position: "absolute", text: this.to.toString(),width:100,height:20, bgcolor:"transparent", left: this.to+this.offset})	
-			]			
+			var rulerres = [];
+			if (this.from) rulerres.push(text({position: "absolute", text: this.from.toString(),width:100,height:20, bgcolor:"transparent", left: this.from+this.offset}));
+			if (this.to) rulerres.pish(text({position: "absolute", text: this.to.toString(),width:100,height:20, bgcolor:"transparent", left: this.to+this.offset}));
 				
 			return rulerres
 		}
@@ -56,10 +66,9 @@ define.class(function(sprite, text, view){
 			this.bg_shader.color = this.vruler
 			this.bg_shader.offset = this.offset			
 	
-			var rulerres = [
-				text({rotation: -90, bgcolor:"transparent",width: 100, height: 20,position: "absolute", text: this.from.toString(), left:-45,top: this.from+this.offset})
-				,text({rotation: -90, bgcolor:"transparent",width: 100, height: 20,position: "absolute", text: this.to.toString(), left:-45,top: this.to+this.offset})
-			]
+			var rulerres = [];
+			if (this.from) rulerres.push(text({rotation: -90, bgcolor:"transparent",width: 100, height: 20,position: "absolute", text: this.from.toString(), left:-45,top: this.from+this.offset}));
+			if (this.to) rulerres.push(text({rotation: -90, bgcolor:"transparent",width: 100, height: 20,position: "absolute", text: this.to.toString(), left:-45,top: this.to+this.offset}));
 			return rulerres;
 		}
 	}
