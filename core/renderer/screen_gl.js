@@ -495,7 +495,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	this.layoutcount = 0;
 	
 	this.performLayout = function(){
-		
+
 		this._width = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
 		this._height = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
 		this.size = [this._width, this._height];
