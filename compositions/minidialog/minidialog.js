@@ -1,6 +1,6 @@
 define.class(function(require, screen, icon,view, edit, text,scrollbar,  treeview, splitcontainer, scrollcontainer, mousedebug, tabcontrol, button, grid){
 
-	var json = require('$compositions/dynagrid/top_movies.json')
+	var json = require('top_movies.json')
 
 	this.buildmoviegrid = function(){
 		var tiles = []
