@@ -494,6 +494,13 @@
 		if(luc !== undefined) return luc
 		return './' + cls
 	}
+
+	define.lookupFileType = function(type){
+		type = type.toLowerCase()
+		if(type === 'json')	return 'json'
+		if(type === 'txt' || type === 'text' || type === 'md') return 'text'
+		return 'arraybuffer'
+	}
 /*
 	// defining a class as environment specific
 	define.browser = function(body, body2){
@@ -1171,8 +1178,8 @@
 				return new Promise(function(resolve, reject){
 					var req = new XMLHttpRequest()
 					// todo, make type do other things
-					if(type === 'json')	req.responseType = 'json'
-					else req.responseType = 'arraybuffer'
+					req.responseType = define.lookupFileType(type)
+
 					req.open("GET", url, true)
 					req.onerror = function(){
 						var err = "Error loading " + url + " from " + from_file
