@@ -338,7 +338,7 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 
 			for (var a =0;a< class_doc.state_attributes.length;a++){
 				state_attributes.push(this.classroot.ClassDocItem({blocktype:"attribute",item: class_doc.state_attributes[a]}))
-				if (a< class_doc.state_attributes.length -1 ) attributes.push(this.classroot.dividerline());
+				if (a< class_doc.state_attributes.length -1 ) state_attributes.push(this.classroot.dividerline());
 				}
 			res.push(foldcontainer({collapsed:true, basecolor:"#f0c0c0", icon:"archive", title:"State Attributes" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({margin:vec4(10), flexdirection: "column", flex: 1}, state_attributes)));
 		}
@@ -358,7 +358,7 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 			//console.log(class_doc.methods);
 			for (var a =0;a<class_doc.methods.length;a++){
 				methods.push(this.classroot.ClassDocItem({blocktype:"function",item: class_doc.methods[a]}))
-					if (a< class_doc.methods.length -1 ) attributes.push(this.classroot.dividerline());
+					if (a< class_doc.methods.length -1 ) methods.push(this.classroot.dividerline());
 			
 			}
 			res.push(foldcontainer({collapsed:true,  basecolor:"#c0c0f0", icon:"paw", title:"Methods" , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, view({flexdirection: "column", flex: 1}, methods)));

@@ -1,7 +1,8 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
-// ruler class
 
 define.class(function(sprite, text, view, icon){
+	// Button. A clickable rectangle with an optional label/icon
+	
 	
 	// the label for the button
 	this.attribute("text", {type: String, value: ""});
