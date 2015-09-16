@@ -682,15 +682,16 @@ define.class('./text_gl', function(require, exports, self){
 		'youtube-square':'\uf166'
 	}
 
+	// The icon to be used. Look at the FontAwesome cheat sheet to see the available options. Icons do not need to specify their 'fa-' prefix -> use 'gears' instead of 'fa-gears'.
 	this.attribute('icon',{type:String, value:'wrench'})
 
 	var glfontParser = require('$gl/glfontparser')
 
-	this.init = function(v){
+	this.init = function(){
 		this.text = table[this.icon]
 	}
 	
-	this.icon = function(v){
+	this.icon = function(){
 		this.text = table[this.icon]
 	}
 	
