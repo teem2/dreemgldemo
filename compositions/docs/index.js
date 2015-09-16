@@ -33,7 +33,7 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 							}
 							path = '$root/'+path
 							require.async(path).then(function(module){
-								console.log(module.toString())
+								//console.log(module.toString())
 								this.find('docviewer').model = module
 							}.bind(this))
 						}

@@ -153,13 +153,20 @@ define.class('$base/nodeworker', function(require, exports, self){
 		
 	}
 	
-	this.margin = this.padding = this.borderwidth = this.cornerradius = this.flex = this.flexdirection =  this.size = this.pos = function(v){
-		if (this.screen)
-		{
+	this.pos = function(){
+		if (!this.screen) return
+		this.screen.addDirtyNode(this);
+		if(this.position !== 'absolute'){
+			console.log(this)
+			this.screen.requestLayout();
+		}
+	}
+
+	this.margin = this.padding = this.borderwidth = this.cornerradius = this.flex = this.flexdirection =  this.size = function(v){
+		if (this.screen){
 			this.screen.addDirtyNode(this);
 			this.screen.requestLayout();
 		}
-		
 	}
 	
 	this.reLayout = function(){

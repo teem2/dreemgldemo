@@ -164,13 +164,11 @@ define.class('./sprite_base', function(require, exports){
 	this.calcrectv4 = vec2();
 	
 	this.calculateBoundingRect = function(force){	
-		if (!this.orientation)
-		{
-			debugger;
-			return{left:0,right:0, top:0, bottom: 0};
+		if (!this.orientation){
+			debugger
+			return {left:0, right:0, top:0, bottom:0}
 		}
-		if (this.matrixdirty || force === true)
-		{
+		if (this.matrixdirty || force === true){
 			//console.trace(" dirty matrix!");
 			this.recomputeMatrix();
 		}
@@ -212,8 +210,7 @@ define.class('./sprite_base', function(require, exports){
 		if (v4[1] < miny) miny = v4[1];else if (v4[1] > maxy) maxy = v4[1];
 		
 		var ret = {left: minx, top: miny, right: maxx, bottom: maxy};
-		if (ret.left === 0 && ret.right === 0 && ret.top === 0 && ret.bottom === 0)
-		{
+		if (ret.left === 0 && ret.right === 0 && ret.top === 0 && ret.bottom === 0){
 //			debugger;
 		}
 		return ret
@@ -314,11 +311,11 @@ define.class('./sprite_base', function(require, exports){
 		this.matrixdirty = true
 	}
 	*/
-	this.init = function (obj){
+	this.init = function(obj){
 		
 		this.orientation = {
 			rotation : vec3(0, 0, 0), // (or {0,0,0} for 3d rotation)
-			translation : vec3(this.x != undefined ? this.x : 0, this.y != undefined ? this.y : 0, 0),
+			translation : vec3(this.x != undefined? this.x: 0, this.y != undefined? this.y: 0, 0),
 			scale : vec3(1, 1, 1),
 			matrix : mat4.identity(), // calculated
 			worldmatrix : mat4.identity() // calculated

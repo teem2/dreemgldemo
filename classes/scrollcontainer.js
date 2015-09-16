@@ -64,13 +64,15 @@ define.class(function(sprite,  view, scrollbar){
 						postLayout:function(){
 							pthis.updatescrollbars(this)
 						}},
-						this.move_view = view({bgcolor: this.move_view_bgcolor, flex:1}, 
+						this.move_view = view({position:'absolute',bgcolor: this.move_view_bgcolor, flex:1}, 
 							this.instance_children
 						)
 					)
 				),
 				this.has_vscroll && (this.vscroll = scrollbar({width:this.scrollbarwidth, offset:function(){
-					pthis.move_view.y = this.offset * pthis.scaled_height * -1
+					var val = this.offset * pthis.scaled_height * -1
+					//debugger
+					pthis.move_view.y = val
 					//console.log(this.offset)
 				}}))	
 			),

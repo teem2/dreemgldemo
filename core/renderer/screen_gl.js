@@ -20,7 +20,8 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	this.totaldirtyrect = {};
 	this.dirtyrectset = false;
 	this.debugshader =false;
-	//this.debug = true;
+	
+	this.debug = false;
 	this.debugalldirtyrects = true;
 	this.showdebugtext = true;
 	this.renderstructure = false;
@@ -543,7 +544,7 @@ this.draw_calls = 0
 		
 		this.time = time;
 		this.last_time = time;
-	
+
 		if (this.moved === true && !this.mousecapture) {//} || this.dirty === true) {
 			this.moved = false
 			if (!this.pic_tex.frame_buf) this.pic_tex.allocRenderTarget(this.device)
@@ -681,7 +682,7 @@ this.draw_calls = 0
 		if (this.screen.rendering) return;
 		
 		this.dirty = true;
-		this.moved = true;
+		//this.moved = true;
 		if (this.device) this.device.redraw();
 	}
 	
