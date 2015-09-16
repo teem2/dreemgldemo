@@ -1,10 +1,11 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
-// mouse debug class
 
 define.class(function(sprite, text, view, button){
 	this.position = "absolute" ;
 	this.left = 100;
 	this.top = 100;
+	this.width = 100;
+	this.height = 100;
 	this.render = function(){
 		this.margin=  140;
 		this.flexdirection = "column";

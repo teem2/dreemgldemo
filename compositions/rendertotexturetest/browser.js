@@ -1,4 +1,4 @@
-define.browser(function(require, screen, view, edit, text){
+define.class(function(require, screen, view, edit, text){
 	this.render = function(){return[
 	view({w:40,h:40,x:0, bgcolor: "red"},
 			 view({w:10,h:10, bgcolor: "purple"}),

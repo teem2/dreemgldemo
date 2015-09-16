@@ -1,4 +1,6 @@
-define.browserClass(function(require, screen, view, edit, text, treeview, splitcontainer, modalview, tabcontrol, button){
+// Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
+
+define.class(function(require, screen, view, edit, text, treeview, splitcontainer, modalview, tabcontrol, button){
 
 	var style =  {
 		tabcontrol_bgcolor:{
