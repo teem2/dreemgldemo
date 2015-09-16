@@ -31,9 +31,9 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 							for(var i = sel.path.length - 1; i >= 1; i--){
 								path = sel.path[i].name + (path!==''?'/' + path:'')
 							}
-							path = '$'+path
+							path = '$root/'+path
 							require.async(path).then(function(module){
-								//console.log(this.find('docviewer'))
+								console.log(module.toString())
 								this.find('docviewer').model = module
 							}.bind(this))
 						}
