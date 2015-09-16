@@ -1,6 +1,9 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 define.class(function(require, cadgrid){
+	
+	// edit layout
+	
 	this.init = function(){
 		// we need to map 'screen' to something else
 		define.atLookupClass = function(cls){

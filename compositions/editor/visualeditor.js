@@ -58,7 +58,7 @@ define.class(function(require, screen, view,menuitem, menubar, edit, text, icon,
 									view({
 										click:function(){
 											this.screen.closeModal(1)
-										},position:'absolute',bgcolor:'red',w:100,h:100})
+										},position:'absolute',bgcolor:'red',w:100,h:100}, [text({text:"click me to close!", fgcolor: "black", padding: vec4(10)})])
 								).then(function(result){
 									console.log('resolved',result)
 								})
@@ -75,18 +75,18 @@ define.class(function(require, screen, view,menuitem, menubar, edit, text, icon,
 						)
 					)
 					,foldcontainer({title:"Split Test", alignself: "stretch", marginbottom: 2}				
-						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"column" }
-							,splitcontainer({vertical: false, margin: 4},
-								text({fontsize: 26, text:"A", bgcolor: "transparent" , fgcolor:"black", margin: 2})
-								,text({fontsize: 26, text:"B", bgcolor: "transparent" ,fgcolor:"black", margin: 2})
-								,text({fontsize: 26, text:"C", bgcolor: "transparent" , fgcolor:"black",margin: 2})
-								,text({fontsize: 26, text:"D", bgcolor: "transparent" , fgcolor:"black",margin: 2})
+						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"column", flex: 1.0 }
+							,splitcontainer({vertical: false, margin: 4, flex: 1.0},
+								text({flex: 0.2, fontsize: 26, text:"A", bgcolor: "transparent" , fgcolor:"black", margin: 2})
+								,text({flex: 0.2, fontsize: 26, text:"B", bgcolor: "transparent" ,fgcolor:"black", margin: 2})
+								,text({flex: 0.2, fontsize: 26, text:"C", bgcolor: "transparent" , fgcolor:"black",margin: 2})
+								,text({flex: 0.2, fontsize: 26, text:"D", bgcolor: "transparent" , fgcolor:"black",margin: 2})
 							)
-							,splitcontainer({vertical: true, margin: 4},
-								text({fontsize: 26, text:"A", bgcolor: "transparent" , fgcolor:"black", margin: 2})
-								,text({fontsize: 26, text:"B", bgcolor: "transparent" ,fgcolor:"black", margin: 2})
-								,text({fontsize: 26, text:"C", bgcolor: "transparent" , fgcolor:"black",margin: 2})
-								,text({fontsize: 26, text:"D", bgcolor: "transparent" , fgcolor:"black",margin: 2})
+							,splitcontainer({vertical: true, margin: 4, flex: 1.0},
+								text({flex: 0.2, fontsize: 26, text:"A", bgcolor: "transparent" , fgcolor:"black", margin: 2})
+								,text({flex: 0.2, fontsize: 26, text:"B", bgcolor: "transparent" ,fgcolor:"black", margin: 2})
+								,text({flex: 0.2, fontsize: 26, text:"C", bgcolor: "transparent" , fgcolor:"black",margin: 2})
+								,text({flex: 0.2, fontsize: 26, text:"D", bgcolor: "transparent" , fgcolor:"black",margin: 2})
 							)
 						)
 					)

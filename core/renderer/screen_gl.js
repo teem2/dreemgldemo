@@ -1,7 +1,8 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
-// Sprite class
 
 define.class('./screen_base', function screen(require, exports, self, baseclass) {
+	
+	// The screen is a root-level visual class responsible for managing rendering and event dispatch to all nodes on the 
 	var GLDevice = require('$gl/gldevice')
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')
@@ -30,6 +31,8 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	this.renderstate = new RenderState();
 	this.atConstructor = function(){}
 
+	// close top level modal view.
+	// <value> the return value for the promise of the modal. 
 	this.closeModal = function(value){
 		if(this.modal && this.modal.resolve)
 			return this.modal.resolve(value)
@@ -37,6 +40,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 
 	// show a modal view.
 	this.openModal = function(object){
+	// <object> a constructor function for a set of visual elements. Works the same as the render function.
 		return new Promise(function(resolve, reject){
 			renderer(object, undefined, this.globals)
 			object.parent = this
@@ -70,6 +74,8 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		}.bind(this))
 	}
 
+	// check if a given node is available for interaction in the current modal chain.
+	// <node> the node to be checked.
 	this.inModalChain = function(node){
 		if(!this.modal_stack.length) return true
 		var last = this.modal_stack[this.modal_stack.length - 1]
@@ -484,7 +490,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 					}
 				}
 			}
-			for(a in node.children){
+			for(var a in node.children){
 				
 				total += this.computeBoundingRects(node.children[a]);
 			}
