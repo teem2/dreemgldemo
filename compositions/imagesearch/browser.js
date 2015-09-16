@@ -1,4 +1,4 @@
-define.browserClass(function(require, screen, view, edit, text, myview, treeview){
+define.class(function(require, screen, view, edit, text, myview, treeview){
 	this.render = function(){return[
 		myview({w:1920,h:1080}
 			//edit({x:100,y:0,w:300,h:80,fontsize:60,text:'Type\nHere\nMultiline'})

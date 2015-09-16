@@ -1,4 +1,4 @@
-define.nodejsClass(function(require, server){
+define.class(function(require, server){
 
 	var nodehttp = require('$server/nodehttp')
 

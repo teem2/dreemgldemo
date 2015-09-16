@@ -1,4 +1,4 @@
-define.browserClass(function(require, view){
+define.class(function(require, view){
 	// this is a class, so use it like normal js codeflow
 	this.bg.fractzoom = function(pos, time, zoom){
 		var dt = sin((80/60)*time*math.PI)
