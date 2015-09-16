@@ -1,7 +1,9 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
-// screens class
 
 define.class(function(node, require, self){
+	
+	// Empty class used as a stub in the composition to contain all the screens. 
+	
 	var RpcProxy = require('$rpc/rpcproxy')
 	var RpcMulti = require('$rpc/rpcmulti')
 

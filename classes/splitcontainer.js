@@ -2,13 +2,17 @@
 // ruler class
 
 define.class(function(sprite,  view){
+	// splitcontainer adds dragbars between nodes to make all the nodes resizable. 
+	
+	// should the splitter bars be introduced horizontally or vertically? 
 	this.attribute("vertical", {type: Boolean, value: true});
-	this.attribute("firstnode", {type: int, value: 0});
+	
 	this.attribute("splitsize", {type: float, value: 8});
 	this.attribute("minimalchildsize", {type: float, value: 20});
 	this.attribute("splittercolor", {type: vec4, value: vec4("#404050")});
 	this.attribute("hovercolor", {type: vec4, value: vec4("#5050a0")});
 	this.attribute("activecolor", {type: vec4, value: vec4("#7070a0")});
+
 	this.flex = 1.0;
 	this.flexdirection = this.vertical?"column":"row" ;
 	this.position = "relative" ;
@@ -19,8 +23,11 @@ define.class(function(sprite,  view){
 		this.flexdirection = this.vertical?"column":"row" ;
 	}
 	
+	// the visual class that defines the draggable bar between the resizable children
 	define.class(this, 'splitter', function(view){
-
+		
+		this.attribute("firstnode", {type: int, value: 0});
+	
 		this.bgcolor = vec4("gray");
 		this.alignitem = "stretch";
 		this.attribute("vertical", {type: Boolean, value: false});
@@ -34,12 +41,12 @@ define.class(function(sprite,  view){
 		this.hovered = 0;
 
 		this.mouseover  = function(){
-			this.hovered++;
+			if (this.hovered < 1) this.hovered++;
 			this.setDirty(true);
 		}
 
 		this.mouseout  = function(){
-			this.hovered--;
+			if (this.hovered>0)	this.hovered--;
 			this.setDirty(true);
 		}
 
