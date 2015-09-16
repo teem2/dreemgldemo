@@ -62,8 +62,9 @@ define.class(function(sprite,  view, scrollbar){
 				view({bgcolor: "#c0c0c0",  clipping:false, flex:1},
 					view({bgcolor: this.move_view_bgcolor,  clipping:true, flex:1, alignself: "stretch",  margin: 0,
 						postLayout:function(){
+							this.move_view.width = this.layout.width;
 							pthis.updatescrollbars(this)
-						}},
+						}.bind(this)},
 						this.move_view = view({position:'absolute',bgcolor: this.move_view_bgcolor, flex:1}, 
 							this.instance_children
 						)
