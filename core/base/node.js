@@ -418,7 +418,25 @@ define.class(function(require, constructor){
 			// initialize value
 			this[value_key] = this[storage_key][config.index]
 		}
-		else if(config.type.primitive){
+		else if(!config.type){
+			setter = function(value){
+				if(this[set_key] !== undefined) value = this[set_key](value)
+				if(typeof value === 'function' && (!value.prototype || Object.getPrototypeOf(value.prototype) === Object.prototype)){
+					if(value.isWired) this.setWiredAttribute(key, value)
+					this[on_key] = value
+					return
+				}
+				if(typeof value === 'object' && value !== null && value.atAttributeAssign) value.atAttributeAssign(this, key)
+
+				var config = this[config_key]
+
+				this[value_key] = config.type(value)
+				
+				if(this.atAttributeSet !== undefined) this.atAttributeSet(key, value)
+				if(on_key in this || listen_key in this)  this.emit(key, value)
+			}
+		}
+		else if (config.type.primitive){
 			setter = function(value){
 				if(this[set_key] !== undefined) value = this[set_key](value)
 				if(typeof value === 'function' && (!value.prototype || Object.getPrototypeOf(value.prototype) === Object.prototype)){
