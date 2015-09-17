@@ -42,7 +42,7 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 					)
 					,view({flex:1}
 							,scrollcontainer({has_hscroll:false, move_view_bgcolor: "#f0f0f0"}
-							,docviewer({model: require('$classes/docviewer')})
+							,docviewer({model: require('$root/README.md')})
 						)
 					)
 				)

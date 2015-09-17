@@ -35,8 +35,7 @@ define.class(function(sprite,  view){
 		this.attribute("splittercolor", {type: vec4, value: vec4("#404050")});
 		this.attribute("hovercolor", {type: vec4, value: vec4("#5050a0")});
 		this.attribute("activecolor", {type: vec4, value: vec4("#7070a0")});
-		this.bg.color1 = vec4("red");
-		this.bg.bgcolorfn = function(A,B){return color1;};
+		this.bg = {color1: vec4("red"), bgcolorfn: function(A,B){return color1;}};
 		this.pressed = 0;
 		this.hovered = 0;
 
@@ -122,12 +121,12 @@ define.class(function(sprite,  view){
 		this.atDraw = function(){
 			if (this.hovered > 0){
 				if (this.pressed > 0){
-					this.bg.color1 = this.activecolor;
+					this.bg_shader.color1 = this.activecolor;
 				}else{
-					this.bg.color1 = this.hovercolor;
+					this.bg_shader.color1 = this.hovercolor;
 				}
 			}else{
-				this.bg.color1 = this.splittercolor;
+				this.bg_shader.color1 = this.splittercolor;
 			}
 		}
 
