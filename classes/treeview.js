@@ -1,43 +1,20 @@
-"use strict";
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
-// view class
 define.class(function(module, sprite, text, view, button, icon){
-
-	var testdata = {name:'test Node', children:[
-		{name:'Child 1000', children:[
-			{name:'node 0-0-0 '}
-		]},
-		{name:'Child 2', children:[
-			{name:'node 0-1-0'}
-		]},
-		{name:'node 0-2' },
-		{name:'node 0-3', children:[
-			{name:'node 0-3-0'},
-			{name:'node 0-3-1',	children:[
-				{name:'node 0-3-1-0', children:[
-					{name:'node 0-3-1-0-0', children:[
-						{name:'node1a'}
-					]}
-				]},
-				{name:'node with an earlier parent'}
-			]}
-		]}
-	]}
-
+	// the treeview control - classic treeview with expandable nodes.
+	
 	// the dataset to use for tree expansion
-	// Livecoding docs works
 	this.attribute("dataset", {type: Object, value:{}});
 	
 	// the current selected value	
 	this.attribute("selected", {type: String, value:""});
 
+	// This event gets triggered when an item is selected.
 	this.event('selectclick')
 
 	// The fold button is a very very flat button. 
 	define.class(this, 'foldbutton', function(button){
 		this.borderwidth = 0
 		this.padding =  4
-		//this.labelcolor = vec4('red')
 		this.labelactivecolor = vec4("#303000")
 		this.bordercolor= "transparent"
 		this.buttoncolor1 =  vec4(1,1,1,0.0)
@@ -82,72 +59,8 @@ define.class(function(module, sprite, text, view, button, icon){
 			];
 		}
 	});
-	/*
-	define.class(this, 'itemheading', function(view){
-		this.attribute("text", {type:String, value:""});
-		this.attribute("id", {type:String, value:""});
-		this.pressed = 0;
-		this.hovered = 0;
-		this.attribute("color1", {type:vec4, value:vec4("white")});
-		this.attribute("color2", {type:vec4, value:vec4("#e0e0f0")});
-		this.attribute("hovercolor1", {type:vec4, value:vec4("white")});
-		this.attribute("hovercolor2", {type:vec4, value:vec4("#f0f0ff")});
-		this.attribute("activecolor1", {type:vec4, value:vec4("#e0e0f0")});
-		this.attribute("activecolor2", {type:vec4, value:vec4("white")});
-		this.bg = {
-			col1: vec4("white"),
-			col2: vec4("#e0e0f0"),
-			bgcolorfn: function(a,b){return mix(col1, col2, a.y);}
-		}
+	
 
-		this.mouseover  = function(){
-			this.hovered++;
-			this.setDirty(true);
-		}			
-		
-		this.mouseout  = function(){
-			this.hovered--;
-			this.setDirty(true);
-		}			
-		
-		this.mouseleftdown = function(){
-			this.pressed++;
-			this.setDirty(true);
-		}
-		
-		this.mouseleftup = function(){
-			this.pressed--;
-			this.setDirty(true);
-		}
-		
-		this.atDraw = function(){
-			
-			if (this.hovered> 0){
-				if (this.pressed > 0){
-					this.bg_shader.col1 = this.activecolor1;
-					this.bg_shader.col2 = this.activecolor2;
-				}
-				else{
-					this.bg_shader.col1 = this.hovercolor1;
-					this.bg_shader.col2 = this.hovercolor2;
-				}
-						
-			}
-			else {
-				this.bg_shader.col1 = this.color1;
-				this.bg_shader.col2 = this.color2;
-			}
-		}
-		
-		this.render = function(){
-			return [
-				text({text: this.text, bgcolor: "transparent", fontsize: 16, fgcolor: "#404040", margin: 2})
-			]
-		}
-	})
-	*/
-	
-	
 	// the treeitem subclass contains 3 controls: a newitemheading, a set of treelines and an optional set of children treeitems in case the current node is expanded
 	define.class(this, 'treeitem', function(view){
 		this.flex = 1.0;	
@@ -155,15 +68,16 @@ define.class(function(module, sprite, text, view, button, icon){
 		this.attribute("text", {type:String, value:""});
 		
 		//this.attribute("collapsed", {type:Boolean, value:false});
-		this.bgcolor = vec4('transparent')
+		this.bgcolor = vec4('red')
 		this.fgcolor = vec4("black")
 
+		this.flexdirection = "row" ;
+		
 		//this.attribute("fontsize", {type:float, value:12});
 		
 		this.attribute("item", {type:Object});
 
-		this.flexdirection = "row" ;
-		
+		// Open/close this node
 		this.toggle = function(){
 			if (this.item){
 				if (!this.item.collapsed) this.item.collapsed = true;
@@ -175,6 +89,7 @@ define.class(function(module, sprite, text, view, button, icon){
 			this.setDirty(true);
 		};
 		
+		// build path for the current treeitem and call the classroot selectclick handler
 		this.selectclick = function(){
 			function walk(stack, node){
 				if(stack === node) return [node]
@@ -191,7 +106,6 @@ define.class(function(module, sprite, text, view, button, icon){
 			this.classroot.emit('selectclick', {item:this.item, path:path})
 		}
 		
-		this.bgcolor = vec4("transparent");
 		this.atConstructor = function(){
 			if (this.item){
 				if (!this.item.collapsed) this.item.collapsed = false;
@@ -199,6 +113,7 @@ define.class(function(module, sprite, text, view, button, icon){
 			
 		//	this.text = this.item.name;
 		}
+		
 		this.count =0;
 		this.render = function(){
 			//debugger;
@@ -229,10 +144,14 @@ define.class(function(module, sprite, text, view, button, icon){
 	
 	// subclass to render the gridlines of the tree
 	define.class(this, 'treeline', function(view){
+		this.bgcolor = vec4("red");
+		//this.width = 20;
+		this.height = 40;
+		this.flex = 1.0;
 		this.bg = {
 			fgcolor: vec4(0.5, 0.5, 0.5, 1.),
 			last: 0,
-			color: function(){
+			bgcolorfn: function(a,b){
 				var pos = mesh.xy * vec2(width, height)
 				var center = 18
 				var left = 11
@@ -244,6 +163,7 @@ define.class(function(module, sprite, text, view, button, icon){
 				if (mod( floor (gl_FragCoord.x) + floor(gl_FragCoord.y) , 2.) > 0.){
 					return vec4(fgcolor.rgb, smoothstep(edge, -edge, field))
 				}
+				
 				return vec4(fgcolor.rgb,0);
 			}
 		}
@@ -259,7 +179,7 @@ define.class(function(module, sprite, text, view, button, icon){
 	
 	this.bg = {
 		bgcolorfn: function(a, b){
-			return mix(bgcolor, bgcolor * 0.8, a.y * a.y);
+			return mix(bgcolor, bgcolor * 0.2, a.y * a.y);
 		}
 	}
 
