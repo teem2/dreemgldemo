@@ -23,8 +23,11 @@ define.class(function(sprite, text, view, icon){
 	this.attribute("pressedcolor2", {type: vec4, value: vec4("#d0d0f0")});
 	this.buttonres = {};
 		
-	this.buttonfill = function(a,b){
-		var fill = mix(col1, col2, (a.y)/0.8);
+		// the shader for the inside fill
+		// <mesh> Texture coordinate from vertex (in 0,0 -> 1,1 space) 
+		// <distance> Distance to outside border (in pixels) 
+	this.buttonfill = function(mesh,distance){
+		var fill = mix(col1, col2, (mesh.y)/0.8);
 		return fill;
 	}
 
