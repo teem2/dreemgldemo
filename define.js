@@ -1193,11 +1193,8 @@
 								console.error(err)
 								return reject(err)
 							}
-							if(req.responseType === 'text')
-								define.factory[facurl] = req.responseText
-							else
-								define.factory[facurl] = req.response
-
+							define.factory[facurl] = req.response
+							
 							resolve(req.response)
 						}
 					}

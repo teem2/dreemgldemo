@@ -139,6 +139,7 @@ define.class('./sprite_base', function(require, exports){
 
 	this.getUnclippedBoundingRect = function(comp){
 		if(!comp){
+			var init = true
 			comp = {
 				left: this.layout.left, 
 				top: this.layout.top, 
@@ -149,11 +150,15 @@ define.class('./sprite_base', function(require, exports){
 		else{
 			if(this.layout.left < comp.left) comp.left = this.layout.left
 			if(this.layout.top < comp.top) comp.top = this.layout.top
-			if(this.layout.right > comp.right) comp.right = this.layout.right
-			if(this.layout.bottom > comp.bottom) comp.bottom = this.layout.bottom
+			if(this.layout.left + this.layout.width > comp.right) comp.right = this.layout.left + this.layout.width
+			if(this.layout.top + this.layout.height > comp.bottom) comp.bottom = this.layout.top + this.layout.height
 		}
 		if(this.children) for(var i = 0; i < this.children.length; i++){
 			this.children[i].getUnclippedBoundingRect(comp)
+		}
+		if(init){
+			comp.width = comp.right - comp.left
+			comp.height = comp.bottom - comp.top
 		}
 		return comp
 	}

@@ -33,13 +33,13 @@ define.class(function(sprite,  view, scrollbar){
 	this.updatescrollbars = function(view){
 		var rect = view.getUnclippedBoundingRect()
 		if(this.vscroll){
-			if(view.layout.height > rect.bottom){
+			if(view.layout.height > rect.height){
 				this.vscroll.page = 1
 			}
 			else{
-				this.vscroll.page = view.layout.height / rect.bottom
-				this.scaled_height = (rect.bottom - view.layout.height) / (1 - this.vscroll.page)
-				this.mouse_height = rect.bottom
+				this.vscroll.page = view.layout.height / rect.height
+				this.scaled_height = (rect.height - view.layout.height) / (1 - this.vscroll.page)
+				this.mouse_height = rect.height
 			}
 		}
 		if(this.hscroll){
