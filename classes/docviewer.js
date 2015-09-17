@@ -28,13 +28,10 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 		// the type of this display block. Accepted values: "function", "attribute"
 		this.attribute("blocktype", {type:String, value:"function"});
 
-		this.render = function()
-		{	
+		this.render = function(){	
 			var res = [];
 			
-			
-			if (this.blocktype === "function")
-			{
+			if (this.blocktype === "function"){
 				var functionsig = "()"
 				if (this.item.params && this.item.params.length > 0) { 
 					functionsig = "(" + this.item.params.map(function(a){return a.name}).join(", ") + ")";
@@ -42,18 +39,14 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 				res.push(text({margin:vec4(2),text: this.item.name + functionsig , fontsize: 20, fgcolor: "black"}));
 			}
 			else{
-				
 				var sub = [];
-				if (this.item.type)
-				{
-					sub.push(
-						text({margin:vec4(2),text: "type: "+ this.item.type, fontsize: 15, fgcolor: "#404040"}));
+				
+				if (this.item.type){
+					sub.push(text({margin:vec4(2),text: "type: "+ this.item.type, fontsize: 15, fgcolor: "#404040"}));
 				}
-				if (this.item.defvalue !== undefined)
-				{
-					
-					if (this.item.type === "vec4")
-					{
+				
+				if (this.item.defvalue !== undefined){	
+					if (this.item.type === "vec4"){
 						var labeltext = (Math.round(this.item.defvalue[0]*100)/100) + ", " + 
 						(Math.round(this.item.defvalue[1]*100)/100) + ", " + 
 						(Math.round(this.item.defvalue[2]*100)/100) + ", " + 
@@ -77,16 +70,13 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 					else{
 						if (this.item.type === "String"){
 							sub.push(text({margin:vec4(2),text: "default: \""+ this.item.defvalue.toString() + "\"" , fontsize: 15, fgcolor: "#404040"}))
-						}
-						else
-						{
+						}else{
 							sub.push(text({margin:vec4(2),text: "default: "+ this.item.defvalue.toString(), fontsize: 15, fgcolor: "#404040"}))
 						}
 					}
 				}
 				
 				var title = text({margin:vec4(2),text: this.item.name, fontsize: 20, fgcolor: "black"})
-				//res.push();
 				
 				res.push(view({flex: 1},[title,view({flex: 1, flexdirection:"column", alignitems:"flex-end" },sub)]));
 			}
@@ -106,13 +96,11 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 					
 					if (parm.body_text && parm.body_text.length > 0){
 						right= view({flex: 0.8},parm.body_text.map(function(a){return text({fgcolor:"gray", text:a})}))
-					}
-					else{
+					} else {
 						right = view({flex: 1.0});
 					}
 					res.push(view({height:1, borderwidth: 1, bordercolor:"#e0e0e0", padding: 0}));
 					res.push(view({ flexdirection:"row"},[left, right]));
-					
 				}
 				res.push(view({height:1, borderwidth: 1, bordercolor:"#e0e0e0", padding: 0}));
 			}
@@ -126,18 +114,15 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 		var res = [];
 		if (!commentarray) return res;
 		var last1 = false;
-		for (var i = commentarray.length -1;i>=0;i--)
-		{
+		for (var i = commentarray.length -1;i>=0;i--) {
 				var com = commentarray[i];
 				if (com === 1){
 					if(last1 === true){
 						break;
-					}
-					else{
+					} else {
 						last1 = true;		
 					}
-				}
-				else{
+				} else {
 					last1 = false;
 					res.unshift(com.trim());
 				}
@@ -146,7 +131,7 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 	}
 	// Build a minimal correct version of the ClassDoc structure
 	function BlankDoc(){
-			return {
+		return {
 			class_name:"",
 			body_text: [], // array with strings. each string = paragraph
 			examples: [],
@@ -165,37 +150,30 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 		class_doc.class_name = proto.constructor.name;
 		//try{
 			
-			var parser = new Parser();
-		
+			var parser = new Parser();		
 			var total_ast = parser.parse(proto.constructor.body.toString());
-				
 			var class_body = total_ast.steps[0];
-			
 			var stepzero = class_body.body.steps[0];
 			if (!stepzero) return class_doc;
 			
 			var class_comment = class_body.body.steps[0].cmu;
 			var last1 = false;
 			
-			for(var a in class_comment)
-			{
+			for(var a in class_comment) {
 				var com = class_comment[a];
 				if (com === 1){
 					if(last1 === true){
 						break;
-					}
-					else{
+					} else {
 						last1 = true;		
 					}
-				}
-				else{
+				} else {
 					last1 = false;
 					class_doc.body_text.push(com);
 				}
 			}
 			
-			for (var a in class_body.body.steps)
-			{				
+			for (var a in class_body.body.steps) {				
 				var step = class_body.body.steps[a];
 				if (step.type ==="Call"){
 					
@@ -208,14 +186,13 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 							if (attr.value){	
 								if (typeof(attr.value ) === "Function"){
 									console.log(attr.value.name);
-								}
-								else{
+								} else {
 									defvaluename = attr.value;
 								}
-}
+							}
 
 							var typename ="typeless";
-						if (attr.type) typename =attr.type.name.toString()
+							if (attr.type) typename =attr.type.name.toString()
 							var attrdoc = {name: attrname, type:typename, defvalue: defvaluename, body_text: WalkCommentUp(step.cmu)}
 							class_doc.attributes.push(attrdoc)
 							
