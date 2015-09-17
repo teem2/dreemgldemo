@@ -1420,6 +1420,11 @@
 				}
 				var old_stack = define.local_require_stack
 				define.local_require_stack = []
+
+				// we cant require non js files
+				var ext = define.fileExt(full_name)
+				if(ext !== '' && ext !== 'js') return undefined
+
 				try{
 					var ret = require(full_name)
 				}
