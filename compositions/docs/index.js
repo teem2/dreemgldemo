@@ -1,7 +1,7 @@
 //Pure JS based composition
 define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitcontainer, treeview, view, text, require, scrollcontainer){
 
-	this.render = function(){ 
+	this.render = function(){
 		//console.log(t)
 		return [
 		fileio(),
@@ -15,6 +15,7 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 						result.collapsed = false
 						// lets make a dataset
 						this.model = filetree.dataset = dataset(result)
+						console.log(result)
 					}.bind(this))
 				}},
 				splitcontainer({vertical:false, position: "relative",   flexdirection: "row", bgcolor: "black", alignitems:"stretch", alignself: "stretch" , flex:1}
