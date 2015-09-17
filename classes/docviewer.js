@@ -8,21 +8,26 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 	this.flex = 1.0
 	this.padding=20;
 	var Parser = require("$parsers/onejsparser");
-	//this.flex = 0.5;
 	
+	// this.flex = 0.5;	
 	// A single documentation block with name and bodytext.
+	
 	define.class(this, 'ClassDocItem', function(view, text){
+		
 		// the item to display. 
 		// An "attribute" item can have name, body_text, defvalue and type properties.
 		// A "function" item can have name, params and body_text properties.
 		this.attribute("item", {type: Object});
+		
 		this.bgcolor = vec4("#ffffff");
 		this.margin = 4;
 		this.padding = 4;
 		this.flexdirection = "column" ;
 		this.flexwrap = "none"
+
 		// the type of this display block. Accepted values: "function", "attribute"
 		this.attribute("blocktype", {type:String, value:"function"});
+
 		this.render = function()
 		{	
 			var res = [];
@@ -360,8 +365,7 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 			return foldcontainer({basecolor:"#c0f0c0",collapsed:true,icon:"cube", title:class_doc.class_name},view({flexdirection:"column", flex:1},res));
 		}
 		
-		return res;
-		
+		return res;	
 	}
 	})
 	
@@ -382,7 +386,5 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 			var class_doc = BuildDoc(R)		
 			return [this.ClassDocView({class_doc:class_doc})]
 		}
-		//console.log( );
-		
 	}
 })

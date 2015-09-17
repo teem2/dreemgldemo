@@ -53,7 +53,7 @@ define.class(function(module, sprite, text, view, button, icon){
 		
 		this.render = function(){
 			return [
-				this.haschildren?this.classroot.foldbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2,width:14,height:16,click: this.toggleclick}):[], 
+				this.haschildren?this.classroot.foldbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2,click: this.toggleclick}):[], 
 				//flatbutton({icon:this.folded?"arrow-right":"arrow-down",padding: 2, click: this.toggleclick}),
 				this.classroot.foldbutton({text: this.text, click:this.selectclick.bind(this)})
 			];
@@ -66,9 +66,9 @@ define.class(function(module, sprite, text, view, button, icon){
 		this.flex = 1.0;	
 		
 		this.attribute("text", {type:String, value:""});
-		
+	this.padding = vec4(3);
 		//this.attribute("collapsed", {type:Boolean, value:false});
-		this.bgcolor = vec4('red')
+		//this.bgcolor = vec4('red')
 		this.fgcolor = vec4("black")
 
 		this.flexdirection = "row" ;
@@ -114,7 +114,7 @@ define.class(function(module, sprite, text, view, button, icon){
 		//	this.text = this.item.name;
 		}
 		
-		this.count =0;
+		this.count = 0;
 		this.render = function(){
 			//debugger;
 			if (!this.item) return [text({text:"empty"})];
@@ -125,12 +125,12 @@ define.class(function(module, sprite, text, view, button, icon){
 					this.classroot.newitemheading({haschildren:this.item.children&&this.item.children.length, folded: this.item.collapsed, toggleclick: this.toggle.bind(this), selectclick: this.selectclick.bind(this),text:this.item.name, id:this.item.id }),
 					this.item.collapsed==false?
 						view({bgcolor:"transparent",flexdirection:"row" },
-							view({bgcolor:"transparent",  flexdirection:"column" , flex:1},
+							view({bgcolor:"transparent",  flexdirection:"column" , flex:1,  padding: 0 },
 								this.item.children?
 								this.item.children.map(function(m, i, array){return [
-									view({bgcolor:"transparent",flexdirection:"row" },
-										this.classroot.treeline({width:20,last:i === array.length - 1?1:0, marginleft: 0,marginright: 0, bgcolor: "#c0c0c0" }), 
-										this.classroot.treeitem({item: m})
+									view({bgcolor:"transparent",flexdirection:"row" , alignitems:"stretch", padding: 0},
+										this.classroot.treeline({width:20,last:i === array.length - 1?1:0, bgcolor: "#c0c0c0" }), 
+										this.classroot.treeitem({item: m})										
 									)
 									]}.bind(this))
 								:[]
@@ -143,11 +143,10 @@ define.class(function(module, sprite, text, view, button, icon){
 	})
 	
 	// subclass to render the gridlines of the tree
-	define.class(this, 'treeline', function(view){
-		this.bgcolor = vec4("red");
-		//this.width = 20;
-		this.height = 40;
-		this.flex = 1.0;
+	define.class(this, 'treeline', function(view){	
+		//this.bgcolor = vec4("red");
+		this.flex = 1;
+		this.alignself = "stretch" 
 		this.bg = {
 			fgcolor: vec4(0.5, 0.5, 0.5, 1.),
 			last: 0,

@@ -15,6 +15,10 @@ define.class(function(sprite, text, view){
 		this.setDirty(true)
 	}
 
+	this.offset = function(){
+		this.setDirty(true);
+	}
+	
 	this.hslider = function(){
 		// we have a rectangle
 		var rel = vec2(mesh.x*width, mesh.y*height)
