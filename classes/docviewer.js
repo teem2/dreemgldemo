@@ -11,6 +11,30 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 	var Parser = require("$parsers/onejsparser");
 	//this.flex = 0.5;
 	
+	define.class(this, 'markdown', function(view, text){
+		this.attribute("body", {type: Object});
+		
+		this.render = function(){
+			if (!this.body) return [];
+			
+			if (typeof(this.body) === "Array"){
+					// join parts and do markup
+				return [];
+			}
+			else{				
+				if (typeof(this.body) === "String"){
+					return [text({fgcolor:"#303030", text:this.body, fontsize:12})];					
+				}
+				else{
+					console.log(typeof(this.body));
+					console.dir(this.body);
+					return [text({fgcolor:"#303030", text:"unknown format for body!" + this.body.toString(), fontsize:12})];
+				}
+			}
+		}
+	
+	});
+	
 	// A single documentation block with name and bodytext.
 	define.class(this, 'ClassDocItem', function(view, text){
 		// the item to display. 
@@ -382,11 +406,23 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 		var functions = [];
 		var res = [];
 		var R = this.model// 	require("$classes/dataset")
-		
-		//console.log( );
-		
+		console.log(typeof(R));
+		if(typeof(R) === "object")
+		{
+			if (Object.getPrototypeOf(R) === String.prototype){
+				return [this.classroot.markdown({body: " " + R.toString()})]
+			}
+			else{
+				console.log("DocViewer does not know what to do with this:", R);
+				return [];
+			}
+		}
+		else{
 		var class_doc = BuildDoc(R)
 		
 		return [this.ClassDocView({class_doc:class_doc})]
+		}
+		//console.log( );
+		
 	}
 })
