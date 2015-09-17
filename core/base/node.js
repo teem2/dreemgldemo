@@ -430,7 +430,7 @@ define.class(function(require, constructor){
 
 				var config = this[config_key]
 
-				this[value_key] = config.type(value)
+				this[value_key] = value;
 				
 				if(this.atAttributeSet !== undefined) this.atAttributeSet(key, value)
 				if(on_key in this || listen_key in this)  this.emit(key, value)

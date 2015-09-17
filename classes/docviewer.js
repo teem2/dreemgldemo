@@ -3,31 +3,81 @@
 define.class(function(sprite,view, require, text,foldcontainer,icon){
 	
 	this.bgcolor = vec4("transparent" );	
-	this.attribute("model", {type:Object})
+	this.attribute("model",{})
 	this.state("model");
-	
 	this.flex = 1.0
 	this.padding=20;
 	var Parser = require("$parsers/onejsparser");
 	//this.flex = 0.5;
 	
 	define.class(this, 'markdown', function(view, text){
-		this.attribute("body", {type: Object});
-		
+		this.attribute("body", {});
+			this.flexdirection = "column"
+
+		// create a set of visual elements for an array of textlines
+		this.BuildMarkdown= function(lines){
+			var res = [];
+			console.dir(lines);
+			for(var a in lines)
+			{
+				
+				var L = lines[a];
+				var LT = L.trim();
+				if (LT.length == 0) continue;
+				var fontsize = 14;
+				var Margin = vec4(10,10,10,10);
+				if (LT.indexOf("######") == 0){
+					L = LT.substr(7);
+					fontsize = 16;				
+				} else if (LT.indexOf("#####") == 0){
+					L = LT.substr(6);
+					fontsize = 18;
+				} else if (LT.indexOf("####") == 0){
+					L = LT.substr(5);
+					fontsize = 22;
+				} else if (LT.indexOf("###") == 0){
+					L = LT.substr(4);
+					fontsize = 25;
+				} else if (LT.indexOf("##") == 0){
+					L = LT.substr(3);
+					fontsize = 27;
+				} else if (LT.indexOf("#") == 0){
+					L = LT.substr(2);					
+					fontsize = 30;
+				} else {
+					// yay!
+				}
+				
+				res.push(text({fgcolor: "#202020", margin: Margin, text: L, fontsize: fontsize}));
+			}
+			
+			return res;
+		}
 		this.render = function(){
 			if (!this.body) return [];
 			
-			if (typeof(this.body) === "Array"){
+			if (typeof(this.body) === "array"){
 					// join parts and do markup
-				return [];
+					
+				var lines = [];
+				for(var i in this.body)
+				{
+					var splitted = this.body[i].split('\n')
+					for(var j in splitted) lines.push(splitted[j]);
+				}
+					
+				return this.BuildMarkdown(lines);;
 			}
 			else{				
-				if (typeof(this.body) === "String"){
-					return [text({fgcolor:"#303030", text:this.body, fontsize:12})];					
+				if (typeof(this.body) === "string"){
+					
+					var lines = [];
+					var splitted = this.body.split('\n');
+					for(var j in splitted) lines.push(splitted[j]);
+
+					return this.BuildMarkdown(lines);
 				}
 				else{
-					console.log(typeof(this.body));
-					console.dir(this.body);
 					return [text({fgcolor:"#303030", text:"unknown format for body!" + this.body.toString(), fontsize:12})];
 				}
 			}
@@ -233,7 +283,10 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 									defvaluename = attr.value;
 								}
 }
-							var attrdoc = {name: attrname, type:attr.type.name.toString(), defvalue: defvaluename, body_text: WalkCommentUp(step.cmu)}
+
+							var typename ="typeless";
+						if (attr.type) typename =attr.type.name.toString()
+							var attrdoc = {name: attrname, type:typename, defvalue: defvaluename, body_text: WalkCommentUp(step.cmu)}
 							class_doc.attributes.push(attrdoc)
 							
 						} else if (step.fn.key.name === "event"){							
@@ -406,21 +459,14 @@ define.class(function(sprite,view, require, text,foldcontainer,icon){
 		var functions = [];
 		var res = [];
 		var R = this.model// 	require("$classes/dataset")
-		console.log(typeof(R));
-		if(typeof(R) === "object")
+		
+		if(typeof(R) === "string")
 		{
-			if (Object.getPrototypeOf(R) === String.prototype){
 				return [this.classroot.markdown({body: " " + R.toString()})]
-			}
-			else{
-				console.log("DocViewer does not know what to do with this:", R);
-				return [];
-			}
 		}
 		else{
-		var class_doc = BuildDoc(R)
-		
-		return [this.ClassDocView({class_doc:class_doc})]
+			var class_doc = BuildDoc(R)		
+			return [this.ClassDocView({class_doc:class_doc})]
 		}
 		//console.log( );
 		
