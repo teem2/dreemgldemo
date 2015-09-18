@@ -11,10 +11,19 @@ define.class(function(module, sprite, text, view, button, icon){
 	// This event gets triggered when an item is selected.
 	this.event('selectclick')
 
+	// json structure
+	/*var json = {
+		name:'hello'
+		children:[
+			{name:'child1'},
+			{name:'child2', children:[]},
+		]
+	}*/
+
 	// The fold button is a very very flat button. 
 	define.class(this, 'foldbutton', function(button){
 		this.borderwidth = 0
-		this.padding =  4
+		this.padding =  0
 		this.labelactivecolor = vec4("#303000")
 		this.bordercolor= "transparent"
 		this.buttoncolor1 =  vec4(1,1,1,0.0)
@@ -35,7 +44,7 @@ define.class(function(module, sprite, text, view, button, icon){
 	define.class(this, 'newitemheading', function(view){
 		this.borderwidth = 0;
 		this.attribute("folded", {type: boolean, value: false});
-		this.padding =  4;
+		this.padding =  0
 		this.labelactivecolor = vec4("#303000");
 		this.bordercolor= "transparent";
 		this.buttoncolor1 = vec4(1,1,1,0.0)
