@@ -58,7 +58,7 @@ define.class(function(sprite, text, view){
 						
 			var rulerres = [];
 			if (this.from) rulerres.push(text({position: "absolute", text: this.from.toString(),width:100,height:20, bgcolor:"transparent", left: this.from+this.offset}));
-			if (this.to) rulerres.pish(text({position: "absolute", text: this.to.toString(),width:100,height:20, bgcolor:"transparent", left: this.to+this.offset}));
+			if (this.to) rulerres.push(text({position: "absolute", text: this.to.toString(),width:100,height:20, bgcolor:"transparent", left: this.to+this.offset}));
 				
 			return rulerres
 		}
