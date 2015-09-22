@@ -1,5 +1,9 @@
 # Dreem Internals
 
+This document contains a compact overview of some of the core components of DreemGL. The document will be
+extended over the next 6 weeks. Once the documentation system is fully working, content in this document
+can be added to the regular Dreem documentation.
+
 ## UI Rendering in Dreem
 Dreem uses two concepts when updating the UI: Rendering and drawing:
 
@@ -10,6 +14,7 @@ render functions on all UI widgets are just a way to expand that scene graph.
 Drawing is the process of walking the scene graph and calling draw() on each node. Drawing is tied to the
 [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) calls.
 
+### Classes containing the logic for Rendering and Drawing
 The source code dealing with rendering is mostly contained the following three files:
 [renderer.js](./core/renderer/renderer.js)
 [screen_gl.js](./core/renderer/screen_gl.js)
@@ -19,7 +24,13 @@ The source code dealing with rendering is mostly contained the following three f
 the scene graph.
 
 [screen_gl.js](./core/renderer/screen_gl.js) represents a screen instance in the composition. The class extends
-[screen_base](./core/renderer/screen_base.js), which contains the API definition for a screen shared across runtimes.
+[screen_base](./core/renderer/screen_base.js), which contains the API definition for a screen shared across runtimes. 
+The actual screen class [screen.js](./classes/screen.js)can be found in the classes folder, and requires the runtime 
+specific renderer.
+
+	define(function(require, exports, module){
+		module.exports = require('$renderer/screen_$rendermode.js')
+	})
 
 [sprite_gl.js](./core/renderer/sprite_gl.js) is the base object for any visual element on the screen. sprite_gl takes 
 care of doing the actual drawing of the visual elements. For a different runtime - e.g. DALi - a sprite_dali.js 
@@ -58,3 +69,14 @@ The subviews of a view or component are stored on the *instance_children* array 
 Every background shader for a every visible item is a nested class which lives on a sprite. A good example is the
 [sprite_gl.js background color](https://github.com/teem2/dreemgl/blob/dev/core/renderer/sprite_gl.js#L34-L80). Nested
  classes contain a reference to the container class through the classroot reference.
+ 
+ Nested classes add a lot of flexibility when building components using class composition: To specialize shader on a
+  view,  
+ 
+## Known Limitations
+1. Event handling for sprites/views only works if the sprite/view receiving the event is the child of another sprite. So
+	
+		screen -> sprite/view (w:100%,h:100%) -> sprite/view receiving events.
+		
+2. Screen does not maintain maximum height when width/height are set to 100%, and a child view is placed onto the
+ screen.
