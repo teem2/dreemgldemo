@@ -1,14 +1,12 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 define.class(function(sprite, text, view, icon){
-	// Button. A clickable rectangle with an optional label/icon
-	
 	
 	// the label for the button
 	this.attribute("text", {type: String, value: ""});
 	// the icon for the button, see FontAwesome for the available icon-names.
 	this.attribute("icon", {type: String, value: ""});
-	
+
 	// font size in device-pixels.
 	this.attribute("fontsize", {type: float, value: 14});
 	
@@ -23,9 +21,9 @@ define.class(function(sprite, text, view, icon){
 	this.attribute("pressedcolor2", {type: vec4, value: vec4("#d0d0f0")});
 	this.buttonres = {};
 		
-		// the shader for the inside fill
-		// <mesh> Texture coordinate from vertex (in 0,0 -> 1,1 space) 
-		// <distance> Distance to outside border (in pixels) 
+	// the shader for the inside fill
+	// <mesh> Texture coordinate from vertex (in 0,0 -> 1,1 space) 
+	// <distance> Distance to outside border (in pixels) 
 	this.buttonfill = function(mesh,distance){
 		var fill = mix(col1, col2, (mesh.y)/0.8);
 		return fill;

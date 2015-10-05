@@ -106,4 +106,10 @@ define.class(function(require, exports, self){
 		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, frame.frame_buf)
 		this.gl.viewport(0, 0, frame.size[0], frame.size[1])
 	}
+
+	this.readPixels = function(x, y, w, h){
+		var buf = new Uint8Array(w*this.ratio*h*this.ratio*4);
+		this.gl.readPixels(x * this.ratio, y * this.ratio, w * this.ratio, h * this.ratio, this.gl.RGBA, this.gl.UNSIGNED_BYTE, buf);
+		return buf
+	}
 })

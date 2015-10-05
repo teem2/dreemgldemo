@@ -83,7 +83,7 @@ function main(){
 	define.$external = define.joinPath(define.$root, args['-external'] || '../compositions')
 	define.$rendermode = 'headless'
 
-	try{fs.mkdirSync(define.expandVariables(define.$build))}catch(e){}
+	//try{fs.mkdirSync(define.expandVariables(define.$build))}catch(e){}
 
 	if(args['-nomoni']){
 		if(args['-sync']){

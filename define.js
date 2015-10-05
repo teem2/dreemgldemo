@@ -68,7 +68,7 @@
 		// parse from the last . to end
 		var m = file.match(/\.([^.\/]+)($|\?)/)
 		if(!m) return ''
-		return m[1]
+		return m[1].toLowerCase()
 	}
 
 	define.fileBase = function(file){
@@ -1405,6 +1405,10 @@
 			function localRequire(name) {
 				if(arguments.length != 1) throw new Error("Unsupported require style")
 
+				// we cant require non js files
+				var ext = define.fileExt(name)
+				if(ext !== '' && ext !== 'js') return undefined
+
 				name = define.expandVariables(name)
 				try{
 					var full_name = Module._resolveFilename(name, module)
@@ -1421,9 +1425,6 @@
 				var old_stack = define.local_require_stack
 				define.local_require_stack = []
 
-				// we cant require non js files
-				var ext = define.fileExt(full_name)
-				if(ext !== '' && ext !== 'js') return undefined
 
 				try{
 					var ret = require(full_name)

@@ -102,8 +102,13 @@ define.class(function(require){
 		}
 
 		// lets load up the teem nodejs part
-		var TeemServer = require(this.index_real)
-		this.teem = new TeemServer(this.busserver)
+		try{
+			var TeemServer = require(this.index_real)
+			this.teem = new TeemServer(this.busserver)
+		}
+		catch(e){
+			console.log(e.stack)
+		}
 	}
 
 	this.loadHTML = function(title, boot){

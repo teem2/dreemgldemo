@@ -90,10 +90,10 @@ define.class('$gl/glshader', function(require, exports, self){
 			var italic = this.italic_ness * info.height * this.font_size
 			if(this.font.baked){
 				this.pushQuad(
-					x1, y1, info.tmin_x, info.tmin_y, unicode, 0, 0, 0,
-					x2, y1, info.tmax_x, info.tmin_y, unicode, 0, 0, 0,
-					x1 + italic, y2, info.tmin_x, info.tmax_y, unicode, 0, 0, 0,
-					x2 + italic, y2, info.tmax_x, info.tmax_y, unicode, 0, 0, 0
+					x1, y1, info.tmin_x, info.tmin_y, unicode, m1, m2, m3,
+					x2, y1, info.tmax_x, info.tmin_y, unicode, m1, m2, m3,
+					x1 + italic, y2, info.tmin_x, info.tmax_y, unicode, m1, m2, m3,
+					x2 + italic, y2, info.tmax_x, info.tmax_y, unicode, m1, m2, m3
 				)
 			}
 			else{
@@ -116,8 +116,7 @@ define.class('$gl/glshader', function(require, exports, self){
 			var length = string.length
 			// alright lets convert some text babeh!
 			for(var i = 0; i < length; i++){
-	
-				var unicode = string.struct? string.array[i*4]: string.charCodeAt(i)
+				var unicode = string.struct? string.array[i * 4]: string.charCodeAt(i)
 				var info = this.font.glyphs[unicode]
 				if(!info) info = this.font.glyphs[32]
 				// lets add some vertices

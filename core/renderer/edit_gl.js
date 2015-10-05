@@ -2,11 +2,9 @@
 // Sprite class
 
 define.class('./sprite_gl', function(require, exports, self){	
-	var GLText = require('$gl/gltext')
-	var GLShader = require('$gl/glshader')
-	var GLCursor = require('$gl/glcursor')
-	var GLMarker = require('$gl/glmarker')
-	var GLDebug = require('$gl/gldebug')
+	define.class(this, 'fg', require('$gl/gltext'), function(){})
+	define.class(this, 'cursor', require('$gl/glcursor'), function(){})
+	define.class(this, 'marker', require('$gl/glmarker'), function(){})
 
 	// lets require the keyhandling from edit
 	this.mixin(require('$edit/editorimpl'))
@@ -19,10 +17,6 @@ define.class('./sprite_gl', function(require, exports, self){
 
 	this.attribute("cursorcolor", {type:vec4, value: vec4("black")});
 	
-	define.class(this, 'fg', GLText, function(){})
-	define.class(this, 'cursor', GLCursor, function(){})
-	define.class(this, 'marker', GLMarker, function(){})
-
 	this.bg = {
 		color: 'vec4(0.6)'
 	}

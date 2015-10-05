@@ -288,6 +288,8 @@ define.class('./sprite_base', function(require, exports){
 	
 	this.destroy = function(){
 		if (this.preDraw) this.screen.unregisterPredraw(this);
+		if (this.postDraw) this.screen.unregisterPostdraw(this);
+
 		//if(this.interfaceguid){
 		//	this.screen.freeGuid(this.interfaceguid);		
 		//	this.interfaceguid = 0
@@ -316,7 +318,13 @@ define.class('./sprite_base', function(require, exports){
 		this.matrixdirty = true
 	}
 	*/
-	this.init = function(obj){
+
+	this.init = function(){
+		this.bg_shader = new this.bg()
+		this.fg_shader = new this.fg()
+	}
+
+	this.reinit = function(obj){
 		
 		this.orientation = {
 			rotation : vec3(0, 0, 0), // (or {0,0,0} for 3d rotation)
@@ -340,9 +348,6 @@ define.class('./sprite_base', function(require, exports){
 		this.texturecache = false;
 		this.effectiveopacity = this.opacity;
 
-		this.bg_shader = new this.bg()
-		this.fg_shader = new this.fg()
-
 		// if we have a bgimage, we have to set our bgimage function to something
 		if(this.bgimage){
 			// lets make the thing fetch a texture
@@ -359,13 +364,18 @@ define.class('./sprite_base', function(require, exports){
 				}
 			}
 
-			require.async(this.bgimage).then(function(result){
+			var imgload = function(result){
 				this.bg_shader.texture = GLTexture.fromImage(result)
 				if(isNaN(this.width)) this.width = this.bg_shader.texture.size[0]
 				if(isNaN(this.height)) this.height = this.bg_shader.texture.size[1]
 				this.reLayout()
 				this.setDirty(true)
-			}.bind(this))
+			}.bind(this)
+
+			if(typeof this.bgimage === 'string')
+				require.async(this.bgimage).then(imgload)
+			else
+				imgload(this.bgimage)
 		}
 
 		if (this.hasListeners('click') || this.hasListeners('mouseleftdown') || 
@@ -398,6 +408,8 @@ define.class('./sprite_base', function(require, exports){
 
 		this.interfaceguid = this.screen.allocGuid(this);
 		if (this.preDraw) this.screen.registerPredraw(this);
+		if (this.postDraw) this.screen.registerPostdraw(this);
+
 		this.effectiveguid = this.interfaceguid;
 	}
 

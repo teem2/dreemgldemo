@@ -10,8 +10,8 @@ define.class(function(sprite,  view, scrollbar){
 	this.flex = 1;
 
 	this.attribute("scrollbarwidth", {type: int, value: 16});
-	this.attribute("has_hscroll", {type: boolean, value: true});
-	this.attribute("has_vscroll", {type: boolean, value: true});
+	this.attribute("hscrollvisible", {type: boolean, value: true});
+	this.attribute("vscrollvisible", {type: boolean, value: true});
 	this.attribute("move_view_bgcolor", {type: vec4, value: vec4("white")});
 	
 	this.mousewheelx = function(){
@@ -70,7 +70,7 @@ define.class(function(sprite,  view, scrollbar){
 						)
 					)
 				),
-				this.has_vscroll && (this.vscroll = scrollbar({width:this.scrollbarwidth, offset:function(){
+				this.vscrollvisible && (this.vscroll = scrollbar({width:this.scrollbarwidth, offset:function(){
 					var val = this.offset * pthis.scaled_height * -1
 					//debugger
 					pthis.move_view.y = val
@@ -79,7 +79,7 @@ define.class(function(sprite,  view, scrollbar){
 			),
 			view({flexdirection :"row" },
 				view({width:this.scrollbarwidth}),
-				this.has_hscroll &&	(this.hscroll = scrollbar({vertical:false, height:this.scrollbarwidth, flex:1, offset:function(){
+				this.hscrollvisible &&	(this.hscroll = scrollbar({vertical:false, height:this.scrollbarwidth, flex:1, offset:function(){
 					pthis.move_view.x = this.offset * pthis.scaled_width * -1
 				}}))
 			)
