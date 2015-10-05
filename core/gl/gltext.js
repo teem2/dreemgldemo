@@ -82,6 +82,39 @@ define.class('$gl/glshader', function(require, exports, self){
 			this.add_y = this.start_y //=== null? this.min_y:0
 		}
 
+		this.measurestring = function(string){
+			var res = {w:0, h:0};
+			if (!string || string.length == 0) return res;
+			
+			var length = string.length
+			// alright lets convert some text babeh!
+			for(var i = 0; i < length; i++){
+				var unicode = string.struct? string.array[i * 4]: string.charCodeAt(i)
+				var info = this.font.glyphs[unicode]
+				if(!info) info = this.font.glyphs[32]
+				res.w += info.advance * this.font_size
+				
+			}
+			
+			return res;
+		}
+
+		this.addWithinWidth = function(string, maxwidth, m1, m2, m3){
+			var words = string.split(' ');
+			for(var i = 0;i<words.length;i++){
+					
+					if (this.add_x > 0) {
+						var s = this.measurestring(words[i]);
+						if (this.add_x + s.w > maxwidth){
+							this.add_x = 0;
+							this.add_y += this.font_size * this.line_spacing
+						}
+					}
+					this.add(words[i] + ' ');
+			}
+			
+		}
+
 		this.addGlyph = function(info, unicode, m1, m2, m3){
 			var x1 = this.add_x + this.font_size * info.min_x
 			var x2 = this.add_x + this.font_size * info.max_x

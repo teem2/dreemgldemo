@@ -23,7 +23,7 @@ define.class('./sprite_gl', function(require, exports, self){
 		if(this.font) this.font = glfontParser(this.font)
 	}
 
-	this.lazyInit = function(){
+	this.lazyInit = function(maxwidth){
 		if(this.rendered_text !== this.text){
 			this.rendered_text = this.text
 			var textbuf = this.fg_shader.newText()
@@ -35,14 +35,19 @@ define.class('./sprite_gl', function(require, exports, self){
 			textbuf.fgcolor = this.color
 			textbuf.start_y = textbuf.line_height
 			textbuf.clear()
-			textbuf.add(this.text)
+			if (this.multiline){
+				textbuf.addWithinWidth(this.text, maxwidth? maxwidth: this.layout.width);
+			}
+			else{
+				textbuf.add(this.text)
+			}
 			//this.fg.textcolor = this.color;
 			this.fg_shader.mesh = textbuf
 		}
 	}
 
 	this.sizetocontent = function(width){
-		this.lazyInit()
+		this.lazyInit(width)
 		return {width: this.fg_shader.mesh.bound_w, height: this.fg_shader.mesh.bound_h};
 	}
 
