@@ -9,6 +9,7 @@ define.class('./sprite_gl', function(require, exports, self){
 	this.attribute('fontsize', {type:float, value: 18});
 	this.attribute('font', {type:Object, value: undefined});
 	this.attribute('color', {type:vec4, value: vec4(1,1,1,1)});
+	this.attribute('multiline', {type:Boolean, value: false })
 	
 	define.class(this, 'fg', GLText, function(){
 	})

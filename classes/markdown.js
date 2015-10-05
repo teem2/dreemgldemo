@@ -48,7 +48,7 @@ define.class( function(view, text){
 				// default text
 			}
 			
-			res.push(text({fgcolor: this.fontcolor, margin: Margin, text: L, fontsize: fontsize}));
+			res.push(text({fgcolor: this.fontcolor, margin: Margin, text: L, fontsize: fontsize, multiline: true}));
 		}
 		
 		return res;
