@@ -56,12 +56,11 @@ define.class( function(view, text){
 	
 	this.render = function(){
 		if (!this.body) return [];
-		
-		if (typeof(this.body) === "array"){
+		if (typeof(this.body) === "array" || (this.body.length && typeof(this.body) !== "string" ) ){
 				// join parts and do markup
 				
 			var lines = [];
-			for(var i in this.body)
+			for(var i = 0;i<this.body.length;i++)
 			{
 				var splitted = this.body[i].split('\n')
 				for(var j in splitted) lines.push(splitted[j]);
@@ -79,7 +78,7 @@ define.class( function(view, text){
 				return this.BuildMarkdown(lines);
 			}
 			else{
-				return [text({fgcolor:"#303030", text:"unknown format for body!" + this.body.toString(), fontsize:12})];
+				return [text({fgcolor:"#303030", text:"unknown format for body!\n\n" + this.body.toString(), multiline: true, fontsize:12})];
 			}
 		}
 	}

@@ -314,10 +314,10 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 		}
 		if (class_doc.body_text.length > 0)
 		{
-			for (var a in class_doc.body_text){
-				var L = class_doc.body_text[a];
-				body.push(text({width: 500, text:L,fontsize: 14, margin: vec4(10,0,10,10), fgcolor: "#303030" }));
-			}
+		//	for (var a in class_doc.body_text){
+			//	var L = class_doc.body_text[a];
+				body.push(markdown({body:class_doc.body_text,fontsize: 14, margin: vec4(10,0,10,10), fgcolor: "#303030" }));
+		//	}
 		}
 			res.push(view({flexdirection:"column", margin: vec4(10,0,0,20)}, body));
 
