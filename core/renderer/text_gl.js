@@ -24,8 +24,9 @@ define.class('./sprite_gl', function(require, exports, self){
 	}
 
 	this.lazyInit = function(maxwidth){
-		if(this.rendered_text !== this.text){
+		if(this.rendered_text !== this.text || this.lastmaxwidth !== maxwidth){
 			this.rendered_text = this.text
+			this.lastmaxwidth = maxwidth;
 			var textbuf = this.fg_shader.newText()
 
 			if(this.font) textbuf.font = this.font
