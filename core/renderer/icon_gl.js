@@ -5,6 +5,18 @@ define.class('./text_gl', function(require, exports, self){
 
 	// The icon class provides an easy way to access most of the commonly used web icons. Look at the FontAwesome cheat sheet to see what can be used.
 
+	
+	var icon = this.constructor;
+	
+	// Basic usage
+	define.example(this, function BasicUsage(){
+		return [
+			icon({icon:"flask", fontsize: 50, fgcolor: "red"})
+			,icon({icon:"youtube", fontsize: 50, fgcolor: "green"})
+			,icon({icon:"gears", fontsize: 50, fgcolor: "yellow"})
+			,icon({icon:"twitter", fontsize: 50, fgcolor: "blue"})
+		]
+	})
 	var table = {
 		'500px':'\uf26e',
 		'adjust':'\uf042',
