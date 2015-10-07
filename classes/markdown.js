@@ -6,6 +6,10 @@ define.class( function(view, text){
 	// Body can be a single string or an array of strings - each string will be its own paragraph.
 	this.attribute("body", {});
 	
+	// alignment of the bodytext. 
+	// accepted values are "left", "right", "justify" and "center" 
+	this.attribute("align", {type: String,  value: "left"});
+
 	// Base fontsize - heading sizes will be multiples of this value.
 	this.attribute("fontsize", {type:Number, value: 13});
 	
@@ -48,7 +52,7 @@ define.class( function(view, text){
 				// default text
 			}
 			
-			res.push(text({fgcolor: this.fontcolor, margin: Margin, text: L, fontsize: fontsize, multiline: true}));
+			res.push(text({fgcolor: this.fontcolor, margin: Margin, text: L, fontsize: fontsize, multiline: true, align: this.align}));
 		}
 		
 		return res;

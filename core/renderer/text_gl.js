@@ -5,11 +5,22 @@ define.class('./sprite_gl', function(require, exports, self){
 	var GLText = require('$gl/gltext')
 	var glfontParser = require('$gl/glfontparser')
 
+	// the string to display.
 	this.attribute('text', {type:String, value: "HELLO" })
+	
+	// size of the font in pixels
 	this.attribute('fontsize', {type:float, value: 18});
+	
+	// name of the font.
 	this.attribute('font', {type:Object, value: undefined});
+	
 	this.attribute('color', {type:vec4, value: vec4(1,1,1,1)});
 	this.attribute('multiline', {type:Boolean, value: false })
+	
+	// alignment of the bodytext. 
+	// accepted values are "left", "right", "justify" and "center" 
+		this.attribute("align", {type: String,  value: "left"});
+
 	
 	define.class(this, 'fg', GLText, function(){
 	})
@@ -24,9 +35,11 @@ define.class('./sprite_gl', function(require, exports, self){
 	}
 
 	this.lazyInit = function(maxwidth){
-		if(this.rendered_text !== this.text || this.lastmaxwidth !== maxwidth){
+		if(this.rendered_text !== this.text || this.lastmaxwidth !== maxwidth || this.align != this.lastalign){
 			this.rendered_text = this.text
 			this.lastmaxwidth = maxwidth;
+			this.lastalign = this.align;
+			
 			var textbuf = this.fg_shader.newText()
 
 			if(this.font) textbuf.font = this.font
@@ -34,6 +47,7 @@ define.class('./sprite_gl', function(require, exports, self){
 			textbuf.font_size = this.fontsize;
 			textbuf.add_y = textbuf.line_height;
 			textbuf.fgcolor = this.color
+			textbuf.align = this.align;
 			textbuf.start_y = textbuf.line_height
 			textbuf.clear()
 			if (this.multiline){

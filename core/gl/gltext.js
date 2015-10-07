@@ -23,6 +23,8 @@ define.class('$gl/glshader', function(require, exports, self){
 		tex:vec2,
 		tag:vec4,
 	}).extend(function(exports, self){
+		
+		this.align = "left";
 		this.start_x = 0
 		this.start_y = 0
 		this.text_x = 0
@@ -101,17 +103,71 @@ define.class('$gl/glshader', function(require, exports, self){
 
 		this.addWithinWidth = function(string, maxwidth, m1, m2, m3){
 			var words = string.split(' ');
+			var lines = []
+			var widths  = []
+			var currentline = []
+			var currentw = 0;
 			for(var i = 0;i<words.length;i++){
 					
-					if (this.add_x > 0) {
-						var s = this.measurestring(words[i]);
-						if (this.add_x + s.w > maxwidth){
-							this.add_x = 0;
-							this.add_y += this.font_size * this.line_spacing
-						}
+					var s = this.measurestring("_" + words[i]);
+					if (currentw > 0) {
+						if (currentw + s.w > maxwidth){
+							lines.push(currentline);
+							widths.push(currentw);
+							currentw = 0;
+							currentline = [];
+						}					
 					}
-					this.add(words[i] + ' ');
+					
+					currentw+= s.w;
+					currentline.push(words[i]);
+				
+			//		this.add(words[i] + ' ');
 			}
+			if (currentline.length > 0) {
+				lines.push(currentline);
+				widths.push(currentw);
+			}
+
+			if (this.align === "left"){
+				for (var i = 0;i<lines.length;i++){
+					this.add_x = 0;
+					var line = lines[i];
+					for (var j = 0;j<line.length;j++) this.add(line[j] + ' ');
+					this.add_y += this.font_size * this.line_spacing
+				} 
+			} else if (this.align === "right"){
+				for (var i = 0;i<lines.length;i++){
+					this.add_x = maxwidth - widths[i];
+					var line = lines[i];
+					for (var j = 0;j<line.length;j++) this.add(line[j] + ' ');
+					this.add_y += this.font_size * this.line_spacing
+				} 
+			}
+			 else if (this.align === "center"){
+				for (var i = 0;i<lines.length;i++){
+					this.add_x = maxwidth/2 - widths[i]/2;
+					var line = lines[i];
+					for (var j = 0;j<line.length;j++) this.add(line[j] + ' ');
+					this.add_y += this.font_size * this.line_spacing
+				} 
+			}
+			 else if (this.align === "justify"){
+				for (var i = 0;i<lines.length;i++){
+					this.add_x = 0;
+					var line = lines[i];
+					var spacer = 0;
+					if (line.length > 1)  spacer = (maxwidth - widths[i])/ (line.length-1)
+
+					for (var j = 0;j<line.length;j++) 
+					{
+						this.add(line[j]+' ' );
+						this.add_x += spacer;
+					}
+					this.add_y += this.font_size * this.line_spacing
+				} 
+			}
+			
 			
 		}
 
