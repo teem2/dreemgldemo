@@ -49,7 +49,7 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 					)
 					,view({flex:1}
 						,scrollcontainer({hscrollvisible:false, move_view_bgcolor: "#f0f0f0"}
-							,docviewer({model: require('$root/README.md')})
+							,docviewer({model: require('$root/classes/button.js')})
 						)
 					)
 				)

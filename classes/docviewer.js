@@ -30,7 +30,6 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 
 		this.render = function(){	
 			var res = [];
-			
 			if (this.blocktype === "function"){
 				var functionsig = "()"
 				if (this.item.params && this.item.params.length > 0) { 
@@ -103,6 +102,16 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 					res.push(view({ flexdirection:"row"},[left, right]));
 				}
 				res.push(view({height:1, borderwidth: 1, bordercolor:"#e0e0e0", padding: 0}));
+			}
+			
+			if (this.blocktype === "example"){
+				res.push(
+				
+					view({flexdirection:"column", borderwidth: 1, bordercolor: "#e0e0e0", padding: vec4(4)}, 
+							view({flexdirection: "column", padding: vec4(3)}
+								,text({text:this.item.examplefunc.toString(), fontsize: 14, fgcolor:"#303030", multiline: true})
+							),
+							view({flex: 1, borderwidth: 1, padding: vec4(0), bordercolor: "#e0e0e0"}, this.item.examplefunc())));
 			}
 			return res;
 		}
@@ -212,7 +221,20 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 										//NewClass.class_name = innerclassname;
 										NewClass.body_text = WalkCommentUp(step.cmu);
 										class_doc.inner_classes.push(NewClass);
-								};
+								} else if (step.fn.key.name === "example"){
+									var Example = {};
+									Example.body_text = WalkCommentUp(step.cmu);
+									var examplename = step.args[1].id.name;
+									Example.name = examplename;
+									for (a in proto.constructor.examples)
+									{
+										if (proto.constructor.examples[a].name === examplename){
+											Example.examplefunc = proto.constructor.examples[a];
+										}
+									}
+									class_doc.examples.push(Example);
+								}	
+								
 							}
 						}
 					}
@@ -299,7 +321,7 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 		}
 		
 		return foldcontainer(
-				{collapsed:false, basecolor:color, icon:icon, title:title , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, 
+				{collapsed:true, basecolor:color, icon:icon, title:title , fontsize: 20,margin: vec4(10,0,0,20), fgcolor: "white" }, 
 					view({flexdirection: "column", flex: 1}, subs)
 			);
 	}
@@ -321,10 +343,13 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 		}
 			res.push(view({flexdirection:"column", margin: vec4(10,0,0,20)}, body));
 
+			
+
+			
+		if(class_doc.examples.length >0) res.push(this.BuildGroup(class_doc.examples, "Examples", "flask", "#e0e0e0", "example"));
 		if(class_doc.attributes.length >0) res.push(this.BuildGroup(class_doc.attributes, "Attributes", "gears", "#f0f0c0"));
-		if(class_doc.state_attributes.length >0) res.push(this.BuildGroup(class_doc.attributes, "State Attributes", "archive", "#f0c0c0"));
+		if(class_doc.state_attributes.length >0) res.push(this.BuildGroup(class_doc.state_attributes, "State Attributes", "archive", "#f0c0c0"));
 		if(class_doc.events.length >0) res.push(this.BuildGroup(class_doc.events, "Events", "plug", "#f0c0f0"));
-		
 				
 		if (class_doc.inner_classes.length > 0){
 			var classes = []
