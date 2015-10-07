@@ -30,6 +30,16 @@ define.class(function(sprite, text, icon, view){
 		this.collapsed = !this.collapsed;		
 	}
 	
+	var foldcontainer = this.constructor;
+	define.example(this, function BasicExample(){
+		
+		return [
+			foldcontainer({icon:"flask", title:"folding thing", basecolor: "#90c0f0" } ,					
+				text({text:"I can be folded away!", fgcolor:"black", bgcolor:"transparent", margin:vec4(10) })
+			)
+		]
+	})
+	
 	// subclass to lay out the clickable portion of the folding container 
 	define.class(this, 'clickablebar', function(view){
 

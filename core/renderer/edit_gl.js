@@ -17,6 +17,15 @@ define.class('./sprite_gl', function(require, exports, self){
 
 	this.attribute("cursorcolor", {type:vec4, value: vec4("black")});
 	
+	var edit = this.constructor;
+	
+	// Basic usage of the edit control
+	define.example(this, function Simple(){
+		return [
+				edit({text:"This is editable text!", bgcolor:"transparent" })
+		]
+	});
+	
 	this.bg = {
 		color: 'vec4(0.6)'
 	}

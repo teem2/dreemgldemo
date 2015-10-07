@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite, text, view, icon, button){
+define.class(function(sprite, text, view, icon){
 	
 	// the label for the button
 	this.attribute("text", {type: String, value: ""});
@@ -11,10 +11,19 @@ define.class(function(sprite, text, view, icon, button){
 	// example: example1
 	this.attribute("fontsize", {type: float, value: 14});
 	
-	// A simple button
-	define.example(this, function example1(){ return [button({text:"Press me!"})] });
 	
-
+	var button = this.constructor;
+	
+	// Some simple buttons	
+	define.example(this, function Buttons(){
+			return [
+					button({text:"Press me!"})
+					,button({text:"Colored!", buttoncolor1: "red", buttoncolor2: "blue", labelcolor: "white"  })
+					,button({text:"With an icon!", icon:"flask" })
+				] 
+			}
+		);
+	
 	// color of the labeltext in neutral state
 	this.attribute("labelcolor", {type: vec4, value: vec4("#404040")});
 	this.attribute("labelactivecolor", {type: vec4, value: vec4("black")});

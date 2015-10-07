@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite,view){
+define.class(function(sprite,view, text){
 
 // The CADGrid class provides a simple way to fill a frame with a classic engineering grid. 
 // todo:
@@ -31,6 +31,15 @@ define.class(function(sprite,view){
 		}
 	}
 
+	var grid = this.constructor
+	
+	// Basic usage of the cadgrid
+	define.example(this, function BasicUsage(){
+		return [
+			grid({}, text({fgcolor: "black", bgcolor: "transparent", text:"I'm on a grid!" , margin: vec4(20)}))
+		]		
+	})
+	
 	// The CADGrid does not do anything to its children - plain passthrough
 	this.render = function(){return this.instance_children;}
 	

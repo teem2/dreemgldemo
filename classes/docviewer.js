@@ -105,13 +105,10 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 			}
 			
 			if (this.blocktype === "example"){
-				res.push(
-				
-					view({flexdirection:"column", borderwidth: 1, bordercolor: "#e0e0e0", padding: vec4(4)}, 
-							view({flexdirection: "column", padding: vec4(3)}
-								,text({text:this.item.examplefunc.toString(), fontsize: 14, fgcolor:"#303030", multiline: true})
-							),
-							view({flex: 1, borderwidth: 1, padding: vec4(0), bordercolor: "#e0e0e0"}, this.item.examplefunc())));
+				res.push(				
+					view({flexdirection:"column", borderwidth: 1, flex:1, bordercolor: "#e0e0e0", padding: vec4(14)}
+							,text({text:this.item.examplefunc.toString(), padding:vec4(14), fontsize: 14, fgcolor:"#303030", multiline: true})
+							,view({flex: 1, borderwidth: 1, flexdirection:"column", padding: vec4(14), bordercolor: "#e0e0e0"}, this.item.examplefunc())));
 			}
 			return res;
 		}
@@ -226,7 +223,7 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 									Example.body_text = WalkCommentUp(step.cmu);
 									var examplename = step.args[1].id.name;
 									Example.name = examplename;
-									for (a in proto.constructor.examples)
+									for (var a in proto.constructor.examples)
 									{
 										if (proto.constructor.examples[a].name === examplename){
 											Example.examplefunc = proto.constructor.examples[a];
@@ -332,7 +329,7 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 		var class_doc = this.class_doc;
 		
 		if (!this.collapsible ){
-			body.push(view({},[icon({fontsize: 30, icon:"cube", fgcolor: "black" }),text({width: 500, text:class_doc.class_name,fontsize: 30,margin: vec4(10,10,0,20), fgcolor: "black" })]));
+			body.push(view({},[icon({fontsize: 38, icon:"cube", fgcolor: "black" }),text({width: 500, text:class_doc.class_name,fontsize: 30,margin: vec4(10,10,0,20), fgcolor: "black" })]));
 		}
 		if (class_doc.body_text.length > 0)
 		{
