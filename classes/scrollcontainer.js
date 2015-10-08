@@ -107,10 +107,11 @@ define.class(function(sprite,  view, scrollbar){
 				}}))	
 			),
 			view({flexdirection :"row" },
-				view({width:this.scrollbarwidth}),
 				this.hscrollvisible &&	(this.hscroll = scrollbar({vertical:false, height:this.scrollbarwidth, flex:1, offset:function(){
 					pthis.move_view.x = this.offset * pthis.scaled_width * -1
-				}}))
+				}})),
+				view({width:this.scrollbarwidth})
+				
 			)
 		]
 	}
