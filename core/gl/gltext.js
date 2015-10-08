@@ -101,7 +101,9 @@ define.class('$gl/glshader', function(require, exports, self){
 			return res;
 		}
 
-		this.addWithinWidth = function(string, maxwidth, m1, m2, m3){
+		this.addWithinWidth = function(string, maxwidth, indent, m1, m2, m3){
+			
+			if (!indent)  indent = 0;
 			var words = string.split(' ');
 			var lines = []
 			var widths  = []
@@ -114,7 +116,7 @@ define.class('$gl/glshader', function(require, exports, self){
 					if (currentw + s.w > maxwidth) {
 						lines.push(currentline);
 						widths.push(currentw);
-						currentw = 0;
+						currentw = indent;
 						currentline = [];
 					}					
 				}
@@ -134,7 +136,7 @@ define.class('$gl/glshader', function(require, exports, self){
 					if (i < lines.length -1) 
 					{
 						this.add_y += this.font_size * this.line_spacing
-						this.add_x = 0;
+						this.add_x = indent;
 					}
 				} 
 			} else if (this.align === "right") {
