@@ -14,6 +14,9 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	var FlexLayout = require('$lib/layout')
 
 	var renderer = require('$renderer/renderer')
+
+	this.attribute('locationhash', {type:Object})
+
 	this.layoutRequested = true;
 	
 	this.dirty = true
@@ -752,7 +755,7 @@ this.draw_calls = 0
 			this[key] = value
 		}
 	}
-	
+	this.state('locationhash')
 	this.state("free_guids");
 	this.state("predraw_registry");
 	this.state("postdraw_registry");
@@ -845,7 +848,38 @@ this.draw_calls = 0
 		}
 	}
 
+	this.decodeLocationHash = function(){
+		// lets split it on & into a=b pairs, 
+		var obj = {}
+		var parts = location.hash.slice(1).split(/\&/)
+		for(var i = 0; i < parts.length; i++){
+			var part = parts[i]
+			var kv = part.split(/=/)
+			if(kv.length === 1) obj[kv[0]] = true
+			else{
+				obj[kv[0]] = kv[1]
+			}
+		}
+		this.locationhash = obj
+	}
+
+	// dont fire this one
+	this.locationhash = function(obj){
+		var str = ''
+		for(var key in obj){
+			var value = obj[key]
+			if(str.length) str += '&'
+			if(value === true) str += key
+			else str += key + '=' + value
+		}
+		location.hash = '#' + str
+	}
+
 	this.bindInputs = function(){
+
+		window.onhashchange = function(){
+			this.decodeLocationHash()
+		}.bind(this)
 
 		this.keyboard.down = function(v){
 			if(!this.focus_object) return
@@ -977,11 +1011,13 @@ this.draw_calls = 0
 		this.lastmouseguid = 0;
 		this.lastidundermouse = 0;
 		this.effectiveguid = 0;
-		this.interfaceguid = 0;
+		this.interfaceguid = 1;
 		this.readGuidTimeout = this.readGuidTimeout.bind(this)
 	}
 
 	this.init = function (parent) {
+		this.decodeLocationHash()
+
 		this.pic_tex = GLTexture.rgba_depth_stencil(16, 16)
 		this.debug_tex = GLTexture.rgba_depth_stencil(16, 16)	
 		this.buf = new Uint8Array(4);
