@@ -6,7 +6,9 @@ define.class(function codeviewerbody(require, text){
 	
 	// The code to display
 	this.attribute("code", {type:String, value:""})
-	this.multiline = true
+	
+	this.attribute("wrap", {type:Boolean, value:true})
+	
 	var codeviewer = this.constructor
 	
 	// Basic usage
@@ -137,7 +139,7 @@ define.class(function codeviewerbody(require, text){
 			textbuf.align = 'left'
 			textbuf.start_y = textbuf.line_height
 			textbuf.clear()
-			if(this.multiline){
+			if(this.wrap){
 				GLTextCode.walk(ast, textbuf, function(text, group, l1, l2, l3, m3){
 					textbuf.addWithinWidth(text, maxwidth? maxwidth: this.layout.width, group, 65536 * (l1||0) + 256 * (l2||0) + (l3||0), m3)
 				}.bind(this))
