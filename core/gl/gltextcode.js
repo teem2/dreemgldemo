@@ -1,4 +1,4 @@
-"use strict";
+
 define.class(function(require, exports){
 	
 	var Parser = require('$parsers/onejsparser')
