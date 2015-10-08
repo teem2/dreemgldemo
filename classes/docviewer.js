@@ -355,9 +355,9 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown, c
 			body.push(view({}, class_doc.base_class_chain.map(function(r){
 				return [
 					icon({icon:"arrow-right", fgcolor:"gray", fontsize:15, margin:vec4(2)})
-					,button({margin: vec4(2),padding:vec4(3), text:r.name, fontsize:12, onclick: function(){console.log(r.path)}.bind(this)})
+					,button({margin: vec4(2),padding:vec4(3), text:r.name, fontsize:12, onclick: function(){this.screen.locationhash = {path: '$root'  + r.path};}.bind(this)})
 				]
-			})));
+			}.bind(this))));
 		}
 	
 		if (class_doc.body_text.length > 0) {

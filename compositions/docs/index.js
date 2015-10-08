@@ -21,10 +21,11 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 				render:function(){
 					if (this.locationhash && this.locationhash.path){
 						require.async(this.locationhash.path).then(function(module){
+							console.log("async done!");
 						this.find('docviewer').model = module						
-					})
+					}.bind(this))
 					}
-					console.log(this);
+					console.log(this.locationhash);
 					return [
 				splitcontainer({ vertical: false, position: "relative", flexdirection: "row", bgcolor: "black", alignitems:"stretch", alignself: "stretch" , flex:1}
 					,view({flexdirection:"column", padding: 0, flex: 0.2}
