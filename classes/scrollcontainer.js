@@ -12,6 +12,7 @@ define.class(function(sprite,  view, scrollbar){
 	
 	var scrollcontainer = this.constructor;
 	
+	// Basic usage of the scrollcontainer
 	define.example(this, function Usage(){
 			return [
 				scrollcontainer({height: 300, width: 300}
@@ -36,7 +37,9 @@ define.class(function(sprite,  view, scrollbar){
 	// Background color of the movable inside view. 
 	this.attribute("move_view_bgcolor", {type: vec4, value: vec4("white")});
 	
-	this.mousewheelx = function(){
+	// Scrollwheel handler to move horizontally
+	// <value> the amount scrolled by
+	this.mousewheelx = function(value){
 		if(this.hscroll && this.mouse_height){
 			var off = this.hscroll.offset
 			off = clamp(off + value / this.mouse_width, 0, 1 - this.hscroll.page)
@@ -44,6 +47,8 @@ define.class(function(sprite,  view, scrollbar){
 		}
 	}
 
+	// Scrollwheel handler to move vertically
+	// <value> the amount scrolled by
 	this.mousewheely = function(value){
 		if(this.vscroll && this.mouse_height){
 			var off = this.vscroll.offset
@@ -52,25 +57,27 @@ define.class(function(sprite,  view, scrollbar){
 		}
 	}
 
+	// Recalculate the size of the scrollbar draggers
+	// <view> the view-derived class to measure
 	this.updatescrollbars = function(view){
 		var rect = view.getUnclippedBoundingRect()
 		if(this.vscroll){
-			if(view.layout.height > rect.height){
+			if(view.layout.height >= rect.height){
 				this.vscroll.page = 1
 			}
 			else{
 				this.vscroll.page = view.layout.height / rect.height
-				this.scaled_height = (rect.height - view.layout.height) / (1 - this.vscroll.page)
+				this.scaled_height = (rect.height - view.layout.height + this.scrollbarwidth) / (1 - this.vscroll.page)
 				this.mouse_height = rect.height
 			}
 		}
 		if(this.hscroll){
-			if(view.layout.width > rect.right){
+			if(view.layout.width >= rect.right){
 				this.hscroll.page = 1
 			}
 			else{
 				this.hscroll.page = view.layout.width / rect.right
-				this.scaled_width = (rect.right - view.layout.width) / (1 - this.hscroll.page)
+				this.scaled_width = (rect.right - view.layout.width + this.scrollbarwidth) / (1 - this.hscroll.page)
 				this.mouse_width = rect.bottom
 			}
 		}

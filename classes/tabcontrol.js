@@ -1,10 +1,29 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // ruler class
 
-define.class(function(sprite,  view, button){
+define.class(function(sprite,  view, button, text){
 	// Create a tabcontrol - 1 tab for each instance-child. Each instance-child can provide a title and an icon property which will be used in the activation button for the tab.
-		
+	
+
+	// The currently active tab. 
 	this.attribute("activetab", {type: int, value: 0});
+	
+	// The currently active tab. 
+	this.state("activetab");
+	
+	var tabcontrol = this.constructor;
+	
+	define.example(this, function Usage(){
+		return [
+			tabcontrol({}
+			,text({tabicon:"flask", tabname:"Flask",  text: "I am on tab 1 - my icon is a flask!", fgcolor: "blue", fontsize: 20})
+			,text({tabicon:"gears",tabname:"Gears",text: "I am on tab 2 - my icon is a gearbox!", fgcolor: "red", fontsize: 20})
+			,text({tabicon:"briefcase",tabname:"Briefcase",text: "I am on tab 3 - my icon is a briefcase!", fgcolor: "green", fontsize: 20})
+			,text({tabicon:"battery-full",tabname:"Battery",text: "I am on tab 4 - my icon is a battery!", fgcolor: "yellow", fontsize: 20})
+			)
+		]
+		
+	});
 	this.attribute("color", {type: vec4, value: vec4("#404050")});
 	this.attribute("hovercolor", {type: vec4, value: vec4("#5050a0")});
 	this.attribute("activecolor", {type: vec4, value: vec4("#7070a0")});
