@@ -1,12 +1,12 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function codeviewer(require, text){
+define.class(function codeviewerbody(require, text){
 
 	// Display a function as syntax highlighted code.
 	
 	// The code to display
 	this.attribute("code", {type:String, value:""})
-	
+	this.multiline = true
 	var codeviewer = this.constructor
 	
 	// Basic usage
@@ -119,31 +119,38 @@ define.class(function codeviewer(require, text){
 		}
 	}
 
-	this.text = "HELLO"
+	this.code = codeviewerbody.toString()
 
-	this.code = codeviewer
-
-	this.lazyInit = function(width){
-		if(this.code !== this.printedcode){
+	this.lazyInit = function(maxwidth){
+		if(this.code !== this.printedcode || this.lastmaxwidth !== maxwidth || this.align != this.lastalign){
 			this.printedcode = this.code
-			var ast = Parser.parse(this.code.toString())
+			this.lastmaxwidth = maxwidth;
+			this.lastalign = this.align;
+			
 			var textbuf = this.fg_shader.newText()
+			var ast = Parser.parse(this.code)
 
 			if(this.font) textbuf.font = this.font
+
 			textbuf.font_size = this.fontsize;
 			textbuf.add_y = textbuf.line_height;
-			textbuf.fgcolor = this.color
-			textbuf.align = this.align;
+			textbuf.align = 'left'
 			textbuf.start_y = textbuf.line_height
-			textbuf.boldness = 0.5
 			textbuf.clear()
+			if(this.multiline){
+				GLTextCode.walk(ast, textbuf, function(text, group, l1, l2, l3, m3){
+					textbuf.addWithinWidth(text, maxwidth? maxwidth: this.layout.width, group, 65536 * (l1||0) + 256 * (l2||0) + (l3||0), m3)
+				}.bind(this))
+			}
+			else{
+				GLTextCode.walk(ast, textbuf, function(text, group, l1, l2, l3, m3){
+					textbuf.add(text, group, 65536 * (l1||0) + 256 * (l2||0) + (l3||0), m3)
+				})
+			}
 
-			GLTextCode.walk(ast, textbuf)
-
-			//textbuf.add("HELLO WORLD")
-
+			//this.fg.textcolor = this.color;
 			this.fg_shader.mesh = textbuf
-
 		}
-	}	
+	}
+
 })

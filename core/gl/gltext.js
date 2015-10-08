@@ -133,14 +133,14 @@ define.class('$gl/glshader', function(require, exports, self){
 				for (var i = 0;i<lines.length;i++){
 					this.add_x = 0;
 					var line = lines[i];
-					for (var j = 0;j<line.length;j++) this.add(line[j] + ' ');
+					for (var j = 0;j<line.length;j++) this.add(line[j] + ' ', m1, m2, m3);
 					this.add_y += this.font_size * this.line_spacing
 				} 
 			} else if (this.align === "right"){
 				for (var i = 0;i<lines.length;i++){
 					this.add_x = maxwidth - widths[i];
 					var line = lines[i];
-					for (var j = 0;j<line.length;j++) this.add(line[j] + ' ');
+					for (var j = 0;j<line.length;j++) this.add(line[j] + ' ', m1, m2, m3);
 					this.add_y += this.font_size * this.line_spacing
 				} 
 			}
@@ -148,7 +148,7 @@ define.class('$gl/glshader', function(require, exports, self){
 				for (var i = 0;i<lines.length;i++){
 					this.add_x = maxwidth/2 - widths[i]/2;
 					var line = lines[i];
-					for (var j = 0;j<line.length;j++) this.add(line[j] + ' ');
+					for (var j = 0;j<line.length;j++) this.add(line[j] + ' ', m1, m2, m3);
 					this.add_y += this.font_size * this.line_spacing
 				} 
 			}
@@ -161,7 +161,7 @@ define.class('$gl/glshader', function(require, exports, self){
 
 					for (var j = 0;j<line.length;j++) 
 					{
-						this.add(line[j]+' ' );
+						this.add(line[j]+' ', m1, m2, m3);
 						this.add_x += spacer;
 					}
 					this.add_y += this.font_size * this.line_spacing

@@ -3,9 +3,10 @@ define.class(function(require, exports){
 	
 	var Parser = require('$parsers/onejsparser')
 
-	exports.walk = function(ast, textbuf){
+	exports.walk = function(ast, textbuf, add){
 		var glwalker = new this()
 		glwalker.textbuf = textbuf
+		glwalker.add = add
 		glwalker.expand(ast)
 	}
 
@@ -97,10 +98,6 @@ define.class(function(require, exports){
 			else this.comment(comment, prefix)
 		}
 		return has_newline
-	}
-
-	this.add = function(text, group, l1, l2, l3, m3){
-		this.textbuf.add(text, group, 65536 * (l1||0) + 256 * (l2||0) + (l3||0), m3)
 	}
 
 	this.lastIsNewline = function(){
@@ -484,6 +481,7 @@ define.class(function(require, exports){
 			}
 			else this.keyword('function', exports._Function)
 		}
+
 		//else Keyword('function', _Function)
 		var mygroup = this.group++
 		this.parenL(exports._Function, mygroup)
@@ -594,6 +592,10 @@ define.class(function(require, exports){
 			this.tab(this.indent)
 		}
 		else this.space()
+		if(n.right.type === 'Function'){
+			this.indent--
+		}
+
 		this.expand(n.right)
 		this.indent = old_indent
 	}
@@ -609,7 +611,7 @@ define.class(function(require, exports){
 		this.expand(n.test)
 		this.operator('?', exports._Condition)
 		this.expand(n.then)
-		this.Operator(':', exports._Condition)
+		this.operator(':', exports._Condition)
 		this.expand(n.else)
 	}
 
