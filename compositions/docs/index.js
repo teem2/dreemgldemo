@@ -6,7 +6,7 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 		return [
 		fileio(),
 		screens(
-			screen({
+			thescreen = screen({
 				init:function(){
 					// lets load the entire directory structure
 					this.teem.fileio.readalldir('',['fonts','build','lib','server.js','favicon.ico','define.js','textures','gzcache','@/\\.','.git', '.gitignore']).then(function(result){
@@ -16,7 +16,16 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 						// lets make a dataset
 						this.model = filetree.dataset = dataset(result)
 					}.bind(this))
-				}},
+					
+				},
+				render:function(){
+					if (this.locationhash && this.locationhash.path){
+						require.async(this.locationhash.path).then(function(module){
+						this.find('docviewer').model = module						
+					})
+					}
+					console.log(this);
+					return [
 				splitcontainer({ vertical: false, position: "relative", flexdirection: "row", bgcolor: "black", alignitems:"stretch", alignself: "stretch" , flex:1}
 					,view({flexdirection:"column", padding: 0, flex: 0.2}
 						,view({alignitems:"center", bgcolor:"#e0e0e0", flexdirection:"row" ,padding: 14},
@@ -49,10 +58,10 @@ define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitco
 					)
 					,view({flex:1}
 						,scrollcontainer({hscrollvisible:false, move_view_bgcolor: "#f0f0f0"}
-							,docviewer({model: require('$root/classes/button.js')})
+							,docviewer({model: ""})
 						)
 					)
-				)
+			)]}}
 			)
 		)
 	]}
