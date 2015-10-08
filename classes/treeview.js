@@ -2,6 +2,12 @@
 define.class(function(module, sprite, text, view, button, icon){
 	// the treeview control - classic treeview with expandable nodes.
 	
+	var treeview = this.constructor;
+	
+	// Basic usage of the treeview control.
+	define.example(this, function Usage(){
+		return [treeview({dataset:{name:"root", children:[{name:"child1"}]}})]
+	})
 	// the dataset to use for tree expansion
 	this.attribute("dataset", {type: Object, value:{}});
 	
