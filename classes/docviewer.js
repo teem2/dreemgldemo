@@ -155,143 +155,154 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown, c
 			attributes: [],
 			state_attributes: [],
 			methods: [],
-			inner_classes: []
+			inner_classes: [],
+			base_class_chain: []
 		}
 	}
 	
 	// Build a documentation structure for a given constructor function
-	function BuildDoc(constructor){
+	function BuildDoc(constructor) {
 		var proto = constructor.prototype;
 		var class_doc = BlankDoc();
+		var p = constructor;
+		
+		while(p) {
+			var prot = Object.getPrototypeOf(p.prototype);
+			if (prot) {
+				p = prot.constructor; 					
+				class_doc.base_class_chain.push(p.name);
+			} else {
+				p = null;
+			}				
+		}
+		
+		console.dir(class_doc.base_class_chain)
+
 		class_doc.class_name = proto.constructor.name;
-		//try{
 			
-			var parser = new Parser();		
-			var total_ast = parser.parse(proto.constructor.body.toString());
-			var class_body = total_ast.steps[0];
-			var stepzero = class_body.body.steps[0];
-			if (!stepzero) return class_doc;
-			
-			var class_comment = class_body.body.steps[0].cmu;
-			var last1 = false;
-			
-			for(var a in class_comment) {
-				var com = class_comment[a];
-				if (com === 1){
-					if(last1 === true){
-						break;
-					} else {
-						last1 = true;		
-					}
+		var parser = new Parser();		
+		var total_ast = parser.parse(proto.constructor.body.toString());
+		var class_body = total_ast.steps[0];
+		var stepzero = class_body.body.steps[0];
+		if (!stepzero) return class_doc;
+		
+		var class_comment = class_body.body.steps[0].cmu;
+		var last1 = false;
+		
+		for(var a in class_comment) {
+			var com = class_comment[a];
+			if (com === 1){
+				if(last1 === true){
+					break;
 				} else {
-					last1 = false;
-					class_doc.body_text.push(com);
+					last1 = true;		
+				}
+			} else {
+				last1 = false;
+				class_doc.body_text.push(com);
+			}
+		}
+		
+		for (var a in class_body.body.steps) {				
+			var step = class_body.body.steps[a];
+			if (step.type ==="Call"){
+				
+				if (step.fn.object.type ==="This"){
+					if (step.fn.key.name === "attribute"){
+						var attrname = step.args[0].value;
+						var attr = proto._attributes[attrname];
+						
+						var defvaluename = undefined;
+						if (attr.value){	
+							if (typeof(attr.value ) === "Function"){
+								console.log(attr.value.name);
+							} else {
+								defvaluename = attr.value;
+							}
+						}
+
+						var typename ="typeless";
+						if (attr.type) typename =attr.type.name.toString()
+						var attrdoc = {name: attrname, type:typename, defvalue: defvaluename, body_text: WalkCommentUp(step.cmu)}
+						class_doc.attributes.push(attrdoc)
+						
+					} else if (step.fn.key.name === "event"){							
+						class_doc.events.push({name: step.args[0].value, body_text: WalkCommentUp(step.cmu)})
+					}
+					else if (step.fn.key.name === "state"){								
+						class_doc.state_attributes.push({name: step.args[0].value})
+					}
+				}
+				else{
+					if (step.fn.object.type ==="Id"){
+						if (step.fn.object.name === "define"){
+							if (step.fn.key.name === "class"){
+								var innerclassname = step.args[1].value;
+									var NewClass = BuildDoc( proto[innerclassname]);
+									//NewClass.class_name = innerclassname;
+									NewClass.body_text = WalkCommentUp(step.cmu);
+									class_doc.inner_classes.push(NewClass);
+							} else if (step.fn.key.name === "example"){
+								var Example = {};
+								Example.body_text = WalkCommentUp(step.cmu);
+								var examplename = step.args[1].id.name;
+								Example.name = examplename;
+								for (var a in proto.constructor.examples)
+								{
+									if (proto.constructor.examples[a].name === examplename){
+										Example.examplefunc = proto.constructor.examples[a];
+									}
+								}
+								class_doc.examples.push(Example);
+							}	
+							
+						}
+					}
+				}
+			} else {
+				var stepleft = step.left;
+				//console.log(step.left, step.right);
+				if (stepleft)	{
+				//		console.log("left", stepleft.key.name, stepleft);
+					
+					if (stepleft.type==="Key" && stepleft.object.type ==="This"){ 
+						var method = {name:stepleft.key.name, params:[]};
+						var stepright = step.right;
+						if (stepright.type === "Function")
+						{
+					//	console.log("right:", stepright);
+						method.body_text = WalkCommentUp(step.cmu);
+						
+						
+						for(var p in stepright.params){							
+							var param = stepright.params[p];						
+							var paramname = param.id.name; 		
+							var paramtag = '<' + paramname  + '>';
+							var param = {name: paramname, body_text: []}
+							
+							var remaining = [];
+							for(var a in method.body_text){
+								var L = method.body_text[a];
+								if (L.indexOf(paramtag) === 0) {
+									param.body_text.push(L.substr(paramtag.length).trim());
+								}
+								else{
+									remaining.push(L);
+								}
+							}
+							method.params.push(param);
+						
+							method.body_text= remaining;
+						}
+						//console.log(method.name);
+						class_doc.methods.push(method);			
+						}						
+
+					}
 				}
 			}
-			
-			for (var a in class_body.body.steps) {				
-				var step = class_body.body.steps[a];
-				if (step.type ==="Call"){
-					
-					if (step.fn.object.type ==="This"){
-						if (step.fn.key.name === "attribute"){
-							var attrname = step.args[0].value;
-							var attr = proto._attributes[attrname];
-							
-							var defvaluename = undefined;
-							if (attr.value){	
-								if (typeof(attr.value ) === "Function"){
-									console.log(attr.value.name);
-								} else {
-									defvaluename = attr.value;
-								}
-							}
+		}			
 
-							var typename ="typeless";
-							if (attr.type) typename =attr.type.name.toString()
-							var attrdoc = {name: attrname, type:typename, defvalue: defvaluename, body_text: WalkCommentUp(step.cmu)}
-							class_doc.attributes.push(attrdoc)
-							
-						} else if (step.fn.key.name === "event"){							
-							class_doc.events.push({name: step.args[0].value, body_text: WalkCommentUp(step.cmu)})
-						}
-						else if (step.fn.key.name === "state"){								
-							class_doc.state_attributes.push({name: step.args[0].value})
-						}
-					}
-					else{
-						if (step.fn.object.type ==="Id"){
-							if (step.fn.object.name === "define"){
-								if (step.fn.key.name === "class"){
-									var innerclassname = step.args[1].value;
-										var NewClass = BuildDoc( proto[innerclassname]);
-										//NewClass.class_name = innerclassname;
-										NewClass.body_text = WalkCommentUp(step.cmu);
-										class_doc.inner_classes.push(NewClass);
-								} else if (step.fn.key.name === "example"){
-									var Example = {};
-									Example.body_text = WalkCommentUp(step.cmu);
-									var examplename = step.args[1].id.name;
-									Example.name = examplename;
-									for (var a in proto.constructor.examples)
-									{
-										if (proto.constructor.examples[a].name === examplename){
-											Example.examplefunc = proto.constructor.examples[a];
-										}
-									}
-									class_doc.examples.push(Example);
-								}	
-								
-							}
-						}
-					}
-				} else {
-					var stepleft = step.left;
-					//console.log(step.left, step.right);
-					if (stepleft)	{
-					//		console.log("left", stepleft.key.name, stepleft);
-						
-						if (stepleft.type==="Key" && stepleft.object.type ==="This"){ 
-							var method = {name:stepleft.key.name, params:[]};
-							var stepright = step.right;
-							if (stepright.type === "Function")
-							{
-						//	console.log("right:", stepright);
-							method.body_text = WalkCommentUp(step.cmu);
-							
-							
-							for(var p in stepright.params){							
-								var param = stepright.params[p];						
-								var paramname = param.id.name; 		
-								var paramtag = '<' + paramname  + '>';
-								var param = {name: paramname, body_text: []}
-								
-								var remaining = [];
-								for(var a in method.body_text){
-									var L = method.body_text[a];
-									if (L.indexOf(paramtag) === 0) {
-										param.body_text.push(L.substr(paramtag.length).trim());
-									}
-									else{
-										remaining.push(L);
-									}
-								}
-								method.params.push(param);
-							
-								method.body_text= remaining;
-							}
-							//console.log(method.name);
-							class_doc.methods.push(method);			
-							}						
-
-						}
-					}
-				}
-			}			
-		//}
-	//	catch(e){
-	//		console.log(e);
-	//	}
 		
 		return class_doc;
 	}
@@ -341,18 +352,17 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown, c
 		if (!this.collapsible ){
 			body.push(view({},[icon({fontsize: 38, icon:"cube", fgcolor: "black" }),text({width: 500, text:class_doc.class_name,fontsize: 30,margin: vec4(10,10,0,20), fgcolor: "black" })]));
 		}
-		if (class_doc.body_text.length > 0)
-		{
-		//	for (var a in class_doc.body_text){
-			//	var L = class_doc.body_text[a];
-				body.push(markdown({body:class_doc.body_text,fontsize: 14, margin: vec4(10,0,10,10), fgcolor: "#303030" }));
-		//	}
+
+		if (class_doc.base_class_chain.length> 0){
+			body.push(view({}, class_doc.base_class_chain.map(function(r){return [icon({icon:"arrow-right", fgcolor:"gray", fontsize:15}), text({margin: vec4(5), text:r, fontsize:12})]})));
 		}
-			res.push(view({flexdirection:"column", margin: vec4(10,0,0,20)}, body));
+	
+		if (class_doc.body_text.length > 0) {
+			body.push(markdown({body:class_doc.body_text,fontsize: 14, margin: vec4(10,0,10,10), fgcolor: "#303030" }));
+		}
 
-			
-
-			
+		res.push(view({flexdirection:"column", margin: vec4(10,0,0,20)}, body));
+	
 		if(class_doc.examples.length >0) res.push(this.BuildGroup(class_doc.examples, "Examples", "flask", "#e0e0e0", "example"));
 		if(class_doc.attributes.length >0) res.push(this.BuildGroup(class_doc.attributes, "Attributes", "gears", "#f0f0c0"));
 		if(class_doc.state_attributes.length >0) res.push(this.BuildGroup(class_doc.state_attributes, "State Attributes", "archive", "#f0c0c0"));
