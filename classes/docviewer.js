@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite,view, require, text,foldcontainer,icon, markdown, codeviewer){
+define.class(function(sprite,view, require, text,foldcontainer,icon, markdown, codeviewer, button){
 	
 	this.bgcolor = vec4("transparent" );	
 	
@@ -170,14 +170,12 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown, c
 			var prot = Object.getPrototypeOf(p.prototype);
 			if (prot) {
 				p = prot.constructor; 					
-				class_doc.base_class_chain.push(p.name);
+				class_doc.base_class_chain.push({name:p.name, path:p.module? (p.module.id? p.module.id:""):"", p: p});
 			} else {
 				p = null;
 			}				
 		}
 		
-		console.dir(class_doc.base_class_chain)
-
 		class_doc.class_name = proto.constructor.name;
 			
 		var parser = new Parser();		
@@ -354,7 +352,12 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown, c
 		}
 
 		if (class_doc.base_class_chain.length> 0){
-			body.push(view({}, class_doc.base_class_chain.map(function(r){return [icon({icon:"arrow-right", fgcolor:"gray", fontsize:15}), text({margin: vec4(5), text:r, fontsize:12})]})));
+			body.push(view({}, class_doc.base_class_chain.map(function(r){
+				return [
+					icon({icon:"arrow-right", fgcolor:"gray", fontsize:15, margin:vec4(2)})
+					,button({margin: vec4(2),padding:vec4(3), text:r.name, fontsize:12, onclick: function(){console.log(r.path)}.bind(this)})
+				]
+			})));
 		}
 	
 		if (class_doc.body_text.length > 0) {
