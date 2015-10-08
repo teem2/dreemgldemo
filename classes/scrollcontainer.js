@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
-// ruler class
 
 define.class(function(sprite,  view, scrollbar){
+
 	// The scrollcontainer wraps all its children in a movable frame with 2 scrollbars around it.
 	
 	this.flexdirection = "column" ;
@@ -9,9 +9,31 @@ define.class(function(sprite,  view, scrollbar){
 	this.alignitems = "stretch";
 	this.flex = 1;
 
+	
+	var scrollcontainer = this.constructor;
+	
+	define.example(this, function Usage(){
+			return [
+				scrollcontainer({height: 300, width: 300}
+					,view({x: 0, y:0, position: "absolute", width:50, height: 50, bgcolor:"green"})
+					,view({x:400, position: "absolute", width:50, height: 50, bgcolor:"red"})
+					,view({y:400, position: "absolute", width:50, height: 50, bgcolor:"blue"})
+					,view({x:400, position: "absolute", y:400, width:50, height: 50, bgcolor:"yellow"})
+				)
+			]
+		}
+	)
+	
+	// Pixelsize of the scrollbars
 	this.attribute("scrollbarwidth", {type: int, value: 16});
+	
+	// Is the horizontal scrollbar visible? 
 	this.attribute("hscrollvisible", {type: boolean, value: true});
+	
+	// Is the vertical scrollbar visible? 	
 	this.attribute("vscrollvisible", {type: boolean, value: true});
+	
+	// Background color of the movable inside view. 
 	this.attribute("move_view_bgcolor", {type: vec4, value: vec4("white")});
 	
 	this.mousewheelx = function(){

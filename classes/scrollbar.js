@@ -1,16 +1,31 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
-// ruler class
 
 define.class(function(sprite, text, view){
 	
+	// Color of the draggable part of the scrollbar
 	this.attribute("draggercolor", {type: vec4, value: vec4("#9090b0")});
+	
+	// Color when the mouse is hovering over the draggable part of the scrollbar
 	this.attribute("hovercolor", {type: vec4, value: vec4("#8080c0")});
+	
+	// Color of the draggable part of the scrollbar while actively scrolling
 	this.attribute("activecolor", {type: vec4, value: vec4("#8080c0")});
+	
+	// Is this a horizontal or a vertical scrollbar? 
 	this.attribute("vertical", {type: Boolean, value: true});
+	
+	// Current start offset of the scrollbar. Ranges from 0 to 1-page
 	this.attribute("offset", {type:float, value:0})
-	this.attribute("page", {type:float, value:0.6})
+	
+	// Page size. Accepted range is 0 to 1
+	this.attribute("page", {type:float, value:1.0})
 
-
+	var scrollbar = this.constructor;
+	
+	define.example(this, function Usage(){
+	return [scrollbar({vertical: false, height: 20, page: 0.2, offset: 0.5})]		
+	})
+	
 	this.page = function(){
 		this.setDirty(true)
 	}
