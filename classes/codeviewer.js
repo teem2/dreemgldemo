@@ -1,12 +1,25 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 define.class(function codeviewer(require, text){
+
+	// Display a function as syntax highlighted code.
+	
+	// The code to display
+	this.attribute("code", {type:String, value:""})
+	
+	var codeviewer = this.constructor
+	
+	// Basic usage
+	define.example(this, function Usage(){
+		return [codeviewer({bgcolor:"#000040", padding:vec4(14), code: "console.log(\"Hello world!\");"})]
+	})
+	
 	var GLTextCode = require('$gl/gltextcode')	
 
 	var Parser = require('$parsers/onejsparser')
 	this.font = require('$fonts/code_font1_ascii.glf')
-	this.bg = {color:undefined}
-	this.fontsize = 10
+	//this.bg = {color:undefined}
+	this.fontsize = 14
 	// syntax highlighting shader
 	this.fg = function(){
 		for(var key in GLTextCode.types){

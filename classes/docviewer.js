@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
+define.class(function(sprite,view, require, text,foldcontainer,icon, markdown, codeviewer){
 	
 	this.bgcolor = vec4("transparent" );	
 	
@@ -109,7 +109,7 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 			if (this.blocktype === "example"){
 				res.push(				
 					view({flexdirection:"column", borderwidth: 1, flex:1, bordercolor: "#e0e0e0", padding: vec4(14)}
-							,text({text:this.item.examplefunc.toString(), padding:vec4(14), fontsize: 14, fgcolor:"#303030", multiline: true})
+							,codeviewer({code:this.item.examplefunc.toString(), padding:vec4(14), fontsize: 14, bgcolor:"#000030", multiline: true})
 							,view({flex: 1, borderwidth: 1, flexdirection:"column", padding: vec4(14), bordercolor: "#e0e0e0"}, this.item.examplefunc())));
 			}
 			return res;

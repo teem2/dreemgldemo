@@ -157,7 +157,7 @@ define.class(function(require, exports){
 			if(has_newlines && !this.comments(elem.cmr))
 				this.newline()
 		}
-		if(has_newlines && this.comments(n.cm2)) this.tab(indent - 1)
+		if(has_newlines && this.comments(n.cm2)) this.tab(this.indent - 1)
 
 		this.indent = old_indent
 		this.bracketR(exports._Array, mygroup)
@@ -175,7 +175,7 @@ define.class(function(require, exports){
 		for(var i = 0; i < n.keys.length; i ++){
 			var prop = n.keys[i]
 			if(!has_newlines && i){
-				this.comma(exports._Object, group++)
+				this.comma(exports._Object, this.group++)
 				this.space()
 			}
 			if(this.lastIsNewline()) this.tab(this.indent)
