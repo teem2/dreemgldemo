@@ -1,14 +1,15 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 define.class(function(sprite, text, view, icon){
+	// Simple button: a rectangle with a textlabel and an icon
 	
-	// the label for the button
+	// The label for the button
 	this.attribute("text", {type: String, value: ""});
-	// the icon for the button, see FontAwesome for the available icon-names.
+	// The icon for the button, see FontAwesome for the available icon-names.
 	this.attribute("icon", {type: String, value: ""});
 
-	// font size in device-pixels.
-	// example: example1
+	// Font size in device-pixels.
+	// Example: example1
 	this.attribute("fontsize", {type: float, value: 14});
 	
 	
@@ -24,15 +25,30 @@ define.class(function(sprite, text, view, icon){
 			}
 		);
 	
-	// color of the labeltext in neutral state
+
+	// Color of the label text in neutral state	
 	this.attribute("labelcolor", {type: vec4, value: vec4("#404040")});
+
+	// Color of the label text in pressed-down state	
 	this.attribute("labelactivecolor", {type: vec4, value: vec4("black")});
+	
+	// First gradient color for the button background in neutral state
 	this.attribute("buttoncolor1", {type: vec4, value: vec4("#fffff0")});
+	// Second gradient color for the button background in neutral state	
 	this.attribute("buttoncolor2", {type: vec4, value: vec4("#ffffff")});
+	
+	// First gradient color for the button background in hovered state
 	this.attribute("hovercolor1", {type: vec4, value: vec4("#f0f0f0")});
+	
+	// Second gradient color for the button background in hovered state
 	this.attribute("hovercolor2", {type: vec4, value: vec4("#f8f8f8")});
+	
+	// First gradient color for the button background in pressed state
 	this.attribute("pressedcolor1", {type: vec4, value: vec4("#d0d0f0")});
+	
+	// Second gradient color for the button background in pressed state
 	this.attribute("pressedcolor2", {type: vec4, value: vec4("#d0d0f0")});
+	
 	this.buttonres = {};
 		
 	// the shader for the inside fill
@@ -86,25 +102,21 @@ define.class(function(sprite, text, view, icon){
 		this.pressed--;
 		this.setDirty(true)
 	}
-	this.drawcount = 0;
+	
 	this.atDraw = function(){
-		this.drawcount ++;
-	//	console.log("atdraw button", this.drawcount);
 		if (this.pressed > 0){
 			this.bg_shader.col2 = this._pressedcolor2;
 			this.bg_shader.col1 = this._pressedcolor1;
 			this.buttonres.fgcolor = this._labelactivecolor;		
 			
 				if (this.iconres) this.iconres.fgcolor = this._labelactivecolor;
-		}
-		else{
+		} else {
 			if (this.hovered > 0){
 				this.bg_shader.col2 = this._hovercolor2;
 				this.bg_shader.col1 = this._hovercolor1;
 				this.buttonres.fgcolor = this._labelactivecolor;
 				if (this.iconres) this.iconres.fgcolor = this._labelactivecolor;
-			}
-			else{
+			} else{
 				this.buttonres.fgcolor = this._labelcolor;
 				if (this.iconres) this.iconres.fgcolor = this._labelcolor;
 				this.bg_shader.col2 = this._buttoncolor2;
@@ -118,8 +130,7 @@ define.class(function(sprite, text, view, icon){
 		if (!this.icon || this.icon.length == 0){
 			this.iconres = undefined;
 			return [this.buttonres];
-		}
-		else{
+		} else {
 			this.iconres = this.icon_class({fontsize: this.fontsize,color:vec4('red'), icon: this.icon}); 
 			return [this.iconres,this.buttonres];
 		}

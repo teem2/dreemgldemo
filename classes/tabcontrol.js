@@ -22,8 +22,8 @@ define.class(function(sprite,  view, button, text){
 			,text({tabicon:"battery-full",tabname:"Battery",text: "I am on tab 4 - my icon is a battery!", fgcolor: "yellow", fontsize: 20})
 			)
 		]
-		
 	});
+	
 	this.attribute("color", {type: vec4, value: vec4("#404050")});
 	this.attribute("hovercolor", {type: vec4, value: vec4("#5050a0")});
 	this.attribute("activecolor", {type: vec4, value: vec4("#7070a0")});

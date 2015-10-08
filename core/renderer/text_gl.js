@@ -5,27 +5,34 @@ define.class('./sprite_gl', function(require, exports, self){
 	var GLText = require('$gl/gltext')
 	var glfontParser = require('$gl/glfontparser')
 
-	// the string to display.
+	
+	var text = this.constructor
+	// A label.
+	define.example(this, function Usage(){
+		return [text({text:"I am a textlabel!", fgcolor:"purple", fontsize: 30 })]
+	})
+	
+	// The string to display.
 	this.attribute('text', {type:String, value: "HELLO" })
 	
-	// size of the font in pixels
+	// Size of the font in pixels
 	this.attribute('fontsize', {type:float, value: 18});
 	
-	// name of the font.
+	// Name of the font.
 	this.attribute('font', {type:Object, value: undefined});
 	
 	this.attribute('color', {type:vec4, value: vec4(1,1,1,1)});
+
+	// Should the text wrap around when its width has been reached?
 	this.attribute('multiline', {type:Boolean, value: false })
 	
-	// alignment of the bodytext. 
-	// accepted values are "left", "right", "justify" and "center" 
-		this.attribute("align", {type: String,  value: "left"});
-
+	// Alignment of the bodytext. 
+	// Accepted values are "left", "right", "justify" and "center" 
+	this.attribute("align", {type: String,  value: "left"});
 	
 	define.class(this, 'fg', GLText, function(){
 	})
 
-	//this.fg.dump =1 
 	this.text = function(){
 		this.dirty = true;
 	}

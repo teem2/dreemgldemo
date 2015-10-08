@@ -2,4 +2,5 @@
 // view class
 
 define.class(function(sprite){
+	// Base class for all things visual.	
 })
