@@ -34,7 +34,7 @@ define.class(function(sprite,view, text){
 	var grid = this.constructor
 	
 	// Basic usage of the cadgrid
-	define.example(this, function BasicUsage(){
+	define.example(this, function Usage(){
 		return [
 			grid({}, text({fgcolor: "black", bgcolor: "transparent", text:"I'm on a grid!" , margin: vec4(20)}))
 		]		

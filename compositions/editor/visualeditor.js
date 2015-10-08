@@ -1,4 +1,4 @@
-define.class(function(require, screen, view,menuitem, menubar, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){
+define.class(function(require, screen, view,menuitem, menubar, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, subcomposition){
 	
 	this.render = function(){ return [
 		view({rotation:0,position: "relative", flexdirection: "column", height: 20, bgcolor:"black", flex:1},
@@ -41,7 +41,7 @@ define.class(function(require, screen, view,menuitem, menubar, edit, text, icon,
 					,view({position: "relative", flex: 1.0, padding: 0, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection: "row" }
 						,ruler({width: 20, vertical: true, offset:0})
 						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"row" ,clipping: false}
-							,editlayout({flex:1.0,padding:10,  composition:'minidialog', clipping: true})
+							,subcomposition({flex:1.0,padding:10,  composition:'minidialog', clipping: true})
 							,scrollbar({width:15, position:'relative'})
 						)
 					)

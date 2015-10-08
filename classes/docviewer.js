@@ -3,6 +3,8 @@
 define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 	
 	this.bgcolor = vec4("transparent" );	
+	
+	// the class for which to create the documentation. If a string is assigned, the model will be interpreted as a markdown text document.
 	this.attribute("model",{})
 	this.state("model");
 	this.flex = 1.0
@@ -367,21 +369,24 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown){
 		return res;	
 	}
 	})
+
+	var docviewer = this.constructor;
+	// Show the documentation for a dreemgl class.
+	define.example(this, function Usage(){
+		return [docviewer({model: docviewer})]		
+	});
 	
 	this.flexdirection = "column"
 	this.flexwrap = "none" ;
-		
-		
+				
 	this.render = function(){	
 		var functions = [];
 		var res = [];
 		var R = this.model// 	require("$classes/dataset")
 		
-		if(typeof(R) === "string")
-		{
-				return [markdown({body: " " + R.toString()})]
-		}
-		else{
+		if(typeof(R) === "string") {
+			return [markdown({body: " " + R.toString()})]
+		} else {
 			var class_doc = BuildDoc(R)		
 			return [this.ClassDocView({class_doc:class_doc})]
 		}

@@ -16,6 +16,15 @@ define.class(function(sprite, text, view){
 	// where to start counting - the first "offset" pixels will be ignored.
 	this.attribute("offset", {type:Number, value: 20});
 	
+	var ruler = this.constructor;
+	
+	// Basic usage
+	define.example(this, function Usage(){
+		return [
+			ruler({from: 10, to: 150, height: 40})
+		];
+	})
+	
 	
 	// horizontal ruler shader
 	this.hruler = function(){

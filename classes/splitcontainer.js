@@ -1,7 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
-// ruler class
 
-define.class(function(sprite,  view){
+define.class(function(sprite,  view, text){
 	// splitcontainer adds dragbars between nodes to make all the nodes resizable. 
 	
 	// should the splitter bars be introduced horizontally or vertically? 
@@ -22,6 +21,18 @@ define.class(function(sprite,  view){
 	this.vertical = function(){
 		this.flexdirection = this.vertical?"column":"row" ;
 	}
+	
+	var splitcontainer = this.constructor;
+	
+	// Basic usage of the splitcontainer
+	define.example(this, function Usage(){ return [
+								splitcontainer({vertical: false, margin: 4, flex: 1.0, borderwidth:2, bordercolor: "darkblue", padding: vec4(2) },
+								text({flex: 0.2, fontsize: 26, text:"A", bgcolor: "transparent" ,multiline: true, align:"center" , fgcolor:"black", margin: 2})
+								,text({flex: 0.2, fontsize: 26, text:"B", bgcolor: "transparent" ,multiline: true, align:"center" ,fgcolor:"black", margin: 2})
+								,text({flex: 0.2, fontsize: 26, text:"C", bgcolor: "transparent" ,multiline: true, align:"center" , fgcolor:"black",margin: 2})
+								,text({flex: 0.2, fontsize: 26, text:"D", bgcolor: "transparent" ,multiline: true, align:"center" , fgcolor:"black",margin: 2})
+		)]});
+
 	
 	// the visual class that defines the draggable bar between the resizable children
 	define.class(this, 'splitter', function(view){

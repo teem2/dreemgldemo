@@ -14,8 +14,8 @@ define.class(function(sprite, text, view, icon){
 	
 	var button = this.constructor;
 	
-	// Some simple buttons	
-	define.example(this, function Buttons(){
+	// Basic usage of the button.	
+	define.example(this, function Usage(){
 			return [
 					button({text:"Press me!"})
 					,button({text:"Colored!", buttoncolor1: "red", buttoncolor2: "blue", labelcolor: "white"  })
