@@ -138,11 +138,14 @@ define.class(function codeviewerbody(require, text){
 			textbuf.add_y = textbuf.line_height;
 			textbuf.align = 'left'
 			textbuf.start_y = textbuf.line_height
+			textbuf.boldness = 0.5
 			textbuf.clear()
 			if(this.wrap){
+				var width = this.layout.width
 				GLTextCode.walk(ast, textbuf, function(text, group, l1, l2, l3, m3){
-					textbuf.addWithinWidth(text, maxwidth? maxwidth: this.layout.width, group, 65536 * (l1||0) + 256 * (l2||0) + (l3||0), m3)
-				}.bind(this))
+					var indent = textbuf.font.glyphs[9].advance * textbuf.font_size * (this.indent)
+					textbuf.addWithinWidth(text, maxwidth? maxwidth: width, indent, group, 65536 * (l1||0) + 256 * (l2||0) + (l3||0), m3)
+				})
 			}
 			else{
 				GLTextCode.walk(ast, textbuf, function(text, group, l1, l2, l3, m3){
