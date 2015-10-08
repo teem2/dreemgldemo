@@ -2,7 +2,7 @@
 // Copyright (C) 2014 OneJS (MIT License)
 // Copyright (C) Marijn Haverbeke (Apache 2.0 license)
 
-define.class(function(require, exports, self){
+define.class(function(require, exports){
 
 	// This parser is a modified version of Acorn
 	// It parses the ONEJS superset of JavaScript
@@ -96,106 +96,111 @@ define.class(function(require, exports, self){
 	// A second optional argument can be given to further configure
 	// the parser process. These options are recognized:
 
-	self.input = ''
-	self.inputLen = 0
+	this.input = ''
+	this.inputLen = 0
 
 	// `ecmaVersion` indicates the ECMAScript version to parse. Must
 	// be either 3 or 5. This
-	// influences support for self.strict mode, the set of reserved words, and
+	// influences support for this.strict mode, the set of reserved words, and
 	// support for getters and setter.
-	self.ecmaVersion = 5
+	this.ecmaVersion = 5
 
 	// Turn on `strictSemicolons` to prevent the parser from doing
-	// automatic self.semicolon insertion.
-	self.strictSemicolons = false
+	// automatic this.semicolon insertion.
+	this.strictSemicolons = false
 	// When `allowTrailingCommas` is false, the parser will not allow
 	// trailing commas in array and object literals.
-	self.allowTrailingCommas = true
+	this.allowTrailingCommas = true
 	// By default, reserved words are not enforced. Enable
 	// `forbidReserved` to enforce them. When this option has the
 	// value "everywhere", reserved words and keywords can also not be
 	// used as property names.
-	self.forbidReserved = false
+	this.forbidReserved = false
 	// Parses { } in top level scope as JS objects, not blocks.
 	// Fixes use for throwing in plain JSON without switching
 	// to expression mode
-	self.objectInTopLevel = true
+	this.objectInTopLevel = true
 	// When enabled, commas are injected where possible
-	self.injectCommas = true
+	this.injectCommas = true
 	// When enabled, a return at the top level is not considered an
 	// error.
-	self.allowReturnOutsideFunction = true
+	this.allowReturnOutsideFunction = true
 
 	// stores comments and newline info on the AST as best as we can
-	self.storeComments = true
+	this.storeComments = true
 	
 	// allows multiline strings
-	self.multilineStrings = true
+	this.multilineStrings = true
 
 	// allow string templating
-	self.stringTemplating = true
+	this.stringTemplating = true
 
-	self.sourceFile = ''
+	this.sourceFile = ''
 
-	// The current position of the tokenizer in the self.input.
-	self.tokPos = 0
+	// The current position of the tokenizer in the this.input.
+	this.tokPos = 0
 
 	// The start and end offsets of the current token.
 
-	self.tokStart = 0
-	self.tokEnd = 0
+	this.tokStart = 0
+	this.tokEnd = 0
 
 	// The type and value of the current token. Token types are objects,
 	// named by variables against which they can be compared, and
 	// holding properties that describe them (indicating, for example,
 	// the precedence of an infix operator, and the original name of a
-	// keyword token). The kind of value that's held in `self.tokVal` depends
+	// keyword token). The kind of value that's held in `this.tokVal` depends
 	// on the type of the token. For literals, it is the literal value,
 	// for operators, the operator name, and so on.
 
-	self.tokType
-	self.tokVal
+	this.tokType
+	this.tokVal
 
 	// Interal state for the tokenizer. To distinguish between division
 	// operators and regular expressions, it remembers whether the last
 	// token was one that is allowed to be followed by an expression.
 	// (If it is, a slash is probably a regexp, if it isn't it's a
-	// division operator. See the `self.parseStatement` function for a
+	// division operator. See the `this.parseStatement` function for a
 	// caveat.)
 
-	self.tokRegexpAllowed
+	this.tokRegexpAllowed
 
 	// These store the position of the previous token, which is useful
 	// when finishing a node and assigning its `end` position.
-	self.lastTok
-	self.lastStart
-	self.lastEnd
+	this.lastTok
+	this.lastStart
+	this.lastEnd
 
 	// used by comma insertion and subscripts
-	self.skippedNewlines
-	self.lastSkippedNewlines
+	this.skippedNewlines
+	this.lastSkippedNewlines
 
-	// This is the parser's state. `self.inFunction` is used to reject
-	// `return` statements outside of functions, `self.labels` to verify that
-	// `break` and `continue` have somewhere to jump to, and `self.strict`
-	// indicates whether self.strict mode is on.
+	// This is the parser's state. `this.inFunction` is used to reject
+	// `return` statements outside of functions, `this.labels` to verify that
+	// `break` and `continue` have somewhere to jump to, and `this.strict`
+	// indicates whether this.strict mode is on.
 
-	self.inFunction
-	self.labels
-	self.strict
+	this.inFunction
+	this.labels
+	this.strict
 
-	// This function is used to self.raise exceptions on parse errors. It
-	// takes an offset integer (into the current `self.input`) to indicate
+	// This function is used to this.raise exceptions on parse errors. It
+	// takes an offset integer (into the current `this.input`) to indicate
 	// the location of the error, attaches the position to the end
 	// of the error message, and then raises a `SyntaxError` with that
 	// message.
-	self.lastComments = []
-	self.lastNodes = []
+	this.lastComments = []
+	this.lastNodes = []
 
 	// alright parsing templating/interpolations.
-	self.parenStack
+	this.parenStack
 
-	self.parse = function(inpt) {
+	exports.parse = function(inpt){
+		var parser = new this()
+		return parser.parse(inpt)
+	}
+
+	this.parse = function(inpt) {
 		if(this.parser_cache){
 			var cache = this.parser_cache[inpt]
 			if(cache) return cache
@@ -216,7 +221,7 @@ define.class(function(require, exports, self){
 	// offset. `this.input` should be the code string that the offset refers
 	// into.
 
-	self.getLineInfo = function( input, offset ) {
+	this.getLineInfo = function( input, offset ) {
 		for (var line = 1, cur = 0;;) {
 			this.lineBreak.lastIndex = cur
 			var match = this.lineBreak.exec(this.input)
@@ -228,7 +233,7 @@ define.class(function(require, exports, self){
 		return {line: line, column: offset - cur}
 	}
 
-	self.raise = function(pos, message) {
+	this.raise = function(pos, message) {
 		var loc = this.getLineInfo(this.input, pos)
 		message += " in " + this.sourceFile + " line " + loc.line + " column " + loc.column 
 		var err = new SyntaxError(message)
@@ -241,7 +246,7 @@ define.class(function(require, exports, self){
 
 	// Reused this.empty array added for node fields that are always this.empty.
 
-	self.empty = []
+	this.empty = []
 
 	// ## Token types
 
@@ -254,13 +259,13 @@ define.class(function(require, exports, self){
 
 	// These are the general types. 
 
-	self._num = {type: "num", canInj:1}
-	self._regexp = {type: "regexp", canInj:1}
-	self._string = {type: "string", canInj:1}
-	self._name = {type: "name", canInj:1}
-	self._eof = {type: "eof"}
+	this._num = {type: "num", canInj:1}
+	this._regexp = {type: "regexp", canInj:1}
+	this._string = {type: "string", canInj:1}
+	this._name = {type: "name", canInj:1}
+	this._eof = {type: "eof"}
 	// templated string type
-	self._template = {}
+	this._template = {}
 
 	// Keyword tokens. The `keyword` property (also used in keyword-like
 	// operators) indicates that the token originated from an
@@ -275,80 +280,80 @@ define.class(function(require, exports, self){
 	// to know when parsing a label, in order to allow or disallow
 	// continue jumps to that label.
 
-	self._break = {keyword: "break"}
-	self._case = {keyword: "case", beforeExpr: true}
-	self._catch = {keyword: "catch"}
-	self._continue = {keyword: "continue"}
-	self._debugger = {keyword: "debugger"}
-	self._default = {keyword: "default"}
-	self._do = {keyword: "do", isLoop: true}
-	self._on = {keyword: "on", isLoop: true}
-	self._else = {keyword: "else", beforeExpr: true}
-	self._finally = {keyword: "finally"}
-	self._for = {keyword: "for", isLoop: true}
-	self._function = {keyword: "function"}
-	self._if = {keyword: "if"}
-	self._return = {keyword: "return", beforeExpr: true}
-	self._yield = {keyword: "yield", beforeExpr: true}
-	self._await = {keyword: "await", beforeExpr: true}
+	this._break = {keyword: "break"}
+	this._case = {keyword: "case", beforeExpr: true}
+	this._catch = {keyword: "catch"}
+	this._continue = {keyword: "continue"}
+	this._debugger = {keyword: "debugger"}
+	this._default = {keyword: "default"}
+	this._do = {keyword: "do", isLoop: true}
+	this._on = {keyword: "on", isLoop: true}
+	this._else = {keyword: "else", beforeExpr: true}
+	this._finally = {keyword: "finally"}
+	this._for = {keyword: "for", isLoop: true}
+	this._function = {keyword: "function"}
+	this._if = {keyword: "if"}
+	this._return = {keyword: "return", beforeExpr: true}
+	this._yield = {keyword: "yield", beforeExpr: true}
+	this._await = {keyword: "await", beforeExpr: true}
 
-	self._switch = {keyword: "switch"}
-	self._throw = {keyword: "throw", beforeExpr: true}
-	self._try = {keyword: "try"}
-	self._var = {keyword: "var"}
-	//self._const = {keyword: "const"}
-	self._while = {keyword: "while", isLoop: true}
-	self._with = {keyword: "with", preIdent:self._name}
-	self._new = {keyword: "new", preIdent:self._name, beforeExpr: true}
-	self._this = {keyword: "this"}
+	this._switch = {keyword: "switch"}
+	this._throw = {keyword: "throw", beforeExpr: true}
+	this._try = {keyword: "try"}
+	this._var = {keyword: "var"}
+	//this._const = {keyword: "const"}
+	this._while = {keyword: "while", isLoop: true}
+	this._with = {keyword: "with", preIdent:this._name}
+	this._new = {keyword: "new", preIdent:this._name, beforeExpr: true}
+	this._this = {keyword: "this"}
 
 	// class extends 
-	self._extends = {keyword:"extends", preIdent:self._name}
-	self._class = {keyword:"class", preIdent:self._name}
-	self._struct = {keyword:"struct", preIdent:self._name}
-	self._enum = {keyword:"enum", preIdent:self._name}
+	this._extends = {keyword:"extends", preIdent:this._name}
+	this._class = {keyword:"class", preIdent:this._name}
+	this._struct = {keyword:"struct", preIdent:this._name}
+	this._enum = {keyword:"enum", preIdent:this._name}
 
 	// The keywords that denote values.
-	self._null = {keyword: "null", isValue:1, atomValue: null}
-	self._true = {keyword: "true", isValue:1, atomValue: true}
-	self._false = {keyword: "false", isValue:1, atomValue: false}
+	this._null = {keyword: "null", isValue:1, atomValue: null}
+	this._true = {keyword: "true", isValue:1, atomValue: true}
+	this._false = {keyword: "false", isValue:1, atomValue: false}
 
 	// Some keywords are treated as regular operators. `in` sometimes
 	// (when parsing `for`) needs to be tested against specifically, so
 	// we assign a variable name to it for quick comparing.
 
-	self._in = {keyword: "in", preIdent:self._name, binop: 7, beforeExpr: true}
-	self._of = {keyword: "of", preIdent:self._name, binop: 7, beforeExpr: true}
+	this._in = {keyword: "in", preIdent:this._name, binop: 7, beforeExpr: true}
+	this._of = {keyword: "of", preIdent:this._name, binop: 7, beforeExpr: true}
 
-	self._instanceof = {keyword: "instanceof", preIdent:self._name, binop: 7, beforeExpr: true}, 
-	self._typeof = {keyword: "typeof", preIdent:self._name, prefix: true, beforeExpr: true}
-	self._void = {keyword: "void", preIdent:self._name, prefix: true, beforeExpr: true}
-	self._delete = {keyword: "delete", preIdent:self._name, prefix: true, beforeExpr: true}
+	this._instanceof = {keyword: "instanceof", preIdent:this._name, binop: 7, beforeExpr: true}, 
+	this._typeof = {keyword: "typeof", preIdent:this._name, prefix: true, beforeExpr: true}
+	this._void = {keyword: "void", preIdent:this._name, prefix: true, beforeExpr: true}
+	this._delete = {keyword: "delete", preIdent:this._name, prefix: true, beforeExpr: true}
 
 	// Punctuation token types.
-	self._bracketL = {type: "[", beforeExpr: true, canInj:1}
-	self._bracketR = {type: "]"}
-	self._braceL = {type: "{", beforeExpr: true, canInj:1}
-	self._braceR = {type: "}"}
-	self._parenL = {type: "(", beforeExpr: true, canInj:1}
-	self._parenR = {type: ")"}
-	self._comma = {type: ",", beforeExpr: true}
-	self._semi = {type: ";", beforeExpr: true}
-	self._colon = {type: ":", prefix: 1, beforeExpr: true}
-	self._doublecolon = {type:"::"}
-	self._dot = {type: ".", canInj:1}
-	self._dotdot = {type: ".."}
-	self._tripledot = {type: "..."}
+	this._bracketL = {type: "[", beforeExpr: true, canInj:1}
+	this._bracketR = {type: "]"}
+	this._braceL = {type: "{", beforeExpr: true, canInj:1}
+	this._braceR = {type: "}"}
+	this._parenL = {type: "(", beforeExpr: true, canInj:1}
+	this._parenR = {type: ")"}
+	this._comma = {type: ",", beforeExpr: true}
+	this._semi = {type: ";", beforeExpr: true}
+	this._colon = {type: ":", prefix: 1, beforeExpr: true}
+	this._doublecolon = {type:"::"}
+	this._dot = {type: ".", canInj:1}
+	this._dotdot = {type: ".."}
+	this._tripledot = {type: "..."}
 
-	self._existkey = {type: "?."}
-	self._existor = {type: "?|", binop:1, beforeExpr:true, logic:1}
-	self._existeq = {type: "?=",isAssign: true, binop:0, beforeExpr: true}
-	self._wtfeq = {type: "??=",isAssign: true, binop:0, beforeExpr: true}
-	self._wtf = {type: "??", binop:1, beforeExpr:true}
+	this._existkey = {type: "?."}
+	this._existor = {type: "?|", binop:1, beforeExpr:true, logic:1}
+	this._existeq = {type: "?=",isAssign: true, binop:0, beforeExpr: true}
+	this._wtfeq = {type: "??=",isAssign: true, binop:0, beforeExpr: true}
+	this._wtf = {type: "??", binop:1, beforeExpr:true}
 
-	self._question = {type: "?", prefix: true, beforeExpr: true}
-	self._fatArrow = {type:"=>"}
-	self._thinArrow = {type:"->"}
+	this._question = {type: "?", prefix: true, beforeExpr: true}
+	this._fatArrow = {type:"=>"}
+	this._thinArrow = {type:"->"}
 	
 	// Operators. These carry several kinds of properties to help the
 	// parser use them properly (the presence of these properties is
@@ -366,30 +371,30 @@ define.class(function(require, exports, self){
 	// binary operators with a very low precedence, that should result
 	// in AssignmentExpression nodes.
 
-	self._slash = {binop: 10, beforeExpr: true}
-	self._eq = {isAssign: true, beforeExpr: true}
-	self._assign = {isAssign: true, binop:0, beforeExpr: true}
-	self._incDec = {postfix: true, prefix: true, isUpdate: true}
-	self._notxor = {prefix: true, beforeExpr: true}
-	self._exists = {prefix: true, beforeExpr: true}
+	this._slash = {binop: 10, beforeExpr: true}
+	this._eq = {isAssign: true, beforeExpr: true}
+	this._assign = {isAssign: true, binop:0, beforeExpr: true}
+	this._incDec = {postfix: true, prefix: true, isUpdate: true}
+	this._notxor = {prefix: true, beforeExpr: true}
+	this._exists = {prefix: true, beforeExpr: true}
 
-	self._logicalOR = {binop: 1, beforeExpr: true, logic:1}
-	self._logicalAND = {binop: 2, beforeExpr: true, logic:1}
-	self._bitwiseOR = {binop: 3, beforeExpr: true}
-	self._bitwiseXOR = {binop: 4, beforeExpr: true}
-	self._bitwiseAND = {binop: 5, prefix:true, beforeExpr: true}
-	self._equality = {binop: 6, beforeExpr: true, logic:1}
-	self._relational = {binop: 7, beforeExpr: true, logic:1}
-	self._bitShift = {binop: 8, beforeExpr: true}
-	self._plusMin = {binop: 9, prefix: true, beforeExpr: true}
-	self._multiplyModulo = {binop: 10, prefix:true, beforeExpr: true}
-	self._pow = {binop: 10, beforeExpr: true}
-	self._intmod = {binop: 10, beforeExpr: true}
-	self._intdiv = {binop: 10, beforeExpr: true}
+	this._logicalOR = {binop: 1, beforeExpr: true, logic:1}
+	this._logicalAND = {binop: 2, beforeExpr: true, logic:1}
+	this._bitwiseOR = {binop: 3, beforeExpr: true}
+	this._bitwiseXOR = {binop: 4, beforeExpr: true}
+	this._bitwiseAND = {binop: 5, prefix:true, beforeExpr: true}
+	this._equality = {binop: 6, beforeExpr: true, logic:1}
+	this._relational = {binop: 7, beforeExpr: true, logic:1}
+	this._bitShift = {binop: 8, beforeExpr: true}
+	this._plusMin = {binop: 9, prefix: true, beforeExpr: true}
+	this._multiplyModulo = {binop: 10, prefix:true, beforeExpr: true}
+	this._pow = {binop: 10, beforeExpr: true}
+	this._intmod = {binop: 10, beforeExpr: true}
+	this._intdiv = {binop: 10, beforeExpr: true}
 	
-	//self._or = {keyword: "or", replace:'||', replaceOp:self._logicalOR, binop: 1, beforeExpr: true}
-	//self._and = {keyword: "and", replace:'&&', replaceOp:self._logicalAND, binop: 2, beforeExpr: true}
-	//self._not = {keyword: "not", replace:'!', prefix: 1, beforeExpr: true}
+	//this._or = {keyword: "or", replace:'||', replaceOp:this._logicalOR, binop: 1, beforeExpr: true}
+	//this._and = {keyword: "and", replace:'&&', replaceOp:this._logicalAND, binop: 2, beforeExpr: true}
+	//this._not = {keyword: "not", replace:'!', prefix: 1, beforeExpr: true}
 
 	// This is a trick taken from Esprima. It turns out that, on
 	// non-Chrome browsers, to check whether a string is in a set, a
@@ -400,7 +405,7 @@ define.class(function(require, exports, self){
 	//
 	// It starts by sorting the words by length.
 
-	self.makePredicate = function(words) {
+	this.makePredicate = function(words) {
 		words = words.split(" ")
 		var f = "", cats = []
 		out: for (var i = 0; i < words.length; ++i) {
@@ -439,12 +444,12 @@ define.class(function(require, exports, self){
 		return new Function("str", f)
 	}
 
-	self._isReservedWord3 = "abstract boolean byte char class double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile"
-	self._isReservedWord5 = "class enum extends super const export import"
-	self._isStrictReservedWord = "implements interface let package private protected public static yield"
-	self._isStrictBadIdWord = "eval arguments"
+	this._isReservedWord3 = "abstract boolean byte char class double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile"
+	this._isReservedWord5 = "class enum extends super const export import"
+	this._isStrictReservedWord = "implements interface let package private protected public static yield"
+	this._isStrictBadIdWord = "eval arguments"
 
-	self.initKeywords = function(){
+	this.initKeywords = function(){
 		var isKeyword = ''
 		this.keywordTypes = {}
 		this.tokTypes = {}
@@ -476,7 +481,7 @@ define.class(function(require, exports, self){
 	}
 
 	// If you externally modify things, call this again
-	self.initKeywords()
+	this.initKeywords()
 
 	// ## Character categories
 
@@ -485,25 +490,35 @@ define.class(function(require, exports, self){
 	// are only applied when a character is found to actually have a
 	// code point above 128.
 
-	self.nonASCIIwhitespace = /[\u1680\u180e\u2000-\u200a\u202f\u205f\u3000\ufeff]/
-	self.nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc"
-	self.nonASCIIidentifierChars = "\u0300-\u036f\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u0620-\u0649\u0672-\u06d3\u06e7-\u06e8\u06fb-\u06fc\u0730-\u074a\u0800-\u0814\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0840-\u0857\u08e4-\u08fe\u0900-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962-\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09d7\u09df-\u09e0\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2-\u0ae3\u0ae6-\u0aef\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b56\u0b57\u0b5f-\u0b60\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c01-\u0c03\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62-\u0c63\u0c66-\u0c6f\u0c82\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2-\u0ce3\u0ce6-\u0cef\u0d02\u0d03\u0d46-\u0d48\u0d57\u0d62-\u0d63\u0d66-\u0d6f\u0d82\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2\u0df3\u0e34-\u0e3a\u0e40-\u0e45\u0e50-\u0e59\u0eb4-\u0eb9\u0ec8-\u0ecd\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f41-\u0f47\u0f71-\u0f84\u0f86-\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u1000-\u1029\u1040-\u1049\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u170e-\u1710\u1720-\u1730\u1740-\u1750\u1772\u1773\u1780-\u17b2\u17dd\u17e0-\u17e9\u180b-\u180d\u1810-\u1819\u1920-\u192b\u1930-\u193b\u1951-\u196d\u19b0-\u19c0\u19c8-\u19c9\u19d0-\u19d9\u1a00-\u1a15\u1a20-\u1a53\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1b46-\u1b4b\u1b50-\u1b59\u1b6b-\u1b73\u1bb0-\u1bb9\u1be6-\u1bf3\u1c00-\u1c22\u1c40-\u1c49\u1c5b-\u1c7d\u1cd0-\u1cd2\u1d00-\u1dbe\u1e01-\u1f15\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2d81-\u2d96\u2de0-\u2dff\u3021-\u3028\u3099\u309a\ua640-\ua66d\ua674-\ua67d\ua69f\ua6f0-\ua6f1\ua7f8-\ua800\ua806\ua80b\ua823-\ua827\ua880-\ua881\ua8b4-\ua8c4\ua8d0-\ua8d9\ua8f3-\ua8f7\ua900-\ua909\ua926-\ua92d\ua930-\ua945\ua980-\ua983\ua9b3-\ua9c0\uaa00-\uaa27\uaa40-\uaa41\uaa4c-\uaa4d\uaa50-\uaa59\uaa7b\uaae0-\uaae9\uaaf2-\uaaf3\uabc0-\uabe1\uabec\uabed\uabf0-\uabf9\ufb20-\ufb28\ufe00-\ufe0f\ufe20-\ufe26\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f"
-	self.nonASCIIidentifierStart = new RegExp("[" + self.nonASCIIidentifierStartChars + "]")
-	self.nonASCIIidentifier = new RegExp("[" + self.nonASCIIidentifierStartChars + self.nonASCIIidentifierChars + "]")
+	this.nonASCIIwhitespace = /[\u1680\u180e\u2000-\u200a\u202f\u205f\u3000\ufeff]/
+	this.nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc"
+	this.nonASCIIidentifierChars = "\u0300-\u036f\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u0620-\u0649\u0672-\u06d3\u06e7-\u06e8\u06fb-\u06fc\u0730-\u074a\u0800-\u0814\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0840-\u0857\u08e4-\u08fe\u0900-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962-\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09d7\u09df-\u09e0\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2-\u0ae3\u0ae6-\u0aef\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b56\u0b57\u0b5f-\u0b60\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c01-\u0c03\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62-\u0c63\u0c66-\u0c6f\u0c82\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2-\u0ce3\u0ce6-\u0cef\u0d02\u0d03\u0d46-\u0d48\u0d57\u0d62-\u0d63\u0d66-\u0d6f\u0d82\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2\u0df3\u0e34-\u0e3a\u0e40-\u0e45\u0e50-\u0e59\u0eb4-\u0eb9\u0ec8-\u0ecd\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f41-\u0f47\u0f71-\u0f84\u0f86-\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u1000-\u1029\u1040-\u1049\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u170e-\u1710\u1720-\u1730\u1740-\u1750\u1772\u1773\u1780-\u17b2\u17dd\u17e0-\u17e9\u180b-\u180d\u1810-\u1819\u1920-\u192b\u1930-\u193b\u1951-\u196d\u19b0-\u19c0\u19c8-\u19c9\u19d0-\u19d9\u1a00-\u1a15\u1a20-\u1a53\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1b46-\u1b4b\u1b50-\u1b59\u1b6b-\u1b73\u1bb0-\u1bb9\u1be6-\u1bf3\u1c00-\u1c22\u1c40-\u1c49\u1c5b-\u1c7d\u1cd0-\u1cd2\u1d00-\u1dbe\u1e01-\u1f15\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2d81-\u2d96\u2de0-\u2dff\u3021-\u3028\u3099\u309a\ua640-\ua66d\ua674-\ua67d\ua69f\ua6f0-\ua6f1\ua7f8-\ua800\ua806\ua80b\ua823-\ua827\ua880-\ua881\ua8b4-\ua8c4\ua8d0-\ua8d9\ua8f3-\ua8f7\ua900-\ua909\ua926-\ua92d\ua930-\ua945\ua980-\ua983\ua9b3-\ua9c0\uaa00-\uaa27\uaa40-\uaa41\uaa4c-\uaa4d\uaa50-\uaa59\uaa7b\uaae0-\uaae9\uaaf2-\uaaf3\uabc0-\uabe1\uabec\uabed\uabf0-\uabf9\ufb20-\ufb28\ufe00-\ufe0f\ufe20-\ufe26\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f"
+	this.nonASCIIidentifierStart = new RegExp("[" + this.nonASCIIidentifierStartChars + "]")
+	this.nonASCIIidentifier = new RegExp("[" + this.nonASCIIidentifierStartChars + this.nonASCIIidentifierChars + "]")
 
-	// Whether a single character denotes a self.newline.
+	// Whether a single character denotes a this.newline.
 
-	self.newline = /[\n\r\u2028\u2029]/
+	this.newline = /[\n\r\u2028\u2029]/
 
 	// Matches a whole line break (where CRLF is considered a single
 	// line break). Used to count lines.
 
-	self.lineBreak = /\r\n|[\n\r\u2028\u2029]/g
+	this.lineBreak = /\r\n|[\n\r\u2028\u2029]/g
 
 	// Test whether a given character code starts an identifier.
+	exports.needsParens = function(node, other, isleft){
+		var other_t = other.type
+
+		if(other_t == 'Assign' || other_t == 'List' || other_t == 'Condition' || 
+			(other_t == 'Binary' || other_t == 'Logic') && other.prio <= node.prio){
+			if(other.prio == node.prio && isleft) return false
+			return true
+		}
+	}
+
 
 	exports.isIdentifierStart = 
-	self.isIdentifierStart = function(code) {
+	this.isIdentifierStart = function(code) {
 		if (code < 65) return code === 36 || code === 35 
 		if (code < 91) return true
 		if (code < 97) return code === 95
@@ -513,7 +528,7 @@ define.class(function(require, exports, self){
 
 	// Test whether a given character is part of an identifier.
 	exports.isIdentifierChar = 
-	self.isIdentifierChar = function(code) {
+	this.isIdentifierChar = function(code) {
 		if (code < 48) return code === 36 || code === 35
 		if (code < 58) return true
 		if (code < 65) return false
@@ -525,19 +540,19 @@ define.class(function(require, exports, self){
 	}
 
 	exports.isNewLine =
-	self.isNewLine = function(code){
+	this.isNewLine = function(code){
 		return this.newline.test(String.fromCharCode(code))
 	}
 
 	exports.isNonNewlineWhiteSpace =
-	self.isNonNewlineWhiteSpace = function(code) {
+	this.isNonNewlineWhiteSpace = function(code) {
 		if(code == 32) return true
 		if(code == 9) return true
 		return code >= 0xaa && this.nonASCIIwhitespace.test(String.fromCharCode(code))
 	}
 
 	exports.isWhiteSpace =
-	self.isWhiteSpace = function(code) {
+	this.isWhiteSpace = function(code) {
 		if(code == 32) return true
 		if(code == 9) return true
 		if(code == 10) return true
@@ -549,7 +564,7 @@ define.class(function(require, exports, self){
 
 	// Reset the token state. Used at the start of a parse.
 
-	self.initTokenState = function() {
+	this.initTokenState = function() {
 		this.parenStack = []
 		this.lastTok = undefined
 		this.skippedNewlines = false
@@ -566,7 +581,7 @@ define.class(function(require, exports, self){
 	// `this.tokRegexpAllowed`, and skips the space after the token, so that
 	// the next one's `this.tokStart` will point at the right position.
 
-	self.finishToken = function(type, val) {
+	this.finishToken = function(type, val) {
 		//console.log('FINISH TOKEN',type)
 		if(this.storeComments) this.lastComments.push(type)
 		this.tokEnd = this.tokPos
@@ -583,7 +598,7 @@ define.class(function(require, exports, self){
 		this.tokRegexpAllowed = type.beforeExpr
 	}
 	
-	self.skipBlockComment = function() {
+	this.skipBlockComment = function() {
 		var start = this.tokPos, end = this.input.indexOf("*/", this.tokPos += 2)
 		if (end === -1) this.raise(this.tokPos - 2, "Unterminated comment")
 		if( this.input.indexOf("\n", this.tokPos ) < end ) this.skippedNewlines = 1
@@ -600,7 +615,7 @@ define.class(function(require, exports, self){
 		}
 	}
 
-	self.skipLineComment = function() {
+	this.skipLineComment = function() {
 
 		var start = this.tokPos
 		var ch = this.input.charCodeAt(this.tokPos+=2)
@@ -625,7 +640,7 @@ define.class(function(require, exports, self){
 	// Called at the start of the parse and after every token. Skips
 	// whitespace and comments, and.
 
-	self.skipSpace = function() {
+	this.skipSpace = function() {
 
 		this.lastSkippedNewlines = this.skippedNewlines
 		this.skippedNewlines = 0
@@ -684,7 +699,7 @@ define.class(function(require, exports, self){
 	// The `forceRegexp` parameter is used in the one case where the
 	// `this.tokRegexpAllowed` trick does not work. See `this.parseStatement`.
 
-	self.readToken_dot = function() {
+	this.readToken_dot = function() {
 		var next = this.input.charCodeAt(this.tokPos + 1)
 		if (next >= 48 && next <= 57) return this.readNumber(true)
 		if( next == 46){
@@ -701,7 +716,7 @@ define.class(function(require, exports, self){
 		return this.finishToken(this._dot)
 	}
 
-	self.readToken_slash = function() {// '/'
+	this.readToken_slash = function() {// '/'
 		var next = this.input.charCodeAt(this.tokPos + 1)
 		if (this.tokRegexpAllowed) {
 			if(next == 32 && this.input.charCodeAt(this.tokPos + 2) == 47){
@@ -715,7 +730,7 @@ define.class(function(require, exports, self){
 		return this.finishOp(this._slash, 1)
 	}
 
-	self.readToken_multiply = function() { // '*'
+	this.readToken_multiply = function() { // '*'
 		var next = this.input.charCodeAt(this.tokPos + 1)
 		
 		if (next === 42) return this.finishOp(this._pow, 2)
@@ -724,7 +739,7 @@ define.class(function(require, exports, self){
 		return this.finishOp(this._multiplyModulo, 1)
 	}
 
-	self.readToken_modulo = function() { // '%'
+	this.readToken_modulo = function() { // '%'
 		var next = this.input.charCodeAt(this.tokPos + 1)
 
 		if (next === 47) return this.finishOp(this._intdiv, 2)
@@ -734,20 +749,20 @@ define.class(function(require, exports, self){
 		return this.finishOp(this._multiplyModulo, 1)
 	}
 
-	self.readToken_pipe_amp = function(code) { // '|&'
+	this.readToken_pipe_amp = function(code) { // '|&'
 		var next = this.input.charCodeAt(this.tokPos + 1)
 		if (next === code) return this.finishOp(code === 124 ? this._logicalOR : this._logicalAND, 2)
 		if (next === 61) return this.finishOp(this._assign, 2)
 		return this.finishOp(code === 124 ? this._bitwiseOR : this._bitwiseAND, 1)
 	}
 
-	self.readToken_caret = function() { // '^'
+	this.readToken_caret = function() { // '^'
 		var next = this.input.charCodeAt(this.tokPos + 1)
 		if (next === 61) return this.finishOp(this._assign, 2)
 		return this.finishOp(this._bitwiseXOR, 1)
 	}
 
-	self.readToken_plus_min = function(code) { // '+-'
+	this.readToken_plus_min = function(code) { // '+-'
 		var next = this.input.charCodeAt(this.tokPos + 1)
 		if (next === code) {
 			if (next == 45 && this.input.charCodeAt(this.tokPos + 2) == 62 &&
@@ -764,7 +779,7 @@ define.class(function(require, exports, self){
 		return this.finishOp(this._plusMin, 1)
 	}
 
-	self.readToken_lt_gt = function(code) { // '<>'
+	this.readToken_lt_gt = function(code) { // '<>'
 		var next = this.input.charCodeAt(this.tokPos + 1)
 		var size = 1
 		if (next === code) {
@@ -785,13 +800,13 @@ define.class(function(require, exports, self){
 		return this.finishOp(this._relational, size)
 	}
 
-	self.readToken_eq_excl = function(code) { // '=!'
+	this.readToken_eq_excl = function(code) { // '=!'
 		var next = this.input.charCodeAt(this.tokPos + 1)
 		if (next === 61) return this.finishOp(this._equality, this.input.charCodeAt(this.tokPos + 2) === 61 ? 3 : 2)
 		return this.finishOp(code === 61 ? this._eq : this._notxor, 1)
 	}
 
-	self.getTokenFromCode = function(code) {
+	this.getTokenFromCode = function(code) {
 		switch(code) {
 			// The interpretation of a dot depends on whether it is followed
 			// by a digit.
@@ -931,7 +946,7 @@ define.class(function(require, exports, self){
 		return false
 	}
 
-	self.readToken = function(forceRegexp) {
+	this.readToken = function(forceRegexp) {
 		// in templated string check
 		this.probe_flag = false
 		if(this.templateNext){ 
@@ -967,7 +982,7 @@ define.class(function(require, exports, self){
 		return tok
 	}
 
-	self.finishOp = function(type, size) {
+	this.finishOp = function(type, size) {
 		var str = this.input.slice(this.tokPos, this.tokPos + size)
 		this.tokPos += size
 		this.finishToken(type, str)
@@ -976,7 +991,7 @@ define.class(function(require, exports, self){
 	// Parse a regular expression. Some context-awareness is necessary,
 	// since a '/' inside a '[]' set does not end the expression.
 
-	self.readRegexp = function(multiLine) {
+	this.readRegexp = function(multiLine) {
 		var content = "", escaped, inClass, start = this.tokPos
 		for (;;) {
 			if (this.tokPos >= this.inputLen) this.raise(start, "Unterminated regular expression")
@@ -1045,7 +1060,7 @@ define.class(function(require, exports, self){
 	// were read, the integer value otherwise. When `len` is given, this
 	// will return `null` unless the integer has exactly `len` digits.
 
-	self.readInt = function(radix, len) {
+	this.readInt = function(radix, len) {
 		var start = this.tokPos, total = 0
 		for (var i = 0, e = len == null ? Infinity : len; i < e; ++i) {
 			var code = this.input.charCodeAt(this.tokPos), val
@@ -1062,7 +1077,7 @@ define.class(function(require, exports, self){
 		return total
 	}
 
-	self.readOctNumber = function(){
+	this.readOctNumber = function(){
 		this.tokPos += 2; // 0o
 		var val = this.readInt(8)
 		if(val == null ) this.raise(this.tokStart + 2, "Expected octal number")
@@ -1071,7 +1086,7 @@ define.class(function(require, exports, self){
 		return this.finishToken(this._num, val)
 	}
 
-	self.readBinNumber = function(){
+	this.readBinNumber = function(){
 		this.tokPos += 2; // 0b
 		var val = this.readInt(2)
 		if(val == null ) this.raise(this.tokStart + 2, "Expected binary number")
@@ -1079,7 +1094,7 @@ define.class(function(require, exports, self){
 		return this.finishToken(this._num, val)
 	}
 
-	self.readHexNumber = function() {
+	this.readHexNumber = function() {
 		this.tokPos += 2; // 0x
 		var val = this.readInt(16)
 		if (val == null) this.raise(this.tokStart + 2, "Expected hexadecimal number")
@@ -1089,7 +1104,7 @@ define.class(function(require, exports, self){
 
 	// Read an integer, octal integer, or floating-point number.
 
-	self.readNumber = function(startsWithDot) {
+	this.readNumber = function(startsWithDot) {
 		var start = this.tokPos, isFloat = false
 
 		if (!startsWithDot && this.readInt(10) === null) this.raise(start, "Invalid number")
@@ -1117,7 +1132,7 @@ define.class(function(require, exports, self){
 	}
 	// Read a string value, interpreting backslash-escapes.
 
-	self.readString = function(quote) {
+	this.readString = function(quote) {
 		this.tokPos++
 		var out = ""
 		this.isMultiLine = false
@@ -1180,7 +1195,7 @@ define.class(function(require, exports, self){
 
 	// Used to read character escape sequences ('\x', '\u', '\U').
 
-	self.readHexChar = function(len) {
+	this.readHexChar = function(len) {
 		var n = this.readInt(16, len)
 		if (n === null) this.raise(this.tokStart, "Bad character escape sequence")
 		return n
@@ -1190,13 +1205,13 @@ define.class(function(require, exports, self){
 	// contained any escape sequences. This is needed because words with
 	// escape sequences must not be interpreted as keywords.
 
-	self.containsEsc
+	this.containsEsc
 
 	// reads ~ and ! as a flag on a word 
-	self.containsFlag
+	this.containsFlag
 
 	// injects a * as the next token
-	self.injectMul
+	this.injectMul
 
 	// Read an identifier, and return it as a string. Sets `this.containsEsc`
 	// to whether the word contained a '\u' escape.
@@ -1205,7 +1220,7 @@ define.class(function(require, exports, self){
 	// containeds an escape, as a micro-optimization.
 
 
-	self.readWord1 = function() {
+	this.readWord1 = function() {
 		this.containsEsc = false
 		this.containsFlag = false
 		var word, first = true, start = this.tokPos
@@ -1244,7 +1259,7 @@ define.class(function(require, exports, self){
 	// Read an identifier or keyword token. Will check for reserved
 	// words when necessary.
 
-	self.readWord = function() {
+	this.readWord = function() {
 		var word = this.readWord1()
 		var type = this._name
 		if (!this.containsEsc && this.isKeyword(word)){
@@ -1277,7 +1292,7 @@ define.class(function(require, exports, self){
 
 	// Continue to the next token.
 
-	self.next = function() {
+	this.next = function() {
 		this.lastStart = this.tokStart
 		this.lastEnd = this.tokEnd
 		this.lastTok = this.tokType
@@ -1292,7 +1307,7 @@ define.class(function(require, exports, self){
 	// Enter this.strict mode. Re-reads the next token to please pedantic
 	// tests ("use this.strict"; 010; -- should fail).
 
-	self.setStrict = function(strct) {
+	this.setStrict = function(strct) {
 		this.strict = strct
 		this.tokPos = this.tokStart
 		this.skipSpace()
@@ -1300,10 +1315,10 @@ define.class(function(require, exports, self){
 	}
 
 	// Start an AST node, attaching a start offset.
-	self.Node = {}
-	self.lastDeferred = []
+	this.Node = {}
+	this.lastDeferred = []
 
-	self.finishComments = function(){
+	this.finishComments = function(){
 		// we take a comment, then walk lastNodes 
 		var comments = this.lastComments
 		var nodes    = this.lastNodes
@@ -1336,7 +1351,7 @@ define.class(function(require, exports, self){
 		this.lastNodes.length = 0
 	}
 
-	self.startNode = function() {
+	this.startNode = function() {
 
 		var node = {
 			_ast_:1,
@@ -1358,7 +1373,7 @@ define.class(function(require, exports, self){
 	// the start of another node. For example, a binary operator node is
 	// only started after its left-hand side has already been parsed.
 
-	self.startNodeFrom = function(other) {
+	this.startNodeFrom = function(other) {
 
 		var node = {
 			_ast_:1,
@@ -1372,7 +1387,7 @@ define.class(function(require, exports, self){
 
 	// Finish an AST node, adding `type` and `end` properties.
 
-	self.finishNode = function(node, type) {
+	this.finishNode = function(node, type) {
 		node.type = type
 		node.end = this.lastEnd
 		if(this.storeComments) this.lastNodes.push( node )
@@ -1381,7 +1396,7 @@ define.class(function(require, exports, self){
 
 	// Test whether a statement node is the string literal `"use this.strict"`.
 
-	self.isUseStrict = function(stmt) {
+	this.isUseStrict = function(stmt) {
 		return this.ecmaVersion >= 5 && stmt.type === "ExpressionStatement" &&
 			stmt.expression.type === "Literal" && stmt.expression.value === "use this.strict"
 	}
@@ -1389,7 +1404,7 @@ define.class(function(require, exports, self){
 	// Predicate that tests whether the next token is of the given
 	// type, and if yes, consumes it as a side effect.
 
-	self.eat = function(type) {
+	this.eat = function(type) {
 		if (this.tokType === type) {
 			this.next()
 			return true
@@ -1398,7 +1413,7 @@ define.class(function(require, exports, self){
 
 	// Test whether a this.semicolon can be inserted at the current position.
 
-	self.canInsertSemicolon = function() {
+	this.canInsertSemicolon = function() {
 		return !this.strictSemicolons &&
 			(this.tokType === this._eof || this.tokType === this._braceR || this.newline.test(this.input.slice(this.lastEnd, this.tokStart)))
 	}
@@ -1406,28 +1421,28 @@ define.class(function(require, exports, self){
 	// Consume a this.semicolon, or, failing that, see if we are allowed to
 	// pretend that there is a this.semicolon at this position.
 
-	self.semicolon = function() {
+	this.semicolon = function() {
 		if (!this.eat(this._semi) && !this.canInsertSemicolon()) this.unexpected()
 	}
 
 	// Expect a token of a given type. If found, consume it, otherwise,
 	// this.raise an this.unexpected token error.
 
-	self.expect = function(type) {
+	this.expect = function(type) {
 		if (this.tokType === type) this.next()
 		else this.unexpected()
 	}
 
 	// Raise an this.unexpected token error.
 
-	self.unexpected = function() {
+	this.unexpected = function() {
 		this.raise(this.tokStart, "Unexpected token")
 	}
 
 	// Verify that a node is an lval — something that can be assigned
 	// to.
 
-	self.checkLVal = function(expr) {
+	this.checkLVal = function(expr) {
 		if( expr.type === "Array" ){ // destructuring assignment
 			this.raise(expr.start, "TODO add destructuring assignment")
 		}
@@ -1445,7 +1460,7 @@ define.class(function(require, exports, self){
 	// `program` argument.  If present, the statements will be appended
 	// to its body instead of creating a new node.
 
-	self.parseTopLevel = function() {
+	this.parseTopLevel = function() {
 		this.lastStart = this.lastEnd = this.tokPos
 		this.inFunction = this.strict = null
 		this.labels = []
@@ -1471,7 +1486,7 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.commentBegin = function(node){
+	this.commentBegin = function(node){
 		var comments = this.lastComments
 		// we have to return the comments 'above' where we are. so
 		// we cant just eat it all. 
@@ -1489,7 +1504,7 @@ define.class(function(require, exports, self){
 		return out
 	}
 	
-	self.commentEnd = function(node, prefix, tail){
+	this.commentEnd = function(node, prefix, tail){
 		// process the prefix comments
 		var out = []
 		var split = false
@@ -1542,7 +1557,7 @@ define.class(function(require, exports, self){
 		comments.length = 0
 	}
 	// called on the head of a block
-	self.commentHead = function(node){
+	this.commentHead = function(node){
 		var out = []
 		var comments = this.lastComments
 		for(var i = 0, l = comments.length; i < l; i++){
@@ -1558,7 +1573,7 @@ define.class(function(require, exports, self){
 		if(out.length) node.cm1 = out
 	}
 	// this is called at a } we run to it then splice and leave that for the next layer up
-	self.commentTail = function(node, tail){
+	this.commentTail = function(node, tail){
 		var out = []
 		var comments = this.lastComments
 		//console.log('tail',cmt.join(','))
@@ -1578,7 +1593,7 @@ define.class(function(require, exports, self){
 		if(out.length) node.cm2 = out
 	}
 
-	self.commentInline = function(term){
+	this.commentInline = function(term){
 		// ok so, we find all newlines and comments
 		var out = []
 		var any = false
@@ -1598,7 +1613,7 @@ define.class(function(require, exports, self){
 		return out
 	}
 
-	self.commentAround = function(node, token){
+	this.commentAround = function(node, token){
 		var comments = this.lastComments
 		for(var i = comments.length - 1;i>=0;i--){
 			if(comments[i] == token){
@@ -1623,7 +1638,7 @@ define.class(function(require, exports, self){
 		}
 	}
 
-	self.commentAfter = function(){
+	this.commentAfter = function(){
 		// ok so, we find all newlines and comments
 		var out = []
 		var any = false
@@ -1645,8 +1660,8 @@ define.class(function(require, exports, self){
 		return out
 	}
 
-	self.loopLabel = {kind: "loop"} 
-	self.switchLabel = {kind: "switch"}
+	this.loopLabel = {kind: "loop"} 
+	this.switchLabel = {kind: "switch"}
 
 	// parse array dimensions
 	/*
@@ -1667,7 +1682,7 @@ define.class(function(require, exports, self){
 
 	// parse function args or variable defines with inits
 	// and destructuring and and and it makes coffee too.
-	self.parseDefs = function( noIn, defs, cantype ){
+	this.parseDefs = function( noIn, defs, cantype ){
 		defs = defs || []
 
 		for (;;) {
@@ -1728,7 +1743,7 @@ define.class(function(require, exports, self){
 		return defs
 	}
 
-	self.parseStatementBlock = function(){
+	this.parseStatementBlock = function(){
 		// this parses 
 		if(this.tokType == this._braceL){
 			return this.parseBlock()
@@ -1746,7 +1761,7 @@ define.class(function(require, exports, self){
 	// `if (foo) /blah/.exec(foo);`, where looking at the previous token
 	// does not help.
 
-	self.parseStatement = function( ) {
+	this.parseStatement = function( ) {
 		if (this.tokType === this._slash || this.tokType === this._assign && this.tokVal == "/=")
 			this.readToken(true)
 
@@ -2060,7 +2075,7 @@ define.class(function(require, exports, self){
 
 	// Used for constructs like `switch` and `if` that insist on
 	// parentheses around their expression.
-	self.parseParenExpression = function() {
+	this.parseParenExpression = function() {
 		this.expect(this._parenL)
 		var val = this.parseExpression()
 		this.expect(this._parenR)
@@ -2071,7 +2086,7 @@ define.class(function(require, exports, self){
 	// this.strict"` declarations when `allowStrict` is true (used for
 	// function bodies).
 
-	self.parseBlock = function(allowStrict) {
+	this.parseBlock = function(allowStrict) {
 		var node = this.startNode(), first = true, strict = false, oldStrict
 		node.steps = []
 		// this pops the comment we need to store on the body
@@ -2100,7 +2115,7 @@ define.class(function(require, exports, self){
 	}
 
 	// parse a comprehension block
-	self.parseComprBlock = function(){
+	this.parseComprBlock = function(){
 		// we can parse either a for or an if or an expression
 		if(this.tokType == this._for){
 			var node = this.startNode()
@@ -2128,7 +2143,7 @@ define.class(function(require, exports, self){
 		return this.parseExpression()
 	}
 
-	self.parseAllFor = function(node, compr){
+	this.parseAllFor = function(node, compr){
 		this.expect(this._parenL)
 
 		if (this.tokType === this._semi) return this.parseFor(node, null, compr)
@@ -2193,7 +2208,7 @@ define.class(function(require, exports, self){
 	// `this.parseStatement` will already have parsed the init statement or
 	// expression.
 
-	self.parseFor = function(node, init, compr) {
+	this.parseFor = function(node, init, compr) {
 		node.init = init
 		this.expect(this._semi)
 		node.test = this.tokType === this._semi ? null : this.parseExpression()
@@ -2208,7 +2223,7 @@ define.class(function(require, exports, self){
 
 	// Parse a `for`/`in` loop.
 
-	self.parseForIn = function(node, init, compr) {
+	this.parseForIn = function(node, init, compr) {
 		node.left = init
 		node.right = this.parseExpression()
 		this.expect(this._parenR)
@@ -2219,7 +2234,7 @@ define.class(function(require, exports, self){
 
 	// Parse a `for`/`to` loop.
 
-	self.parseForTo = function(node, init, compr) {
+	this.parseForTo = function(node, init, compr) {
 
 		node.left = init
 		node.right = this.parseNoCommaExpression(true)
@@ -2239,7 +2254,7 @@ define.class(function(require, exports, self){
 
 	// Parse a `for`/`of` loop.
 
-	self.parseForOf = function(node, init, compr) {
+	this.parseForOf = function(node, init, compr) {
 		node.left = init
 		node.right = this.parseExpression()
 		this.expect(this._parenR)
@@ -2254,7 +2269,7 @@ define.class(function(require, exports, self){
 	}
 
 	// Parse a for from optimized array loop
-	self.parseForFrom = function(node, init, compr) {
+	this.parseForFrom = function(node, init, compr) {
 		node.left = init
 		node.right = this.parseExpression()
 		this.expect(this._parenR)
@@ -2266,14 +2281,14 @@ define.class(function(require, exports, self){
 		return this.finishNode(node, "ForFrom")
 	}
 	// Parse a list of variable declarations.
-	self.parseVar = function(node, noIn) {
+	this.parseVar = function(node, noIn) {
 		node.kind = "var"
 		node.defs = this.parseDefs( noIn )
 		return node
 	}
 
 	// Determines if a comma injection is safe
-	self.canInjectComma = function( type ) {
+	this.canInjectComma = function( type ) {
 		return  this.injectCommas && 
 			this.lastSkippedNewlines && (
 			type.canInj ||
@@ -2293,7 +2308,7 @@ define.class(function(require, exports, self){
 	// sequences (in argument lists, array literals, or object literals)
 	// or the `in` operator (in for loops initalization expressions).
 
-	self.parseExpression = function(noIn, termColon, inStatement) {
+	this.parseExpression = function(noIn, termColon, inStatement) {
 
 		var expr = this.parseMaybeQuote(noIn)
 
@@ -2360,12 +2375,12 @@ define.class(function(require, exports, self){
 		return expr
 	}
 
-	self.parseNoCommaExpression = function(noIn) {
+	this.parseNoCommaExpression = function(noIn) {
 		return this.parseMaybeQuote(noIn)
 	}
 
 	// parse quoting of expressions
-	self.parseMaybeQuote = function(noIn) {
+	this.parseMaybeQuote = function(noIn) {
 		if(this.tokType == this._colon ){
 			var node = this.startNode()
 			this.next()
@@ -2378,7 +2393,7 @@ define.class(function(require, exports, self){
 	// Parse an assignment expression. This includes applications of
 	// operators like `+=`.
 
-	self.parseMaybeAssign = function(noIn) {
+	this.parseMaybeAssign = function(noIn) {
 		var left = this.parseMaybeConditional(noIn)
 		if (this.tokType.isAssign) {
 			var node = this.startNodeFrom(left)
@@ -2401,7 +2416,7 @@ define.class(function(require, exports, self){
 
 	// Parse a ternary conditional (`?:`) operator.
 
-	self.parseMaybeConditional = function(noIn) {
+	this.parseMaybeConditional = function(noIn) {
 		var expr = this.parseExprOps(noIn)
 		if (this.eat(this._question)) {
 			var node = this.startNodeFrom(expr)
@@ -2416,7 +2431,7 @@ define.class(function(require, exports, self){
 
 	// Start the precedence parser.
 
-	self.parseExprOps = function(noIn) {
+	this.parseExprOps = function(noIn) {
 		return this.parseExprOp(this.parseMaybeUnary(), -1, noIn)
 	}
 
@@ -2426,7 +2441,7 @@ define.class(function(require, exports, self){
 	// defer further parser to one of its callers when it encounters an
 	// operator that has a lower precedence than the set it is parsing.
 
-	self.parseExprOp = function(left, minPrec, noIn) {
+	this.parseExprOp = function(left, minPrec, noIn) {
 
 		var prec = this.tokType.binop
 		if (prec != null && !this.tokType.isAssign && 
@@ -2458,7 +2473,7 @@ define.class(function(require, exports, self){
 
 	// Parse unary operators, both prefix and postfix.
 
-	self.parseMaybeUnary = function() {
+	this.parseMaybeUnary = function() {
 		if (this.tokType.prefix) {
 			var node = this.startNode(), update = this.tokType.isUpdate
 
@@ -2489,16 +2504,16 @@ define.class(function(require, exports, self){
 
 	// Parse call, dot, and `[]`-subscript expressions.
 
-	self.parseExprSubscripts = function() {
+	this.parseExprSubscripts = function() {
 		var probe = this.probe_flag
 		var atom = this.parseExprAtom()
 		if(probe) atom.store = atom.store || 0, atom.store |= 8
 		return this.parseSubscripts(atom)
 	}
 
-	self.bench = {}
+	this.bench = {}
 
-	self.parseSubscripts = function(base, noCalls) {
+	this.parseSubscripts = function(base, noCalls) {
 
 		switch(this.tokType){
 		case this._bracketL:
@@ -2701,7 +2716,7 @@ define.class(function(require, exports, self){
 		return base
 	}
 
-	self.parseCall = function(base){
+	this.parseCall = function(base){
 		if( this.lastSkippedNewlines ) return base
 		var probe = this.probe_flag
 		this.eat(this._parenL)
@@ -2717,7 +2732,7 @@ define.class(function(require, exports, self){
 	// `new`, or an expression wrapped in punctuation like `()`, `[]`,
 	// or `{}`.
 
-	self.parseExprAtom = function() {
+	this.parseExprAtom = function() {
 	
 		switch (this.tokType) {
 		case this._this:
@@ -2877,7 +2892,7 @@ define.class(function(require, exports, self){
 	// to be a `[]` or dot subscript expression, but not a call — at
 	// least, not without wrapping it in parentheses. Thus, it uses the
 
-	self.parseNew = function() {
+	this.parseNew = function() {
 		var node = this.startNode()
 		this.next()
 		node.fn = this.parseSubscripts(this.parseExprAtom(), true)
@@ -2887,7 +2902,7 @@ define.class(function(require, exports, self){
 	}
 
 	// parseArray
-	self.parseArray = function(){
+	this.parseArray = function(){
 		var node = this.startNode()
 
 		if(this.storeComments) this.commentHead(node)
@@ -2906,7 +2921,7 @@ define.class(function(require, exports, self){
 	}
 
 	// Parse an object literal.
-	self.parseObj = function() {
+	this.parseObj = function() {
 		var node = this.startNode(), first = true, sawGetSet = false
 		node.keys = []
 
@@ -2962,7 +2977,7 @@ define.class(function(require, exports, self){
 		return this.finishNode(node, "Object")
 	}
 
-	self.parsePropertyName = function() {
+	this.parsePropertyName = function() {
 		if (this.tokType === this._num || this.tokType === this._string) return this.parseExprAtom()
 		return this.parseIdent(true)
 	}
@@ -2970,7 +2985,7 @@ define.class(function(require, exports, self){
 	// Parse a function declaration or literal (depending on the
 	// `isStatement` parameter).
 	
-	self.argToDef = function( node ) {
+	this.argToDef = function( node ) {
 		var o = this.startNodeFrom(node)
 		o.end = node.end
 		o.type = 'Def'
@@ -2984,7 +2999,7 @@ define.class(function(require, exports, self){
 		return o
 	}
 
-	self.parseArrowFunction = function(node, args) {
+	this.parseArrowFunction = function(node, args) {
 		if(args){
 			// convert args to a List of Defs
 			if( args.type === 'Empty' ){
@@ -3022,7 +3037,7 @@ define.class(function(require, exports, self){
 	// Parse a function declaration or literal (depending on the
 	// `isStatement` parameter).
 
-	self.parseFunction = function(node, isStatement) {
+	this.parseFunction = function(node, isStatement) {
 		if( this.tokType === this._multiplyModulo){
 			node.gen = 1
 			this.next()
@@ -3067,7 +3082,7 @@ define.class(function(require, exports, self){
 	// nothing in between them to be parsed as `null` (which is needed
 	// for array literals).
 
-	self.parseExprList = function(close, allowTrailingComma, allowEmpty) {
+	this.parseExprList = function(close, allowTrailingComma, allowEmpty) {
 		var elts = [], first = true
 		while (!this.eat(close)) {
 			if(this.storeComments){
@@ -3091,7 +3106,7 @@ define.class(function(require, exports, self){
 	// when parsing properties), it will also convert keywords into
 	// identifiers.
 
-	self.parseIdent = function(liberal) {
+	this.parseIdent = function(liberal) {
 		var node = this.startNode()
 		if(this.tokIsType) node.isType = this.tokVal
 		if (liberal && this.forbidReserved == "everywhere") liberal = false

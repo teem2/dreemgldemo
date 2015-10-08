@@ -289,7 +289,7 @@ define.class('./sprite_base', function(require, exports){
 	this.destroy = function(){
 		if (this.preDraw) this.screen.unregisterPredraw(this);
 		if (this.postDraw) this.screen.unregisterPostdraw(this);
-
+		
 		//if(this.interfaceguid){
 		//	this.screen.freeGuid(this.interfaceguid);		
 		//	this.interfaceguid = 0

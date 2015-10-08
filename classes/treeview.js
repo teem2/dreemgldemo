@@ -7,18 +7,10 @@ define.class(function(module, sprite, text, view, button, icon){
 	
 	// the current selected value	
 	this.attribute("selected", {type: String, value:""});
+	this.state('selected')
 
 	// This event gets triggered when an item is selected.
 	this.event('selectclick')
-
-	// json structure
-	/*var json = {
-		name:'hello'
-		children:[
-			{name:'child1'},
-			{name:'child2', children:[]},
-		]
-	}*/
 
 	// The fold button is a very very flat button. 
 	define.class(this, 'foldbutton', function(button){
@@ -45,19 +37,19 @@ define.class(function(module, sprite, text, view, button, icon){
 		this.borderwidth = 0;
 		this.attribute("folded", {type: boolean, value: false});
 		this.padding =  0
-		this.labelactivecolor = vec4("#303000");
-		this.bordercolor= "transparent";
+		this.labelactivecolor = vec4("#303000")
+		this.bordercolor= "transparent"
 		this.buttoncolor1 = vec4(1,1,1,0.0)
 		this.buttoncolor2 = vec4(1,1,1,0.0)
 		this.pressedcolor1 = vec4(0,0,0,0.14)
-		this.pressedcolor2 = vec4(0,0,0,0.05);
-		this.hovercolor1 = vec4(0,0,0,0.1);
-		this.hovercolor2 = vec4(0,0,0,0.1);
-		this.cornerradius = 0;
-		this.fgcolor = "black";
-		this.margin = 0;
-		this.bgcolor = "transparent";
-		this.flex = undefined;
+		this.pressedcolor2 = vec4(0,0,0,0.05)
+		this.hovercolor1 = vec4(0,0,0,0.1)
+		this.hovercolor2 = vec4(0,0,0,0.1)
+		this.cornerradius = 0
+		this.fgcolor = "black"
+		this.margin = 0
+		this.bgcolor = "transparent"
+		this.flex = undefined
 		this.alignself = "flex-start"
 		
 		this.render = function(){
@@ -69,34 +61,35 @@ define.class(function(module, sprite, text, view, button, icon){
 		}
 	});
 	
-
 	// the treeitem subclass contains 3 controls: a newitemheading, a set of treelines and an optional set of children treeitems in case the current node is expanded
 	define.class(this, 'treeitem', function(view){
-		this.flex = 1.0;	
-		
-		this.attribute("text", {type:String, value:""});
-	this.padding = vec4(3);
+
+		this.flex = 1.0
+
+		this.attribute("text", {type:String, value:""})
+
+		this.padding = vec4(3)
 		//this.attribute("collapsed", {type:Boolean, value:false});
 		//this.bgcolor = vec4('red')
 		this.fgcolor = vec4("black")
 
-		this.flexdirection = "row" ;
+		this.flexdirection = "row"
 		
 		//this.attribute("fontsize", {type:float, value:12});
 		
-		this.attribute("item", {type:Object});
+		this.attribute("item", {type:Object})
 
 		// Open/close this node
 		this.toggle = function(){
 			if (this.item){
-				if (!this.item.collapsed) this.item.collapsed = true;
-				else this.item.collapsed = false;
+				if (!this.item.collapsed) this.item.collapsed = true
+				else this.item.collapsed = false
 				//this.collapsed = this.item.collapsed;
 				this.reRender()
 			}
 			//this.reLayout();
-			this.setDirty(true);
-		};
+			this.setDirty(true)
+		}
 		
 		// build path for the current treeitem and call the classroot selectclick handler
 		this.selectclick = function(){
@@ -117,10 +110,9 @@ define.class(function(module, sprite, text, view, button, icon){
 		
 		this.atConstructor = function(){
 			if (this.item){
-				if (!this.item.collapsed) this.item.collapsed = false;
+				if (!this.item.collapsed) this.item.collapsed = false
 			}
-			
-		//	this.text = this.item.name;
+			//	this.text = this.item.name;
 		}
 		
 		this.count = 0;
@@ -129,7 +121,7 @@ define.class(function(module, sprite, text, view, button, icon){
 			if (!this.item) return [text({text:"empty"})];
 			//this.collapsed;
 			//console.log("treeitem", this.item.name, this.item.children);
-			return [view({flexdirection:"row", flex:1},[
+			return [view({flexdirection:"row", flex:1}, [
 				view({bgcolor:"transparent", flexwrap:"none", flexdirection:"column" },
 					this.classroot.newitemheading({haschildren:this.item.children&&this.item.children.length, folded: this.item.collapsed, toggleclick: this.toggle.bind(this), selectclick: this.selectclick.bind(this),text:this.item.name, id:this.item.id }),
 					this.item.collapsed==false?
@@ -152,27 +144,28 @@ define.class(function(module, sprite, text, view, button, icon){
 	})
 	
 	// subclass to render the gridlines of the tree
-	define.class(this, 'treeline', function(view){	
+	define.class(this, 'treeline', function(view){
 		//this.bgcolor = vec4("red");
 		this.flex = 1;
-		this.alignself = "stretch" 
+		this.alignself = "stretch"
 		this.bg = {
 			fgcolor: vec4(0.5, 0.5, 0.5, 1.),
 			last: 0,
-			bgcolorfn: function(a,b){
+			bgcolorfn: function(a, b){
 				var pos = mesh.xy * vec2(width, height)
 				var center = 18
 				var left = 11
 				var field = shape.union(
-							shape.box(pos, left,0,1,height * (1-last) + center * last),
-							shape.box(pos, left,center,width,1)  )
+					shape.box(pos, left, 0., 1., height * (1. - last) + center * last),
+					shape.box(pos, left, center, width, 1.)
+				)
 				var edge = 1.
 
-				if (mod( floor (gl_FragCoord.x) + floor(gl_FragCoord.y) , 2.) > 0.){
+				if(mod(floor(gl_FragCoord.x) + floor(gl_FragCoord.y), 2.) > 0.){
 					return vec4(fgcolor.rgb, smoothstep(edge, -edge, field))
 				}
 				
-				return vec4(fgcolor.rgb,0);
+				return vec4(fgcolor.rgb, 0)
 			}
 		}
 		this.atDraw = function(){
@@ -184,7 +177,7 @@ define.class(function(module, sprite, text, view, button, icon){
 	this.cornerradius = 0;
 	this.clipping = true;
 	this.bgcolor = vec4("white");
-	
+
 	this.bg = {
 		bgcolorfn: function(a, b){
 			return mix(bgcolor, bgcolor * 0.2, a.y * a.y);

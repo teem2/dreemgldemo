@@ -15,7 +15,7 @@ define.class(function(teem, screens, screen, view, text){
 
 	this.render = function(){ return [
 		fileio(),
-		screens(     
+		screens( 
 			screen(  
 				view({
 					bg:{bgcolorfn: function(pos, tex){

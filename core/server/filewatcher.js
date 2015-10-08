@@ -45,7 +45,7 @@ define.class(function(require, exports, self){
 							this.atChange(file)
 						}
 						catch(e){
-							console.log('WATCH EXCEPTION', e, e.stack)
+							//console.log('WATCH EXCEPTION', e, e.stack)
 							throw e
 						}
 					}
