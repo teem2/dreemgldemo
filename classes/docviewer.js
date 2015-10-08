@@ -108,9 +108,17 @@ define.class(function(sprite,view, require, text,foldcontainer,icon, markdown, c
 			
 			if (this.blocktype === "example"){
 				res.push(				
-					view({flexdirection:"column", borderwidth: 1, flex:1, bordercolor: "#e0e0e0", padding: vec4(14)}
-							,codeviewer({code:this.item.examplefunc.toString(), padding:vec4(14), fontsize: 14, bgcolor:"#000030", multiline: true})
-							,view({flex: 1, borderwidth: 1, flexdirection:"column", padding: vec4(14), bordercolor: "#e0e0e0"}, this.item.examplefunc())));
+					view({flexdirection:"row",  flex:1, padding: vec4(2)}
+							,view({flex: 1, borderwidth: 1, flexdirection:"column", padding: vec4(4), bordercolor: "#e0e0e0"}
+								,text({fgcolor:"black", text:"Code", margin:vec4(10)})
+								,codeviewer({margin:vec4(10),code:this.item.examplefunc.toString(), padding:vec4(4), fontsize: 14, bgcolor:"#000030", multiline: true})
+							)
+							,view({flex: 1, borderwidth: 1, flexdirection:"column", padding: vec4(4), bordercolor: "#e0e0e0", bgcolor: "gray" } 
+								,text({fgcolor:"white",bgcolor:"transparent",  text:"Live demo", margin:vec4(10)})								
+								,this.item.examplefunc()
+							)
+					)
+				);
 			}
 			return res;
 		}

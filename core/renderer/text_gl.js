@@ -5,7 +5,8 @@ define.class('./sprite_gl', function(require, exports, self){
 	var GLText = require('$gl/gltext')
 	var glfontParser = require('$gl/glfontparser')
 
-	
+	this.bgcolor = vec4("transparent");
+	this.fgcolor = vec4("black");
 	var text = this.constructor
 	// A label.
 	define.example(this, function Usage(){
@@ -53,7 +54,6 @@ define.class('./sprite_gl', function(require, exports, self){
 
 			textbuf.font_size = this.fontsize;
 			textbuf.add_y = textbuf.line_height;
-			textbuf.fgcolor = this.color
 			textbuf.align = this.align;
 			textbuf.start_y = textbuf.line_height
 			textbuf.clear()
