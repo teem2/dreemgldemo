@@ -23,7 +23,7 @@ define(function(require, exports){
 	var t2 = vec2(0,0);
 	var t3 = vec2(0,0);
 	
-	exports.setv1n1t1 = function(x,y,z,nx,ny,nz,tx,ty){
+	var v1n1t1 = function(x,y,z,nx,ny,nz,tx,ty){
 		v1[0] = x;
 		v1[1] = y;
 		v1[2] = z;
@@ -33,7 +33,7 @@ define(function(require, exports){
 		t1[0] = tx;
 		t1[1] = ty;
 	}
-	exports.v2n2t2 = function(x,y,z,nx,ny,nz,tx,ty){
+	var v2n2t2 = function(x,y,z,nx,ny,nz,tx,ty){
 		v2[0] = x;
 		v2[1] = y;
 		v2[2] = z;
@@ -44,7 +44,7 @@ define(function(require, exports){
 		t2[1] = ty;
 	}
 
-	exports.v3n3t3 = function(x,y,z,nx,ny,nz,tx,ty){
+	var v3n3t3 = function(x,y,z,nx,ny,nz,tx,ty){
 		v3[0] = x;
 		v3[1] = y;
 		v3[2] = z;
@@ -83,7 +83,7 @@ define(function(require, exports){
 		var cx = hw, cy = hh, cz = -hd;
 		var dx = -hw, dy = hh, dz = -hd;
 		var ex = -hw, ey = -hh, ez = hd;
-		var fx  = hw, fxy = -hh, fx z = hd;
+		var fx  = hw, fy = -hh, fz = hd;
 		var gx = hw, gy = hh, gz = hd;
 		var hx = -hw, hy = hh, hz = hd;			
 		
@@ -121,4 +121,4 @@ define(function(require, exports){
 	
 	exports.createSphere = function(addtriangle, radius, detaillevel){			
 	}
-}
+})

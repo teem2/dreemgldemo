@@ -25,15 +25,18 @@ define.class(function(sprite, text, view, button, icon){
 	this.attribute("p3", {type: vec2, value: vec2(100,100)});
 	this.attribute("off", {type: vec4, value: vec2(0,0,0,0)});
 	
+	
+	
 	this.vertexstruct = define.struct({
 		pos: float,
 		cap: float,
 		side: float
 	})
 
-	
 	this.bg = {
 
+
+	
 		draw_type: 'TRIANGLE_STRIP',	
 		linewidth: 10.0,
 		off: vec4(0),

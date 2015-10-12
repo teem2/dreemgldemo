@@ -1708,10 +1708,11 @@ define(function(require, exports){
 	exports.mat4.perspective = function(FY, A, N, F, o){
 		if(!o) o = exports.mat4()
 		var f = 1.0 / Math.tan(FY / 2), nf = 1 / (N - F)
-		o[0] = f / A, o[1] = 0,  o[2] = 0,                 o[3] = 0
-		o[4] = 0,     o[5] = f,  o[6] = 0,                 o[7] = 0
-		o[8] = 0,     o[9] = 0,  o[10] = (F + N) * nf,      o[11] = -1
-		o[12] = 0,     o[13] = 0,  o[14] = (2 * F * N) * nf,  o[15] = 0
+		
+		o[0] = f / A, o[4] = 0,  o[8] = 0,                 o[12] = 0
+		o[1] = 0,     o[5] = f,  o[9] = 0,                 o[13] = 0
+		o[2] = 0,     o[6] = 0,  o[10] = (F + N) * nf,      o[14] = -1
+		o[3] = 0,     o[7] = 0,  o[11] = (2 * F * N) * nf,  o[15] = 0
 		return o
 	}
  
@@ -1732,7 +1733,7 @@ define(function(require, exports){
 		var x0, x1, x2, y0, y1, y2, z0, z1, z2, len,
 			ex = eye[0], ux = up[0], lx = look[0], 
 			ey = eye[1], uy = up[1], ly = look[1],
-			ez = eye[2], uz = up[2], ly = look[2]		
+			ez = eye[2], uz = up[2], lz = look[2]		
 
 		if (Math.abs(ex - lx) < 0.000001 &&
 			Math.abs(ey - ly) < 0.000001 &&
@@ -1756,12 +1757,13 @@ define(function(require, exports){
 		if (!len)  y0 = 0, y1 = 0, y2 = 0
 		else len = 1 / len, y0 *= len, y1 *= len, y2 *= len
 
-		o[0] = x0, o[1] = y0, o[2] = z0,  o[3] = 0
-		o[4] = x1, o[5] = y1, o[6] = z1,  o[7] = 0
-		o[8] = x2, o[9] = y2, o[10] = z2,  o[11] = 0
-		o[12] = -(x0 * ex + x1 * ey + x2 * ez)
-		o[13] = -(y0 * ex + y1 * ey + y2 * ez)
-		o[14] = -(z0 * ex + z1 * ey + z2 * ez)
+		
+		o[0] = x0, o[4] = y0, o[8] = z0,  o[12] = 0
+		o[4] = x1, o[5] = y1, o[9] = z1,  o[13] = 0
+		o[8] = x2, o[6] = y2, o[10] = z2,  o[14] = 0
+		o[3] = -(x0 * ex + x1 * ey + x2 * ez)
+		o[7] = -(y0 * ex + y1 * ey + y2 * ez)
+		o[11] = -(z0 * ex + z1 * ey + z2 * ez)
 		o[15] = 1
 		return o
 	}

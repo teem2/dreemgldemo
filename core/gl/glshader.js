@@ -1035,6 +1035,7 @@ define.class('$base/node', function(require, exports, self){
 		//if(this.mydbg) debugger
 
 		if(!this.hasOwnProperty('shader') || !this.shader) this.compile(gldevice)
+		if (!this.shader.guid) return;
 		var gl = gldevice.gl
 		var len = this.useShader(gl, this.shader.guid)
 		// draw
