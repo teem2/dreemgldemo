@@ -477,7 +477,7 @@
 		var result = str.match(/function\s*[\w]*\s*\(([\w,\s]*)\)/)
 
 		var map = result[1].split(/\s*,\s*/)
-		for(var i = 0; i<map.length; i++) if(map[i] !== '') output.push(map[i].toLowerCase())
+		for(var i = 0; i<map.length; i++) if(map[i] !== '') output.push(map[i].toLowerCase().trim())
 
 		var matchrx = new RegExp(/define\.(?:render|class)\s*\(\s*(?:this\s*,\s*['"]\w+['"]\s*,\s*(?:\w+\s*,\s*){0,1}){0,1}function\s*[\w]*\s*\(([\w,\s]*)\)\s*{/g)
 		while((result = matchrx.exec(str)) !== null) {
