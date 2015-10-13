@@ -1,10 +1,10 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 define.class(function(require, sprite, text, view, icon){
-	
+	if(define.$environment === 'nodejs') return
+
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')
-	var GLText = require('$gl/gltext')
 	var GLGeom= require('$gl/glgeom')
 	var GLMat = require('$gl/glmaterial')
 	
