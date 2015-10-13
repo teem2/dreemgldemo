@@ -1,7 +1,8 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(require, sprite, view){
-	
+define.class(function(require, sprite, text, view, icon){
+	if(define.$environment === 'nodejs') return
+
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')
 	var GLGeom= require('$gl/glgeom')
@@ -65,7 +66,7 @@ define.class(function(require, sprite, view){
 		
 		console.log(this.mesh);
 		
-		this.texture = require('$textures/matcap6.png');
+		this.texture = require('$textures/matcap2.png');
 		
 		
 		this.matrix = mat4.identity()
@@ -89,14 +90,14 @@ define.class(function(require, sprite, view){
 		this.color = function(){
 			//return vec4("yellow") ;
 			
-			var n = noise.s2d(vec2(sin(mesh.uv.x*6.283), sin(mesh.uv.y*6.283)));
+			var n = noise.s2d(vec2(sin(mesh.uv.x*6.283)*0.215, sin(mesh.uv.y*6.283)));
 			
 			var nn = normalize(transnorm.xyz
 			+ 
 					vec3(
-						sin(n * PI2 * 10) * 0.08,
-						sin(n * PI2 * 11) * 0.08,
-						sin(n * PI2 * 12) * 0.03
+						sin(n * PI2 * 3) * 0.03,
+						sin(n * PI2 * 5) * 0.03,
+						sin(n * PI2 * 4) * 0.03
 					)
 				);
 
