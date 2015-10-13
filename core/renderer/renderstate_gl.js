@@ -7,13 +7,24 @@ define.class(function(require, exports, self){
 		this.clipStack.push(rect);		
 		var gl = this.device.gl;
 		
-		//console.log("clipdepth: ", previousdepth, "frame: ", this.frame);
-		
-		
+// 		console.log("clipdepth: ", previousdepth, "frame: ", this.frame);
+
 		gl.enable(gl.STENCIL_TEST);				
 		gl.colorMask(true, true,true,true);
 		gl.stencilFunc(gl.EQUAL, previousdepth, 0xFF);
 		gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR);
+	}
+	
+	this.setupPerspective = function() {
+		var gl = this.device.gl;
+//		gl.enable(gl.DEPTH_TEST);		
+//		gl.enable(gl.CULL_FACE);
+	}
+	
+	this.popPerspective = function() {
+		var gl = this.device.gl;
+	//	gl.disable(gl.DEPTH_TEST);
+		gl.disable(gl.CULL_FACE);		
 	}
 	
 	this.pushClip = function( sprite){

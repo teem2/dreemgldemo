@@ -16,6 +16,7 @@ define.class('$base/node', function(require, exports, self){
 	this.shape = require('$gl/glshape')
 	this.math = require('$gl/glmath')
 	this.demos = require('$gl/gldemos')
+	this.material = require('$gl/glmaterial')
 
 	this.RAD = '1'
 	this.DEG = '0.017453292519943295'
@@ -342,7 +343,7 @@ define.class('$base/node', function(require, exports, self){
 		return out
 	}
 
-	this.decodeDepthEquation = function(gl, eq, value){
+	this.decodeDepthEquation = function(eq, value){
 		var out = {original:value}
 		if(!eq) return out
 		if(eq.type == 'Logic' && eq.left.name == 'src_depth' && eq.right.name == 'dst_depth'){
@@ -364,14 +365,14 @@ define.class('$base/node', function(require, exports, self){
 	Object.defineProperty(self, 'color_blend', {
 		get:function(){ return this.color_blend_eq && this.color_blend_eq.original },
 		set:function(value){
-			this.color_blend_eq = blend_eq_cache[value] || (blend_eq_cache[value] = this.decodeBlendEquation(onejsparser.parse(value).steps[0]))
+			this.color_blend_eq = blend_eq_cache[value] || (blend_eq_cache[value] = this.decodeBlendEquation(onejsparser.parse(value).steps[0], value))
 		}
 	})
 
 	Object.defineProperty(self, 'alpha_blend', {
 		get:function(){ return this.alpha_blend_eq && this.alpha_blend_eq.original },
 		set:function(value){
-			this.alpha_blend_eq = blend_eq_cache[value] || (blend_eq_cache[value] = this.decodeBlendEquation(onejsparser.parse(value).steps[0]))
+			this.alpha_blend_eq = blend_eq_cache[value] || (blend_eq_cache[value] = this.decodeBlendEquation(onejsparser.parse(value).steps[0], value))
 		}
 	})
 
@@ -379,12 +380,13 @@ define.class('$base/node', function(require, exports, self){
 	Object.defineProperty(self, 'depth_test', {
 		get:function(){ return this.depth_test_eq && this.depth_test_eq.original },
 		set:function(value){
-			this.depth_test_eq = depth_eq_cache[value] || (depth_eq_cache[value] = this.decodeDepthEquation(onejsparser.parse(this.depth_compare).steps[0]))
+			this.depth_test_eq = depth_eq_cache[value] || (depth_eq_cache[value] = this.decodeDepthEquation(onejsparser.parse(value).steps[0], value))
 		}
 	})
 
 	this.alpha_blend = ''
-	this.depth_test = 'src_depth > dst_depth'
+	//this.depth_test = 'src_depth > dst_depth'
+	this.depth_test = ''
 	this.color_blend = '(1 - src_alpha) * dst_color + src_alpha * src_color'
 
 	this.alpha = ''
@@ -820,7 +822,6 @@ define.class('$base/node', function(require, exports, self){
 		else{
 			gl.disable(gl.BLEND)
 		}
-
 		// set up depth test
 		if(this.depth_test_eq.func){
 			gl.enable(gl.DEPTH_TEST)
@@ -904,7 +905,7 @@ define.class('$base/node', function(require, exports, self){
 		else{
 			gl.disable(gl.BLEND)
 		}
-
+		
 		// set up depth test
 		if(root.depth_test_eq.func){
 			gl.enable(gl.DEPTH_TEST)

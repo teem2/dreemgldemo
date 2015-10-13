@@ -14,7 +14,9 @@ define.class('./sprite_base', function(require, exports){
 	this.matrixdirty = true;
 	this.dirty = true
 	this.attribute("texturecache", {type:boolean, value:false})
-
+	
+	this.threedee = false;
+	
 	this.clipping =
 	this.bordercolor =
 	this.bgcolor =
@@ -33,7 +35,7 @@ define.class('./sprite_base', function(require, exports){
 
 	define.class(this, 'bg', GLShader, function(){
 		this.has_guid = true
-
+		this.depth_test = "";
 		this.texture = new GLTexture()
 
 		this.mesh = vec2.quad(0, 0, 1, 0, 0, 1, 1, 1)
@@ -237,7 +239,7 @@ define.class('./sprite_base', function(require, exports){
 			}					
 		}
 	
-		o.rotation[2] = this._rotation * 6.283 / 360;
+		o.rotation[2] = this._rotation * 6.283 / 360.0;
 		
 		if (this.layout) {
 			var s = o.scale;
@@ -641,6 +643,8 @@ define.class('./sprite_base', function(require, exports){
 
 			fg.screen = this.screen
 			bg.screen = this.screen
+			
+			
 			if(renderstate.drawmode === 2){
 				var type = bg.drawDebug(this.screen.device)
 				if(type) renderstate.debugtypes.push(type)
@@ -732,12 +736,14 @@ define.class('./sprite_base', function(require, exports){
 			if (actuallyclipping) renderstate.stopClipSetup();
 
 			if ((actuallyclipping && onscreen) || actuallyclipping == false) {
+				if (this.threedee){renderstate.setupPerspective();}
 				if (this.children) for (var i = 0; i < this.children.length; i++) {
 					var child = this.children[i]
 					if (child.draw) {
 						this.children[i].draw(renderstate);
 					}
 				}
+				if (this.threedee){renderstate.popPerspective();}
 			}
 			
 			if (actuallyclipping) renderstate.popClip(this);

@@ -77,9 +77,9 @@ define(function (require, exports) {
 	
 	exports.dithercrystal = function(col, time){
 		var texc = mod((vec2(gl_FragCoord.x, 1.0 - gl_FragCoord.y) + vec2(0.5)) / texture.size.xy, 1.0);
-var R = crystaltex.sample(mod(texc*0.2,1.0)).x * crystaltex.sample(mod(vec2(0,time*0.12314) +texc.yx*0.625123,1.0)).y;
-R = 1.0- R;
-R = R*R*R;
+		var R = crystaltex.sample(mod(texc*0.2,1.0)).x * crystaltex.sample(mod(vec2(0,time*0.12314) +texc.yx*0.625123,1.0)).y;
+		R = 1.0- R;
+		R = R*R*R;
 		col.xyz *=  0.6+R;
 
 		return col;
