@@ -216,14 +216,14 @@ function getBezier(percent,C1,C2,C3,C4) {
 		for(var i =0;i<10;i++){
 			var patch = patchdata[i];
 			var pcontrol = []
-			for (var j = 0;j<16;j++)
-			{
+			for (var j = 0;j<16;j++) {
 				pcontrol.push(controlpoints[patch[j]]);
 			}
+			
 			var detail = 10;
-			var ndetail = 0.1/detail;
-			for (var j =0 ;j<detail;j++)
-			{
+			var ndetail = -0.01/detail;
+			
+			for (var j =0 ;j<detail;j++) {
 				var p1 = j/detail;
 				var p2 = (j+1)/detail;
 				var p1n = p1 + ndetail
@@ -284,29 +284,29 @@ function getBezier(percent,C1,C2,C3,C4) {
 					var normD = calcnormal(DD,DDn1, DDn2)
 					
 					
-					v1n1t1(AA[0],AA[1],AA[2],normA[0],normA[1],normA[2],0,0); v2n2t2(BB[0],BB[1],BB[2],normB[0],normB[1],normB[2],1,0); v3n3t3(CC[0],CC[1], CC[2],normC[0],normC[1],normC[2],1,1);		
+					v1n1t1(AA[0],AA[1],AA[2],normA[0],normA[1],normA[2],q1,p1); v2n2t2(BB[0],BB[1],BB[2],normB[0],normB[1],normB[2],q2,p1); v3n3t3(CC[0],CC[1], CC[2],normC[0],normC[1],normC[2],q2,p2);		
 					cb(0, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-					v1n1t1(AA[0],AA[1],AA[2],normA[0],normA[1],normA[2],0,0); v2n2t2(CC[0],CC[1],CC[2],normC[0],normC[1],normC[2],1,1); v3n3t3(DD[0],DD[1],DD[2],normD[0],normD[1],normD[2],0,1);
+					v1n1t1(AA[0],AA[1],AA[2],normA[0],normA[1],normA[2],q1,p1); v2n2t2(CC[0],CC[1],CC[2],normC[0],normC[1],normC[2],q2,p2); v3n3t3(DD[0],DD[1],DD[2],normD[0],normD[1],normD[2],q1,p2);
 					cb(1, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
 
 
-					v1n1t1(AA[0],-AA[1],AA[2],normA[0],-normA[1],normA[2],0,0); v2n2t2(BB[0],-BB[1],BB[2],normB[0],-normB[1],normB[2],1,0); v3n3t3(CC[0],-CC[1], CC[2],normC[0],-normC[1],normC[2],1,1);		
+					v1n1t1(AA[0],-AA[1],AA[2],normA[0],-normA[1],normA[2],q1,p1); v2n2t2(BB[0],-BB[1],BB[2],normB[0],-normB[1],normB[2],q2,p1); v3n3t3(CC[0],-CC[1], CC[2],normC[0],-normC[1],normC[2],q2,p2);		
 					cb(0, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-					v1n1t1(AA[0],-AA[1],AA[2],normA[0],-normA[1],normA[2],0,0); v2n2t2(CC[0],-CC[1],CC[2],normC[0],-normC[1],normC[2],1,1); v3n3t3(DD[0],-DD[1],DD[2],normD[0],-normD[1],normD[2],0,1);
+					v1n1t1(AA[0],-AA[1],AA[2],normA[0],-normA[1],normA[2],q1,p1); v2n2t2(CC[0],-CC[1],CC[2],normC[0],-normC[1],normC[2],q2,p2); v3n3t3(DD[0],-DD[1],DD[2],normD[0],-normD[1],normD[2],q1,p2);
 					cb(1, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
 
 					if (i<6){
 						
-					v1n1t1(-AA[0],AA[1],AA[2],-normA[0],normA[1],normA[2],0,0); v2n2t2(-BB[0],BB[1],BB[2],-normB[0],normB[1],normB[2],1,0); v3n3t3(-CC[0],CC[1], CC[2],-normC[0],normC[1],normC[2],1,1);		
-					cb(0, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-					v1n1t1(-AA[0],AA[1],AA[2],-normA[0],normA[1],normA[2],0,0); v2n2t2(-CC[0],CC[1],CC[2],-normC[0],normC[1],normC[2],1,1); v3n3t3(-DD[0],DD[1],DD[2],-normD[0],normD[1],normD[2],0,1);
-					cb(1, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
+						v1n1t1(-AA[0],AA[1],AA[2],-normA[0],normA[1],normA[2],q1,p1); v2n2t2(-BB[0],BB[1],BB[2],-normB[0],normB[1],normB[2],q2,p1); v3n3t3(-CC[0],CC[1], CC[2],-normC[0],normC[1],normC[2],q2,p2);		
+						cb(0, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
+						v1n1t1(-AA[0],AA[1],AA[2],-normA[0],normA[1],normA[2],q1,p1); v2n2t2(-CC[0],CC[1],CC[2],-normC[0],normC[1],normC[2],q2,p2); v3n3t3(-DD[0],DD[1],DD[2],-normD[0],normD[1],normD[2],q1,p2);
+						cb(1, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
 
 
-					v1n1t1(-AA[0],-AA[1],AA[2],-normA[0],-normA[1],normA[2],0,0); v2n2t2(-BB[0],-BB[1],BB[2],-normB[0],-normB[1],normB[2],1,0); v3n3t3(-CC[0],-CC[1], CC[2],-normC[0],-normC[1],normC[2],1,1);		
-					cb(0, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-					v1n1t1(-AA[0],-AA[1],AA[2],-normA[0],-normA[1],normA[2],0,0); v2n2t2(-CC[0],-CC[1],CC[2],-normC[0],-normC[1],normC[2],1,1); v3n3t3(-DD[0],-DD[1],DD[2],-normD[0],-normD[1],normD[2],0,1);
-					cb(1, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
+						v1n1t1(-AA[0],-AA[1],AA[2],-normA[0],-normA[1],normA[2],q1,p1); v2n2t2(-BB[0],-BB[1],BB[2],-normB[0],-normB[1],normB[2],q2,p1); v3n3t3(-CC[0],-CC[1], CC[2],-normC[0],-normC[1],normC[2],q2,p2);		
+						cb(0, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
+						v1n1t1(-AA[0],-AA[1],AA[2],-normA[0],-normA[1],normA[2],q1,p1); v2n2t2(-CC[0],-CC[1],CC[2],-normC[0],-normC[1],normC[2],q2,p2); v3n3t3(-DD[0],-DD[1],DD[2],-normD[0],-normD[1],normD[2],q1,p2);
+						cb(1, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
 					}
 					
 					}

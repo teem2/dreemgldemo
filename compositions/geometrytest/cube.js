@@ -1,10 +1,9 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(require, sprite, text, view, icon){
+define.class(function(require, sprite, view){
 	
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')
-	var GLText = require('$gl/gltext')
 	var GLGeom= require('$gl/glgeom')
 	var GLMat = require('$gl/glmaterial')
 	
@@ -92,15 +91,15 @@ define.class(function(require, sprite, text, view, icon){
 			
 			var n = noise.s2d(vec2(sin(mesh.uv.x*6.283), sin(mesh.uv.y*6.283)));
 			
-			var nn = normalize(transnorm.xyz)
-			/*+ 
+			var nn = normalize(transnorm.xyz
+			+ 
 					vec3(
 						sin(n * PI2 * 10) * 0.08,
 						sin(n * PI2 * 11) * 0.08,
 						sin(n * PI2 * 12) * 0.03
 					)
 				);
-*/
+
 			var res = texture.sample(material.matcap(vec3(0,0,-1.0), nn));
 			
 			
