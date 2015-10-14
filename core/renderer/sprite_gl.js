@@ -386,7 +386,7 @@ define.class('./sprite_base', function(require, exports){
 			this.hasListeners('mousewheelx') || this.hasListeners('mousewheely')){
 			this.has_mouse_interaction = true
 		}
-		else{
+		else{			
 			this.has_mouse_interaction = false
 		}
 
@@ -571,6 +571,7 @@ define.class('./sprite_base', function(require, exports){
 
 	this.doDrawGuid = function(renderstate){
 		this.bg_shader._viewmatrix = renderstate.viewmatrix;		
+		
 		this.bg_shader.drawGuid(this.screen.device)
 	}
 
@@ -656,7 +657,7 @@ define.class('./sprite_base', function(require, exports){
 					this.effectiveguid = this.interfaceguid;
 				}
 				else{
-					this.effectiveguid = this.parent.effectiveguid;
+					this.effectiveguid = this.parent.effectiveguid;					
 				}
 				var r = ((this.effectiveguid &255)) / 255.0
 				var g = ((this.effectiveguid>>8) &255) / 255.0

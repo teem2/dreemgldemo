@@ -81,7 +81,7 @@ this.frame =0;
 		
 		this.uimode = true;
 		this.matrix = mat4.identity();
-		this.viewmatrix = mat4.ortho(0 + offx, device.size[0] + offx, 0 + offy, device.size[1] + offy, -100, 100);
+		this.viewmatrix = mat4.ortho(0 + offx, device.size[0] + offx, 0 + offy, device.size[1] + offy, 1, -1);
 		//this.device.gl.scissor(0,0, viewportwidth * device.ratio, viewportheight * device.ratio);
 		this.device.gl.viewport(0, 0, device.size[0] * device.ratio, device.size[1] * device.ratio)
 		this.device.gl.clearStencil(0);
