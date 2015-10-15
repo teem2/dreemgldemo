@@ -494,9 +494,14 @@
 	define.lookupClass = function(cls){
 		var luc = define.system_classes[cls]
 		if(luc !== undefined) return luc
-		if (cls.match(/^[a-zA-Z0-9_]+\$/)) {
-			return '$plugins/' + cls.replace(/\$/g, '/') + '.js'
+
+		var match = /^([a-zA-Z0-9_]+\$[a-zA-Z0-9_$]+)/.exec(cls);
+		if (match) {
+			var comploc = match[1];
+			var remainder = cls.substr(comploc.length);
+			return '$plugins/' + comploc.replace(/\$/g, '/') + remainder;
 		}
+
 		return './' + cls
 	}
 
