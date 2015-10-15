@@ -22,6 +22,8 @@
 	define.$lib = "$root/lib"
 	define.$build = "$root/build"
 	define.$compositions = "$root/compositions"
+	//defaults to allowing all compositions to be used as resources for each other, but can be changed if needed for security reasons.
+	define.$plugins = "$compositions"
 	define.$tests = '$root/tests'
 	define.$fonts = '$root/fonts'
 	define.$textures = "$root/textures"
@@ -137,7 +139,7 @@
 			define.module[abs_path] = module
 
 			if(factory === null) return null // its not an AMD module, but accept that
-			if(!factory) throw new Error("Cannot find factory for module (file not found):" + abs_path)
+			if(!factory) throw new Error("Cannot find factory for module (file not found): " + dep_path + " > " + abs_path)
 
 			// call the factory
 			if(typeof factory == 'function'){
@@ -474,12 +476,12 @@
 		
 		var result;
 		var output = []
-		var result = str.match(/function\s*[\w]*\s*\(([\w,\s]*)\)/)
+		var result = str.match(/function\s*[$_\w]*\s*\(([$_\w,\s]*)\)/)
 
 		var map = result[1].split(/\s*,\s*/)
 		for(var i = 0; i<map.length; i++) if(map[i] !== '') output.push(map[i].toLowerCase().trim())
 
-		var matchrx = new RegExp(/define\.(?:render|class)\s*\(\s*(?:this\s*,\s*['"]\w+['"]\s*,\s*(?:\w+\s*,\s*){0,1}){0,1}function\s*[\w]*\s*\(([\w,\s]*)\)\s*{/g)
+		var matchrx = new RegExp(/define\.(?:render|class)\s*\(\s*(?:this\s*,\s*['"][$_\w]+['"]\s*,\s*(?:[$_\w]+\s*,\s*){0,1}){0,1}function\s*[$_\w]*\s*\(([$_\w,\s]*)\)\s*\{/g)
 		while((result = matchrx.exec(str)) !== null) {
 			var map = result[1].split(/\s*,\s*/)
 			for(var i = 0; i<map.length; i++)if(map[i] !== '') output.push(map[i].toLowerCase())
@@ -492,6 +494,9 @@
 	define.lookupClass = function(cls){
 		var luc = define.system_classes[cls]
 		if(luc !== undefined) return luc
+		if (cls.match(/^[a-zA-Z0-9_]+\$/)) {
+			return '$plugins/' + cls.replace(/\$/g, '/') + '.js'
+		}
 		return './' + cls
 	}
 
