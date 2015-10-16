@@ -1,4 +1,4 @@
-define.class(function(teem, server, screens, screen, view, text, samplext$sserver, samplext$sview) {
+define.class(function(teem, server, screens, screen, view, text, samplext$sserver, samplext$views$sview) {
 
     this.render = function() {
         return [
@@ -6,7 +6,7 @@ define.class(function(teem, server, screens, screen, view, text, samplext$sserve
                 screen(
                     view(
                         { x:100, y:100, height: 500, width:300, bgcolor:"pink" },
-                        samplext$sview({x:10, y:10})
+                        samplext$views$sview({x:10, y:10})
                     )
                 )
             ),
