@@ -21,11 +21,11 @@ define.class(function(require, sprite, text, view, icon){
 
 		this.bg_shader.modelmatrix =  mat;
 		this.bg_shader.normalmatrix =  normalmat;
-		this.bg_shader.projectionmatrix = renderstate.projectionmatrix;
-		this.bg_shader.lookatmatrix = renderstate.lookatmatrix;
-		this.bg_shader.adjustmatrix1 = renderstate.adjustmatrix1;
-		this.bg_shader.adjustmatrix2 = renderstate.adjustmatrix2;
-		
+//		this.bg_shader.projectionmatrix = renderstate.projectionmatrix;
+		//this.bg_shader.lookatmatrix = renderstate.lookatmatrix;
+	//	this.bg_shader.adjustmatrix1 = renderstate.adjustmatrix1;
+		//this.bg_shader.adjustmatrix2 = renderstate.adjustmatrix2;
+		this.bg_shader.flattenmatrix = renderstate.flattenmatrix;
 		var adjust = mat4.identity();;
 		
 			//adjust[3] = 300;
@@ -109,17 +109,14 @@ define.class(function(require, sprite, text, view, icon){
 		}
 				
 	
-		this.texture = require('$textures/matcap2.png');
+		this.texture = require('$textures/matcap6.png');
 
 		this.matrix = mat4.identity()
 		this.modelmatrix = mat4.identity();;
-		this.adjustmatrix1 = mat4.identity();;
-this.adjustmatrix2 = mat4.identity();;
+		
 		this.normalmatrix = mat3.identity();;
 
-		this.projectionmatrix = mat4.perspective(45, 1, 0.1, 400);				
-		this.lookatmatrix = mat4.translate(mat4.lookAt(vec3(0,0,-2), vec3(0,-0,0), vec3(0,1,0)), vec3(0,0,0));
-
+		this.flattenmatrix = mat4.identity();
 
 		this.viewmatrix = mat4.identity();				
 		
@@ -130,10 +127,8 @@ this.adjustmatrix2 = mat4.identity();;
 			
 			transnorm = normalize(temp.xyz);
 			
-			var t = vec4(mesh.pos, 1) * modelmatrix * lookatmatrix *  adjustmatrix1 * projectionmatrix * adjustmatrix2 ;
-			var t2 = t;//vec4(t.xyz, 1.0);
-			
-			return t2  * matrix * viewmatrix ; // * matrix *viewmatrix
+			var t = vec4(mesh.pos, 1) * modelmatrix * flattenmatrix ;			
+			return t  * matrix * viewmatrix ; // * matrix *viewmatrix
 		}
 		
 		this.color = function(){

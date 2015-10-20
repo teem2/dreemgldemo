@@ -4,19 +4,19 @@ define.class(function(require, screen, view, text, cube, perspective3d, teapot){
 	this.render = function(){
 		return [
 			view({alignitems:"stretch", flex: 0.3, bgcolor:"transparent" }
-				,perspective3d({flex: 1, aligself:"stretch", clipping: true, fov:0.2, camera:vec3(-15,-15,15), margin:vec4(10), borderwidth:2, bordercolor:"lightgray"}, 
-					teapot({radius: 1, detail:2, pos3d:vec3(4,0,0), rot3d:vec3(0,2,0)}),
-					teapot({radius: 1, detail:2, rot3d:vec3(PI/2,0,0), pos3d:vec3(0,5,0)})
+				,perspective3d({flex: 1, aligself:"stretch", clipping: true, fov:30, camera:vec3(-35,-5,35), lookat:vec3(0,-2,0),margin:vec4(10), borderwidth:2, bordercolor:"lightgray"}, 
+					teapot({radius: 1, detail:2, pos3d:vec3(0,0,0), rot3d:vec3(PI/2,0,5)}),
+					teapot({radius: 1, detail:2, rot3d:vec3(PI/2,0,0), pos3d:vec3(10,0,-10)})
 				)
 			)
 			,view({alignitems:"stretch", flex: 0.3, bgcolor:"transparent" }
-				,perspective3d({flex: 1, aligself:"stretch", clipping: true, margin:vec4(10), borderwidth:2, bordercolor:"lightgray"}, 
-					teapot({radius: 1, detail:4, pos3d:vec3(4,0,0), rot3d:vec3(0,2,0)}),
+				,perspective3d({flex: 1, aligself:"stretch", clipping: true, margin:vec4(10), borderwidth:2, bordercolor:"lightgray", fov:90}, 
+					teapot({radius: 1, detail:3, pos3d:vec3(4,0,0), rot3d:vec3(0,2,0)}),
 					teapot({radius: 1, detail:4, rot3d:vec3(PI/2,0,0), pos3d:vec3(0,5,0)})
 				)
 			)
 			,view({alignitems:"stretch", flex: 0.3, bgcolor:"transparent" }
-				,perspective3d({flex: 1, aligself:"stretch", clipping: true, margin:vec4(10), borderwidth:2, bordercolor:"lightgray",fov:0.3, camera:vec3(-15,-15,15)}, 
+				,perspective3d({flex: 1, aligself:"stretch", clipping: true, margin:vec4(10), borderwidth:2, bordercolor:"lightgray",fov:40, camera:vec3(-15,-15,15)}, 
 					teapot({radius: 1, detail:12, pos3d:vec3(4,0,0), rot3d:vec3(0,2,0)}),
 					teapot({radius: 1, detail:12, rot3d:vec3(PI/2,0,0), pos3d:vec3(0,5,0)})
 				)

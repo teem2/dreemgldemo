@@ -15,8 +15,8 @@ define.class(function(require, sprite, text, view, icon, teapot){
 					thepot({})))]
 	})
 	
-	// Field of view in radians. 
-	this.attribute("fov", {type:float, value: 1});
+	// Field of view in degrees. 
+	this.attribute("fov", {type:float, value: 30});
 	
 	// If set to true, the distance from camera to "lookat" point will be normalized to make items at the lookat point facing the camera be exactly 1 unit = 1 pixel.
 	this.attribute("camerafixedtofov", {type:Boolean, value: false});
@@ -59,25 +59,21 @@ define.class(function(require, sprite, text, view, icon, teapot){
 
 		var w = this.layout.width>0? this.layout.width: this.layout.right - this.layout.left;
 		var h = this.layout.height>0? this.layout.height: this.layout.bottom - this.layout.top;
-		console.log(w,h);
-		this.projectionmatrix = mat4.perspective(this.fov, 1, this.near, this.far);										
 
+		this.projectionmatrix = mat4.perspective(this.fov * 6.283/360, w/h, this.near, this.far);										
+		
 		renderstate.projectionmatrix = this.projectionmatrix;
 		renderstate.lookatmatrix = this.lookatmatrix;
 	
 		var adjust = mat4.identity();;
-		mat4.scale(adjust, vec3(100,100, 1), adjust);
-//		adjust = mat4.transpose(mat4.translate(mat4.transpose(adjust), vec3(w/2, h/2, 0)));
-		
-		renderstate.adjustmatrix1  = adjust;
-		
+		mat4.scale(adjust, vec3(w,h, 1), adjust);	
 		var adjust2 = mat4.identity();;
 		adjust2 = mat4.transpose(mat4.translate(mat4.transpose(adjust2), vec3(w/2, h/2, 0)));
-		renderstate.adjustmatrix2  = adjust2;
-
-	
-	
+		renderstate.adjustmatrix  = mat4.mul(adjust,adjust2);
+		
+		renderstate.flattenmatrix = mat4.mul(mat4.mul(this.lookatmatrix, this.projectionmatrix),renderstate.adjustmatrix); 		
 	}
+	
 	this.init = function() {
 		this.threedee = true;		
 		this.UpdateProjectionMatrix();
