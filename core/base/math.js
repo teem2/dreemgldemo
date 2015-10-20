@@ -467,6 +467,15 @@ define(function(require, exports){
 		return o
 	}
 
+	exports.vec3.mulfloat = 
+	exports.vec3.vec3_mul_float = function(a, b, o){
+		if(!o) o = exports.vec3()
+		o[0] = a[0] * b
+		o[1] = a[1] * b
+		o[2] = a[2] * b
+		return o
+	}
+
 	exports.vec3.add = 
 	exports.vec3.vec3_add_vec3 = function(a, b, o){
 		if(!o) o = exports.vec3()
@@ -977,7 +986,8 @@ define(function(require, exports){
 	
 	exports.mat3 = define.struct({
 		a:exports.float32, b:exports.float32, c:exports.float32, 
-		d:exports.float32, e:exports.float32, f:exports.float32
+		d:exports.float32, e:exports.float32, f:exports.float32,
+		g:exports.float32, h:exports.float32, i:exports.float32
 	}, 'mat3')
 	matApi(exports.mat3)
 
@@ -1143,7 +1153,7 @@ define(function(require, exports){
 			b06 = a20 * a31 - a21 * a30, b07 = a20 * a32 - a22 * a30,
 			b08 = a20 * a33 - a23 * a30, b09 = a21 * a32 - a22 * a31,
 			b10 = a21 * a33 - a23 * a31, b11 = a22 * a33 - a23 * a32,
-			d = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
+			det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
 
 		if (!det) return null 
 		det = 1.0 / det
@@ -1371,8 +1381,8 @@ define(function(require, exports){
 		if(!o) o = exports.mat4()
 		var rx = r[0], ry = r[1], rz = r[2]
 		var mx = m[0], my = m[1], mz = m[2]
-		var t1x = t1[0], t1y = t1[1], t1z = t[2]
-		var t2x = t2[0], t2y = t2[1], t2z = t[2]
+		var t1x = t1[0], t1y = t1[1], t1z = t1[2]
+		var t2x = t2[0], t2y = t2[1], t2z = t2[2]
 		var cx = Math.cos(rx), cy = Math.cos(ry), cz = Math.cos(rz)
 		var sx = Math.sin(rx), sy = Math.sin(ry), sz = Math.sin(rz)
 		o[0] = mx*(cy * cz + sx * sy * sz),  o[1] = my*(-sz*cy+cz*sx*sy),  o[2] = mz*(sy*cx),     o[3] = t2x + (o[0]*t1x + o[1]*t1y + o[2]*t1z)

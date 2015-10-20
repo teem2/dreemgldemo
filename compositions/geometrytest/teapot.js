@@ -9,11 +9,11 @@ define.class(function(require, shape3d, text, view, icon){
 	var GLMat = require('$gl/glmaterial')
 
 	
-	this.attribute("dimension", {type:vec3, value:vec3(1)});
-
+	this.attribute("radius", {type:float, value:1});
+	this.attribute("detail", {type:float, value:10});
 	
 	this.init = function(){
-		this.bg_shader.addBox(this.dimension[0], this.dimension[1], this.dimension[2]);
+		this.bg_shader.addTeapot(this.radius, this.detail);
 	}
 	
 	this.mouseover  = function(){
