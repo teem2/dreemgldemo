@@ -11,7 +11,7 @@ define.class(function(require, shape3d, text, view, icon){
 	this.attribute("file", {type:string});
 	
 	this.init = function(){
-		this.bg_shader.addModel(this.file);
+	this.bg_shader.addModel(this.file, function(){ this.setDirty()}.bind(this));
 	}
 
 	this.mouseover  = function(){

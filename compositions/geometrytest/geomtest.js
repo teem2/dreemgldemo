@@ -1,11 +1,14 @@
-define.class(function(require, screen, view, text, cube, perspective3d, teapot, model, plane){
+define.class(function(require, screen, view, text, cube, perspective3d, teapot, model, plane, button){
 
 	this.bgcolor = vec4("#f0f0f0") 
 	this.padding = vec4(0);
 	
 	this.render = function(){
 		return [
-			view({alignitems:"stretch", flex: 0.3, bgcolor:"transparent", bg:{bgcolorfn:function(a,b){return vec4("black" ) + (1-a.y) * vec4("#005060");}}}
+			view({alignitems:"stretch",flexdirection:"column" , flex: 0.3, bgcolor:"transparent", bg:{bgcolorfn:function(a,b){return vec4("black" ) + (1-a.y) * vec4("#005060");}}}
+				,perspective3d({ bgcolor:"transparent", aligself:"stretch", clipping: true, fov:45, camera:vec3(53,-55,53), lookat:vec3(0,-10,0),margin:vec4(0), borderwidth:0, bordercolor:"lightgray"}, 
+					button({text:"I am a button in a 3d viewport" })
+				)
 				,perspective3d({flex: 1, bgcolor:"transparent", aligself:"stretch", clipping: true, fov:45, camera:vec3(53,-55,53), lookat:vec3(0,-10,0),margin:vec4(0), borderwidth:0, bordercolor:"lightgray"}, 
 					model({file:"molecule.obj", rot3d:vec3(PI,0,0),scale3d:vec3(0.2,0.2,0.2),pos3d:vec3(20,-10,0)}),
 					model({file:"molecule.obj", rot3d:vec3(PI,1,6),scale3d:vec3(0.2,0.2,0.2),pos3d:vec3(51,-2,0)}),
@@ -24,13 +27,12 @@ define.class(function(require, screen, view, text, cube, perspective3d, teapot, 
 							}						
 						}, rot3d:vec3(PI/2,0,0), pos3d:vec3(0,-10,0)})
 				)
-			)
-/*			,view({alignitems:"stretch", flex: 0.3, bgcolor:"transparent" }
-				,perspective3d({flex: 1, aligself:"stretch", clipping: true, margin:vec4(10), borderwidth:2, bordercolor:"lightgray",fov:40, camera:vec3(-15,-15,15)}, 
+				,perspective3d({flex: 1, bgcolor:"transparent", aligself:"stretch", clipping: true, margin:vec4(10), borderwidth:2, bordercolor:"lightgray",fov:40, camera:vec3(-15,-15,15)}, 
 					teapot({radius: 1, detail:12, pos3d:vec3(4,0,0), rot3d:vec3(0,2,0)}),
 					teapot({radius: 1, detail:12, rot3d:vec3(PI/2,0,0), pos3d:vec3(0,5,0)})
 				)
-			)*/
+			)
+/*			*/
 /*			,view({bgcolor:"rgba(240,220,255,150)", cornerradius:vec4(20) , borderwidth: 1, bordercolor:"transparent", x: 100,y:100,position: "absolute" , flexdirection:"column" , padding:vec4(15)}
 				,text({text:"Cubes:", fontsize: 20,  fgcolor: "darkblue", bgcolor: "transparent", margin: vec4(1), padding: vec4(2)})
 				,perspective3d({clipping: true, width: 200, height: 200, margin:vec4(10)}

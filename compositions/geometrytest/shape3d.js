@@ -14,6 +14,11 @@ define.class(function(require, sprite, text, view, icon){
 	this.attribute("rot3d", {type:vec3, value:vec3(0.)});
 	this.attribute("anchor", {type:vec3, value:vec3(0.)});
 	
+	
+	this.anchor = this.pos3d = this.scale3d = this.rot3d = function(){
+		this.setDirty();
+	}
+	
 	this.atDraw = function(renderstate){		
 		var mat =mat4.TSRT2(this.anchor, this.scale3d, this.rot3d, this.pos3d);
 
@@ -96,7 +101,7 @@ define.class(function(require, sprite, text, view, icon){
 			}.bind(this))		
 		}
 		
-		this.addModel = function(objfile){
+		this.addModel = function(objfile, completioncallback){
 						
 			require.async(objfile, 'txt').then(function(data){
 				GLGeom.createModel(data, function(triidx,v1,v2,v3,n1,n2,n3,t1,t2,t3,faceidx){
@@ -104,6 +109,7 @@ define.class(function(require, sprite, text, view, icon){
 					this.mesh.push(v2,n2,t2);
 					this.mesh.push(v3,n3,t3);
 				}.bind(this))
+				completioncallback();
 			}.bind(this));						
 		}
 				
@@ -140,7 +146,7 @@ define.class(function(require, sprite, text, view, icon){
 		this.viewmatrix = mat4.identity();				
 		
 		this.position = function() {						
-			var temp = (vec3(mesh.norm) * normalmatrix  ) ;			
+			var temp = (vec4(mesh.norm,1.0) * normalmatrix   ) ;			
 			transnorm = temp.xyz;			
 			pos = vec4(mesh.pos, 1) * modelmatrix* flattenmatrix ;
 			;			
@@ -153,7 +159,7 @@ define.class(function(require, sprite, text, view, icon){
 			
 			var tn = normalize(transnorm.xyz);
 			
-//			return vec4("black")  + vec4("yellow") * pow(pos.z/200.,2.0);
+			return vec4(vec3(1.,1.,1.) * pow((1- dot(vec3(0,0,1.0), tn)),2.0), 1.0);
 			var res = texture.sample(material.matcap(vec3(0,0,-1.0), tn));
 
 			
