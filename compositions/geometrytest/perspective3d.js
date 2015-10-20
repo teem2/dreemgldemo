@@ -1,8 +1,21 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(require, sprite, text, view, icon){
+define.class(function(require, sprite, text, view, icon, teapot){
 
-	// Field of view. Usual values are in the 30 to 40 degree range. 90 to 180 will give more of a fisheye view. 0 to 30 will make things look very small (nearing orthagonal projection)
+	// The perspective3d defines a 3d viewport
+
+	var perspective3d = this.constructor;
+	var thepot = teapot;
+	
+	// Basic usage:
+	define.example(this, function Usage(teapot){		
+		return [
+			view({height: 200, clipping:false,alignself:"stretch", alignitems: "stretch" , bgcolor:"green", flex: 1 }, 
+				perspective3d({ bgcolor:"green", alignself:"stretch", flex:1,  fov:0.8,camera:vec3(-2,10,2)},
+					thepot({})))]
+	})
+	
+	// Field of view in radians. 
 	this.attribute("fov", {type:float, value: 1});
 	
 	// If set to true, the distance from camera to "lookat" point will be normalized to make items at the lookat point facing the camera be exactly 1 unit = 1 pixel.
