@@ -1,17 +1,6 @@
-// MIT License. 
+// Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define(function(require, exports){	
-	/*
-	define.struct({
-		pos:vec3
-	})
-
-	createCube(10,10,10,function(id, p1, p2, p3, n1, n2, n3, t1, t2, t3){
-		buf.push(p1, n1, t1)
-		buf.push(p2, n2, t2)
-		buf.push(p3, n3, t3)
-	})*/
-	
+define(function(require, exports){		
 	var v1 = vec3(0,0,0);
 	var v2 = vec3(0,0,0);
 	var v3 = vec3(0,0,0);
@@ -55,6 +44,85 @@ define(function(require, exports){
 		t3[1] = ty;
 	}
 	
+	exports.createModel = function(data, cb) {
+		var lines = data.split('\n');
+		var vertices = [vec3(0,0,0)];
+		var normals = [vec3(0,0,0)];
+		var texcoords = [vec3(0,0,0)]
+		var multicoords = [vec3(0,0,0)]
+		var faceidx = 0;
+
+		for(var i = 0; i < lines.length; i++) {
+			var line = lines[i].trim();
+			if (line.length > 0) {
+				line = line.replace("  "," ");
+				var parts = line.split(' ');
+				var linetype = parts[0];
+				if (linetype == 'f') {
+
+					if (parts[1].indexOf('/')>-1) splitter = '/'; else splitter = '\\';
+				
+					var triangles = [[1,2,3]]
+					
+					if (parts.length > 4) {  // dirty triangle fan implementation for Ngons.. 
+						for (var j = 1;j<parts.length-3;j++){							
+							triangles.push([1,j+2, j+3]);						
+						}
+					}
+					
+					for (var j = 0; j < triangles.length; j++) {						
+						var t = triangles[j];
+						
+						var ia = t[0];
+						var ib = t[1];
+						var ic = t[2];						
+					
+						var i1 = parts[ia].split(splitter).map(function(a){return Math.floor(a);});
+						var i2 = parts[ib].split(splitter).map(function(a){return Math.floor(a);});
+						var i3 = parts[ic].split(splitter).map(function(a){return Math.floor(a);});
+						
+						var n1,n2,n3,t1,t2,t3;						
+						var v1 = vertices[i1[0]];
+						var v2 = vertices[i2[0]];
+						var v3 = vertices[i3[0]];
+						
+						if (i1.length == 1 || i1[1].length == 0) {
+							t1 = vec3(0,0,0);
+							t2 = vec3(1,0,0);
+							t3 = vec3(1,1,0);							
+						} else {
+							t1 = texcoords[i1[1]];
+							t2 = texcoords[i2[1]];
+							t3 = texcoords[i3[1]];
+						}
+						
+						if (i1.length  < 3) {// generate normals;
+							console.log(v1,v2,v3, vertices, line);
+							var ab = vec3.sub(v2,v1);
+							var bc = vec3.sub(v3,v1);						
+							n3 = n2 =n1 = vec3.normalize(vec3.cross(ab,bc));							
+						} 
+						else {
+							n1 = normals[i1[2]];
+							n2 = normals[i2[2]];
+							n3 = normals[i3[2]];
+						}
+						
+						cb(faceidx, v1,v2,v3, n1,n2,n3,t1,t2,t3,faceidx);
+						faceidx++;
+					}
+				}
+				else if (linetype == 'v')  {vertices.push(vec3(parseFloat(parts[1]), parseFloat(parts[2]), parseFloat(parts[3])))}
+				else if (linetype == 'vt') {texcoords.push(vec3(parseFloat(parts[1]), parseFloat(parts[2]), parseFloat(parts[3])))}
+				else if (linetype == 'vn') {normals.push(vec3(parseFloat(parts[1]), parseFloat(parts[2]),parseFloat(parts[3])))}
+				else if (linetype == 'vp') {multicoords.push(vec3(parseFloat(parts[1]), parseFloat(parts[2]), parseFloat(parts[3])))}
+			}
+		}
+		
+		console.log("loaded " + (vertices.length -1) + " vertices and " + faceidx + " triangles");
+		};
+		
+			
 	exports.createCube = function(width, height, depth, cb) {
 		if(arguments.length === 2) cb = height, height = depth = width
 		if(arguments.length === 3) cb = depth, depth = height, height = width
@@ -159,9 +227,63 @@ define(function(require, exports){
 		}
 	}
 	
+
+	function B1(t) { return t*t*t }
+	function B2(t) { return 3*t*t*(1-t) }
+	function B3(t) { return 3*t*(1-t)*(1-t) }
+	function B4(t) { return (1-t)*(1-t)*(1-t) }
+
+	function getBezier(percent,C1,C2,C3,C4) {
+		
+		var pos = vec3();
+		
+		var b1 = B1(percent);
+		var b2 = B2(percent);
+		var b3 = B3(percent);
+		var b4 = B4(percent);
+		
+		pos[0] = C1[0]*b1 + C2[0]*b2 + C3[0]*b3 + C4[0]*b4;
+		pos[1] = C1[1]*b1 + C2[1]*b2 + C3[1]*b3 + C4[1]*b4;
+		pos[2] = C1[2]*b1 + C2[2]*b2 + C3[2]*b3 + C4[2]*b4;
+
+		return pos;
+	}
+	
+	exports.createPlane = function(width, height, xdiv, ydiv, cb){
+		
+		var ox = -width/2;
+		var oy = -height/2;
+		var ix = width / xdiv;
+		var iy = height / ydiv;
+		var tx = 1/xdiv;
+		var ty = 1/ydiv;
+		for (var x = 0;x<xdiv;x++){
+			for (var y = 0; y < ydiv; y++){
+				
+				var ax = ox + (x + 0) * ix;var ay = oy + (y + 0) * iy;
+				var bx = ox + (x + 1) * ix;var by = oy + (y + 0) * iy;
+				var cx = ox + (x + 1) * ix;var cy = oy + (y + 1) * iy;
+				var dx = ox + (x + 0) * ix;var dy = oy + (y + 1) * iy;
+				
+				var atx = tx * x; var aty = ty * y;
+				var btx = tx * (x+1); var bty = ty * y;
+				var ctx = tx * (x+1); var cty = ty * (y+1);
+				var dtx = tx * x; var dty = ty * (y+1);
+				
+				v1n1t1(ax,ay,0,0,0,-1,atx,aty); v2n2t2(bx,by,0,0,0,-1,btx,bty); v3n3t3(cx,cy,0,0,0,-1,ctx,cty);		
+				cb(0, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
+				v1n1t1(ax,ay,0,0,0,-1,atx,aty); v2n2t2(cx,cy,0,0,0,-1,ctx,cty); v3n3t3(dx,dy,0,0,0,-1,dtx,dty);
+				cb(1, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
+		
+		
+			}
+		}
+		
+	}
+
+	
 	exports.createTeapot = function (radius, detail, cb){
 
-	console.log(" teapot: ", radius, detail);
 		var patchdata = [
     /* rim */  	[102, 103, 104, 105, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
     /* body */ 	[12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
@@ -173,31 +295,25 @@ define(function(require, exports){
 				[53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 28, 65, 66, 67],
     /* spout */ [68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83],
 				[80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95]
-			];
-
-			
-function B1(t) { return t*t*t }
-function B2(t) { return 3*t*t*(1-t) }
-function B3(t) { return 3*t*(1-t)*(1-t) }
-function B4(t) { return (1-t)*(1-t)*(1-t) }
-
-function getBezier(percent,C1,C2,C3,C4) {
-  var pos = vec3();
-  var b1 = B1(percent);
-  var b2 = B2(percent);
-  var b3 = B3(percent);
-  var b4 = B4(percent);
-  pos[0] = C1[0]*b1 + C2[0]*b2 + C3[0]*b3 + C4[0]*b4;
-  pos[1] = C1[1]*b1 + C2[1]*b2 + C3[1]*b3 + C4[1]*b4;
-  pos[2] = C1[2]*b1 + C2[2]*b2 + C3[2]*b3 + C4[2]*b4;
-  
-  return pos;
-}
-
+			];			
 
 		var controlpoints  =
 		[
-			[0.2, 0, 2.7], [0.2, -0.112, 2.7], 	[0.112, -0.2, 2.7], [0, -0.2, 2.7], [1.3375, 0, 2.53125], [1.3375, -0.749, 2.53125], [0.749, -1.3375, 2.53125], [0, -1.3375, 2.53125], [1.4375,  0, 2.53125], [1.4375, -0.805, 2.53125], [0.805, -1.4375, 2.53125], [0, -1.4375, 2.53125], [1.5, 0, 2.4], [1.5, -0.84, 2.4], [0.84, -1.5, 2.4], [0, -1.5, 2.4], [1.75, 0, 1.875],
+			[0.2, 0, 2.7], 
+			[0.2, -0.112, 2.7], 	
+			[0.112, -0.2, 2.7], 
+			[0, -0.2, 2.7], 
+			[1.3375, 0, 2.53125], 
+			[1.3375, -0.749, 2.53125],
+			[0.749, -1.3375, 2.53125], 
+			[0, -1.3375, 2.53125], 
+			[1.4375,  0, 2.53125], 
+			[1.4375, -0.805, 2.53125], 
+			[0.805, -1.4375, 2.53125], 
+			[0, -1.4375, 2.53125], 
+			[1.5, 0, 2.4], 
+			[1.5, -0.84, 2.4], 
+			[0.84, -1.5, 2.4], [0, -1.5, 2.4], [1.75, 0, 1.875],
 			[1.75, -0.98, 1.875], [0.98, -1.75, 1.875], [0, -1.75, 1.875], [2, 0, 1.35], [2, -1.12, 1.35], [1.12, -2, 1.35], [0, -2, 1.35], [2, 0, 0.9], [2, -1.12, 0.9], [1.12, -2, 0.9], [0, -2, 0.9], [-2, 0, 0.9], [2, 0, 0.45], [2, -1.12, 0.45], [1.12, -2, 0.45], [0, -2, 0.45], [1.5, 0, 0.225], [1.5, -0.84, 0.225], [0.84, -1.5, 0.225], [0, -1.5, 0.225], [1.5, 0, 0.15], [1.5, -0.84, 0.15], [0.84, -1.5, 0.15], [0,
     -1.5, 0.15], [-1.6, 0, 2.025], [-1.6, -0.3, 2.025], [-1.5,-0.3, 2.25], [-1.5, 0, 2.25], [-2.3, 0, 2.025], [-2.3, -0.3, 2.025], [-2.5, -0.3, 2.25], [-2.5, 0, 2.25], [-2.7, 0, 2.025], [-2.7, -0.3, 2.025], [-3, -0.3, 2.25], [-3, 0, 2.25], [-2.7, 0, 1.8], [-2.7, -0.3, 1.8], [-3, -0.3, 1.8],
     [-3, 0, 1.8], [-2.7, 0, 1.575], [-2.7, -0.3, 1.575], [-3, -0.3, 1.35], [-3, 0, 1.35], [-2.5, 0, 1.125], [-2.5, -0.3, 1.125], [-2.65, -0.3, 0.9375], [-2.65, 0, 0.9375], [-2, -0.3, 0.9], [-1.9, -0.3, 0.6], [-1.9, 0, 0.6], [1.7, 0, 1.425], [1.7, -0.66, 1.425], [1.7, -0.66, 0.6], [1.7, 0, 0.6], [2.6, 0, 1.425], [2.6, -0.66, 1.425], [3.1, -0.66, 0.825], [3.1, 0, 0.825], [2.3, 0, 2.1], [2.3, -0.25, 2.1],
@@ -314,72 +430,7 @@ function getBezier(percent,C1,C2,C3,C4) {
 					}
 			}
 			
-			/*
-			for (var j =0 ;j<3;j++){
-				for (var l =0 ;l<3;l++){
-					
-					var x1 = j;
-					var x2 = j+1;
-					var x3 = x2;
-					var x4 = x1;
-
-					var y1 = l;
-					var y2 = y1;
-					var y3 = (y1 + 1)%4;
-					var y4 = y3;
-					
-					var ax = controlpoints[patch[x1 + y1 * 4]][0];
-					var ay = controlpoints[patch[x1 + y1 * 4]][1];
-					var az = controlpoints[patch[x1 + y1 * 4]][2];
-					var bx = controlpoints[patch[x2 + y2 * 4]][0];
-					var by = controlpoints[patch[x2 + y2 * 4]][1];					
-					var bz = controlpoints[patch[x2 + y2 * 4]][2];
-					
-					var cx = controlpoints[patch[x3 + y3 * 4]][0];
-					var cy = controlpoints[patch[x3 + y3 * 4]][1];
-					var cz = controlpoints[patch[x3 + y3 * 4]][2];
-					var dx = controlpoints[patch[x4 + y4 * 4]][0];
-					var dy = controlpoints[patch[x4 + y4 * 4]][1];
-					var dz = controlpoints[patch[x4 + y4 * 4]][2];
-					
-					var a = vec3(ax,ay,az);
-					var b = vec3(bx,by,bz);
-					var c = vec3(cx,cy,cz);
-					var ab = vec3.sub(a,b);
-					var _cb = vec3.sub(c,b);
-					var norm = vec3.normalize(vec3.cross(ab,_cb));
-							
-					v1n1t1(ax,ay,az,norm[0],norm[1],norm[2],0,0); v2n2t2(bx,by,bz,norm[0],norm[1],norm[2],1,0); v3n3t3(cx,cy,cz,norm[0],norm[1],norm[2],1,1);		
-					cb(0, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-					v1n1t1(ax,ay,az,norm[0],norm[1],norm[2],0,0); v2n2t2(cx,cy,cz,norm[0],norm[1],norm[2],1,1); v3n3t3(dx,dy,dz,norm[0],norm[1],norm[2],0,1);
-					cb(1, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-
-
-					v1n1t1(ax,-ay,az,norm[0],-norm[1],norm[2],0,0); v2n2t2(bx,-by,bz,norm[0],-norm[1],norm[2],1,0); v3n3t3(cx,-cy,cz,norm[0],-norm[1],norm[2],1,1);		
-					cb(0, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-					v1n1t1(ax,-ay,az,norm[0],-norm[1],norm[2],0,0); v2n2t2(cx,-cy,cz,norm[0],-norm[1],norm[2],1,1); v3n3t3(dx,-dy,dz,norm[0],-norm[1],norm[2],0,1);
-					cb(1, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-
-					if (i<6){
-						v1n1t1(-ax,ay,az,-norm[0],norm[1],norm[2],0,0); v2n2t2(-bx,by,bz,-norm[0],norm[1],norm[2],1,0); v3n3t3(-cx,cy,cz,-norm[0],norm[1],norm[2],1,1);		
-						cb(0, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-						v1n1t1(-ax,ay,az,-norm[0],norm[1],norm[2],0,0); v2n2t2(-cx,cy,cz,-norm[0],norm[1],norm[2],1,1); v3n3t3(-dx,dy,dz,-norm[0],norm[1],norm[2],0,1);
-						cb(1, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-
-
-						v1n1t1(-ax,-ay,az,-norm[0],-norm[1],norm[2],0,0); v2n2t2(-bx,-by,bz,-norm[0],-norm[1],norm[2],1,0); v3n3t3(-cx,-cy,cz,-norm[0],-norm[1],norm[2],1,1);		
-						cb(0, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-						v1n1t1(-ax,-ay,az,-norm[0],-norm[1],norm[2],0,0); v2n2t2(-cx,-cy,cz,-norm[0],-norm[1],norm[2],1,1); v3n3t3(-dx,-dy,dz,-norm[0],-norm[1],norm[2],0,1);
-						cb(1, v1, v2, v3, n1, n2, n3, t1, t2, t3, 0);
-					}
-			
-
-				}
-			}
-			*/
 			
 		}
-			
-
 	}
 })

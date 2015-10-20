@@ -163,7 +163,7 @@
 			return module.exports
 		}
 
-		require.async = function(path){
+		require.async = function(path, ext){
 			var dep_path = define.joinPath(base_path, define.expandVariables(path))
 			return new Promise(function(resolve, reject){
 				if(define.factory[path]){
@@ -171,7 +171,7 @@
 					var module = require(path)
 					return resolve(module)
 				}
-				define.loadAsync(dep_path, from_file).then(function(){
+				define.loadAsync(dep_path, from_file, ext).then(function(){
 					var module = require(path)
 					resolve(module)
 				}, reject)
@@ -1123,11 +1123,11 @@
 		var app_root = define.filePath(window.location.href)
 
 		// loadAsync is the resource loader
-		define.loadAsync = function(files, from_file){
+		define.loadAsync = function(files, from_file, inext){
 
 			function loadResource(url, from_file, recurblock, module_deps){
-
-				var ext = define.fileExt(url)
+				var ext = inext === undefined ? define.fileExt(url): inext;
+				
 				var abs_url, fac_url
 
 				if(url.indexOf('http:') === 0){ // we are fetching a url..

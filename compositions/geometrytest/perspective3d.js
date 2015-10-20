@@ -7,12 +7,12 @@ define.class(function(require, sprite, text, view, icon, teapot){
 	var perspective3d = this.constructor;
 	var thepot = teapot;
 	
-	// Basic usage:
+	// Basic usage. This demo shows a single teapot in a perspective view.
 	define.example(this, function Usage(teapot){		
 		return [
 			view({height: 200, clipping:false,alignself:"stretch", alignitems: "stretch" , bgcolor:"green", flex: 1 }, 
-				perspective3d({ bgcolor:"green", alignself:"stretch", flex:1,  fov:0.8,camera:vec3(-2,10,2)},
-					thepot({})))]
+				perspective3d({ bgcolor:"green", alignself:"stretch", flex:1,  fov:15,camera:vec3(-2,10,2)},
+					thepot({scale3d:vec3(0.1)})))]
 	})
 	
 	// Field of view in degrees. 
@@ -63,14 +63,16 @@ define.class(function(require, sprite, text, view, icon, teapot){
 		this.projectionmatrix = mat4.perspective(this.fov * 6.283/360, w/h, this.near, this.far);										
 		
 		renderstate.projectionmatrix = this.projectionmatrix;
+
 		renderstate.lookatmatrix = this.lookatmatrix;
 	
-		var adjust = mat4.identity();;
+		var adjust = mat4.identity();
 		mat4.scale(adjust, vec3(w,h, 1), adjust);	
-		var adjust2 = mat4.identity();;
+
+		var adjust2 = mat4.identity();
 		adjust2 = mat4.transpose(mat4.translate(mat4.transpose(adjust2), vec3(w/2, h/2, 0)));
-		renderstate.adjustmatrix  = mat4.mul(adjust,adjust2);
-		
+
+		renderstate.adjustmatrix  = mat4.mul(adjust,adjust2);		
 		renderstate.flattenmatrix = mat4.mul(mat4.mul(this.lookatmatrix, this.projectionmatrix),renderstate.adjustmatrix); 		
 	}
 	

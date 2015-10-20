@@ -1,18 +1,17 @@
-// MIT License.
+// Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 // some shapes based on http://iquilezles.org/www/articles/distfunctions/distfunctions.htm
 
 define(function (require, exports) {
 	
-	
 	exports.roundedrectdistance = function(sized, width, height, topleftcorner, toprightcorner, bottomleftcorner, bottomrightcorner){
-
 		var c1 = vec2(topleftcorner-0.5 , topleftcorner -0.5);
 		var c2 = vec2(bottomleftcorner -0.5, height - bottomleftcorner -0.5);
 		var c3 = vec2(width - bottomrightcorner -.50 , height - bottomrightcorner -.5);
 		var c4 = vec2(width - toprightcorner - .50, toprightcorner -0.5 );
 
 		var dist = 0.0
+
 		if (sized.x <= c1.x && sized.y < c1.y) {
 			dist = distcircle(sized - c1, topleftcorner);
 		} else {
@@ -30,7 +29,7 @@ define(function (require, exports) {
 				}
 			}
 		}
-				
+		
 		return dist;
 	}
 

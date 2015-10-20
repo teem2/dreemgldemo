@@ -1769,8 +1769,9 @@ define(function(require, exports){
 
 		
 		o[0] = x0, o[4] = y0, o[8] = z0,  o[12] = 0
-		o[4] = x1, o[5] = y1, o[9] = z1,  o[13] = 0
-		o[8] = x2, o[6] = y2, o[10] = z2,  o[14] = 0
+		o[1] = x1, o[5] = y1, o[9] = z1,  o[13] = 0
+		o[2] = x2, o[6] = y2, o[10] = z2,  o[14] = 0
+		
 		o[3] = -(x0 * ex + x1 * ey + x2 * ez)
 		o[7] = -(y0 * ex + y1 * ey + y2 * ez)
 		o[11] = -(z0 * ex + z1 * ey + z2 * ez)
