@@ -62,7 +62,7 @@ define.class('./sprite_base', function(require, exports){
 			//dump = dist*0.01
 			//dist += noise.s2d(mesh*32)*5
 			var bgcolor =  bgcolorfn(mesh.xy, dist)
-			if(borderwidth < 0.001) return bgcolor
+			//if(borderwidth < 0.001) return bgcolor
 			var clamped = 1.0 - (clamp(dist, -0.5, 0.5) + 0.5)
 			if (clamped == 0.) discard
 			var b = clamp(- dist - (borderwidth - 0.5), 0., 1.)

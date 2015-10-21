@@ -97,7 +97,6 @@ define(function(require, exports){
 						}
 						
 						if (i1.length  < 3) {// generate normals;
-							console.log(v1,v2,v3, vertices, line);
 							var ab = vec3.sub(v2,v1);
 							var bc = vec3.sub(v3,v1);						
 							n3 = n2 =n1 = vec3.normalize(vec3.cross(ab,bc));							
