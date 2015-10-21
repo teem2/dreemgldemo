@@ -22,12 +22,13 @@ define.class(function(require, sprite, text, view, icon){
 	this.atDraw = function(renderstate){		
 		var mat =mat4.TSRT2(this.anchor, this.scale3d, this.rot3d, this.pos3d);
 
-		var normalmat = mat4.transpose(mat4.invert(mat4.mul(mat, renderstate.lookatmatrix)));
+		var normalmat = mat3.transpose(mat3.normalFromMat4(mat4.transpose(mat)));
 
 		this.bg_shader.modelmatrix =  mat;
 		this.bg_shader.normalmatrix =  normalmat;
 //		this.bg_shader.projectionmatrix = renderstate.projectionmatrix;
 		this.bg_shader.lookatmatrix = renderstate.lookatmatrix;
+		this.bg_shader.cameraposition = renderstate.cameraposition;
 	//	this.bg_shader.adjustmatrix1 = renderstate.adjustmatrix1;
 		//this.bg_shader.adjustmatrix2 = renderstate.adjustmatrix2;
 		this.bg_shader.flattenmatrix = renderstate.flattenmatrix;
@@ -93,8 +94,8 @@ define.class(function(require, sprite, text, view, icon){
 			if (radius === undefined) radius = 1;
 			if (xdetail === undefined) xdetail = 20;
 			if (ydetail === undefined) ydetail = 20;
-			
-			GLGeom.createSphere(50,140,125,function(triidx,v1,v2,v3,n1,n2,n3,t1,t2,t3,faceidx){
+			console.log(radius, xdetail, ydetail);
+			GLGeom.createSphere(radius,xdetail,ydetail,function(triidx,v1,v2,v3,n1,n2,n3,t1,t2,t3,faceidx){
 				this.mesh.push(v1,n1,t1);
 				this.mesh.push(v2,n2,t2);
 				this.mesh.push(v3,n3,t3);
@@ -113,32 +114,15 @@ define.class(function(require, sprite, text, view, icon){
 			}.bind(this));						
 		}
 				
-		this.buildGeometry = function()
-		{
-			var shapelc = this.shape.toLowerCase();
-			if (shapelc == "cube" || shapelc == "box" ) {
-				this.addBox()
-				return;
-			}
-			
-			if (shapelc =="sphere"){			
-				this.addSphere()
-				return;
-			}
-			
-			if (shapelc =="teapot"){
-				this.addTeapot();
-				return;
-			}
-		}
-				
+		
 	
 		this.texture = require('$textures/matcap6.png');
 
 		this.matrix = mat4.identity()
+		this.cameraposition = vec3(0,0,0)
 		this.modelmatrix = mat4.identity();;
-		
-		this.normalmatrix = mat4.identity();;
+		this.dimension = vec2(1025,1025);
+		this.normalmatrix = mat3.identity();;
 		this.lookatmatrix = mat4.identity();;
 
 		this.flattenmatrix = mat4.identity();
@@ -146,25 +130,37 @@ define.class(function(require, sprite, text, view, icon){
 		this.viewmatrix = mat4.identity();				
 		
 		this.position = function() {						
-			var temp = (vec4(mesh.norm,1.0) * normalmatrix   ) ;			
+			var temp = (vec3(mesh.norm) * normalmatrix );			
+			
 			transnorm = temp.xyz;			
-			pos = vec4(mesh.pos, 1) * modelmatrix* flattenmatrix ;
-			;			
-			return pos  * matrix * viewmatrix ; // * matrix *viewmatrix
+			pos = vec4(mesh.pos, 1) * modelmatrix;
+			//pos2 = pos * lookatmatrix;
+			
+			return pos * flattenmatrix * matrix * viewmatrix; // * matrix *viewmatrix
 		}
 				
 		this.color = function() {
+
 			//return vec4("yellow") ;			
 			var n = noise.s2d(vec2(sin(mesh.uv.x*6.283)*0.215, sin(mesh.uv.y*6.283)));
+
+			var raydir = -normalize( pos.xyz - cameraposition);
 			
 			var tn = normalize(transnorm.xyz);
+			var res = material.matcap(raydir, tn);//texture.sample(material.matcap(tn,raydir));
 			
-			return vec4(vec3(1.,1.,1.) * pow((1- dot(vec3(0,0,1.0), tn)),2.0), 1.0);
-			var res = texture.sample(material.matcap(vec3(0,0,-1.0), tn));
-
+			var r1 = cross(raydir, vec3(0,1,0));
+			var r2 = cross(raydir, r1);
+			
+			return texture.sample(-vec2(dot(tn, r1), dot(tn,r2)) * 0.5 + vec2(0.5)) * diffusecolor;
+			return vec4(dot(tn, r1), dot(tn,r2),0,1.);
+			return vec4(vec3(0.5+0.5*sin((1-pow(dot(raydir, tn), 1. )) * 20.))  + sin(dot(r1, tn)*10.)*vec3(1,1,0) , 1.0);
+			
+			
+			
 			
 	//		res.xyz *= 0.1*n + 0.9;
-			return vec4(res.x *diffusecolor.x, res.y * diffusecolor.y, res.z*diffusecolor.z, 1.0) ;
+	//		return vec4(res.x *diffusecolor.x, res.y * diffusecolor.y, res.z*diffusecolor.z, 1.0) ;
 			
 			//return vec4(l,l,l,1.0);		
 			

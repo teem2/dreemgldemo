@@ -12,7 +12,10 @@ define.class(function(require, sprite, text, view, icon, teapot){
 		return [
 			view({height: 200, clipping:false,alignself:"stretch", alignitems: "stretch" , bgcolor:"green", flex: 1 }, 
 				perspective3d({ bgcolor:"green", alignself:"stretch", flex:1,  fov:15,camera:vec3(-2,10,2)},
-					thepot({scale3d:vec3(0.1)})))]
+					thepot({scale3d:vec3(0.1)})
+				)
+			)
+		]
 	})
 	
 	// Field of view in degrees. 
@@ -40,21 +43,19 @@ define.class(function(require, sprite, text, view, icon, teapot){
 	}
 	
 	this.fov = function(){
-		console.log("fov updated!");
 	}
 	
 	this.lookat = this.up = this.camera = function(){		
-		console.log("camera updated");		
 	}
 
 	this.UpdateProjectionMatrix = function(){
+		this.UpdateLookAtMatrix();
 	}
 	
 	this.UpdateLookAtMatrix = function(){
 		this.lookatmatrix = mat4.lookAt(this.camera, this.lookat, this.up);		
 	}
-	
-	
+		
 	this.atDraw = function(renderstate){
 
 		var w = this.layout.width>0? this.layout.width: this.layout.right - this.layout.left;
@@ -63,9 +64,9 @@ define.class(function(require, sprite, text, view, icon, teapot){
 		this.projectionmatrix = mat4.perspective(this.fov * 6.283/360, w/h, this.near, this.far);										
 		
 		renderstate.projectionmatrix = this.projectionmatrix;
-
 		renderstate.lookatmatrix = this.lookatmatrix;
-	
+		renderstate.cameraposition = this.camera;
+		
 		var adjust = mat4.identity();
 		mat4.scale(adjust, vec3(w,h, 1), adjust);	
 
