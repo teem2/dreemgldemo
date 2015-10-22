@@ -198,7 +198,6 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				}
 			}
 			else if (msg.type == 'return'){
-				console.log('got return',msg)
 				this.rpc.resolveReturn(msg)
 			}
 		}.bind(this)

@@ -13,7 +13,7 @@ define.class(function(composition, screens, screen, view, text){
 			console.log("Received hello call!")
 			console.log('calling s1')
 			this.rpc.screens.s1.test().then(function(result){
-				console.log('s1 returned '+result)
+				console.log('s1 returned ',result.value)
 			})
 			return 30
 		}
@@ -34,11 +34,11 @@ define.class(function(composition, screens, screen, view, text){
 					init: function(){
 						console.log("calling test on s2")
 						this.rpc.screens.s2.test().then(function(result){
-							console.log("s2 returned " + result)
+							console.log("s2 returned ", result)
 						})
 						console.log("calling fileio")
 						this.rpc.fileio.hello().then(function(result){
-							console.log('fileio returned '+result)
+							console.log('fileio returned ', result.value)
 						})
 						
 					}

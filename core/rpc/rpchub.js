@@ -21,10 +21,10 @@ define.class(function(require, exports){
 		this.uid_free.push(msg.uid)
 		this.promises[msg.uid] = undefined
 		if(msg.error){
-			promise.reject(msg.value)
+			promise.reject(msg)
 		}
 		else{
-			promise.resolve(msg.value)
+			promise.resolve(msg)
 		}
 	}
 
