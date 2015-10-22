@@ -10,7 +10,7 @@ define.class(function(view, button, text,screenoverlay){
 	
 	// the menuclick is the default handler for the button click. 
 	this.menuclick = function(){
-		// ok now we have to do a modal view of our instance_children
+		// ok now we have to do a modal view of our constructor_children
 		if(this.hasListeners('click')){
 			this.screen.closeModal()
 			this.emit('click')
@@ -22,7 +22,7 @@ define.class(function(view, button, text,screenoverlay){
 				this.screen.closeModal(-1)
 			}, position:'absolute', flexdirection:'column'},
 			screenoverlay({x: -br.left}), 
-			this.instance_children)
+			this.constructor_children)
 		)
 	}
 

@@ -175,8 +175,8 @@ define.class('$base/node', function(require, exports, self){
 		childset.parent = parent
 		childset.name = object.name || object.constructor.name
 
-		for(var i = 0; i < object.instance_children.length; i++){
-			var child = object.instance_children[i]
+		for(var i = 0; i < object.constructor_children.length; i++){
+			var child = object.constructor_children[i]
 			childset[child.name || child.constructor.name] = child.createRpcProxy(childset)
 		}
 		return childset

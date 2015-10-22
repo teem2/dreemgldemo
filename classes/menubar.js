@@ -5,7 +5,7 @@ define.class(function(view, menuitem){
 	this.bgcolor = vec4("lightgray" );	
 
 	// render function passthrough
-	this.render = function(){return this.instance_children;}
+	this.render = function(){return this.constructor_children;}
 	
 	var menubar  = this.constructor;
 	

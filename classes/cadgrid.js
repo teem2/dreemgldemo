@@ -1,11 +1,10 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 define.class(function(view, text){
-
-// The CADGrid class provides a simple way to fill a frame with a classic engineering grid. 
-// todo:
-// - support zooming with incremental subdivision lines
-// - link up to 
+	// The CADGrid class provides a simple way to fill a frame with a classic engineering grid. 
+	// todo:
+	// - support zooming with incremental subdivision lines
+	// - link up to 
 
 	this.flex = 1;
 	this.flexdirection = "column"
@@ -41,7 +40,7 @@ define.class(function(view, text){
 	})
 	
 	// The CADGrid does not do anything to its children - plain passthrough
-	this.render = function(){return this.instance_children;}
+	this.render = function(){return this.constructor_children;}
 	
 	// Minimal usage example:
 	this.example = function(){return cadgrid({width:100,height:100});};

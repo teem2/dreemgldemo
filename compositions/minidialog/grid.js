@@ -26,9 +26,9 @@ define.class(function(sprite, text, view,icon){
 		
 		var new_children = [];
 		var new_row = [];
-		for (var i = 0; i < this.instance_children.length;i++){			
+		for (var i = 0; i < this.constructor_children.length;i++){			
 			
-			new_row.push(this.wrapitem(this.instance_children[i]));
+			new_row.push(this.wrapitem(this.constructor_children[i]));
 			
 			if ((i+1) % this.cols == 0)
 			{

@@ -84,7 +84,7 @@ define.class(function(view, scrollbar){
 	}
 
 	this.render = function(){		
-		if (this.instance_children.length === 0) return []
+		if (this.constructor_children.length === 0) return []
 		var pthis = this
 		return [
 			view({flexdirection :"row", flex: 1 },
@@ -95,7 +95,7 @@ define.class(function(view, scrollbar){
 							pthis.updatescrollbars(this)
 						}.bind(this)},
 						this.move_view = view({position:'absolute',bgcolor: this.move_view_bgcolor, flex:1}, 
-							this.instance_children
+							this.constructor_children
 						)
 					)
 				),

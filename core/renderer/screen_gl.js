@@ -747,7 +747,7 @@ this.draw_calls = 0
 			if(other.__lookupGetter__(key))continue
 			if(key === 'children' || key.charAt(0) === '_') continue
 			if(key === 'constructor_args' || 
-				key === 'instance_children' || 
+				key === 'constructor_children' || 
 				key === 'atAttributeGet') continue
 			var value = other[key]
 			if(typeof value === 'function') continue

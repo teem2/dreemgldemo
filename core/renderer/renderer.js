@@ -24,7 +24,7 @@ define.class(function(require, exports, module){
 				object = old_version
 				old_children = object.children
 				// but use new versions instance children
-				old_version.instance_children = new_version.instance_children
+				old_version.constructor_children = new_version.constructor_children
 			}
 			else{ // we are going to use new_version. lets copy _state properties
 				object = new_version
@@ -115,7 +115,7 @@ define.class(function(require, exports, module){
 		if(last_children) for(var i = 0; i < last_children.length; i++){
 			var last_child = last_children[i]
 
-			//if(object.instance_children.indexOf(last_child) === -1 && allchildren.indexOf(last_child) === -1 && new_children.indexOf(last_child) === -1){
+			//if(object.constructor_children.indexOf(last_child) === -1 && allchildren.indexOf(last_child) === -1 && new_children.indexOf(last_child) === -1){
 			last_child.emitRecursive('destroy', 1, allchildren)
 			//}
 		}

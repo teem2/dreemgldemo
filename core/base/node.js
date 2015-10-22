@@ -16,7 +16,7 @@ define.class(function(require, constructor){
 	this._atConstructor = function(){
 		// store the args for future reference
 		var args = this.constructor_args = Array.prototype.slice.call(arguments)
-		this.instance_children = []
+		this.constructor_children = []
 		this.initFromConstructorArgs(args)
 	}
 
@@ -58,7 +58,7 @@ define.class(function(require, constructor){
 				this.initFromConstructorArgs(arg)
 			}
 			else if(arg !== undefined && typeof arg === 'object'){
-				this.instance_children.push(arg)
+				this.constructor_children.push(arg)
 				var name = arg.name || arg.constructor && arg.constructor.name
 				if(name !== undefined && !(name in this)) this[name] = arg
 			}
@@ -107,7 +107,7 @@ define.class(function(require, constructor){
 
 	// render this node
 	this.render = function(){
-		return this.instance_children
+		return this.constructor_children
 	}
 
 	// Mixes in another class
@@ -628,6 +628,30 @@ define.class(function(require, constructor){
 
 	this.createRpcProxy = function(parent){
 		return RpcProxy.createFromObject(this, parent)
+	}
+
+	// support mixins
+	Object.defineProperty(this, 'is', {
+		set:function(value){
+			// lets copy on value. 
+			if(Array.isArray(value)){
+				for(var i = 0; i<value.length; i++) this.is = value[i]
+				return
+			}
+			if(typeof value === 'function') value = value.prototype
+			if(typeof value === 'object'){
+				for(var key in value){
+					this[key] = value[key]
+				}
+			}
+		}
+	})
+
+	this.setParent = function(value){
+		if(!value) return
+		if(!value.constructor_children) value.constructor_children = []
+		value.constructor_children.push(this)
+		this.parent = value
 	}
 
 	this.hideProperty(Object.keys(this))

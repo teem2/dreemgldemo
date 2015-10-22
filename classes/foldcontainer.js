@@ -122,7 +122,7 @@ define.class(function(view, text, icon){
 										{bgcolorfn:function(a,b){
 												return mix(bgcolor*1.7, vec4("white"), (a.y/8))
 											}
-										} , bgcolor: this.basecolor, borderwidth: this.borderwidth, bordercolor:this.bordercolor,  padding: vec4(5,5,5,5),position:"relative"} ,this.instance_children) 
+										} , bgcolor: this.basecolor, borderwidth: this.borderwidth, bordercolor:this.bordercolor,  padding: vec4(5,5,5,5),position:"relative"} ,this.constructor_children) 
 			res.push(this.container)
 		}
 		this.children = [];

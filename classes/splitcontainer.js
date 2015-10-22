@@ -153,17 +153,17 @@ define.class(function(view, text){
 	});
 	
 	this.render = function(){		
-		if (this.instance_children.length > 1){
+		if (this.constructor_children.length > 1){
 			this.newchildren = []
-			this.newchildren.push(view({clipping: true, flex: this.instance_children[0].flex},this.instance_children[0]));
-			for (var i = 1;i<this.instance_children.length;i++){
+			this.newchildren.push(view({clipping: true, flex: this.constructor_children[0].flex},this.constructor_children[0]));
+			for (var i = 1;i<this.constructor_children.length;i++){
 				this.newchildren.push(this.splitter({vertical: this.vertical,firstnode: (i-1)*2, splitsize: this.splitsize, splittercolor: this.splittercolor, hovercolor: this.hovercolor, activecolor: this.activecolor}));
-				this.newchildren.push(view({clipping: true, flex: this.instance_children[i].flex },this.instance_children[i]));				
+				this.newchildren.push(view({clipping: true, flex: this.constructor_children[i].flex },this.constructor_children[i]));				
 			}
 			this.children = [];
 			return this.newchildren;
 		}else{
-			return this.instance_children;
+			return this.constructor_children;
 		}
 	}
 });

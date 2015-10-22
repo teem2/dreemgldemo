@@ -17,15 +17,13 @@ define.class(function(view, text, view, icon){
 	
 	// Basic usage of the button.	
 	define.example(this, function Usage(){
-			return [
-					button({text:"Press me!"})
-					,button({text:"Colored!", buttoncolor1: "red", buttoncolor2: "blue", labelcolor: "white"  })
-					,button({text:"With an icon!", icon:"flask" })
-				] 
-			}
-		);
+		return [
+			button({text:"Press me!"})
+			,button({text:"Colored!", buttoncolor1: "red", buttoncolor2: "blue", labelcolor: "white"  })
+			,button({text:"With an icon!", icon:"flask" })
+		] 
+	});
 	
-
 	// Color of the label text in neutral state	
 	this.attribute("labelcolor", {type: vec4, value: vec4("#404040")});
 
@@ -78,7 +76,7 @@ define.class(function(view, text, view, icon){
 		
 	// The icon class used for the icon display. Exposed to allow overloading/replacing from the outside.
 	define.class(this, 'icon_class', function(icon){
-
+		
 	})
 
 	this.mouseover  = function(){
@@ -109,14 +107,16 @@ define.class(function(view, text, view, icon){
 			this.bg_shader.col1 = this._pressedcolor1;
 			this.buttonres.fgcolor = this._labelactivecolor;		
 			
-				if (this.iconres) this.iconres.fgcolor = this._labelactivecolor;
-		} else {
+			if (this.iconres) this.iconres.fgcolor = this._labelactivecolor;
+		} 
+		else {
 			if (this.hovered > 0){
 				this.bg_shader.col2 = this._hovercolor2;
 				this.bg_shader.col1 = this._hovercolor1;
 				this.buttonres.fgcolor = this._labelactivecolor;
 				if (this.iconres) this.iconres.fgcolor = this._labelactivecolor;
-			} else{
+			} 
+			else{
 				this.buttonres.fgcolor = this._labelcolor;
 				if (this.iconres) this.iconres.fgcolor = this._labelcolor;
 				this.bg_shader.col2 = this._buttoncolor2;
@@ -132,7 +132,7 @@ define.class(function(view, text, view, icon){
 			return [this.buttonres];
 		} else {
 			this.iconres = this.icon_class({fontsize: this.fontsize,color:vec4('red'), icon: this.icon}); 
-			return [this.iconres,this.buttonres];
+			return [this.iconres, this.buttonres];
 		}
 	}
 	

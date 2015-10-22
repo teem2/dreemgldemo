@@ -342,7 +342,7 @@ define.class(function(require, screen, node, dataset, spline, blokjesgrid, menub
 					bgcolor: this.bgcolor,
 					padding: 4,
 					position:"relative"}
-					,this.instance_children)
+					,this.constructor_children)
 				res.push(this.container)
 			}
 			this.children = [];
