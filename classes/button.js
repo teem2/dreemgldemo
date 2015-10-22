@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite, text, view, icon){
+define.class(function(view, text, view, icon){
 	// Simple button: a rectangle with a textlabel and an icon
 	
 	// The label for the button

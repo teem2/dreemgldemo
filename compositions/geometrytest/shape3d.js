@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(require, sprite, text, view, icon){
+define.class(function(require, view, text, icon){
 	if(define.$environment === 'nodejs') return
 
 	var GLShader = require('$gl/glshader')

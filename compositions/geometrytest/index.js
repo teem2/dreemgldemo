@@ -1,4 +1,4 @@
-define.class(function(teem, screens, geomtest, screen){
+define.class(function( screens, geomtest, screen){
 	
 	this.render = function(){
 		return [

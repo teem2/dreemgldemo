@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(require, sprite, text, view, icon, teapot){
+define.class(function(require, view, text, icon, teapot){
 
 	// The perspective3d defines a 3d viewport
 
