@@ -8,23 +8,21 @@ define.class(function(require, shape3d, text, view, icon){
 	var GLGeom= require('$gl/glgeom')
 	var GLMat = require('$gl/glmaterial')
 
-	
-	this.attribute("dimension", {type:vec3, value:vec3(1)});
-
+	this.attribute("file", {type:string});
 	
 	this.init = function(){
-		this.bg_shader.addBox(this.dimension[0], this.dimension[1], this.dimension[2]);
+	this.bg_shader.addModel(this.file, function(){ this.setDirty()}.bind(this));
 	}
-	
+
 	this.mouseover  = function(){
 		console.log("mouse over geometry!", this.interfaceguid);
+		this.bg_shader.diffusecolor = vec4("#ff0000");
+		this.setDirty();
 	}
 	
 	this.mouseout = function(){
 		console.log("mouse out geometry!", this.interfaceguid);
+		this.bg_shader.diffusecolor = vec4("#ffffff");
+		this.setDirty();
 	}
-	
-	this.t = 0;
-
-	
 })

@@ -22,6 +22,8 @@
 	define.$lib = "$root/lib"
 	define.$build = "$root/build"
 	define.$compositions = "$root/compositions"
+	//defaults to allowing all compositions to be used as resources for each other, but can be changed if needed for security reasons.
+	define.$plugins = "$compositions"
 	define.$tests = '$root/tests'
 	define.$fonts = '$root/fonts'
 	define.$textures = "$root/textures"
@@ -137,7 +139,7 @@
 			define.module[abs_path] = module
 
 			if(factory === null) return null // its not an AMD module, but accept that
-			if(!factory) throw new Error("Cannot find factory for module (file not found):" + abs_path)
+			if(!factory) throw new Error("Cannot find factory for module (file not found): " + dep_path + " > " + abs_path)
 
 			// call the factory
 			if(typeof factory == 'function'){
@@ -161,7 +163,7 @@
 			return module.exports
 		}
 
-		require.async = function(path){
+		require.async = function(path, ext){
 			var dep_path = define.joinPath(base_path, define.expandVariables(path))
 			return new Promise(function(resolve, reject){
 				if(define.factory[path]){
@@ -169,7 +171,7 @@
 					var module = require(path)
 					return resolve(module)
 				}
-				define.loadAsync(dep_path, from_file).then(function(){
+				define.loadAsync(dep_path, from_file, ext).then(function(){
 					var module = require(path)
 					resolve(module)
 				}, reject)
@@ -474,12 +476,12 @@
 		
 		var result;
 		var output = []
-		var result = str.match(/function\s*[\w]*\s*\(([\w,\s]*)\)/)
+		var result = str.match(/function\s*[$_\w]*\s*\(([$_\w,\s]*)\)/)
 
 		var map = result[1].split(/\s*,\s*/)
 		for(var i = 0; i<map.length; i++) if(map[i] !== '') output.push(map[i].toLowerCase().trim())
 
-		var matchrx = new RegExp(/define\.(?:render|class)\s*\(\s*(?:this\s*,\s*['"]\w+['"]\s*,\s*(?:\w+\s*,\s*){0,1}){0,1}function\s*[\w]*\s*\(([\w,\s]*)\)\s*{/g)
+		var matchrx = new RegExp(/define\.(?:render|class)\s*\(\s*(?:this\s*,\s*['"][$_\w]+['"]\s*,\s*(?:[$_\w]+\s*,\s*){0,1}){0,1}function\s*[$_\w]*\s*\(([$_\w,\s]*)\)\s*\{/g)
 		while((result = matchrx.exec(str)) !== null) {
 			var map = result[1].split(/\s*,\s*/)
 			for(var i = 0; i<map.length; i++)if(map[i] !== '') output.push(map[i].toLowerCase())
@@ -492,6 +494,14 @@
 	define.lookupClass = function(cls){
 		var luc = define.system_classes[cls]
 		if(luc !== undefined) return luc
+
+		var match = /^([a-zA-Z0-9_]+\$[a-zA-Z0-9_$]+)/.exec(cls);
+		if (match) {
+			var comploc = match[1];
+			var remainder = cls.substr(comploc.length);
+			return '$plugins/' + comploc.replace(/\$/g, '/') + remainder;
+		}
+
 		return './' + cls
 	}
 
@@ -623,7 +633,11 @@
 				var arg = body.argmap[i]
 				if(!(arg in define.builtinClassArgs)){
 					var luttedclass = define.atLookupClass(arg)
-					moduleFactory.depstring += 'require("' + luttedclass + '")'
+					if(moduleFactory.depstring)
+						moduleFactory.depstring += 'require("' + luttedclass + '")'
+					else
+						moduleFactory.depstring = 'require("' + luttedclass + '")'
+
 					// the first non builtin argument is the baseclass if we dont have one
 					if(!base_class) base_class = luttedclass
 				}
@@ -1109,11 +1123,11 @@
 		var app_root = define.filePath(window.location.href)
 
 		// loadAsync is the resource loader
-		define.loadAsync = function(files, from_file){
+		define.loadAsync = function(files, from_file, inext){
 
 			function loadResource(url, from_file, recurblock, module_deps){
-
-				var ext = define.fileExt(url)
+				var ext = inext === undefined ? define.fileExt(url): inext;
+				
 				var abs_url, fac_url
 
 				if(url.indexOf('http:') === 0){ // we are fetching a url..
