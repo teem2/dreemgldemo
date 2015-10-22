@@ -126,12 +126,8 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				//if(obj) obj[msg.attribute] = msg.value
 			}
 			else if(msg.type == 'method'){
-				// alright lets check where to send this.
-				// it could be a local call,
-				// or it could be a call to a connected screen, which needs to be routed
-				// lets check.
 				this.callMethod(msg).then(function(result){
-					socket.write(result)
+					socket.send(result)
 				})
 			}
 			else if(msg.type == 'return'){

@@ -11,7 +11,6 @@ define.class(function(composition, docviewer, fileio, screens, screen, dataset, 
 					// lets load the entire directory structure
 					this.rpc.fileio.readalldir('',['fonts','build','lib','server.js','favicon.ico','define.js','textures','gzcache','@/\\.','.git', '.gitignore']).then(function(result){
 						var filetree = this.find('filetree')
-						console.log("hmm?");
 						result.name = 'Documentation'
 						result.collapsed = false
 						// lets make a dataset
