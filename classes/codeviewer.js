@@ -121,8 +121,6 @@ define.class(function codeviewerbody(require, text){
 				fgcolor = "#ff9d00"
 			}
 			//if(type>7)mesh.outline = true
-			if(type == _Function) mesh.outline = true
-			fgcolor = pal.pal1(type*0.1 + mesh.distance*0.1)
 		}
 	}
 
