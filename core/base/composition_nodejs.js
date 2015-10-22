@@ -27,7 +27,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	this.callRpc = function(msg){
 		return new Promise(function(resolve, reject){
 			this.callMethod(msg).then(function(result){
-				resolve(result.value)
+				resolve(result)
 			}).catch(reject)
 		}.bind(this))
 	}
@@ -56,8 +56,8 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				// lets wait for all screens of this name
 				Promise.all(res).then(function(results){
 					// walk over promises and results
-					var rmsg = {type:'return', uid:uid, value:results.length?results[0]:null, other:[]}
-					for(var i = 1; i < results.length; i++) rmsg.other.push(results[i])
+					var rmsg = {type:'return', uid:uid, value:results.length?results[0].value:null, other:[]}
+					for(var i = 1; i < results.length; i++) rmsg.other.push(results[i].value)
 					// lets return the result
 					resolve(rmsg)
 				})
@@ -73,7 +73,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 
 				if(ret && typeof ret === 'object' && ret.then){ // its a promise.
 					ret.then(function(result){
-						rmsg.ret = result
+						rmsg.value = result.value
 						resolve(rmsg)
 					})
 				}
