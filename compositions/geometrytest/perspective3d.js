@@ -39,6 +39,10 @@ define.class(function(require, view, text, icon, teapot){
 	// Far plane distance
 	this.attribute("far", {type:float, value: 1000});
 
+	this.state("up");
+	this.state("lookat");
+	this.state("camera");
+	
 	this.camerafixedtofov = function() {
 	}
 	
@@ -67,6 +71,10 @@ define.class(function(require, view, text, icon, teapot){
 		renderstate.lookatmatrix = this.lookatmatrix;
 		renderstate.cameraposition = this.camera;
 		
+		var up = vec3(renderstate.lookatmatrix[1], renderstate.lookatmatrix[5], renderstate.lookatmatrix[9]);
+		var left = vec3(renderstate.lookatmatrix[0], renderstate.lookatmatrix[4], renderstate.lookatmatrix[8]);
+		renderstate.camup = up;
+		renderstate.camleft = left;
 		var adjust = mat4.identity();
 		mat4.scale(adjust, vec3(w,h, 1), adjust);	
 
