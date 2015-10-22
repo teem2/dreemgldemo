@@ -11,6 +11,10 @@ define.class(function(composition, screens, screen, view, text){
 
 		this.hello = function(){
 			console.log("Received hello call!")
+			console.log('calling s1')
+			this.rpc.screens.s1.test().then(function(result){
+				console.log('s1 returned '+result)
+			})
 			return 30
 		}
 	})

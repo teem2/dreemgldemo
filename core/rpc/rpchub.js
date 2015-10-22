@@ -13,12 +13,17 @@ define.class(function(require, exports){
 	if(define.$environment == 'nodejs'){
 		this.callRpc = function(name, msg){
 			msg.rpcid = name
+			// we should return a promise
+			return new Promise(function(resolve, reject){
+				this.sendbus.callRpc(msg).then(function(result){
+					resolve(result.value)
+				}).catch(reject)
+			}.bind(this))
 			// lets call this thing
-			var prom = this.allocPromise()
-			msg.uid  = prom.uid
+			//var prom = this.allocPromise()
+			//msg.uid  = prom.uid
 			// we eitehr need to call our own server object
-			// or a (set of) clients
-
+			// or a (set of) clients.
 		}
 	}
 	else{

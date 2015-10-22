@@ -10,7 +10,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	var renderer = require('$renderer/renderer')
 
 	// ok now what. well we need to build our RPC interface
-	self.postAPI = function(msg, response){
+	this.postAPI = function(msg, response){
 		if(msg.type == 'attribute'){
 			var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
 			if(obj) obj[msg.attribute] = msg.value
@@ -22,14 +22,72 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		}
 		else response.send({type:'error', value:'please set type to rpcAttribute or rpcCall'})
 	}
+	
+	this.callRpc = function(msg){
+		// lets make a promise
+		return new Promise(function(resolve, reject){
+			var parts = msg.rpcid.split('.')
+			if(parts[0] === 'screens'){
+				var scr = this.connected_screens[parts[1]]
 
-	self.atConstructor = function(bus){
+				var res = []
+				var uid = msg.uid
+				if(scr) for(var i = 0; i < scr.length; i ++){
+					var screensock = scr[i]
+					// socket open
+					if(screensock.readyState === 1){
+						// lets send our message
+						var prom = this.rpc.allocPromise()
+						res.push(prom)
+						prom.origuid = msg.uid
+						msg.uid = prom.uid
+						screensock.send(msg)
+					}
+				}
+				// lets wait for all screens of this name
+				Promise.all(res).then(function(results){
+					// walk over promises and results
+					var rmsg = {type:'return', uid:uid, value:results.length?results[0]:null, other:[]}
+					for(var i = 1; i < results.length; i++) rmsg.other.push(results[i])
+					// lets return the result
+					resolve(rmsg)
+				})
+			}
+			else{ // its a local thing, call it directly on our composition
+				var obj = this.names
+				for(var i = 0; i < parts.length; i ++){
+					obj = obj[parts[i]]
+					if(!obj) return console.log("Error parsing rpc name "+msg.rpcid)
+				}
+				var ret = obj[msg.method].apply(obj, msg.args)
+				var rmsg = {type:'return', uid:msg.uid, value:ret}
+
+				if(ret && typeof ret === 'object' && ret.then){ // its a promise.
+					ret.then(function(result){
+						rmsg.ret = result
+						resolve(rmsg)
+					})
+				}
+				else{
+					if(!RpcProxy.isJsonSafe(ret)){
+						rmsg.error = 'Result not json safe'
+						rmsg.ret = undefined
+						console.log("Rpc result is not json safe "+msg.rpcid+"."+msg.method)
+					}
+					resolve(rmsg)
+					socket.send(rmsg)
+				}
+			}
+		}.bind(this))
+	}
+
+	this.atConstructor = function(bus){
 		
 		baseclass.prototype.atConstructor.call(this)
 
 		this.bus = bus
 		this.session = Math.random() * 100000
-		this.rpc = new RpcHub()
+		this.rpc = new RpcHub(this)
 		this.connected_screens = {}
 
 		bus.broadcast({type:'sessionCheck', session:this.session})
@@ -63,56 +121,9 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				// it could be a local call,
 				// or it could be a call to a connected screen, which needs to be routed
 				// lets check.
-				var parts = msg.rpcid.split('.')
-				if(parts[0] === 'screens'){
-					var scr = this.connected_screens[parts[1]]
-					var res = []
-					var uid = msg.uid
-					if(scr) for(var i = 0; i < scr.length; i ++){
-						var screensock = scr[i]
-						// socket open
-						if(screensock.readyState === 1){
-							// lets send our message
-							var prom = this.rpc.allocPromise()
-							res.push(prom)
-							prom.origuid = msg.uid
-							msg.uid = prom.uid
-							screensock.send(msg)
-						}
-					}
-					// lets wait for all screens of this name
-					Promise.all(res).then(function(results){
-						// walk over promises and results
-						var ret = {type:'return', uid:uid, value:results.length?results[0]:null, other:[]}
-						for(var i = 1; i < results.length; i++) other.push(results[i])
-						// lets return the result
-						socket.send(ret)
-					})
-				}
-				else{ // its a local thing, call it directly on our composition
-					var obj = this.names
-					for(var i = 0; i < parts.length; i ++){
-						obj = obj[parts[i]]
-						if(!obj) return console.log("Error parsing rpc name "+msg.rpcid)
-					}
-					var ret = obj[msg.method].apply(obj, msg.args)
-					var msg = {type:'return', uid:msg.uid, value:ret}
-
-					if(ret && typeof ret === 'object' && ret.then){ // its a promise.
-						ret.then(function(result){
-							msg.ret = result
-							socket.send(msg)
-						})
-					}
-					else{
-						if(!RpcProxy.isJsonSafe(ret)){
-							msg.error = 'Result not json safe'
-							msg.ret = undefined
-							console.log("Rpc result is not json safe "+msg.rpcid+"."+msg.method)
-						}
-						socket.send(msg)
-					}
-				}
+				this.callRpc(msg).then(function(result){
+					socket.write(result)
+				})
 			}
 			else if(msg.type == 'return'){
 				// lets resolve this return 
@@ -133,6 +144,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		for(var i = 0; i < this.children.length; i++){
 			// create child name shortcut
 			var child = this.children[i]
+			child.rpc = this.rpc
 			if(!child.environment || child.environment === define.$environment){
 				child.emitRecursive('init')
 			}
