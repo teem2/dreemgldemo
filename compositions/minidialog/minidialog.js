@@ -1,4 +1,4 @@
-define.class(function(require, screen, icon,view, edit, text,scrollbar,  treeview, splitcontainer, scrollcontainer, mousedebug, tabcontrol, button, grid){
+define.class(function(require, screen, icon,view, editor, text,scrollbar,  treeview, splitcontainer, scrollcontainer, mousedebug, tabcontrol, button, grid){
 
 	var json = require('./top_movies.json')
 
@@ -73,13 +73,13 @@ define.class(function(require, screen, icon,view, edit, text,scrollbar,  treevie
 					view({tabname: "tab 3"}	,button({text:"Github",icon:"github"})),
 					view({tabname: "tab 4", tabicon:"gears"}	,button({text:"Youtube",icon:"youtube"})),
 					splitcontainer({tabname: "Splitter thing" ,tabicon:"flask", vertical:false}
-						,edit({margin:2,fontsize:30,text:'This box contains editable text.\nTo the right is a mouse-test box', flex: 1, 'bg.color':function(){return vec4("#f0f0f0")} , fgcolor: "black"})
+						,editor({margin:2,fontsize:30,text:'This box contains editable text.\nTo the right is a mouse-test box', flex: 1, 'bg.color':function(){return vec4("#f0f0f0")} , fgcolor: "black"})
 						,mousedebug({flex: 1, margin:4,  alignself: "stretch",bgcolor: "blue"})
 						,treeview({flex:1,alignself:"stretch"})
 					)
 				)
 					, splitcontainer({tabname:"tests", tabicon:"hand-spock" ,vertical:false}
-						,edit({margin:2,fontsize:30,text:'This box contains editable text.\nTo the right is a mouse-test box', flex: 1, 'bg.color':function(){return vec4("#f0f0f0")} , fgcolor: "black"})
+						,editor({margin:2,fontsize:30,text:'This box contains editable text.\nTo the right is a mouse-test box', flex: 1, 'bg.color':function(){return vec4("#f0f0f0")} , fgcolor: "black"})
 						,mousedebug({flex: 1, margin:4,  alignself: "stretch",bgcolor: "blue"})
 						,treeview({flex:1,alignself:"stretch"})
 					)

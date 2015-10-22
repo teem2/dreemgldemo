@@ -3,13 +3,13 @@
 
 define.class(function(require, exports, self){
 
-	self.atConstructor = function(url){
+	this.atConstructor = function(url){
 		this.url = url || ''
 		this.backoff = 1
 		this.reconnect()
 	}
 
-	self.disconnect = function(){
+	this.disconnect = function(){
 		if(this.socket){
 			this.socket.onclose = undefined
 			this.socket.onerror = undefined
@@ -21,7 +21,7 @@ define.class(function(require, exports, self){
 	}
 
 	// Reconnect to server (used internally and automatically)
-	self.reconnect = function(){
+	this.reconnect = function(){
 		this.disconnect()
 		if(!this.queue) this.queue = []
 
@@ -49,28 +49,28 @@ define.class(function(require, exports, self){
 
 		this.socket.onmessage = function(event){
 			var msg = JSON.parse(event.data)
-			this.atMessage(msg)
+			this.atMessage(msg, this)
 		}.bind(this)
 	}
 
 	
 	// Send a message to the server
-	self.send = function(msg){
+	this.send = function(msg){
 		msg = JSON.stringify(msg)
 		if(this.queue) this.queue.push(msg)
 		else this.socket.send(msg)
 	}
 
 	// Causes a console.color on the server
-	self.color = function(data){
+	this.color = function(data){
 		this.send({type:'color', value:data})
 	}
 
 	// Causes a console.log on the server
-	self.log = function(data){
+	this.log = function(data){
 		this.send({type:'log', value:data})
 	}
 
 	// Called when a message is received
-	self.atMessage = function(message){}
+	this.atMessage = function(message){}
 })

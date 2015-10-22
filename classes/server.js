@@ -2,7 +2,5 @@
 
 define.class(function(node){
 	// Empty stub used in the composition
-	
 	this.environment = 'nodejs'
-
 })

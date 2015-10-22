@@ -1,5 +1,6 @@
 //Pure JS based composition
-define.class(function(teem, screens, screen, view, text){
+define.class(function(composition, screens, screen, view, text){
+
 	var fileio = define.class(function fileio(server){
 		
 		this.attribute('bla', {type:String, value:'test'})
@@ -14,22 +15,27 @@ define.class(function(teem, screens, screen, view, text){
 	})
 
 	this.render = function(){ return [
-		fileio(),
-		screens( 
-			screen(  
-				view({
-					bg:{bgcolorfn: function(pos, tex){
-						return 'darkblue'
-						//return demos.fractzoom(pos, time * 2, 1.)
-						//return demos.highdefblirpy(pos * 0.5, time * 2, 1.)
-						//return mix('red','blue',sin(32*length(mesh+time)))
-					}},
-					init: function(){
-						this.teem.fileio.hello()
-					},
-					bgcolor:'transparent', w:2000, h:1000
-				})
-			)
+		fileio({name:'fileio'}),
+		screens(
+			screen({
+				render:function(){
+					return view({
+						bg:{
+							color:function(){
+								return 'blue'
+							}
+						},
+						init: function(){
+							this.rpc.fileio.hello()
+						},
+						click:function(){
+							this.bg_shader.bla = vec4('red')
+							this.setDirty(true)
+						},
+						bgcolor:'blue', w:2000, h:1000
+					})
+				}
+			})
 		)
 	]}
 })

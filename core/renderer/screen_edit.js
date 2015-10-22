@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class('./sprite_gl', function (require, exports, self) {
+define.class('./view_gl', function (require, exports, self) {
 		
 	var ScreenGL = require('./screen_gl')
 

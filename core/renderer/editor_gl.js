@@ -22,11 +22,11 @@ define.class('./sprite_gl', function(require, exports, self){
 	// Basic usage of the edit control
 	define.example(this, function Simple(){
 		return [
-				edit({text:"This is editable text!", bgcolor:"transparent" })
+			editor({text:"This is editable text!", bgcolor:"transparent" })
 		]
 	});
 	
-	this.bg = {
+	this.bg = { 
 		color: 'vec4(0.6)'
 	}
 

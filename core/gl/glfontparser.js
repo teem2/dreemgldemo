@@ -3,6 +3,7 @@ define(function(require, exports, module){
 	var GLTexture = require('$gl/gltexture')
 
 	module.exports = function parseFont(blob){
+		if(!blob) return
 		if(blob._parsedFont) return blob._parsedFont
 
 		// lets parse the font
@@ -83,11 +84,13 @@ define(function(require, exports, module){
 			min_y: -0.3,
 			max_x: 0.5,
 			max_y: 1.,
-			tmin_x:0,
-			tmin_y:0,
-			tmax_x:1,
-			tmax_y:1,
-			advance:0.5,
+			tmin_x: 0,
+			tmin_y: 0,
+			tmax_x: 1,
+			tmax_y: 1,
+			nominal_w:24,
+			nominal_h:24,
+			advance: 0.5,
 			width: 0,
 			height: 0,
 		}
@@ -101,6 +104,8 @@ define(function(require, exports, module){
 			tmin_y:0,
 			tmax_x:1,
 			tmax_y:1,
+			nominal_w:24,
+			nominal_h:24,
 			advance:0.5,
 			width: 0,
 			height: 0
@@ -115,6 +120,8 @@ define(function(require, exports, module){
 			tmin_y:0,
 			tmax_x:1,
 			tmax_y:1,
+			nominal_w:24 * 4,
+			nominal_h:24,
 			advance:2,
 			width: 2,
 			height: 1

@@ -13,7 +13,7 @@ define.class(function(require, exports, self){
 	var FileWatcher = require('$server/filewatcher')
 	var ExternalApps = require('$server/externalapps')
 	var BusServer = require('$rpc/busserver')
-	var CompositionServer = require('$dreem/compositionserver')
+	var CompositionServer = require('$server/compositionserver')
 	var NodeWebSocket = require('$server/nodewebsocket')
 	var mimeFromFile = require('$server/mimefromfile')
 
@@ -95,7 +95,8 @@ define.class(function(require, exports, self){
 
 	self.getComposition = function(url){
 		if(url.indexOf('.')!== -1) return
-		var path = url.split('/')
+		var base = url.split('?')[0]
+		var path = base.split('/')
 		var name = path[1] || path[0] || this.default_composition
 		if(!name) return
 

@@ -53,6 +53,7 @@ define.class(function(require, exports, self){
 			this.gl.height = this.canvas.height = sh
 			this.canvas.style.width = w + 'px'
 			this.canvas.style.height = h + 'px'
+
 			this.gl.viewport(0, 0, sw, sh)
 			// store our w/h and pixelratio on our frame
 			this.main_frame.ratio = pixelRatio

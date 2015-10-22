@@ -24,10 +24,10 @@ console.clear = function(){
 	process.stdout.write("\033[2J");
 }
 
-console.setposition =function(x,y)
-{
-	process.stdout.write("\033["+y.toString() + ";"+x.toString() + "f");
+console.setposition = function(x, y){
+	process.stdout.write("\033[" + y.toString() + ";" + x.toString() + "f")
 }
+
 // make a nice console.dump function
 var dump = require('$core/debug/dump')
 console.dump = function(){
@@ -65,7 +65,7 @@ function main(){
 	if(args['-h'] || args['-help'] || args['--h'] || args['--help']){
 		console.color('~by~Teem~~ Server ~bm~2.0~~\n')
 		console.color('commandline: node server.js <flags>\n')
-		console.color('~bc~-web htmlfile.html~~ Short for -edit -notify -devtools -delay -browser htmlfile.html\n')	
+		console.color('~bc~-web htmlfile.html~~ Short for -edit -notify -devtools -delay -browser htmlfile.html\n')
 		console.color('~bc~-port ~br~[port]~~ Server port\n')
 		console.color('~bc~-nomoni ~~ Start process without monitor\n')
 		console.color('~bc~-iface ~br~[interface]~~ Server interface\n')
@@ -76,7 +76,6 @@ function main(){
 		console.color('~bc~-delay~~ Delay reloads your pages when reloading the server\n')
 		console.color('~bc~-restart~~ Auto restarts after crash (Handy for client dev, not server dev)\n')
 		console.color('~bc~-edit~~ Automatically open an exception in your code editor at the right line\n')
-
 		console.color('~bc~-external~~ ~br~[directory]~~ path to external compositions directory\n')
 		return process.exit(0)
 	}
@@ -93,7 +92,7 @@ function main(){
 		}
 		else
 		if(args['-dali']){
-			var DaliClient = require('$core/dreem/daliclient')
+			var DaliClient = require('$core/renderer/daliclient')
 			new DaliClient(args)
 		}
 		else if(args['-test']){
@@ -101,8 +100,8 @@ function main(){
 
 		}
 		else{
-			var TeemServer = require('$core/dreem/dreemserver')
-			new TeemServer(args)
+			var RootServer = require('$core/server/rootserver')
+			new RootServer(args)
 		}
 
 	}

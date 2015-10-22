@@ -7,6 +7,7 @@ define.class(function(require, constructor){
 
 	var OneJSParser =  require('$parsers/onejsparser')
 	var WiredWalker = require('$parsers/wiredwalker')
+	var RpcProxy = require('$rpc/rpcproxy')
 
 	var onejsparser = new OneJSParser()
 	onejsparser.parser_cache = {}
@@ -623,6 +624,10 @@ define.class(function(require, constructor){
 			}
 		}
 		return true
+	}
+
+	this.createRpcProxy = function(parent){
+		return RpcProxy.createFromObject(this, parent)
 	}
 
 	this.hideProperty(Object.keys(this))

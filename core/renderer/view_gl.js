@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Sprite class
 
-define.class('./sprite_base', function(require, exports){
+define.class('./view_base', function(require, exports){
 
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')

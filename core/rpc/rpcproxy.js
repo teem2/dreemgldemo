@@ -3,16 +3,8 @@
 
 define.class('$base/node', function(require, exports, self){
 	var Node = require('$base/node')
-	var RpcMulti = require('$rpc/rpcmulti')
 	var RpcProxy = exports
 	
-	// json safety check
-	Object.defineProperty(self, 'subRpcDef', {
-		value:function(){
-			return {kind:'single',self:RpcProxy.createRpcDef(this, Node)}
-		}
-	})
-
 	RpcProxy.defineProp = function(obj, key, value){
 		var store = '__' + key
 		Object.defineProperty(obj, key, {
@@ -29,7 +21,7 @@ define.class('$base/node', function(require, exports, self){
 	RpcProxy.defineMethod = function(obj, key){
 		obj[key] = function(){
 			var args = []
-			var msg = {type:'method', rpcid:this._rpcid, method:key, args:args }
+			var msg = {type:'method', method:key, args:args}
 
 			for(var i = 0; i < arguments.length; i++){
 				var arg = arguments[i]
@@ -40,11 +32,10 @@ define.class('$base/node', function(require, exports, self){
 
 				args.push(arg)
 			}
-			if(!this._rpcpromise) return new Promise(function(resolve, reject){resolve(null)})
-			return this._rpcpromise.sendAndCreatePromise(msg)
+			return this.parent.callRpc(this.name, msg)
 		}
 	}
-
+/*
 	RpcProxy.handleCall = function(object, msg, socket){
 		var ret = object[msg.method].apply(object, msg.args)
 		if(ret && ret.then){ // make the promise resolve to a socket send
@@ -61,7 +52,7 @@ define.class('$base/node', function(require, exports, self){
 			}
 			socket.send({type:'return', uid:msg.uid, value:ret})
 		}		
-	}
+	}*/
 
 	RpcProxy.verifyRpc = function(rpcdef, component, prop, kind){
 		// lets rip off the array index
@@ -77,7 +68,7 @@ define.class('$base/node', function(require, exports, self){
 		}
 		return true
 	}
-
+	/*
 	RpcProxy.bindSetAttribute = function(object, rpcid, bus){
 		// ok lets now wire our mod.vdom.onSetAttribute
 		Object.defineProperty(object, 'atAttributeSet', {
@@ -99,15 +90,12 @@ define.class('$base/node', function(require, exports, self){
 				bus.send(msg)
 			}
 		}})
-	}
-
+	}*/
+/*
 	RpcProxy.decodeRpcID = function(onobj, rpcid){
 		if(!rpcid) throw new Error('no RPC ID')
 
-		var idx = rpcid.split('[')
-		var name = idx[0]
-
-		// its a object.sub[0] call
+		var name = idx
 		if(name.indexOf('.') != -1){
 			var part = name.split('.')
 			var obj = onobj[part[0]]
@@ -118,7 +106,7 @@ define.class('$base/node', function(require, exports, self){
 			return obj
 		}
 		return onobj[name]
-	}
+	}*/
 
 	RpcProxy.isJsonSafe = function(obj, stack){
 		if(obj === undefined || obj === null) return true
@@ -150,19 +138,19 @@ define.class('$base/node', function(require, exports, self){
 		return true
 	}
 
-	RpcProxy.createFromStub = function(stub, baseproto, rpcid, rpcpromise){
+	RpcProxy.createFromObject = function(object, parent){
 		var proxy = new RpcProxy()
-		proxy.name = stub.name || stub.constructor.name
-		Object.defineProperty(proxy, '_rpcid', {value: rpcid})
-		Object.defineProperty(proxy, '_rpcpromise', {value: rpcpromise})
+		proxy.parent = parent
+		proxy.name = object.name || object.constructor.name
 
-		for(var key in stub){
-			if(key.charAt(0) === '_' || baseproto && key in baseproto) continue
-			if(stub.isAttribute(key)){ // we iz attribute
-				proxy.attribute(key, stub.getAttributeConfig(key))
+		// we should walk up till we 
+		for(var key in object){
+			if(key.charAt(0) === '_' || key in Node.prototype) continue
+			if(object.isAttribute(key)){ // we iz attribute
+				proxy.attribute(key, object.getAttributeConfig(key))
 			}
 			else{
-				var prop = stub[key]
+				var prop = object[key]
 
 				if(typeof prop == 'function'){
 					RpcProxy.defineMethod(proxy, key)
@@ -173,5 +161,24 @@ define.class('$base/node', function(require, exports, self){
 			}
 		}
 		return proxy
+	}
+
+	var RpcChildSet = define.class(function RpcChildSet(){
+		this.callRpc = function(rpcid, message){
+			return this.parent.callRpc(this.name +'.' + rpcid, message)
+		}
+	})
+
+	// we create a set of RPC forwards for the child nodes
+	RpcProxy.createChildSet = function(object, parent){
+		var childset = new RpcChildSet()
+		childset.parent = parent
+		childset.name = object.name || object.constructor.name
+
+		for(var i = 0; i < object.instance_children.length; i++){
+			var child = object.instance_children[i]
+			childset[child.name || child.constructor.name] = child.createRpcProxy(childset)
+		}
+		return childset
 	}
 })
