@@ -54,7 +54,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 			screen:this.screen
 		}
 		globals.globals = globals
-
+		window.comp = this
 		// copy keyboard and mouse objects from previous
 		if(!previous){
 			if(!parent){
@@ -90,12 +90,19 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		this.rendered = true
 	}
 
+	this.callRpc = function(msg){
+		var prom = this.rpc.allocPromise()
+		msg.uid  = prom.uid
+		this.bus.send(msg)
+		return prom
+	}
+
 	this.createBus = function(){
 		
 		this.bus = new BusClient(location.pathname)
 
 		// create the rpc object
-		this.rpc = new RpcHub(this.bus)
+		this.rpc = new RpcHub(this)
 
 		this.bus.atMessage = function(msg, socket){
 			if(msg.type == 'sessionCheck'){

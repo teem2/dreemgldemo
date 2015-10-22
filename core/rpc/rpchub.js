@@ -3,39 +3,16 @@
 
 define.class(function(require, exports){
 
-	this.atConstructor = function(sendbus){
-		this.sendbus = sendbus
+	this.atConstructor = function(host){
+		this.host = host
 		this.promises = {}
 		this.uid_free = []
 		this.uid = 0
 	}
 
-	if(define.$environment == 'nodejs'){
-		this.callRpc = function(name, msg){
-			msg.rpcid = name
-			// we should return a promise
-			return new Promise(function(resolve, reject){
-				this.sendbus.callRpc(msg).then(function(result){
-					resolve(result.value)
-				}).catch(reject)
-			}.bind(this))
-			// lets call this thing
-			//var prom = this.allocPromise()
-			//msg.uid  = prom.uid
-			// we eitehr need to call our own server object
-			// or a (set of) clients.
-		}
-	}
-	else{
-		this.callRpc = function(name, msg){
-			msg.rpcid = name
-			// lets call this thing
-			var prom = this.allocPromise()
-			msg.uid  = prom.uid
-			// lets call the server
-			this.sendbus.send(msg)
-			return prom
-		}
+	this.callRpc = function(name, msg){
+		msg.rpcid = name
+		return this.host.callRpc(msg)
 	}
 
 	this.resolveReturn = function(msg){

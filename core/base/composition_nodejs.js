@@ -23,7 +23,16 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		else response.send({type:'error', value:'please set type to rpcAttribute or rpcCall'})
 	}
 	
+
 	this.callRpc = function(msg){
+		return new Promise(function(resolve, reject){
+			this.callMethod(msg).then(function(result){
+				resolve(result.value)
+			}).catch(reject)
+		}.bind(this))
+	}
+
+	this.callMethod = function(msg){
 		// lets make a promise
 		return new Promise(function(resolve, reject){
 			var parts = msg.rpcid.split('.')
@@ -121,7 +130,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				// it could be a local call,
 				// or it could be a call to a connected screen, which needs to be routed
 				// lets check.
-				this.callRpc(msg).then(function(result){
+				this.callMethod(msg).then(function(result){
 					socket.write(result)
 				})
 			}
