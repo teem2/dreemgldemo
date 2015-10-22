@@ -66,7 +66,7 @@ define.class(function(require, sprite, text, view, icon){
 		
 		console.log(this.mesh);
 		
-		this.texture = require('$textures/matcap2.png');
+		this.texture = require('$textures/matcap3.png');
 		
 		
 		this.matrix = mat4.identity()
@@ -90,7 +90,7 @@ define.class(function(require, sprite, text, view, icon){
 		this.color = function(){
 			//return vec4("yellow") ;
 			
-			var n = noise.s2d(vec2(sin(mesh.uv.x*6.283)*0.215, sin(mesh.uv.y*6.283)));
+			var n = noise.s2d(vec2(mesh.uv.x*0.01, mesh.uv.y*0.01));
 			
 			var nn = normalize(transnorm.xyz
 			+ 

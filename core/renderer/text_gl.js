@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Sprite class
 
-define.class('./sprite_gl', function(require, exports, self){	
+define.class('./view_gl', function(require, exports, self){	
 	var GLText = require('$gl/gltext')
 	var glfontParser = require('$gl/glfontparser')
 

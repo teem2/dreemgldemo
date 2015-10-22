@@ -220,7 +220,7 @@ function getBezier(percent,C1,C2,C3,C4) {
 				pcontrol.push(controlpoints[patch[j]]);
 			}
 			
-			var detail = 10;
+			var detail = 30;
 			var ndetail = -0.01/detail;
 			
 			for (var j =0 ;j<detail;j++) {

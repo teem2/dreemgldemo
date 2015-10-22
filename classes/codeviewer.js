@@ -28,8 +28,9 @@ define.class(function codeviewerbody(require, text){
 			this[key] = String(GLTextCode.types[key])
 		}
 
-		this.paint = function(p, dpdx, dpdy, edge){
+		this.paint = function(p,  dpdx, dpdy, edge){
 			//var edge = min(length(dpx))
+			//dump = edge
 			var unicode = int(mesh.tag.x)
 			var selected = mesh.tag.w
 
@@ -50,24 +51,24 @@ define.class(function codeviewerbody(require, text){
 			if(unicode == 9){ // the screen aligned tab dots
 				// make a nice tab line
 				//var out = vec4(0)
-				if(edge > 0.01){ // pixel drawing
-				//	var py = .5 * device.h - pixel vertex.y * floor(device.h * .5) 
-				//	if(p.x > 1. * abs(dpdx.x) && p.x <= 2. * abs(dpdx.x) && mod(py,2.) > 1.) return vec4("#445", 1.)
+				//dump = edge
+				if(edge > 0.5){ // pixel drawing
+					if(p.x > dpdx.x && p.x <= 3*dpdx.x && mod(p.y, 2.*dpdy.y) > dpdy.y) return '#445'
 				}
-				else{ // switch to vector drawing
-					var w = .01
-					var h = .02
-					var field = shape.box(mod(p,vec2(1.,.05)),.5*w,0,w,h)
-					var col = vec4("#667".rgb, smoothstep(edge,-edge,field))
-					if(col.a>0.01)return col
+				else { // switch to vector drawing
+					var w = 1
+					var h = 1
+					var field = shape.box(mod(p, vec2(24*3, 3.)), .5 * w, 0, w, h)
+					var col = vec4("#667".rgb, smoothstep(edge, -edge, field))
+					if(col.a > 0.01) return col
 				}
 
 				if(selected < 0.){
-					if(edge > 0.02){
-						if(p.x > 3. * dpdx.x && p.y >= .5 - .5 * dpdy.y && p.y <= .5 + .5 * dpdy.y)
-							return vec4("#AF8F7E".rgb,1.)
-						return vec4(0)
-					}
+					//if(edge > 0.02){
+					//	if(p.x > 3. * dpdx.x && p.y >= .5 - .5 * dpdy.y && p.y <= .5 + .5 * dpdy.y)
+					//		return vec4("#AF8F7E".rgb,1.)
+					//	return vec4(0)
+					//}
 					var sz = .01
 					var field = shape.line(p, 0., .5-sz, 1., .5-sz, 2.*sz)
 					return vec4("#AF8F7E".rgb, smoothstep(edge,-edge,field))
@@ -83,6 +84,7 @@ define.class(function codeviewerbody(require, text){
 			var sub = int(mod(mesh.tag.z / 256., 256.))
 			var part = int(mod(mesh.tag.z, 256.))
 			var unicode = int(mesh.tag.x)
+			
 			if(unicode == 10 || unicode == 32 || unicode == 9) discard
 			if(sub == _Paren || sub == _Brace || sub == _Bracket){
 				if(sub == _Paren){
@@ -118,6 +120,9 @@ define.class(function codeviewerbody(require, text){
 			}else{
 				fgcolor = "#ff9d00"
 			}
+			//if(type>7)mesh.outline = true
+			if(type == _Function) mesh.outline = true
+			fgcolor = pal.pal1(type*0.1 + mesh.distance*0.1)
 		}
 	}
 
@@ -126,16 +131,16 @@ define.class(function codeviewerbody(require, text){
 	this.lazyInit = function(maxwidth){
 		if(this.code !== this.printedcode || this.lastmaxwidth !== maxwidth || this.align != this.lastalign){
 			this.printedcode = this.code
-			this.lastmaxwidth = maxwidth;
-			this.lastalign = this.align;
+			this.lastmaxwidth = maxwidth
+			this.lastalign = this.align
 			
 			var textbuf = this.fg_shader.newText()
 			var ast = Parser.parse(this.code)
 
 			if(this.font) textbuf.font = this.font
 
-			textbuf.font_size = this.fontsize;
-			textbuf.add_y = textbuf.line_height;
+			textbuf.font_size = this.fontsize
+			textbuf.add_y = textbuf.line_height
 			textbuf.align = 'left'
 			textbuf.start_y = textbuf.line_height
 			textbuf.boldness = 0.5

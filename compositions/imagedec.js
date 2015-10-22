@@ -107,7 +107,8 @@ Pluck.prototype.pause = function() {
 							var b = samp1(pos+vec2(off, off), dist);
 							var c = samp1(pos+vec2(0.00, off), dist);
 							var d = samp1(pos+vec2(off, 0.0), dist);
-							return texture.sample(cc + vec2(sin(ang)*d2*(.741), cos(ang)*d2)) + vec4(1.0)*step(0.5,a + b + c + d) //+ stripe;				
+							var col = texture.sample(cc + vec2(sin(ang)*d2*(.741), cos(ang)*d2)) 
+							return col + vec4(1.0)*step(0.5,a + b + c + d) //+ stripe;				
 						}
 					},
 					postDraw: function(device){
@@ -132,7 +133,6 @@ Pluck.prototype.pause = function() {
 						}
 
 						for(var i = 0;i<128;i++){
-							console.log()
 							if (newnotes[i] != this.playingNote[i]){
 								if (newnotes[i]) {
 									var p = new Pluck(this.ctx)

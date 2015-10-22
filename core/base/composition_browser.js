@@ -1,12 +1,12 @@
 // Copyright 2015 this2 LLC, MIT License (see LICENSE)
 // this class
 
-define.class('$dreem/teem_base', function(require, exports, self, baseclass){
+define.class('$base/composition_base', function(require, exports, self, baseclass){
 
 	var Node = require('$base/node')
 	var RpcProxy = require('$rpc/rpcproxy')
-	var RpcMulti = require('$rpc/rpcmulti')
-	var RpcPromise = require('$rpc/rpcpromise')
+	var RpcHub = require('$rpc/rpchub')
+
 	var WebRTC = require('$rpc/webrtc')
 	var BusClient = require('$rpc/busclient')
 	var Mouse = require('$renderer/mouse_web')
@@ -14,10 +14,43 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 	var Touch = require('$renderer/touch_web')
 	var renderer = require('$renderer/renderer')
 
+	this.atConstructor = function(previous, parent){
+
+		this.parent = parent
+		
+		if(previous){
+			this.reload = (previous.reload || 0) + 1
+			console.log("Reload " + this.reload)
+		}
+
+		// how come this one doesnt get patched up?
+		baseclass.prototype.atConstructor.call(this)
+
+		this.screenname = location.search?location.search.slice(1):'browser'
+
+		// web environment
+		if(previous){
+			this.bus = previous.bus
+			this.rpc = previous.rpc//new RpcHub(this.bus)//previous.rpc
+			this.rendered = true
+		}
+		else this.createBus()
+
+		this.renderComposition()
+
+		this.screen = this.names.screens[this.screenname]
+		if(!this.screen){
+			this.screen = this.names.screens.instance_children[0]			
+		}
+
+		if(previous || parent) this.doRender(previous, parent)
+	}
+
 	this.doRender = function(previous, parent){
 		
 		var globals = {
-			teem:this, 
+			composition:this,
+			rpc:this.rpc, 
 			screen:this.screen
 		}
 		globals.globals = globals
@@ -45,7 +78,7 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 			this.screen.device = parent.screen.device
 			this.screen.parent = parent
 		}
-		this.screen.teem = this
+		//this.screen.teem = this
 		renderer(this.screen, previous && previous.screen, globals, true)
 
 		if(this.screen.title !== undefined) document.title = this.screen.title 
@@ -60,14 +93,15 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 	this.createBus = function(){
 		
 		this.bus = new BusClient(location.pathname)
-		
-		this.rpcpromise = new RpcPromise(this.bus)
-		
-		this.bus.atMessage = function(msg){
+
+		// create the rpc object
+		this.rpc = new RpcHub(this.bus)
+
+		this.bus.atMessage = function(msg, socket){
 			if(msg.type == 'sessionCheck'){
 				if(this.session) location.href = location.href
 				if(this.session != msg.session){
-					this.bus.send({type:'connectScreen'})
+					this.bus.send({type:'connectScreen', name:this.screenname})
 				}
 			}  
 			else if(msg.type == 'webrtcOffer'){
@@ -128,14 +162,36 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 				if(obj) obj[msg.attribute] = msg.value
 			}
 			else if(msg.type == 'method'){
-				// lets call our method on root.
-				if(!this.root[msg.method]){
-					return console.log('Rpc call received on nonexisting method ' + msg.method)
+				// someone is calling a method on us. 
+				method = this.screen[msg.method]
+				if(!method){
+					return console.log("Invalid rpc method" + msg.method)
 				}
-				RpcProxy.handleCall(this.root, msg, this.bus)
+				var ret = method.apply(this.screen, msg.args)
+				var uid = msg.uid
+				if(ret && typeof ret === 'object' && ret.then){ // promise
+					ret.then(function(result){
+						var rmsg = {type:'return', uid:uid, value:result}
+						if(!RpcProxy.isJsonSafe(result)){
+							console.log("Rpc return value not json safe" + msg.method)
+							rmsg.error = 'Return value not json safe'
+							rmsg.value = undefined
+						}
+						socket.send(rmsg)
+					})
+				}
+				else{
+					var rmsg = {type:'return', uid:uid, value:ret}
+					if(!RpcProxy.isJsonSafe(ret)){
+						console.log("Rpc return value not json safe" + msg.method)
+						rmsg.error = 'Return value not json safe'
+						rmsg.value = undefined
+					}
+					socket.send(rmsg)
+				}
 			}
 			else if (msg.type == 'return'){
-				this.rpcpromise.resolveResult(msg)
+				this.rpc.resolveReturn(msg)
 			}
 		}.bind(this)
 	}
@@ -150,36 +206,4 @@ define.class('$dreem/teem_base', function(require, exports, self, baseclass){
 		console.log.apply(console, args)
 	}
 
-	this.atConstructor = function(previous, parent){
-
-		this.parent = parent
-		
-		if(previous){
-			this.reload = (previous.reload||0)+1
-			console.log("Reload " + this.reload)
-		}
-
-		// how come this one doesnt get patched up?
-		baseclass.prototype.atConstructor.call(this)
-
-		// web environment
-		if(previous){
-			this.bus = previous.bus
-			this.rendered = true
-			this.rpcpromise = previous.rpcpromise
-		}
-		else this.createBus()
-
-		if(!parent) window.teem = this
-
-		this.renderComposition()
-
-		// alright now we find the screen we wanna render somehow
-		if(!this.screens.browser){
-			this.screen = this.screens.instance_children[0]			
-		}
-		else this.screen = this.screens.browser
-
-		if(previous || parent) this.doRender(previous, parent)
-	}
 })

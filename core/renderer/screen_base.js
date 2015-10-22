@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class('$base/nodeworker', function(require, exports, self){
+define.class('$base/node', function(require, exports, self){
 	var AnimTrack = require('$animation/animtrack')
 
 	this.init = function(){

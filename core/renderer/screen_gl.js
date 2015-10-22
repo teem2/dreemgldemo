@@ -8,7 +8,6 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	var GLTexture = require('$gl/gltexture')
 	var GLText = require('$gl/gltext')
 
-	var Sprite = require('./sprite_gl')
 	var Text = require('./text_gl')
 	var RenderState = require('./renderstate_gl')
 	var FlexLayout = require('$lib/layout')
@@ -22,7 +21,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	this.dirty = true
 	this.totaldirtyrect = {};
 	this.dirtyrectset = false;
-	this.debugshader =false;
+	this.debugshader = false;
 	
 	this.debug = false;
 	this.debugalldirtyrects = true;
@@ -41,7 +40,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		if(this.modal && this.modal.resolve)
 			return this.modal.resolve(value)
 	}
-
+	
 	// show a modal view.
 	this.openModal = function(object){
 	// <object> a constructor function for a set of visual elements. Works the same as the render function.

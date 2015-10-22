@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Sprite class
 
-define.class('$base/nodeworker', function(require, exports, self){
+define.class('$base/node', function(require, exports, self){
 
 	this.attribute("bgcolor", {type:vec4, value: "white"})
 	this.attribute("src", {type:String, value: ""})

@@ -11,7 +11,6 @@ define.class(function(require){
 	var FileWatcher = require('$server/filewatcher')
 	var HTMLParser = require('$parsers/htmlparser')
 	var ScriptError = require('$parsers/scripterror')
-	var dreem_compiler = require('$dreem/dreemcompiler')
 	var legacy_support = 0
 
 	this.atConstructor = function(
@@ -24,7 +23,12 @@ define.class(function(require){
 		this.name = name
 
 		this.busserver = new BusServer()
+
 		this.watcher = new FileWatcher()
+
+		// lets give it a session
+		this.session = Math.random() * 1000000
+
 		this.watcher.atChange = function(){
 			// lets reload this app
 			this.reload()
@@ -55,22 +59,35 @@ define.class(function(require){
 		this.myteem = undefined
 	}
 
+	this.readSystemClasses = function(basedir, out){
+		var dir = fs.readdirSync(define.expandVariables(basedir))
+		for(var i = 0; i < dir.length; i++){
+			var subitem = basedir + '/' + dir[i]
+			var stat = fs.statSync(define.expandVariables(subitem))
+			if(stat.isDirectory()){
+				this.readSystemClasses(subitem, out)
+			}
+			else{
+				var clsname = dir[i].replace(/\.js$/, '')
+				if(clsname in out){
+					console.log("WARNING DUPLICATE CLASS: " + subitem + " ORIGINAL:" + out[clsname])
+				}
+				out[clsname] = subitem
+			}
+		}
+	}
+
 	this.reload = function(){
 		console.color("~bg~Reloading~~ composition\n")
 		this.destroy()
 
-		var dir = fs.readdirSync(define.expandVariables('$classes'))
-		var system_classes = this.system_classes = {}
-		for(var i = 0; i<dir.length; i++){
-			var clsname = dir[i].replace(/\.js$/, '')
-			system_classes[clsname] = '$classes/'+clsname
-		}
+		this.readSystemClasses('$classes', this.system_classes = {})
 
 		// lets fill 
 		require.clearCache()
 
 		// ok, we will need to compute the local classes thing
-		define.system_classes = system_classes
+		define.system_classes = this.system_classes
 
 		// lets figure out if we are a direct .js file or a 
 		// directory with an index.js 
@@ -103,8 +120,8 @@ define.class(function(require){
 
 		// lets load up the teem nodejs part
 		try{
-			var TeemServer = require(this.index_real)
-			this.teem = new TeemServer(this.busserver)
+			var Composition = require(this.index_real)
+			this.composition = new Composition(this.busserver, this.session)
 		}
 		catch(e){
 			console.log(e.stack)
@@ -136,8 +153,8 @@ define.class(function(require){
 			'      atMain:function(require, modules){\n'+
 			'        define.endLoader()\n'+
 			'		 define.global(require(modules[0]))\n'+
-			'		 var TeemClient = require(modules[1])\n'+
-			'        define.rootTeemClient = new TeemClient(define.rootTeemClient)\n'+
+			'		 var Composition = require(modules[1])\n'+
+			'        define.rootComposition = new Composition(define.rootComposition)\n'+
 			'      },\n'+
 			'	   atEnd:function(){\n'+
 			'         define.startLoader()\n'+
@@ -152,7 +169,8 @@ define.class(function(require){
 	}
 
 	this.request = function(req, res){
-		var app = req.url.split('/')[2] || 'browser'
+		var base = req.url.split('?')[0]
+		var app = base.split('/')[2] || 'browser'
 		// ok lets serve our Composition device 
 
 		if(req.method == 'POST'){
@@ -162,7 +180,7 @@ define.class(function(require){
 			req.on('end', function(){
 				try{
 					var json = JSON.parse(buf)
-					this.myteem.postAPI(json, {send:function(msg){
+					this.composition.postAPI(json, {send:function(msg){
 						res.writeHead(200, {"Content-Type":"text/json"})
 						res.write(JSON.stringify(msg))
 						res.end()
