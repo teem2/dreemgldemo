@@ -1,5 +1,5 @@
 //Pure JS based composition
-define.class(function(require, teem, screens, screen, view, text){
+define.class(function(composition, require, screens, screen, view, text){
 	var imgload = require('$parsers/imageparser')
 
 function Pluck( ctx ) {

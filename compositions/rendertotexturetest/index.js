@@ -1,5 +1,5 @@
 // this is the teem object for the composition
-define.class(function(teem, screens, browser){
+define.class(function(composition, screens, browser){
 	this.render = function(){
 		return [
 			screens(

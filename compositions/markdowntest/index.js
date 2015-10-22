@@ -1,5 +1,5 @@
 //Pure JS based composition
-define.class(function(teem, docviewer, fileio, screens, screen, dataset, splitcontainer, treeview, view, text, require, scrollcontainer, markdown){
+define.class(function(composition, docviewer, fileio, screens, screen, dataset, splitcontainer, treeview, view, text, require, scrollcontainer, markdown){
 
 	this.render = function(){
 		//console.log(t)

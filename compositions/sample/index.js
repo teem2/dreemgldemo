@@ -1,4 +1,4 @@
-define.class(function(teem, server, screens, screen, view, text, samplext$sserver, samplext$views$sview) {
+define.class(function(composition, server, screens, screen, view, text, samplext$sserver, samplext$views$sview) {
 
     this.render = function() {
         return [

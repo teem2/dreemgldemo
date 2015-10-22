@@ -1,5 +1,5 @@
 //Pure JS based composition
-define.class(function(teem, screens, screen, scrollcontainer, codeviewer){
+define.class(function(composition, screens, screen, scrollcontainer, codeviewer){
 	this.render = function(){ return [
 		screens( 
 			screen( 

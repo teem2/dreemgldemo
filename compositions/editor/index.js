@@ -1,5 +1,5 @@
 // this is the teem object for the composition
-define.class(function(teem, screens, fileio, visualeditor){
+define.class(function(composition, screens, fileio, visualeditor){
 	this.render = function(){
 		return [
 			fileio(),
