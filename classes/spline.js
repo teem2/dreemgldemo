@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite, text, view, button, icon){
+define.class(function(view, text, button, icon){
 
 	// 4 point bezier curve defined by 4 points
 	

@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite, view, button, text,screenoverlay){
+define.class(function(view, button, text,screenoverlay){
 	// menuitem provides standard "context menu" functionality, regularly found in menu's like the rightclick one. 
 	// if the menuitem has children - these children shall be shown as a modal popup on click. If the click function has been overridden, this functionality will not fire.
 	this.bgcolor = vec4("lightgray");

@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite, text, view){
+define.class(function(view, text){
 	// A fullscreen semitransparent overlay, for use under modal dialogs
 	
 	var screenoverlay = this.constructor;

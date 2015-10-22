@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite,view, menuitem){
+define.class(function(view, menuitem){
 	// container class for menuitem instances
 	this.bgcolor = vec4("lightgray" );	
 

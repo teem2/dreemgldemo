@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // ruler class
 
-define.class(function(sprite,  view, button, text){
+define.class(function(view, button, text){
 	// Create a tabcontrol - 1 tab for each instance-child. Each instance-child can provide a title and an icon property which will be used in the activation button for the tab.
 	
 

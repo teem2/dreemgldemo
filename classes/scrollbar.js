@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite, text, view){
+define.class(function(view, text){
 	
 	// Color of the draggable part of the scrollbar
 	this.attribute("draggercolor", {type: vec4, value: vec4("#9090b0")});

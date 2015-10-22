@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // ruler class
 
-define.class(function(sprite, text, view){
+define.class(function(view, text){
 	// the ruler shows a sideline every N ticks.
 	
 	// vertical or horizontal ruler.

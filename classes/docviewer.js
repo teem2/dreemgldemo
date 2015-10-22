@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite,view, require, text,foldcontainer,icon, markdown, codeviewer, button){
+define.class(function(view, require, text,foldcontainer,icon, markdown, codeviewer, button){
 	
 	this.bgcolor = vec4("transparent" );	
 	

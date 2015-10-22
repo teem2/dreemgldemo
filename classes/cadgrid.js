@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite,view, text){
+define.class(function(view, text){
 
 // The CADGrid class provides a simple way to fill a frame with a classic engineering grid. 
 // todo:

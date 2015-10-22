@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite,  view, scrollbar){
+define.class(function(view, scrollbar){
 
 	// The scrollcontainer wraps all its children in a movable frame with 2 scrollbars around it.
 	

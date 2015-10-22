@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // ruler class
 
-define.class(function(sprite, text, icon, view){
+define.class(function(view, text, icon){
 
 	// the foldcontainer shows/hides all its children when the top bar is clicked
 	

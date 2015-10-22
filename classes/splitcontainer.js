@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(sprite,  view, text){
+define.class(function(view, text){
 	// splitcontainer adds dragbars between nodes to make all the nodes resizable. 
 	
 	// should the splitter bars be introduced horizontally or vertically? 

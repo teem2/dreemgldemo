@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Sprite class
 
-define.class('./sprite_gl', function(require, exports, self){	
+define.class('./view_gl', function(require, exports, self){	
 	define.class(this, 'fg', require('$gl/gltext'), function(){})
 	define.class(this, 'cursor', require('$gl/glcursor'), function(){})
 	define.class(this, 'marker', require('$gl/glmarker'), function(){})
