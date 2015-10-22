@@ -1,4 +1,4 @@
-define.class(function(require, screen, view, text, cube, perspective3d, teapot, model, plane, button,sphere){
+define.class(function(require, screen, view, text, cube, perspective3d, teapot, model, plane, button,sphere, ballrotate){
 
 	this.bgcolor = vec4("#f0f0f0") 
 	this.padding = vec4(0);
@@ -27,9 +27,10 @@ define.class(function(require, screen, view, text, cube, perspective3d, teapot, 
 								}						
 							}, rot3d:vec3(PI/2,0,0), pos3d:vec3(0,1,0)})
 					)
-					,perspective3d({flex: 1, bgcolor:"transparent", aligself:"stretch", clipping: true, borderwidth:12, bordercolor:"black",fov:40, camera:vec3(0,0,-100)}
+					,perspective3d({name:"rotatableview", flex: 1, bgcolor:"transparent", aligself:"stretch", clipping: true, borderwidth:12, bordercolor:"black",fov:40, camera:vec3(0,0,-100)}
 						
-						,teapot({radius: 1, detail:4, pos3d:vec3(10,0,10), rot3d:vec3(PI/2,0,0)})
+						,ballrotate({init:function(){this.target= this.find("rotatableview");}, width:100, height:100})	
+						,teapot({position:"absolute" , radius: 1, detail:4, pos3d:vec3(10,0,10), rot3d:vec3(PI/2,0,0)})
 						,teapot({radius: 1, detail:4, pos3d:vec3(20,0,20), rot3d:vec3(PI/2,0,0)})
 						,teapot({radius: 1, detail:4, pos3d:vec3(30,0,30), rot3d:vec3(PI/2,0,0)})
 						,teapot({radius: 1, detail:4, pos3d:vec3(40,0,40), rot3d:vec3(PI/2,0,0)})
@@ -41,6 +42,7 @@ define.class(function(require, screen, view, text, cube, perspective3d, teapot, 
 						,sphere({radius: 1, pos3d:vec3(10,0,0)})
 						,sphere({radius: 1, pos3d:vec3(20,0,0)})
 					)
+					
 				)
 				,view({flex: 1, bgcolor:"rgba(40,220,255,150)", bordercolor:"transparent", flexdirection:"row" }
 				,perspective3d({clipping: true, flex: 1, bgcolor:"transparent" }
@@ -53,11 +55,8 @@ define.class(function(require, screen, view, text, cube, perspective3d, teapot, 
 				)
 				,perspective3d({flex:1, clipping: true, bgcolor:"transparent"}, 
 					cube({bgcolor: "black", rot3d:vec3(2,1,0)}))
-
+				)
 			)
-			)
-/*			*/
-/*			*/
 		]
 	}
 })

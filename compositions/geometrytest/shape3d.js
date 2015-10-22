@@ -130,17 +130,14 @@ define.class(function(require, sprite, text, view, icon){
 		this.viewmatrix = mat4.identity();				
 		
 		this.position = function() {						
-			var temp = (vec3(mesh.norm) * normalmatrix );			
-			
+			var temp = (vec3(mesh.norm) * normalmatrix );						
 			transnorm = temp.xyz;			
 			pos = vec4(mesh.pos, 1) * modelmatrix;
 			//pos2 = pos * lookatmatrix;
-			
 			return pos * flattenmatrix * matrix * viewmatrix; // * matrix *viewmatrix
 		}
 				
 		this.color = function() {
-
 			//return vec4("yellow") ;			
 			var n = noise.s2d(vec2(sin(mesh.uv.x*6.283)*0.215, sin(mesh.uv.y*6.283)));
 
@@ -149,7 +146,7 @@ define.class(function(require, sprite, text, view, icon){
 			var tn = normalize(transnorm.xyz);
 			var res = material.matcap(raydir, tn);//texture.sample(material.matcap(tn,raydir));
 			
-			var r1 = cross(raydir, vec3(0,1,0));
+			var r1 = cross(raydir, vec3(1,0,0));
 			var r2 = cross(raydir, r1);
 			
 			return texture.sample(-vec2(dot(tn, r1), dot(tn,r2)) * 0.5 + vec2(0.5)) * diffusecolor;

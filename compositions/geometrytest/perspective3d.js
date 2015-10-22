@@ -48,11 +48,11 @@ define.class(function(require, sprite, text, view, icon, teapot){
 	this.lookat = this.up = this.camera = function(){		
 	}
 
-	this.UpdateProjectionMatrix = function(){
-		this.UpdateLookAtMatrix();
+	this.updateProjectionMatrix = function(){
+		this.updateLookAtMatrix();
 	}
 	
-	this.UpdateLookAtMatrix = function(){
+	this.updateLookAtMatrix = function(){
 		this.lookatmatrix = mat4.lookAt(this.camera, this.lookat, this.up);		
 	}
 		
@@ -74,13 +74,14 @@ define.class(function(require, sprite, text, view, icon, teapot){
 		adjust2 = mat4.transpose(mat4.translate(mat4.transpose(adjust2), vec3(w/2, h/2, 0)));
 
 		renderstate.adjustmatrix  = mat4.mul(adjust,adjust2);		
-		renderstate.flattenmatrix = mat4.mul(mat4.mul(this.lookatmatrix, this.projectionmatrix),renderstate.adjustmatrix); 		
+		this.flattenmatrix = mat4.mul(mat4.mul(this.lookatmatrix, this.projectionmatrix),renderstate.adjustmatrix); 		
+		renderstate.flattenmatrix = this.flattenmatrix;
 	}
 	
 	this.init = function() {
 		this.threedee = true;		
-		this.UpdateProjectionMatrix();
-		this.UpdateLookAtMatrix();
+		this.updateProjectionMatrix();
+		this.updateLookAtMatrix();
 	}
 
 })
