@@ -41,6 +41,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		this.screen = this.names.screens[this.screenname]
 		if(!this.screen){
 			this.screen = this.names.screens.constructor_children[0]			
+			this.screenname = this.screen.name || this.screen.constructor.name
 		}
 
 		if(previous || parent) this.doRender(previous, parent)
