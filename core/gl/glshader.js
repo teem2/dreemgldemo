@@ -15,7 +15,7 @@ define.class('$base/node', function(require, exports, self){
 	this.pal = require('$gl/glpalette')
 	this.shape = require('$gl/glshape')
 	this.math = require('$gl/glmath')
-	this.demos = require('$gl/gldemos')
+	this.demo = require('$gl/gldemo')
 	this.material = require('$gl/glmaterial')
 
 	this.RAD = '1'

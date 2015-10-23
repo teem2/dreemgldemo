@@ -31,8 +31,8 @@ define.class(function(composition, screens, screen, view, text){
 					return 10
 				}},
 				view({
-					size: vec2(200,200),
-					bgcolor: vec4('red'),
+					size: vec2(200, 200),
+					bgcolor: vec4('oce'),
 					init: function(){
 						console.log("calling test on s2")
 						this.rpc.screens.s2.test().then(function(result){

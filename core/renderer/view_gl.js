@@ -6,17 +6,104 @@ define.class('./view_base', function(require, exports){
 	var GLShader = require('$gl/glshader')
 	var GLTexture = require('$gl/gltexture')
 	var GLText = require('$gl/gltext')
+	var ViewGL = exports
 
-	var Sprite = this
 	this.dump = 1
-
-	exports.interfaceguid = 1
 	this.matrixdirty = true;
 	this.dirty = true
-	this.attribute("texturecache", {type:boolean, value:false})
-	
 	this.threedee = false;
+	this.texturecache = false
 	
+	this.init = function(){
+		this.bg_shader = new this.bg()
+		this.fg_shader = new this.fg()
+	}
+
+	this.reinit = function(obj){
+		
+		this.orientation = {
+			rotation : vec3(0, 0, 0), // (or {0,0,0} for 3d rotation)
+			translation : vec3(this.x != undefined? this.x: 0, this.y != undefined? this.y: 0, 0),
+			scale : vec3(1, 1, 1),
+			matrix : mat4.identity(), // calculated
+			worldmatrix : mat4.identity() // calculated
+		};
+		
+		this.texturecache = function(){
+			//console.log("setting texturecaching: ", this.texturecache);
+			this.enableTextureCache(this.texturecache);
+		}
+		/*
+		this.emit('rotation')
+		this.emit('y')
+		this.emit('x')
+	*/
+		this.visible = true
+		this.backgroundTexture = false;
+		this.texturecache = false;
+		this.effectiveopacity = this.opacity;
+
+		// if we have a bgimage, we have to set our bgimage function to something
+		if(this.bgimage){
+			// lets make the thing fetch a texture
+			this.bg_shader.texture = new GLTexture()
+			
+			if(this.bg_shader.bgcolorfn === this.plaincolor){
+				this.bg_shader.bgcolorfn = function(pos, dist){
+					var aspect = texture.size.y / texture.size.x
+					var center = (1. - aspect) * .5
+					var sam = vec2(pos.x * aspect + center, pos.y)
+					var col = texture.sample(sam)
+					if(sam.x< 0. || sam.x > 1.) col.a = 0.
+					return col
+				}
+			}
+
+			var imgload = function(result){
+				this.bg_shader.texture = GLTexture.fromImage(result)
+				if(isNaN(this.width)) this.width = this.bg_shader.texture.size[0]
+				if(isNaN(this.height)) this.height = this.bg_shader.texture.size[1]
+				this.reLayout()
+				this.setDirty(true)
+			}.bind(this)
+
+			if(typeof this.bgimage === 'string')
+				require.async(this.bgimage).then(imgload)
+			else
+				imgload(this.bgimage)
+		}
+
+		if (this.hasListeners('click') || this.hasListeners('mouseleftdown') || 
+			this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| 
+			this.hasListeners('mouseup') || this.hasListeners('mousemove') ||
+			this.hasListeners('mousewheelx') || this.hasListeners('mousewheely')){
+			this.has_mouse_interaction = true
+		}
+		else{			
+			this.has_mouse_interaction = false
+		}
+
+		this.screen.addDirtyNode(this);
+		if(!this.mode && this.parent) this.mode = this.parent.mode
+
+		if(this.mode === undefined || this.mode === 'GL'){
+			this.drawContent = this.drawContentGL
+		}
+		else if(this.mode === 'DOM'){
+			this.drawContent = this.drawContentDOM
+		}
+		else if(this.mode === 'Dali'){
+			this.drawContent = this.drawContentDali
+		}
+
+		this.interfaceguid = this.screen.allocGuid(this);
+		if (this.preDraw) this.screen.registerPredraw(this);
+		if (this.postDraw) this.screen.registerPostdraw(this);
+
+		this.effectiveguid = this.interfaceguid;
+	}
+
+	// dirty event hook
 	this.clipping =
 	this.bordercolor =
 	this.bgcolor =
@@ -51,11 +138,11 @@ define.class('./view_base', function(require, exports){
 		//this.dump = 1
 		this.height = 0
 		this.matrix = mat4.identity()
-		this.viewmatrix = mat4.identity();
+		this.viewmatrix = mat4.identity()
 		this.opacity = 0.0;
 		this.time = 0.1
 
-		this.bgcolorfn = Sprite.plaincolor 
+		this.bgcolorfn = ViewGL.prototype.plaincolor 
 
 		this.color = function(){
 			var dist = shape.roundedrectdistance(sized.xy + vec2( -1.,0.), width-1., height, radius.r, radius.a, radius.g, radius.b)
@@ -127,7 +214,9 @@ define.class('./view_base', function(require, exports){
 	}
 	
 	this.boundingRectCache = undefined;
+
 	this.lastdrawnboundingrect = {left:0, right: 0, top:0, bottom:0};
+
 	this.getLastDrawnBoundingRect = function(){
 		return this.lastdrawnboundingrect;
 	}
@@ -164,39 +253,36 @@ define.class('./view_base', function(require, exports){
 		}
 		return comp
 	}
-		
-	this.calcrectv1 = vec2();
-	this.calcrectv2 = vec2();
-	this.calcrectv3 = vec2();
-	this.calcrectv4 = vec2();
 	
+	var rectv1 = vec2(), rectv2 = vec2(), rectv3 = vec2(), rectv4 = vec2();
+
 	this.calculateBoundingRect = function(force){	
 		if (!this.orientation){
 			debugger
 			return {left:0, right:0, top:0, bottom:0}
 		}
 		if (this.matrixdirty || force === true){
-			//console.trace(" dirty matrix!");
-			this.recomputeMatrix();
+			this.recomputeMatrix()
 		}
-		var x1 = 0;
-		var x2 = this._size[0];
-		var y1 = 0;
-		var y2 = this._size[1];
+
+		var x1 = 0
+		var x2 = this._size[0]
+		var y1 = 0
+		var y2 = this._size[1]
 
 		if(this.layout){
-			x2 = this.layout.width;
-			y2 = this.layout.height;
+			x2 = this.layout.width
+			y2 = this.layout.height
 		}
 
-		var v1 = this.calcrectv1;
-		var v2 = this.calcrectv2;
-		var v3 = this.calcrectv3;
-		var v4 = this.calcrectv4;
-		v1[0] = x1;v1[1] = y1;
-		v2[0] = x2;v2[1] = y1;
-		v3[0] = x2;v3[1] = y2;
-		v4[0] = x1;v4[1] = y2;
+		var v1 = rectv1
+		var v2 = rectv2
+		var v3 = rectv3
+		var v4 = rectv4
+		v1[0] = x1, v1[1] = y1
+		v2[0] = x2, v2[1] = y1
+		v3[0] = x2, v3[1] = y2
+		v4[0] = x1, v4[1] = y2
 		
 		vec2.mul_mat4_t(v1, this.orientation.worldmatrix,v1)
 		vec2.mul_mat4_t(v2, this.orientation.worldmatrix,v2)
@@ -204,50 +290,49 @@ define.class('./view_base', function(require, exports){
 		vec2.mul_mat4_t(v4, this.orientation.worldmatrix,v4)		
 		//mat4.debug(this.orientation.worldmatrix,true);
 		//mat4.debug(this.orientation.matrix,true);
-		var minx = v1[0];
-		var miny = v1[1];
-		var maxx = v1[0];
-		var maxy = v1[1];
-		if (v2[0] < minx) minx = v2[0];else if (v2[0] > maxx) maxx = v2[0];
-		if (v3[0] < minx) minx = v3[0];else if (v3[0] > maxx) maxx = v3[0];
-		if (v4[0] < minx) minx = v4[0];else if (v4[0] > maxx) maxx = v4[0];
+		var minx = v1[0]
+		var miny = v1[1]
+		var maxx = v1[0]
+		var maxy = v1[1]
+		if (v2[0] < minx) minx = v2[0];else if (v2[0] > maxx) maxx = v2[0]
+		if (v3[0] < minx) minx = v3[0];else if (v3[0] > maxx) maxx = v3[0]
+		if (v4[0] < minx) minx = v4[0];else if (v4[0] > maxx) maxx = v4[0]
 		
-		if (v2[1] < miny) miny = v2[1];else if (v2[1] > maxy) maxy = v2[1];
-		if (v3[1] < miny) miny = v3[1];else if (v3[1] > maxy) maxy = v3[1];
-		if (v4[1] < miny) miny = v4[1];else if (v4[1] > maxy) maxy = v4[1];
+		if (v2[1] < miny) miny = v2[1];else if (v2[1] > maxy) maxy = v2[1]
+		if (v3[1] < miny) miny = v3[1];else if (v3[1] > maxy) maxy = v3[1]
+		if (v4[1] < miny) miny = v4[1];else if (v4[1] > maxy) maxy = v4[1]
 		
-		var ret = {left: minx, top: miny, right: maxx, bottom: maxy};
-		if (ret.left === 0 && ret.right === 0 && ret.top === 0 && ret.bottom === 0){
-//			debugger;
-		}
+		var ret = {left: minx, top: miny, right: maxx, bottom: maxy}
+		//if (ret.left === 0 && ret.right === 0 && ret.top === 0 && ret.bottom === 0){
+		//}
 		return ret
 	}
 	
 	
 	this.recomputeMatrix = function(){
 		
-		var o = this.orientation;
+		var o = this.orientation
 		if (!o) {
-			debugger;
-			return;
+			debugger
+			return
 		}
 		
 		if ((this.parent && this.parent.matrixdirty) || (this.parent && this.parent.hasLayoutChanged && this.parent.hasLayoutChanged()))  {
 			if (parent.recomputeMatrix){
-				parent.recomputeMatrix();
-				mat4.debug(parent.orientation.worldmatrix, true);
+				parent.recomputeMatrix()
+				mat4.debug(parent.orientation.worldmatrix, true)
 			}					
 		}
 	
 		o.rotation[2] = this._rotation * 6.283 / 360.0;
 		
 		if (this.layout) {
-			var s = o.scale;
-			var r = o.rotation;
-			var t = vec3(this.layout.left, this.layout.top, 0);
+			var s = o.scale
+			var r = o.rotation
+			var t = vec3(this.layout.left, this.layout.top, 0)
 			if (this._position === "absolute"){
-				t[0] = this._pos[0];
-				t[1] = this._pos[1];
+				t[0] = this._pos[0]
+				t[1] = this._pos[1]
 			}
 			var hw = ( this.layout.width !== undefined? this.layout.width: this._width ) /  2;
 			var hh = ( this.layout.height !== undefined ? this.layout.height: this._height) / 2;
@@ -257,16 +342,16 @@ define.class('./view_base', function(require, exports){
 			//console.log(this.layout)
 		}
 		else {
-			var s = o.scale;
-			var r = o.rotation;
-			var t = o.translation;
-			var hw = this._size[0] / 2;
-			var hh = this._size[1] / 2;
+			var s = o.scale
+			var r = o.rotation
+			var t = o.translation
+			var hw = this._size[0] / 2
+			var hh = this._size[1] / 2
 			mat4.TSRT(-hw, -hh, 0, s[0], s[1], s[2], r[0], r[1], r[2], t[0] + hw * s[0], t[1] + hh * s[1], t[2], this.orientation.matrix);
 				//for (var i =0 ;i<16;i++) if (isNaN(this.orientation.matrix[i] )) debugger;
 		}
 		
-		this.orientation.invertedworldmatrix = undefined;
+		this.orientation.invertedworldmatrix = undefined
 		if (this.parent ) {
 				if ( this.parent.orientation){
 					this.orientation.worldmatrix = mat4.mul(this.orientation.matrix,this.parent.orientation.worldmatrix );
@@ -278,165 +363,261 @@ define.class('./view_base', function(require, exports){
 					}
 				}
 		} else {
-			console.log("ehhhm");
-			this.orientation.worldmatrix = this.orientation.matrix;			
+			console.log("ehhhm")
+			this.orientation.worldmatrix = this.orientation.matrix		
 		}
 		
-		this.matrixdirty = false;
+		this.matrixdirty = false
 	}
-	
-	//this.init = function(){
-	//}
 	
 	this.destroy = function(){
-		if (this.preDraw) this.screen.unregisterPredraw(this);
-		if (this.postDraw) this.screen.unregisterPostdraw(this);
-		
-		//if(this.interfaceguid){
-		//	this.screen.freeGuid(this.interfaceguid);		
-		//	this.interfaceguid = 0
-		//}
-		//else debugger
+		if (this.preDraw) this.screen.unregisterPredraw(this)
+		if (this.postDraw) this.screen.unregisterPostdraw(this)
 	}
 	
-	this.orientation = {};
-	this.orientation.worldmatrix = mat4.identity();
-	
-	/*this.rotation = function(){
-		this.orientation.rotation[2] = this.rotation;
-		this.setDirty(true)
-		this.matrixdirty = true
-	}
-
-	this.y = function(){
-		this.orientation.translation[1] = this.y;
-		this.setDirty(true)
-		this.matrixdirty = true
-	}
-
-	this.x = function(){
-		this.orientation.translation[0] = this.x;
-		this.setDirty(true)
-		this.matrixdirty = true
-	}
-	*/
-
-	this.init = function(){
-		this.bg_shader = new this.bg()
-		this.fg_shader = new this.fg()
-	}
-
-	this.reinit = function(obj){
-		
-		this.orientation = {
-			rotation : vec3(0, 0, 0), // (or {0,0,0} for 3d rotation)
-			translation : vec3(this.x != undefined? this.x: 0, this.y != undefined? this.y: 0, 0),
-			scale : vec3(1, 1, 1),
-			matrix : mat4.identity(), // calculated
-			worldmatrix : mat4.identity() // calculated
-		};
-		
-		this.texturecache = function(){
-			//console.log("setting texturecaching: ", this.texturecache);
-			this.enableTextureCache(this.texturecache);
-		}
-		/*
-		this.emit('rotation')
-		this.emit('y')
-		this.emit('x')
-	*/
-		this.visible = true
-		this.backgroundTexture = false;
-		this.texturecache = false;
-		this.effectiveopacity = this.opacity;
-
-		// if we have a bgimage, we have to set our bgimage function to something
-		if(this.bgimage){
-			// lets make the thing fetch a texture
-			this.bg_shader.texture = new GLTexture()
-			
-			if(this.bg_shader.bgcolorfn === this.plaincolor){
-				this.bg_shader.bgcolorfn = function(pos, dist){
-					var aspect = texture.size.y / texture.size.x
-					var center = (1. - aspect) * .5
-					var sam = vec2(pos.x * aspect + center, pos.y)
-					var col = texture.sample(sam)
-					if(sam.x< 0. || sam.x > 1.) col.a = 0.
-					return col
-				}
-			}
-
-			var imgload = function(result){
-				this.bg_shader.texture = GLTexture.fromImage(result)
-				if(isNaN(this.width)) this.width = this.bg_shader.texture.size[0]
-				if(isNaN(this.height)) this.height = this.bg_shader.texture.size[1]
-				this.reLayout()
-				this.setDirty(true)
-			}.bind(this)
-
-			if(typeof this.bgimage === 'string')
-				require.async(this.bgimage).then(imgload)
-			else
-				imgload(this.bgimage)
-		}
-
-		if (this.hasListeners('click') || this.hasListeners('mouseleftdown') || 
-			this.hasListeners('mouseout') ||  this.hasListeners('mouseover')|| 
-			this.hasListeners('mouseup') || this.hasListeners('mousemove') ||
-			this.hasListeners('mousewheelx') || this.hasListeners('mousewheely')){
-			this.has_mouse_interaction = true
-		}
-		else{			
-			this.has_mouse_interaction = false
-		}
-
-		//this.shader = new this.Shader()
-		//this.textureshader = new this.TexturedShader()
-		//this.boundingrect = rect(0, 0, 0, 0);
-	
-	//	this.recomputeMatrix();
-		this.screen.addDirtyNode(this);
-		if(!this.mode && this.parent) this.mode = this.parent.mode
-
-		if(this.mode === undefined || this.mode === 'GL'){
-			this.drawContent = this.drawContentGL
-		}
-		else if(this.mode === 'DOM'){
-			this.drawContent = this.drawContentDOM
-		}
-		else if(this.mode === 'Dali'){
-			this.drawContent = this.drawContentDali
-		}
-
-		this.interfaceguid = this.screen.allocGuid(this);
-		if (this.preDraw) this.screen.registerPredraw(this);
-		if (this.postDraw) this.screen.registerPostdraw(this);
-
-		this.effectiveguid = this.interfaceguid;
-	}
+	this.orientation = {}
+	this.orientation.worldmatrix = mat4.identity()
 
 	this.renderQuad = function(texture, rect) {}
 
 	this.drawStencil = function (renderstate) {
-		this.bg_shader.matrix = renderstate.matrix;
-		this.bg_shader.viewmatrix = renderstate.viewmatrix;
+		this.bg_shader.matrix = renderstate.matrix
+		this.bg_shader.viewmatrix = renderstate.viewmatrix
 		
 		if (this.layout){
-			this.bg_shader.width = this.layout.width? this.layout.width:this.width;
-			this.bg_shader.height = this.layout.height? this.layout.height:this.height;
+			this.bg_shader.width = this.layout.width? this.layout.width:this.width
+			this.bg_shader.height = this.layout.height? this.layout.height:this.height
 		}
 		else{
-			this.bg_shader.width = this.width;
-			this.bg_shader.height = this.height;
+			this.bg_shader.width = this.width
+			this.bg_shader.height = this.height
 		}
-		this.bg_shader.draw(renderstate.device);
+		this.bg_shader.draw(renderstate.device)
 	}
 
 	this.show = function(){
 		if(!this.dom) return
 		this.dom.style.display = 'block'
 	}
+
+	// called by diffing
+	this.atDestroy = function(){
+
+		if (this.screen) this.screen.requestLayout();
+
+		if(this.dom) this.dom.parentNode.removeChild(this.dom)
+	}
+
+	this.drawContentDali = function(renderstate){
+
+	}
+
+	this.doDraw = function(renderstate){
+		this.bg_shader._time = this.screen.time
+		this.fg_shader._time = this.screen.time
+
+		this.bg_shader.draw(this.screen.device)
+		this.fg_shader.draw(this.screen.device)
+
+		// lets check if we have a reference on time
+		if(this.bg_shader.shader && this.bg_shader.shader.unilocs.time || 
+			this.fg_shader.shader && this.fg_shader.shader.unilocs.time){
+			//console.log('here')
+			this.screen.node_timers.push(this)
+		}
+	}
+
+	this.doDrawGuid = function(renderstate){
+		this.bg_shader._viewmatrix = renderstate.viewmatrix;		
+		
+		this.bg_shader.drawGuid(this.screen.device)
+	}
+
+	this.drawContentGL = function(renderstate){
+		//mat4.debug(this.orientation.matrix);
+		var bg = this.bg_shader
+		var fg = this.fg_shader
+		bg._viewmatrix = renderstate.viewmatrix
+		fg._viewmatrix = renderstate.viewmatrix
+		
+		var bound = this.getBoundingRect()
+
+		this.lastdrawnboundingrect.left = bound.left
+		this.lastdrawnboundingrect.right = bound.right
+		this.lastdrawnboundingrect.top = bound.top
+		this.lastdrawnboundingrect.bottom = bound.bottom
+
+		if (this.texturecache == false || this.texturecache == true && this.dirty){
+			// idea reference outer node using shader.node
+			// and 
+			if (this.matrixdirty) this.recomputeMatrix()
+			fg._matrix = bg._matrix = renderstate.matrix
+
+			if(this.layout){
+				this.bg_shader._width = this.layout.width? this.layout.width: this._width
+				this.bg_shader._height = this.layout.height? this.layout.height: this._height
+			}
+			else{
+				//console.log(this.layout.width);
+				this.bg_shader._width = this._width
+				this.bg_shader._height = this._height
+			}
 	
+			if (this.texturecache == false){
+				var myrect = rect(bound.left, bound.top, bound.right, bound.bottom);
+
+				var actuallyvisible = true
+				if (renderstate.cliprect){
+					actuallyvisible = rect.intersects(myrect, renderstate.cliprect);
+					if (actuallyvisible == false) 
+					{
+				//		console.log("rects: ", myrect, renderstate.cliprect);
+					}
+				} 
+				
+				if (isNaN(myrect[0])){
+					actuallyvisible = true;
+				}
+				if ( actuallyvisible == false && renderstate.drawmode == 0){
+					//console.log("hmm?");
+						//this.screen.debugtext(bound.left, bound.top+15, "ND" );
+					//console.log(myrect, renderstate.boundrect);
+					return false;
+				}
+			}
+			
+			bg._borderwidth = this._borderwidth[0]
+			//console.log(this.effectiveopacity);
+			fg._alpha = bg._alpha = this.effectiveopacity
+			fg._opacity = bg._opacity = this.effectiveopacity
+
+			fg._fgcolor = this._fgcolor
+			bg._bgcolor = this._bgcolor
+
+			bg._bordercolor = this._bordercolor
+			bg._radius = this._cornerradius
+
+			fg.screen = this.screen
+			bg.screen = this.screen
+			
+			
+			if(renderstate.drawmode === 2){
+				var type = bg.drawDebug(this.screen.device)
+				if(type) renderstate.debugtypes.push(type)
+				type = fg.drawDebug(this.screen.device)
+				if(type) renderstate.debugtypes.push(type)
+			}
+			else if(renderstate.drawmode === 1){
+				if(this.has_mouse_interaction){
+					this.effectiveguid = this.interfaceguid;
+				}
+				else{
+					this.effectiveguid = this.parent.effectiveguid;					
+				}
+				var r = ((this.effectiveguid &255)) / 255.0
+				var g = ((this.effectiveguid>>8) &255) / 255.0
+				var b = ((this.effectiveguid>>16) &255) / 255.0
+				bg._guid = vec4(r, g, b, 1.0)
+				this.doDrawGuid(renderstate)
+			}
+			else{
+				
+				this.doDraw(renderstate)
+			}
+			this.dirty = false;
+		} 
+		else {
+			console.log("Drawing cached content")
+			this.renderQuad(textureID, this.getBoundingRect())
+		}
+		//this.dirty = false;
+		return true
+	}
+	
+	this.drawContent = this.drawContentGL
+
+	this.hideContent = function(){
+		
+	}
+	
+	this.hasLayoutChanged = function(){
+		var changed = false
+		
+		if (this.layout && !this.lastLayout){
+				changed = true
+				this.lastLayout = {left:0, top:0, width:0, height:0, right: 0, bottom: 0}
+		}
+		if (!this.layout && this.lastLayout) changed = true
+		
+		if (this.layout){
+			if (this.layout.left != this.lastLayout.left) changed = true
+			if (this.layout.top != this.lastLayout.top) changed = true
+			if (this.layout.right != this.lastLayout.right) changed = true
+			if (this.layout.bottom != this.lastLayout.bottom) changed = true
+		}
+		if (changed){
+//			this.layoutchanged();
+//			this.setDirty();
+			//this.setDirty(true, this.lastLayout)
+		}
+		if (this.layout) this.lastLayout= {left:this.layout.left, top:this.layout.top, width:this.layout.width, height:this.layout.height, right: this.layout.right, bottom:this.layout.bottom};
+		return changed;
+	}
+	
+	this.draw = function(renderstate){
+		if (this.atDraw) this.atDraw(renderstate)
+		if (this.visible){
+			if (this.dirty != false || this.hasLayoutChanged()) {
+				//if(this.matrixdirty) 
+				this.recomputeMatrix();
+
+				this.effectiveopacity = this._opacity !== undefined ? this._opacity : 1.0;
+				if (this.parent !== undefined && this.parent.effectiveopacity !== undefined) {
+					this.effectiveopacity *= this.parent.effectiveopacity;
+				}
+			}
+
+			var prevmatrix = mat4.copy(renderstate.matrix)
+			this.orientation.worldmatrix = mat4.mul(this.orientation.matrix, renderstate.matrix)
+			renderstate.matrix = mat4.copy(this.orientation.worldmatrix)
+
+			var actuallyclipping = this._clipping == true || this.texturecache != false
+
+			if (actuallyclipping) renderstate.pushClip(this)
+
+			var onscreen = this.drawContent(renderstate) // should check against bounds?
+		//	onscreen = true;
+
+			if (actuallyclipping) renderstate.stopClipSetup();
+
+			if ((actuallyclipping && onscreen) || actuallyclipping == false) {
+				if (this.threedee){renderstate.setupPerspective();}
+				if (this.children) for (var i = 0; i < this.children.length; i++) {
+					var child = this.children[i]
+					if (child.draw) {
+						this.children[i].draw(renderstate);
+					}
+				}
+				if (this.threedee){renderstate.popPerspective();}
+			}
+			
+			if (actuallyclipping) renderstate.popClip(this);
+
+			renderstate.matrix = prevmatrix;
+		}
+		else this.hideContent()
+		//this.screen.device.redraw()
+	}
+
+	// give it keyboard focus
+	this.focus = function(){
+		this.screen.setFocus(this)
+	}
+
+	this.spawn = function (parent) {}
+
+	// DOM nodes
+
 	var lastindex = 1000
 	this.setDomFullscreen = function(set){
 		this._domfullscreen = set
@@ -492,10 +673,10 @@ define.class('./view_base', function(require, exports){
 			dom.style.transformOrigin = '0px 0px'
 			dom.style.transform = 'scaleX('+(1/scalex)+') scaleY('+(1/scalex)+')'
 			//dom.style.rotateY = '90degrees'
-			dom.style.width = (Math.floor(r.right - r.left))*scalex;
-			dom.style.height = (Math.floor(r.bottom - r.top))*scalex;
-			dom.style.left = Math.floor(r.left);
-			dom.style.top = Math.floor(r.top);	
+			dom.style.width = (Math.floor(r.right - r.left))*scalex
+			dom.style.height = (Math.floor(r.bottom - r.top))*scalex
+			dom.style.left = Math.floor(r.left)
+			dom.style.top = Math.floor(r.top)
 		//	console.log(r)	
 		}
 		else if(this._domfullscreen){
@@ -504,24 +685,7 @@ define.class('./view_base', function(require, exports){
 			dom.style.left = 0
 			dom.style.top = 0
 		}
-		 /*else
-		}
-
-
-		if(this.layout){
-			console.log(this.layout)
-			dom.style.width = this.layout.width? this.layout.width: this._width
-			dom.style.height = this.layout.height? this.layout.height: this._height
-			dom.style.left = this.layout.left
-			dom.style.top = this.layout.top
-		}
-		else{
-			//console.log(this.layout.width);
-			dom.style.width = this._width
-			dom.style.height = this._height
-		}*/
-
-
+		
 		dom.onload = function(){
 			window.addEventListener("message", function(msg){
 				// we received a closewindow from msg
@@ -542,225 +706,6 @@ define.class('./view_base', function(require, exports){
 		// we have to append it to our parent
 	}
 
-	// called by diffing
-	this.atDestroy = function(){
-
-		if (this.screen) this.screen.requestLayout();
-
-		if(this.dom) this.dom.parentNode.removeChild(this.dom)
-	}
-
-	this.drawContentDali = function(renderstate){
-
-	}
-
-	this.doDraw = function(renderstate){
-		this.bg_shader._time = this.screen.time
-		this.fg_shader._time = this.screen.time
-
-		this.bg_shader.draw(this.screen.device)
-		this.fg_shader.draw(this.screen.device)
-
-		// lets check if we have a reference on time
-		if(this.bg_shader.shader && this.bg_shader.shader.unilocs.time || 
-			this.fg_shader.shader && this.fg_shader.shader.unilocs.time){
-			//console.log('here')
-			this.screen.node_timers.push(this)
-		}
-	}
-
-	this.doDrawGuid = function(renderstate){
-		this.bg_shader._viewmatrix = renderstate.viewmatrix;		
-		
-		this.bg_shader.drawGuid(this.screen.device)
-	}
-
-	this.drawContentGL = function(renderstate){
-		//mat4.debug(this.orientation.matrix);
-			var bg = this.bg_shader
-			var fg = this.fg_shader
-			bg._viewmatrix = renderstate.viewmatrix;
-			fg._viewmatrix = renderstate.viewmatrix;
-			
-			var bound = this.getBoundingRect();
-
-			this.lastdrawnboundingrect.left = bound.left;
-			this.lastdrawnboundingrect.right = bound.right;
-			this.lastdrawnboundingrect.top = bound.top;
-			this.lastdrawnboundingrect.bottom = bound.bottom;
-
-		if (this._texturecache == false || this._texturecache == true && this.dirty){
-			// idea reference outer node using shader.node
-			// and 
-			if (this.matrixdirty) this.recomputeMatrix()
-			fg._matrix = bg._matrix = renderstate.matrix
-
-			if(this.layout){
-				this.bg_shader._width = this.layout.width? this.layout.width: this._width
-				this.bg_shader._height = this.layout.height? this.layout.height: this._height
-			}
-			else{
-				//console.log(this.layout.width);
-				this.bg_shader._width = this._width
-				this.bg_shader._height = this._height
-			}
-	
-			if (this._texturecache == false){
-						var myrect = rect(bound.left, bound.top, bound.right, bound.bottom);
-
-						var actuallyvisible = true;
-							if (renderstate.cliprect)
-							{
-								actuallyvisible = rect.intersects(myrect, renderstate.cliprect);
-								if (actuallyvisible == false) 
-								{
-							//		console.log("rects: ", myrect, renderstate.cliprect);
-								}
-							} 
-						
-						if (isNaN(myrect[0]))
-						{
-							actuallyvisible = true;
-						}
-						if ( actuallyvisible == false && renderstate.drawmode == 0)
-						{
-							//console.log("hmm?");
-								//this.screen.debugtext(bound.left, bound.top+15, "ND" );
-							//console.log(myrect, renderstate.boundrect);
-							return false;
-						}
-			}
-			
-			bg._borderwidth = this._borderwidth[0]
-			//console.log(this.effectiveopacity);
-			fg._alpha = bg._alpha = this.effectiveopacity
-			fg._opacity = bg._opacity = this.effectiveopacity
-
-			fg._fgcolor = this._fgcolor
-			bg._bgcolor = this._bgcolor
-
-			bg._bordercolor = this._bordercolor
-			bg._radius = this._cornerradius
-
-			fg.screen = this.screen
-			bg.screen = this.screen
-			
-			
-			if(renderstate.drawmode === 2){
-				var type = bg.drawDebug(this.screen.device)
-				if(type) renderstate.debugtypes.push(type)
-				type = fg.drawDebug(this.screen.device)
-				if(type) renderstate.debugtypes.push(type)
-			}
-			else if(renderstate.drawmode === 1){
-				if(this.has_mouse_interaction){
-					this.effectiveguid = this.interfaceguid;
-				}
-				else{
-					this.effectiveguid = this.parent.effectiveguid;					
-				}
-				var r = ((this.effectiveguid &255)) / 255.0
-				var g = ((this.effectiveguid>>8) &255) / 255.0
-				var b = ((this.effectiveguid>>16) &255) / 255.0
-				bg._guid = vec4(r, g, b, 1.0)
-				this.doDrawGuid(renderstate)
-			}
-			else{
-				
-				this.doDraw(renderstate)
-			}
-			this.dirty = false;
-		} 
-		else {
-			console.log("Drawing cached content");
-			this.renderQuad(textureID, this.getBoundingRect());
-		}
-		//this.dirty = false;
-		return true;
-	}
-	
-	this.drawContent = this.drawContentGL
-
-	this.hideContent = function(){
-		
-	}
-	this.lastLayout ;
-	
-	this.hasLayoutChanged = function(){
-		var changed = false;
-		
-		if (this.layout && !this.lastLayout){
-				changed = true
-				this.lastLayout = {left:0, top:0, width:0, height:0, right: 0, bottom: 0};
-		}
-		if (!this.layout && this.lastLayout) changed = true;
-		
-		if (this.layout){
-			if (this.layout.left != this.lastLayout.left) { changed = true;}
-			if (this.layout.top != this.lastLayout.top) { changed = true;}
-			if (this.layout.right != this.lastLayout.right) {changed = true;}
-			if (this.layout.bottom != this.lastLayout.bottom) { changed = true;}
-		}
-		if (changed){
-//			this.layoutchanged();
-//			this.setDirty();
-			//this.setDirty(true, this.lastLayout)
-		}
-		if (this.layout) this.lastLayout= {left:this.layout.left, top:this.layout.top, width:this.layout.width, height:this.layout.height, right: this.layout.right, bottom:this.layout.bottom};
-		return changed;
-	}
-	
-	this.draw = function(renderstate){
-		if (this.atDraw) this.atDraw(renderstate)
-		if (this.visible){
-			if (this.dirty != false || this.hasLayoutChanged()) {
-				//if(this.matrixdirty) 
-				this.recomputeMatrix();
-
-				this.effectiveopacity = this._opacity !== undefined ? this._opacity : 1.0;
-				if (this.parent !== undefined && this.parent.effectiveopacity !== undefined) {
-					this.effectiveopacity *= this.parent.effectiveopacity;
-				}
-			}
-
-			var prevmatrix = mat4.copy(renderstate.matrix);
-			this.orientation.worldmatrix = mat4.mul(this.orientation.matrix, renderstate.matrix);
-			renderstate.matrix = mat4.copy(this.orientation.worldmatrix);
-
-			var actuallyclipping = this._clipping == true || this._texturecache != false;
-
-			if (actuallyclipping) renderstate.pushClip(this);
-
-			var onscreen = this.drawContent(renderstate); // should check against bounds?
-		//	onscreen = true;
-
-			if (actuallyclipping) renderstate.stopClipSetup();
-
-			if ((actuallyclipping && onscreen) || actuallyclipping == false) {
-				if (this.threedee){renderstate.setupPerspective();}
-				if (this.children) for (var i = 0; i < this.children.length; i++) {
-					var child = this.children[i]
-					if (child.draw) {
-						this.children[i].draw(renderstate);
-					}
-				}
-				if (this.threedee){renderstate.popPerspective();}
-			}
-			
-			if (actuallyclipping) renderstate.popClip(this);
-
-			renderstate.matrix = prevmatrix;
-		}
-		else this.hideContent()
-		//this.screen.device.redraw()
-	}
-
-	// give it keyboard focus
-	this.focus = function(){
-		this.screen.setFocus(this)
-	}
-
-	this.spawn = function (parent) {}
 
 	this.hideProperty(Object.keys(this))
 

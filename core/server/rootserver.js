@@ -168,6 +168,7 @@ define.class(function(require, exports, self){
 			}
 
 			var header = {
+				"Connection":"Close",
 				"Cache-control":"max-age=0",
 				"Content-Type": mimeFromFile(file),
 				"ETag": stat.mtime.getTime() + '_' + stat.ctime.getTime() + '_' + stat.size
@@ -183,12 +184,16 @@ define.class(function(require, exports, self){
 			// lets add a gzip cache
 			var type = header["Content-Type"]
 			if(type !== 'image/jpeg' && type !== 'image/png'){
-				header["Content-encoding"] = "deflate"
+				//header["Content-Type"]+="; utf8"
+				header["Content-encoding"] = "gzip"
+				header["Transfer-Encoding"] = "gzip"
 				var gzip_file = path.join(this.cache_dir, requrl.replace(/\//g,'_')+header.ETag)
 				fs.stat(gzip_file, function(err, stat){
 					if(err){ // make it
 						fs.readFile(file, function(err, data){
-							zlib.deflate(data, function(err, compr){
+							zlib.gzip(data, function(err, compr){
+								//header["Content-length"] = compr.length
+								//console.log(compr.length)
 								res.writeHead(200, header)
 								res.write(compr)
 								res.end()

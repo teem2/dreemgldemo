@@ -3,16 +3,16 @@
 define.class(function(view, text){
 	
 	// Color of the draggable part of the scrollbar
-	this.attribute("draggercolor", {type: vec4, value: vec4("#9090b0")});
+	this.attribute("draggercolor", {type: vec4, value: vec4("#9090b0")})
 	
 	// Color when the mouse is hovering over the draggable part of the scrollbar
-	this.attribute("hovercolor", {type: vec4, value: vec4("#8080c0")});
+	this.attribute("hovercolor", {type: vec4, value: vec4("#8080c0")})
 	
 	// Color of the draggable part of the scrollbar while actively scrolling
-	this.attribute("activecolor", {type: vec4, value: vec4("#8080c0")});
+	this.attribute("activecolor", {type: vec4, value: vec4("#8080c0")})
 	
 	// Is this a horizontal or a vertical scrollbar? 
-	this.attribute("vertical", {type: Boolean, value: true});
+	this.attribute("vertical", {type: Boolean, value: true})
 	
 	// Current start offset of the scrollbar. Ranges from 0 to 1-page
 	this.attribute("offset", {type:float, value:0})
@@ -23,7 +23,7 @@ define.class(function(view, text){
 	var scrollbar = this.constructor;
 	
 	define.example(this, function Usage(){
-	return [scrollbar({vertical: false, height: 20, page: 0.2, offset: 0.5})]		
+		return [scrollbar({vertical: false, height: 20, page: 0.2, offset: 0.5})]		
 	})
 	
 	this.page = function(){
@@ -66,29 +66,29 @@ define.class(function(view, text){
 	
 	this.render = function(){
 		if (this.vertical){
-			this.bg_shader.color = this.vslider;
+			this.bg_shader.color = this.vslider
 		}
 		else {
-			this.bg_shader.color = this.hslider;	
+			this.bg_shader.color = this.hslider
 		}		
 	}
 
-	this.borderwidth  = 2;
-	this.margin = 1;
-	this.bordercolor = vec4("#303060");
+	this.borderwidth = 2
+	this.margin = 1
+	this.bordercolor = vec4("#303060")
 	
-	this.pressed = 0;
-	this.hovered = 0;
+	this.pressed = 0
+	this.hovered = 0
 		
 	this.mouseover  = function(){
-		this.hovered++;
+		this.hovered++
 		this.setDirty(true)
 	}
 	
-	this.attribute("bgcolor", {duration: 1.0});
+	this.attribute("bgcolor", {duration: 1.0})
 	
 	this.mouseout = function(){
-		this.hovered--;
+		this.hovered--
 		this.setDirty(true)
 	}
 	
@@ -117,7 +117,7 @@ define.class(function(view, text){
 			}
 		}
 		var start_offset = this.offset
-		this.onmousemove = function(pos){
+		this.mousemove = function(pos){
 			if(this.vertical){
 				var p = start_offset + (pos[1] - start[1]) / this.layout.height
 			}
@@ -133,28 +133,28 @@ define.class(function(view, text){
 	}
 	
 	this.mouseleftup = function(){
-		this.pressed--;
-		this.onmousemove = function(){}
+		this.pressed--
+		this.mousemove = function(){}
 		this.setDirty(true)
 	}
 
 	this.drawcount = 0;
 	this.atDraw = function(){
-		this.drawcount ++;
+		this.drawcount ++
 
 		this.bg_shader._offset = this._offset
 		this.bg_shader._page = this._page
 
 	//	console.log("atdraw button", this.drawcount);
 		if (this.pressed > 0){
-				this.bg_shader._draggercolor = this.activecolor;
+				this.bg_shader._draggercolor = this.activecolor
 		}
 		else{
 			if (this.hovered > 0){
-				this.bg_shader._draggercolor = this.hovercolor;
+				this.bg_shader._draggercolor = this.hovercolor
 			}
 			else{
-				this.bg_shader._draggercolor = this.draggercolor;
+				this.bg_shader._draggercolor = this.draggercolor
 			}
 		}
 	}

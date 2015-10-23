@@ -29,8 +29,6 @@ define.class('$base/node', function(require, exports, self){
 		}
 		return value
 	}
-
-
 	
 	this.attribute("w", {storage:'size', index:0, parser:percentParser})
 	this.attribute("h", {storage:'size', index:1, parser:percentParser})
@@ -157,7 +155,6 @@ define.class('$base/node', function(require, exports, self){
 		if (!this.screen) return
 		this.screen.addDirtyNode(this);
 		if(this.position !== 'absolute'){
-			console.log(this)
 			this.screen.requestLayout();
 		}
 	}

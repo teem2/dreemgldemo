@@ -16,23 +16,58 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 
 	this.attribute('locationhash', {type:Object})
 
-	this.layoutRequested = true;
-	
+	this.layoutRequested = true
 	this.dirty = true
-	this.totaldirtyrect = {};
-	this.dirtyrectset = false;
-	this.debugshader = false;
+	this.dirtyrectset = false
+	this.debugshader = false
+	this.debug = false
+	this.debugalldirtyrects = true
+	this.showdebugtext = true
+	this.renderstructure = false
+	this.lastx = -1
+	this.lasty = -1
 	
-	this.debug = false;
-	this.debugalldirtyrects = true;
-	this.showdebugtext = true;
-	this.renderstructure = false;
-	
-	this.lastx = -1;
-	this.lasty = -1;
+	this.state("postdraw_registry", "predraw_registry", "free_guids", 'locationhash', 'pic_tex','debug_tex','device','buf','mouse','keyboard','debugtextshader',
+		'utilityrectangle','debugrectangle','utilityframe','_init')
 
-	this.renderstate = new RenderState();
-	this.atConstructor = function(){}
+	this.atConstructor = function(){
+		this.renderstate = new RenderState()
+		this.totaldirtyrect = {}
+	}
+
+	this.initVars = function(){
+		this.guidmap = {}
+		this.guidmap[0] = this
+		this.mousecapture = false
+		this.mousecapturecount = false
+		this.lastmouseguid = 0
+		this.lastidundermouse = 0
+		this.effectiveguid = 0
+		this.interfaceguid = 1
+		this.readGuidTimeout = this.readGuidTimeout.bind(this)
+	}
+
+	this.init = function (parent) {
+		
+		this.debuglabels = []
+		this.decodeLocationHash()
+
+		this.pic_tex = GLTexture.rgba_depth_stencil(16, 16)
+		this.debug_tex = GLTexture.rgba_depth_stencil(16, 16)	
+		this.buf = new Uint8Array(4)
+		this.device = new GLDevice()
+		this.free_guids = []
+		this.predraw_registry = []
+		this.postdraw_registry = []
+		this.modal_stack = []
+
+		this.debugtextshader = new GLText()
+		this.debugtextshader.has_guid = false
+			
+		this.initDebugShaders()
+		this.initVars()
+		this.bindInputs()
+	}
 
 	// close top level modal view.
 	// <value> the return value for the promise of the modal. 
@@ -91,80 +126,13 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		return false
 	}
 	
-	this.debuglabels = []
-	this.frameconsolecounter = 0;
-	
-	this.frameconsoletext = function(text, color){
-		if (color === undefined) color = vec4("white");
-		this.debugtext(10, this.frameconsolecounter * 14, text, color);
-		this.frameconsolecounter++;
-	}
-	
-	this.debugtext = function(x,y,text,color){
-		return;
-		if (color === undefined) color = vec4("white");
-		this.debuglabels.push({x:x, y:y, text:text, color: color});	
-	}
-
-	this.logDebug = function(value){
-		console.log(value)
-		document.title = value
-	}
-
-	this.drawDebug = function(){
-		this.renderstate.setup(this.device, 2, 2,-this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
-		//this.renderstate.translate(-this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
-		this.renderstate.drawmode = 2;
-		this.renderstate.debugtypes = []
-		this.device.clear(vec4(0.5, 0.5, 0.5, 1))
-		this.device.gl.clearStencil(0);
-
-		for (var i = 0; i < this.children.length; i++) {
-			this.children[i].draw(this.renderstate)
-		}
-		this.device.gl.readPixels(1 * this.device.ratio, 1 * this.device.ratio, 1, 1, this.device.gl.RGBA, this.device.gl.UNSIGNED_BYTE, this.buf);
-		// lets decode the types
-		var type = this.renderstate.debugtypes[0]
-		if (type) {
-			if (this.buf[0] == 127 && this.buf[1] == 127 && this.buf[2] == 127) {
-				this.logDebug('no debug')
-			} 
-			else {
-				if (type == 'int') {
-					var i = this.buf[2] < 128 ? -this.buf[0] : this.buf[0]// + this.buf[1]*255
-						if (this.buf[1])
-							i += this.buf[1] * 256
-							this.logDebug(i)
-				}
-				if (type == 'float') {
-					var i = this.buf[2] < 128 ? -this.buf[0] / 255 : this.buf[0] / 255 // + this.buf[1]*255
-						if (this.buf[1])
-							i += this.buf[1]
-							this.logDebug(i)
-				}
-				if (type == 'vec2') {
-					this.logDebug('(' + this.buf[0] / 255 + ',' + this.buf[1] / 255 + ')')
-				}
-				if (type == 'ivec2') {
-					this.logDebug('(' + this.buf[0] + ',' + this.buf[1] + ')')
-				}
-				if (type == 'vec3') {
-					this.logDebug('(' + this.buf[0] / 255 + ',' + this.buf[1] / 255 + ',' + this.buf[2] / 255 + ')')
-				}
-				if (type == 'ivec3') {
-					this.logDebug('(' + this.buf[0] + ',' + this.buf[1] + ',' + this.buf[2] + ')')
-				}
-			}
-		}
-	}
-
 	this.drawGuid = function(){
-		this.renderstate.setup(this.device, 2, 2, this.mouse.x - 1, -this.device.size[1] + (this.mouse.y) + 1);
+		this.renderstate.setup(this.device, 2, 2, this.mouse.x - 1, -this.device.size[1] + (this.mouse.y) + 1)
 		//this.renderstate.translate(- this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
-		this.renderstate.drawmode = 1;
+		this.renderstate.drawmode = 1
 
 		this.device.clear(vec4(0, 0, 0, 1))
-		this.device.gl.clearStencil(0);
+		this.device.gl.clearStencil(0)
 		//this.device.clear(this.device.gl.STENCIL_BUFFER_BIT);
 		for (var i = 0; i < this.children.length; i++) {
 			this.children[i].draw(this.renderstate)
@@ -175,8 +143,8 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		//return
 		//return
 		this.device.gl.readPixels(1 * this.device.ratio, 1 * this.device.ratio, 1, 1, this.device.gl.RGBA, this.device.gl.UNSIGNED_BYTE, this.buf);
-		var id = this.buf[0] + (this.buf[1] << 8) + (this.buf[2] << 16);
-		this.lastidundermouse = id;
+		var id = this.buf[0] + (this.buf[1] << 8) + (this.buf[2] << 16)
+		this.lastidundermouse = id
 
 		if (this.mousecapture !== false) {
 			id = this.mousecapture;
@@ -188,10 +156,10 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	this.remapMouse = function(node){
 		if (node && node.getWorldMatrix){
 			var M = node.getWorldMatrix()
-			var screenw = this.device.main_frame.size[0] / this.device.main_frame.ratio;
-			var screenh = this.device.main_frame.size[1] / this.device.main_frame.ratio;
-			var M2 =mat4.ortho(0, screenw, 0, screenh, -100, 100);
-			var M3 = mat4.mul( M, M2);
+			var screenw = this.device.main_frame.size[0] / this.device.main_frame.ratio
+			var screenh = this.device.main_frame.size[1] / this.device.main_frame.ratio
+			var M2 = mat4.ortho(0, screenw, 0, screenh, -100, 100)
+			var M3 = mat4.mul( M, M2)
 			var M3i = mat4.invert(M3)
 			var R = vec2.mul_mat4_t(vec2(this.mouse.glx, this.mouse.gly), M3i)
 			return R
@@ -199,48 +167,48 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	}
 	
 	this.registerPredraw = function(node){
-		this.predraw_registry.push(node);
+		this.predraw_registry.push(node)
 	}
 	
 	this.unregisterPredraw = function(node){
-		var idx = this.predraw_registry.indexOf(node);
-		if (idx >-1) this.predraw_registry.splice(idx, 1);
+		var idx = this.predraw_registry.indexOf(node)
+		if (idx >-1) this.predraw_registry.splice(idx, 1)
 	}
 	
 	this.registerPostdraw = function(node){
-		this.postdraw_registry.push(node);
+		this.postdraw_registry.push(node)
 	}
 	
 	this.unregisterPostdraw = function(node){
-		var idx = this.postdraw_registry.indexOf(node);
-		if (idx >-1) this.postdraw_registry.splice(idx, 1);
+		var idx = this.postdraw_registry.indexOf(node)
+		if (idx >-1) this.postdraw_registry.splice(idx, 1)
 	}
 	
 	this.allocGuid = function(node){
 		if (this.free_guids.length > 0){
-			var reusedguid = this.free_guids.pop();
-			this.guidmap[reusedguid] = node;
-			return reusedguid;
+			var reusedguid = this.free_guids.pop()
+			this.guidmap[reusedguid] = node
+			return reusedguid
 		}
 		
-		var newguid = this.interfaceguid++;
-		this.guidmap[newguid] = node;
+		var newguid = this.interfaceguid++
+		this.guidmap[newguid] = node
 		return newguid;
 	}
 
 	this.freeGuid = function(guid){
 		var node = this.guidmap[guid]
-		this.guidmap[guid] = undefined;
-		this.free_guids.push(guid);
+		this.guidmap[guid] = undefined
+		this.free_guids.push(guid)
 	}
 	
 	this.setguid = function(id){
 
-		var screenw = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
-		var screenh = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
+		var screenw = this.device.main_frame.size[0] / this.device.main_frame.ratio
+		var screenh = this.device.main_frame.size[1] / this.device.main_frame.ratio
 		
-		this.mouse.glx = (this.mouse.x/(screenw/2))-1;
-		this.mouse.gly = -(this.mouse.y/(screenh/2)-1);				
+		this.mouse.glx = (this.mouse.x/(screenw/2)) - 1
+		this.mouse.gly = -(this.mouse.y/(screenh/2) - 1)
 
 		if(id != this.lastmouseguid || this.mouse.x != this.lastx || this.mouse.y != this.lasty){
 		
@@ -271,48 +239,12 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		}
 	}
 
-	this.hasDirtyRect = function()
-	{
-		return this.dirtyrectset;
+	this.hasDirtyRect = function(){
+		return this.dirtyrectset
 	}
 
-	this.drawColorFrames = 0;
-	this.renderBoundingBox = function(node, depth){	
-		
-		var bb = node.getBoundingRect();
-		
-		if (this.lastmouseguid == node.effectiveguid){
-			this.utilityrectangle.viewmatrix = this.renderstate.viewmatrix;
-			this.utilityrectangle.matrix = mat4.identity();
-			this.utilityrectangle.frame = this.renderstate.frame;
-			this.utilityrectangle.width = bb.right - bb.left;
-			this.utilityrectangle.height = bb.bottom - bb.top;
-			this.utilityrectangle.x = bb.left;
-			this.utilityrectangle.y = bb.top;
-			this.utilityrectangle.depth = depth;
-			this.utilityrectangle.draw(this.device);
-		}
-		else{
-		
-		}
-		
-		this.utilityframe.viewmatrix = this.renderstate.viewmatrix;
-		this.utilityframe.matrix = mat4.identity();
-		this.utilityframe.frame = this.renderstate.frame;
-		this.utilityframe.width = bb.right - bb.left;
-		this.utilityframe.height = bb.bottom - bb.top;
-		this.utilityframe.x = bb.left;
-		this.utilityframe.y = bb.top;
-		this.utilityframe.depth = depth;
-		this.utilityframe.draw(this.device);
-		
-		for(var i = 0; i < node.children.length; i++){
-			this.renderBoundingBox(node.children[i], depth + 1);
-		}
+	this.drawColorFrames = 0
 
-					
-					
-	}
 	this.drawColor = function(){
 		this.drawColorFrames++
 		var clippedrect = false
@@ -337,56 +269,43 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 				//	this.debugtext(0,0,"Full screen repaint: " + this.drawColorFrames);
 			}
 			else {
-				this.renderstate.setup(this.device);
-				clippedrect = true;
-				donesetup = true;
-				
-				this.utilityrectangle.viewmatrix = this.renderstate.viewmatrix;
-				this.utilityrectangle.matrix = mat4.identity();
-				this.utilityrectangle.frame = this.renderstate.frame;
+				this.renderstate.setup(this.device)
+				clippedrect = true
+				donesetup = true
 			
-				this.utilityrectangle.bgcolor = vec4("black");
-				
-		//		this.renderstate.pushClipRect(rect(0,0,0,0));
-				
-				this.utilityrectangle.width = w;
-				this.utilityrectangle.height = h;
-				this.utilityrectangle.x = this.totaldirtyrect.left;
-				this.utilityrectangle.y = this.totaldirtyrect.top;
-				
+				if(this.debug){
+					this.debugSetupUtilityRect(w, h)
+				}
 			//	this.utilityrectangle.draw(this.device);
-			
 				this.renderstate.cliprect =  rect(this.totaldirtyrect.left,this.totaldirtyrect.top,this.totaldirtyrect.left+ w,this.totaldirtyrect.top+ h);;
-			
 			//	this.renderstate.stopClipSetup();
 			}
 		}
 		
 		if (donesetup == false){
-			this.renderstate.setup(this.device);
-			this.device.gl.clearStencil(0);
+			this.renderstate.setup(this.device)
+			this.device.gl.clearStencil(0)
 		}
 
-		this.orientation = {};
-		this.orientation.worldmatrix = mat4.identity();
+		this.orientation = {}
+		this.orientation.worldmatrix = mat4.identity()
 		this.invertedworldmatrix =  mat4.invert(this.orientation.worldmatrix)
-		this.renderstate.debugmode = false;
-		this.renderstate.drawmode = 0;
+		this.renderstate.debugmode = false
+		this.renderstate.drawmode = 0
 		
 		if (this.renderstructure){
 			this.device.clear(vec4("black"))
 
 			for (var i = 0; i < this.children.length; i++){
-				this.renderBoundingBox(this.children[i],0)
+				this.debugRenderBoundingBox(this.children[i], 0)
 			}
 		} 
 		else {
 			
-			if (clippedrect)
-			{
-				this.device.gl.enable(this.device.gl.SCISSOR_TEST);
+			if (clippedrect){
+				this.device.gl.enable(this.device.gl.SCISSOR_TEST)
 				var ratio = this.device.ratio
-				this.device.gl.scissor(x*ratio, (devh -  y*ratio -h*ratio),w *ratio,h *ratio);
+				this.device.gl.scissor(x*ratio, (devh -  y*ratio -h*ratio),w *ratio,h *ratio)
 			}
 			
 			this.device.clear(this.bgcolor)
@@ -399,73 +318,12 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 				this.device.gl.disable(this.device.gl.SCISSOR_TEST);
 			}
 		}
-				
-		if (this.debug)
-		{
-			this.utilityframe.viewmatrix = this.renderstate.viewmatrix;
-			this.utilityframe.matrix = mat4.identity();
-			
-			if (this.dirtyrectset){			
-				this.utilityframe.width = this.totaldirtyrect.right - this.totaldirtyrect.left;
-				this.utilityframe.height = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
-				this.utilityframe.x =  this.totaldirtyrect.left;
-				this.utilityframe.y = this.totaldirtyrect.top;
-				this.utilityframe.draw(this.device);
-			}
-
-			this.utilityframe.frame = this.renderstate.frame;			
-			
-			if (this.debugalldirtyrects){
-				for (var i = 0; i < this.dirtyrects.length; i++){
-					var bb = this.dirtyrects[i];
-					this.utilityframe.width = bb.right - bb.left;
-					this.utilityframe.height = bb.bottom - bb.top;
-					this.utilityframe.x = bb.left;
-					this.utilityframe.y = bb.top;
-					this.utilityframe.depth = i;
-					this.utilityframe.draw(this.device);
-				}
-			}
-			
-			if (this.debuglabels.length > 0 ){
-				this.renderstate.setup(this.device);
 		
-				this.device.gl.clearStencil(0);
-				if (this.renderstate.scissor) this.device.gl.disable(this.device.gl.SCISSOR_TEST);
-				
-				this.debugtextshader.viewmatrix = this.renderstate.viewmatrix;
-				
-				if(this.showdebugtext == true){			
-					for(var a in this.debuglabels){
-						var label = this.debuglabels[a]
-						var textbuf = this.debugtextshader.newText()
-						textbuf.font_size = 12
-						textbuf.fgcolor = label.color
-						textbuf.bgcolor = label.color
-						textbuf.clear()
-						textbuf.add(label.text)
-					
-						var ofx = [-1, 0, 1,-1,1,-1,0,1,0]
-						var ofy = [-1,-1,-1, 0,0,1,1,1,0]
-						this.debugtextshader.mesh = textbuf;
-						this.debugtextshader.bgcolor = vec4("white");
-						this.debugtextshader.fgcolor = vec4("black");
-
-						for (var i =0 ; i < 9; i++){
-							var t = mat4.identity();
-							mat4.translate(t, vec3(label.x + ofx[i], label.y + ofy[i] + 10, 0), t);
-							mat4.transpose(t,t);
-							this.debugtextshader.matrix = t;
-							if (i == 8) this.debugtextshader.fgcolor = label.color;									
-							this.debugtextshader.draw(this.device);
-						}					
-					}
-				}
-				this.debuglabels = [];				
-			}
+		if (this.debug){
+			this.drawDebugShaders()
 		}
 		
-		this.dirtyrects = [];		
+		this.dirtyrects = []
 	}
 
 	this.readGuidTimeout = function(){
@@ -474,125 +332,108 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		this.readGuid()
 	}
 	
-	this.computeBoundingRects = function (node)
-	{
-			var total = 1;
-			//if (node.dirty === false) return;
-			if (node.getBoundingRect) 
-			{
-				var br = node.getBoundingRect(true);
-				var pr = node.getLastDrawnBoundingRect();
-				if (br.left != pr.left || br.top != pr.top || br.right != pr.right || br.bottom != pr.bottom) 
-				{
-//					console.log("rect changed: " , pr, br);
-					node.lastdrawnboundingrect = br;
-					this.addDirtyRect(br);
-					this.addDirtyRect(pr);
-//					this.bubbleDirty();
-				}
-				else{
-					if (node.dirtynode){
-						this.addDirtyRect(br);
-						node.dirtynode = false;
-					}
+	this.computeBoundingRects = function (node){
+		var total = 1;
+		//if (node.dirty === false) return;
+		if (node.getBoundingRect) {
+			var br = node.getBoundingRect(true)
+			var pr = node.getLastDrawnBoundingRect()
+			if (br.left != pr.left || br.top != pr.top || br.right != pr.right || br.bottom != pr.bottom) {
+				node.lastdrawnboundingrect = br
+				this.addDirtyRect(br)
+				this.addDirtyRect(pr)
+			}
+			else{
+				if (node.dirtynode){
+					this.addDirtyRect(br)
+					node.dirtynode = false
 				}
 			}
-			for(var a = 0; a < node.children.length; a++){
-				total += this.computeBoundingRects(node.children[a]);
-			}
-			return total;
-	
+		}
+		for(var a = 0; a < node.children.length; a++){
+			total += this.computeBoundingRects(node.children[a])
+		}
+		return total;
 	}
-	
-	this.layoutcount = 0;
 	
 	this.performLayout = function(){
 
-		this._width = this.device.main_frame.size[0]/ this.device.main_frame.ratio;
-		this._height = this.device.main_frame.size[1]/ this.device.main_frame.ratio;
-		this.size = [this._width, this._height];
-		this.pos = [0,0];
-		this.flexdirection = "column" ;
+		this._width = this.device.main_frame.size[0]/ this.device.main_frame.ratio
+		this._height = this.device.main_frame.size[1]/ this.device.main_frame.ratio
+		this.size = [this._width, this._height]
+		this.pos = [0,0]
+		this.flexdirection = "column" 
 		
-		this._top = 0;
-		this._left =0;
-		this._right = this._width;
-		this._bottom = this._height;
+		this._top = 0
+		this._left = 0
+		this._right = this._width
+		this._bottom = this._height
 
-		FlexLayout.fillNodes(this);	
-		var layouted = FlexLayout.computeLayout(this);
-		
+		FlexLayout.fillNodes(this)
+		var layouted = FlexLayout.computeLayout(this)
 	}
-this.draw_calls = 0
+	
+	this.draw_calls = 0
 		
 	this.draw = function (time) {
 		var anim = this.doAnimation(time)
-		this.draw_calls ++;	
+		this.draw_calls ++
 		
 		if (this.layoutRequested)  {
-			this.performLayout();
-			this.layoutRequested = false;
+			this.performLayout()
+			this.layoutRequested = false
 		}
 		
-		if (this.dirty === true) {		
-			this.rendering = false;
+		if (this.dirty === true) {
+			this.rendering = false
 
-			var computed = this.computeBoundingRects(this);
+			var computed = this.computeBoundingRects(this)
 
 			for(var a in this.predraw_registry){
-				this.predraw_registry[a].preDraw();				
+				this.predraw_registry[a].preDraw()
 			}
 		}
 		
-		this.time = time;
-		this.last_time = time;
+		this.time = time
+		this.last_time = time
 
 		if (this.moved === true && !this.mousecapture) {//} || this.dirty === true) {
 			this.moved = false
 			if (!this.pic_tex.frame_buf) this.pic_tex.allocRenderTarget(this.device)
 			this.device.setTargetFrame(this.pic_tex)
 			
-			this.rendering = true;
+			this.rendering = true
 			this.drawGuid()
-			this.rendering = false;
+			this.rendering = false
 			// make sure reading the texture is delayed otherwise framerate is destroyed
-			this.readGuidTimeout()			
+			this.readGuidTimeout()
 		}
 		
 		if (this.dirty === true) {
-		//	console.clear();
-		
-
-			
-			
 			this.device.setTargetFrame()
 
 			this.node_timers = []
 
-			this.rendering = true;
-			this.drawColor();
-			this.rendering = false;
-
-			
+			this.rendering = true
+			this.drawColor()
+			this.rendering = false
 			this.dirty = false
 
 			if (this.dirtyrectset){
-				this.lastdrawnboundingrect = this.totaldirtyrect;
+				this.lastdrawnboundingrect = this.totaldirtyrect
 			}
 			else{
-				this.lastdrawnboundingrect = this.getBoundingRect();
+				this.lastdrawnboundingrect = this.getBoundingRect()
 			}
 			
-			this.totaldirtyrect = {};
-			this.dirtyrectset = false;	
+			this.totaldirtyrect = {}
+			this.dirtyrectset = false
 
 			if(this.has_timers) this.setDirty(true)
 
-
 			for(var a in this.postdraw_registry){
-				this.postdraw_registry[a].postDraw(this.device);				
+				this.postdraw_registry[a].postDraw(this.device)
 			}
-				
 		}
 
 		if (this.debugshader === true) {
@@ -605,27 +446,31 @@ this.draw_calls = 0
 			this.node_timers[i].setDirty(true)
 		}
 
-
 		if(anim || this.hasListeners('time')) {
 			this.device.redraw()
 		}
 	}
-	
-	this.dirtyNodes = [];
+
+
+	// Dirty rect handling
+
+
+	this.dirtyNodes = []
 	
 	this.addDirtyNode =function(node){
 		if (this.rendering === true) return;
 		
-		this.dirtyNodes.push(node);	
-		node.dirtynode = true;
-		node.bubbleDirty();
+		this.dirtyNodes.push(node)
+		node.dirtynode = true
+		node.bubbleDirty()
 	}
 	
-	this.dirtyrects = [];
+	this.dirtyrects = []
 	
-	this.lastdrawnboundingrect = {left:0, right: 0, top:0, bottom:0};
+	this.lastdrawnboundingrect = {left:0, right: 0, top:0, bottom:0}
+
 	this.getLastDrawnBoundingRect = function(){
-		return this.getBoundingRect();
+		return this.getBoundingRect()
 	}
 	
 	this.getBoundingRect = function(){
@@ -635,109 +480,70 @@ this.draw_calls = 0
 	
 	this.addDirtyRect = function(rect, tag){				
 		// round to visible pixels.. round up.
-		var w = rect.right - rect.left;
-		var h = rect.bottom - rect.top;
-		if (w > 100) 
-		{
-			if (window.dbg) console.log(rect);
-		}
-		if (rect.width !== undefined)
-		{
-			debugger;
-		}
+		var w = rect.right - rect.left
+		var h = rect.bottom - rect.top
+
 		if (w == 0 || h == 0) {
 			//zero area rect;	
-		//	debugger;
-			return;
+			return
 		}
 		
-		var rrect = {bottom: Math.ceil(rect.bottom+1), right:  Math.ceil(rect.right+1), left:  Math.floor(rect.left-1), top: Math.floor(rect.top-1)};
-
-
+		var rrect = {bottom: Math.ceil(rect.bottom+1), right:  Math.ceil(rect.right+1), left:  Math.floor(rect.left-1), top: Math.floor(rect.top-1)}
 		
-		
-		this.dirtyrects.push(rect);
+		this.dirtyrects.push(rect)
 		
 		if (isNaN(w) || isNaN(h)) {
-			//console.log("NaN?");
-			//console.log(" nan node:
-			
-//			debugger;
 			return;
 		}
 		
-		if (this.debug){
+		//if (this.debug){
 		//	this.debugtext(rect.left, rect.top, rect.left + " " +rect.top +  " " + rect. right + " "+  rect.bottom, vec4("white") );	
-		}
+		//}
 		
 		if (this.dirtyrectset === true){	
 			//console.log("adding to existing dirtyrect: ", rect);	
-			this.totaldirtyrect.top = Math.min(this.totaldirtyrect.top, rrect.top);
-			this.totaldirtyrect.bottom = Math.max(this.totaldirtyrect.bottom, rrect.bottom);
-			this.totaldirtyrect.left = Math.min(this.totaldirtyrect.left, rrect.left);
-			this.totaldirtyrect.right = Math.max(this.totaldirtyrect.right, rrect.right);
+			this.totaldirtyrect.top = Math.min(this.totaldirtyrect.top, rrect.top)
+			this.totaldirtyrect.bottom = Math.max(this.totaldirtyrect.bottom, rrect.bottom)
+			this.totaldirtyrect.left = Math.min(this.totaldirtyrect.left, rrect.left)
+			this.totaldirtyrect.right = Math.max(this.totaldirtyrect.right, rrect.right)
 		}else{
 			//console.log("replacing existing dirtyrect: ", rect);	
-			this.totaldirtyrect = rrect;
+			this.totaldirtyrect = rrect
 		}
 		
-		//console.log("full dirty: ",this.totaldirtyrect, tag);		
-		//if (this.totaldirtyrect.right > 1998) debugger;
-		this.dirtyrectset = true;
+		this.dirtyrectset = true
 	}
 	
 	this.bubbleDirty = function(){
 		
-		if (this.screen.rendering) return;
+		if (this.screen.rendering) return
 		
-		this.dirty = true;
+		this.dirty = true
 		//this.moved = true;
-		if (this.device) this.device.redraw();
+		if (this.device) this.device.redraw()
 	}
 	
 	this.requestLayout = function(){
 		if (this.layoutRequested === true)  return
-		this.layoutRequested = true;
-		if (this.screen.rendering) return;
-		this.bubbleDirty();
+		this.layoutRequested = true
+		if (this.screen.rendering) return
+		this.bubbleDirty()
 	}
 	
 	this.atRender = function(){
-		this.requestLayout();
+		this.requestLayout()
 	}
 	
 	this.setDirty = function(){		
-		this.bubbleDirty();
-//		this.device.redraw();
+		this.bubbleDirty()
 	}
 
 	this.onmoved = function(value){
 		if (value === true && this.device !== undefined){
-			this.device.redraw();
+			this.device.redraw()
 		}
-		return value;
+		return value
 	}
-
-	this.click = function(){
-		if (this.lastmouseguid > 0) {
-			if (this.uieventdebug){
-				console.log(" clicked: " + this.guidmap[this.lastmouseguid].constructor.name);
-			}
-			var overnode = this.guidmap[this.lastmouseguid];
-			if (this.inModalChain(overnode) && overnode && overnode.emit) overnode.emit('click')
-		}
-	}
-
-	this.dblclick = function(){
-		if (this.lastmouseguid > 0) {
-			if (this.uieventdebug){
-				console.log(" clicked: " + this.guidmap[this.lastmouseguid].constructor.name);
-			}
-			var overnode = this.guidmap[this.lastmouseguid];
-			if (this.inModalChain(overnode) && overnode && overnode.emit) overnode.emit('dblclick')
-		}
-	}
-
 
 	this.copyProps = function(other){
 		// lets copy the old props
@@ -754,44 +560,11 @@ this.draw_calls = 0
 			this[key] = value
 		}
 	}
-	this.state('locationhash')
-	this.state("free_guids");
-	this.state("predraw_registry");
-	this.state("postdraw_registry");
-	
-	this.state('pic_tex','debug_tex','device','buf','mouse','keyboard','debugtextshader',
-		'utilityrectangle','debugrectangle','utilityframe','_init')
 
 	this.reinit = function(){
 		this.initVars()
 		this.bindInputs()
 	}
-	/*
-	this.diff = function(other, globals){
-		baseclass.prototype.diff.call(this, other, globals)
-		
-		for(i = 0; i < this.children.length; i++) this.children[i].parent = this
-		// alright now lets copy over the settings
-
-		this._init = 1
-/*
-		this.pic_tex = other.pic_tex
-		this.debug_tex = other.debug_tex
-		this.device = other.device
-		this.buf = other.buf
-		this.mouse = other.mouse
-		this.keyboard = other.keyboard
-		this.debugtextshader = other.debugtextshader
-		this.utilityrectangle = other.utilityrectangle
-		this.debugrectangle = other.debugrectangle
-		this.utilityframe = other.utilityframe
-
-		this.modal_stack = []//other.modal_stack
-		this.initVars()
-		this.bindInputs()
-
-		return this
-	}*/
 
 	this.setFocus = function(object){
 		if(this.focus_object !== object){
@@ -845,33 +618,6 @@ this.draw_calls = 0
 			findprev(this)
 			if(last) screen.setFocus(last)
 		}
-	}
-
-	this.decodeLocationHash = function(){
-		// lets split it on & into a=b pairs, 
-		var obj = {}
-		var parts = location.hash.slice(1).split(/\&/)
-		for(var i = 0; i < parts.length; i++){
-			var part = parts[i]
-			var kv = part.split(/=/)
-			if(kv.length === 1) obj[kv[0]] = true
-			else{
-				obj[kv[0]] = kv[1]
-			}
-		}
-		this.locationhash = obj
-	}
-
-	// dont fire this one
-	this.locationhash = function(obj){
-		var str = ''
-		for(var key in obj){
-			var value = obj[key]
-			if(str.length) str += '&'
-			if(value === true) str += key
-			else str += key + '=' + value
-		}
-		location.hash = '#' + str
 	}
 
 	this.bindInputs = function(){
@@ -953,8 +699,14 @@ this.draw_calls = 0
 			if(this.modal_miss){
 				this.modal_miss = false
 				return
-			}			
-			this.click();
+			}
+			if (this.lastmouseguid > 0) {
+				if (this.uieventdebug){
+					console.log(" clicked: " + this.guidmap[this.lastmouseguid].constructor.name);
+				}
+				var overnode = this.guidmap[this.lastmouseguid];
+				if (this.inModalChain(overnode) && overnode && overnode.emit) overnode.emit('click')
+			}
 		}.bind(this)
 
 		this.mouse.dblclick = function () {
@@ -962,7 +714,13 @@ this.draw_calls = 0
 				this.modal_miss = false
 				return
 			}			
-			this.dblclick();
+			if (this.lastmouseguid > 0) {
+				if (this.uieventdebug){
+					console.log(" clicked: " + this.guidmap[this.lastmouseguid].constructor.name);
+				}
+				var overnode = this.guidmap[this.lastmouseguid];
+				if (this.inModalChain(overnode) && overnode && overnode.emit) overnode.emit('dblclick')
+			}
 		}.bind(this)
 
 		this.mouse.wheelx = function(){
@@ -1001,34 +759,144 @@ this.draw_calls = 0
 			this.draw(time / 1000.)
 		}.bind(this)
 	}
-	
-	this.initVars = function(){
-		this.guidmap = {};
-		this.guidmap[0] = this;
-		this.mousecapture = false;
-		this.mousecapturecount = false;
-		this.lastmouseguid = 0;
-		this.lastidundermouse = 0;
-		this.effectiveguid = 0;
-		this.interfaceguid = 1;
-		this.readGuidTimeout = this.readGuidTimeout.bind(this)
+
+
+	// Location hash
+
+
+	this.decodeLocationHash = function(){
+		// lets split it on & into a=b pairs, 
+		var obj = {}
+		var parts = location.hash.slice(1).split(/\&/)
+		for(var i = 0; i < parts.length; i++){
+			var part = parts[i]
+			var kv = part.split(/=/)
+			if(kv.length === 1) obj[kv[0]] = true
+			else{
+				obj[kv[0]] = kv[1]
+			}
+		}
+		this.locationhash = obj
 	}
 
-	this.init = function (parent) {
-		this.decodeLocationHash()
+	// dont fire this one
+	this.locationhash = function(obj){
+		var str = ''
+		for(var key in obj){
+			var value = obj[key]
+			if(str.length) str += '&'
+			if(value === true) str += key
+			else str += key + '=' + value
+		}
+		location.hash = '#' + str
+	}
 
-		this.pic_tex = GLTexture.rgba_depth_stencil(16, 16)
-		this.debug_tex = GLTexture.rgba_depth_stencil(16, 16)	
-		this.buf = new Uint8Array(4);
-		this.device = new GLDevice()
-		this.free_guids = [];
-		this.predraw_registry = [];
-		this.postdraw_registry = [];
-		this.modal_stack = [];
-
-		this.debugtextshader = new GLText();
-		this.debugtextshader.has_guid = false;
 		
+	// DEBUG HELPERS
+
+
+	this.frameconsolecounter = 0;
+	
+	this.frameconsoletext = function(text, color){
+		if (color === undefined) color = vec4("white");
+		this.debugtext(10, this.frameconsolecounter * 14, text, color);
+		this.frameconsolecounter++;
+	}
+	
+	this.debugtext = function(x,y,text,color){
+		return;
+		if (color === undefined) color = vec4("white");
+		this.debuglabels.push({x:x, y:y, text:text, color: color});	
+	}
+
+	this.logDebug = function(value){
+		console.log(value)
+		document.title = value
+	}
+
+	this.debugRenderBoundingBox = function(node, depth){	
+		
+		var bb = node.getBoundingRect();
+		
+		if (this.lastmouseguid == node.effectiveguid){
+			this.utilityrectangle.viewmatrix = this.renderstate.viewmatrix;
+			this.utilityrectangle.matrix = mat4.identity();
+			this.utilityrectangle.frame = this.renderstate.frame;
+			this.utilityrectangle.width = bb.right - bb.left;
+			this.utilityrectangle.height = bb.bottom - bb.top;
+			this.utilityrectangle.x = bb.left;
+			this.utilityrectangle.y = bb.top;
+			this.utilityrectangle.depth = depth;
+			this.utilityrectangle.draw(this.device);
+		}
+		else{
+			
+		}
+		
+		this.utilityframe.viewmatrix = this.renderstate.viewmatrix;
+		this.utilityframe.matrix = mat4.identity();
+		this.utilityframe.frame = this.renderstate.frame;
+		this.utilityframe.width = bb.right - bb.left;
+		this.utilityframe.height = bb.bottom - bb.top;
+		this.utilityframe.x = bb.left;
+		this.utilityframe.y = bb.top;
+		this.utilityframe.depth = depth;
+		this.utilityframe.draw(this.device);
+		
+		for(var i = 0; i < node.children.length; i++){
+			this.debugRenderBoundingBox(node.children[i], depth + 1);
+		}
+	}
+
+	this.drawDebug = function(){
+		this.renderstate.setup(this.device, 2, 2,-this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
+		//this.renderstate.translate(-this.mouse.x + 1, this.device.size[1] - (this.mouse.y) - 1);
+		this.renderstate.drawmode = 2;
+		this.renderstate.debugtypes = []
+		this.device.clear(vec4(0.5, 0.5, 0.5, 1))
+		this.device.gl.clearStencil(0);
+
+		for (var i = 0; i < this.children.length; i++) {
+			this.children[i].draw(this.renderstate)
+		}
+		this.device.gl.readPixels(1 * this.device.ratio, 1 * this.device.ratio, 1, 1, this.device.gl.RGBA, this.device.gl.UNSIGNED_BYTE, this.buf);
+		// lets decode the types
+		var type = this.renderstate.debugtypes[0]
+		if (type) {
+			if (this.buf[0] == 127 && this.buf[1] == 127 && this.buf[2] == 127) {
+				this.logDebug('no debug')
+			} 
+			else {
+				if (type == 'int') {
+					var i = this.buf[2] < 128 ? -this.buf[0] : this.buf[0]// + this.buf[1]*255
+						if (this.buf[1])
+							i += this.buf[1] * 256
+							this.logDebug(i)
+				}
+				if (type == 'float') {
+					var i = this.buf[2] < 128 ? -this.buf[0] / 255 : this.buf[0] / 255 // + this.buf[1]*255
+						if (this.buf[1])
+							i += this.buf[1]
+							this.logDebug(i)
+				}
+				if (type == 'vec2') {
+					this.logDebug('(' + this.buf[0] / 255 + ',' + this.buf[1] / 255 + ')')
+				}
+				if (type == 'ivec2') {
+					this.logDebug('(' + this.buf[0] + ',' + this.buf[1] + ')')
+				}
+				if (type == 'vec3') {
+					this.logDebug('(' + this.buf[0] / 255 + ',' + this.buf[1] / 255 + ',' + this.buf[2] / 255 + ')')
+				}
+				if (type == 'ivec3') {
+					this.logDebug('(' + this.buf[0] + ',' + this.buf[1] + ',' + this.buf[2] + ')')
+				}
+			}
+		}
+	}
+
+	this.initDebugShaders = function(){
+
 		this.utilityframe = new GLShader();
 		this.utilityframe.has_guid = false;		
 		this.utilityframe.draw_type = "LINE_STRIP";
@@ -1088,9 +956,84 @@ this.draw_calls = 0
 		this.debugrectangle.matrix = mat4;
 		
 		this.debugrectangle.position = function(){return (vec2(mesh.x * width, mesh.y*height)  + vec2(x,y))* matrix * viewmatrix};
-		
-		
-		this.initVars();
-		this.bindInputs();
 	}
+
+	this.debugSetupUtilityRect = function(w, h){
+		this.utilityrectangle.viewmatrix = this.renderstate.viewmatrix
+		this.utilityrectangle.matrix = mat4.identity()
+		this.utilityrectangle.frame = this.renderstate.frame
+		this.utilityrectangle.bgcolor = vec4("black")
+		
+//		this.renderstate.pushClipRect(rect(0,0,0,0));
+		this.utilityrectangle.width = w
+		this.utilityrectangle.height = h
+		this.utilityrectangle.x = this.totaldirtyrect.left
+		this.utilityrectangle.y = this.totaldirtyrect.top
+	}
+
+	this.drawDebugShaders = function(){
+		this.utilityframe.viewmatrix = this.renderstate.viewmatrix;
+		this.utilityframe.matrix = mat4.identity();
+		
+		if (this.dirtyrectset){			
+			this.utilityframe.width = this.totaldirtyrect.right - this.totaldirtyrect.left;
+			this.utilityframe.height = this.totaldirtyrect.bottom - this.totaldirtyrect.top;
+			this.utilityframe.x =  this.totaldirtyrect.left;
+			this.utilityframe.y = this.totaldirtyrect.top;
+			this.utilityframe.draw(this.device);
+		}
+
+		this.utilityframe.frame = this.renderstate.frame;			
+		
+		if (this.debugalldirtyrects){
+			for (var i = 0; i < this.dirtyrects.length; i++){
+				var bb = this.dirtyrects[i];
+				this.utilityframe.width = bb.right - bb.left;
+				this.utilityframe.height = bb.bottom - bb.top;
+				this.utilityframe.x = bb.left;
+				this.utilityframe.y = bb.top;
+				this.utilityframe.depth = i;
+				this.utilityframe.draw(this.device);
+			}
+		}
+		
+		if (this.debuglabels.length > 0 ){
+			this.renderstate.setup(this.device);
+	
+			this.device.gl.clearStencil(0);
+			if (this.renderstate.scissor) this.device.gl.disable(this.device.gl.SCISSOR_TEST);
+			
+			this.debugtextshader.viewmatrix = this.renderstate.viewmatrix;
+			
+			if(this.showdebugtext == true){			
+				for(var a in this.debuglabels){
+					var label = this.debuglabels[a]
+					var textbuf = this.debugtextshader.newText()
+					textbuf.font_size = 12
+					textbuf.fgcolor = label.color
+					textbuf.bgcolor = label.color
+					textbuf.clear()
+					textbuf.add(label.text)
+				
+					var ofx = [-1, 0, 1,-1,1,-1,0,1,0]
+					var ofy = [-1,-1,-1, 0,0,1,1,1,0]
+					this.debugtextshader.mesh = textbuf;
+					this.debugtextshader.bgcolor = vec4("white");
+					this.debugtextshader.fgcolor = vec4("black");
+
+					for (var i =0 ; i < 9; i++){
+						var t = mat4.identity();
+						mat4.translate(t, vec3(label.x + ofx[i], label.y + ofy[i] + 10, 0), t);
+						mat4.transpose(t,t);
+						this.debugtextshader.matrix = t;
+						if (i == 8) this.debugtextshader.fgcolor = label.color;									
+						this.debugtextshader.draw(this.device);
+					}					
+				}
+			}
+			this.debuglabels = [];				
+		}		
+	}
+
+
 })

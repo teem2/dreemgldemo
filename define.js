@@ -1127,7 +1127,7 @@
 
 			function loadResource(url, from_file, recurblock, module_deps){
 				var ext = inext === undefined ? define.fileExt(url): inext;
-				
+
 				var abs_url, fac_url
 
 				if(url.indexOf('http:') === 0){ // we are fetching a url..

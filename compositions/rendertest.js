@@ -18,11 +18,11 @@ define.class(function(composition, screens, screen, view, text){
 		fileio({name:'fileio'}),
 		screens(
 			screen({
-				render:function(){
+				render: function(){
 					return view({
 						bg:{
 							color:function(){
-								return 'blue'
+								return demo.highdefblirpy(mesh.xy, time, 1)
 							}
 						},
 						init: function(){

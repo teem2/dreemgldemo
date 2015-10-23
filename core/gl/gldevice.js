@@ -37,8 +37,12 @@ define.class(function(require, exports, self){
 		}
 
 		this.gl = this.canvas.getContext('webgl', options) || 
-			this.canvas.getContext('webgl-experimental')
-
+			this.canvas.getContext('webgl-experimental', options) || 
+			this.canvas.getContext('experimental-webgl', options)
+		if(!this.gl){
+			console.log(this.canvas)
+			console.log("Could not get webGL context!")
+		}
 		// require derivatives
 		this.getExtension('OES_standard_derivatives')
 
