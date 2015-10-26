@@ -6,7 +6,7 @@ define.class(function(view, require, text,foldcontainer,icon, markdown, codeview
 	
 	// the class for which to create the documentation. If a string is assigned, the model will be interpreted as a markdown text document.
 	this.attribute("model",{})
-	this.state("model");
+
 	this.flex = 1.0
 	this.padding=20;
 	var Parser = require("$parsers/onejsparser");
@@ -48,13 +48,15 @@ define.class(function(view, require, text,foldcontainer,icon, markdown, codeview
 				
 				if (this.item.defvalue !== undefined){	
 					if (this.item.type === "vec4"){
-						var labeltext = (Math.round(this.item.defvalue[0]*100)/100) + ", " + 
-						(Math.round(this.item.defvalue[1]*100)/100) + ", " + 
-						(Math.round(this.item.defvalue[2]*100)/100) + ", " + 
-						(Math.round(this.item.defvalue[3]*100)/100) ;
+						var type  = define.typemap.types[this.item.type] ;
+						var defvalue = type(this.item.defvalue);
+						var labeltext = (Math.round(defvalue[0]*100)/100) + ", " + 
+						(Math.round(defvalue[1]*100)/100) + ", " + 
+						(Math.round(defvalue[2]*100)/100) + ", " + 
+						(Math.round(defvalue[3]*100)/100) ;
 						
-						var zwartdiff = this.item.defvalue[0] + this.item.defvalue[1] + this.item.defvalue[2];
-						var witdiff = (1-this.item.defvalue[0]) + (1-this.item.defvalue[1]) + (1-this.item.defvalue[2]);
+						var zwartdiff = defvalue[0] + defvalue[1] + defvalue[2];
+						var witdiff = (1-defvalue[0]) + (1-defvalue[1]) + (1-defvalue[2]);
 						var color = "black";
 						if (witdiff > zwartdiff) color = "white";
 						

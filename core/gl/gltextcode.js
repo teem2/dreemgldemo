@@ -5,6 +5,7 @@ define.class(function(require, exports){
 
 	exports.walk = function(ast, textbuf, add){
 		var glwalker = new this()
+		glwalker.line = 0
 		glwalker.textbuf = textbuf
 		glwalker.add = add
 		glwalker.expand(ast)
@@ -77,6 +78,7 @@ define.class(function(require, exports){
 
 
 	this.newline = function(){
+		this.line++
 		this.add('\n')
 	}
 
@@ -102,6 +104,10 @@ define.class(function(require, exports){
 
 	this.lastIsNewline = function(){
 		return this.textbuf.charCodeAt(this.textbuf.char_count - 1) === 10
+	}
+
+	this.lastCharCode = function(){
+		return this.textbuf.charCodeAt(this.textbuf.char_count - 1)
 	}
 
 	// expand ast node
@@ -160,7 +166,7 @@ define.class(function(require, exports){
 		this.bracketR(exports._Array, mygroup)
 	}
 
-	this.Object = function(n){//: { keys:3 },
+	this.Object = function(n, indent){//: { keys:3 },
 		var mygroup = this.group++
 		this.braceL(exports._Object, mygroup)
 		// allright so
@@ -187,11 +193,11 @@ define.class(function(require, exports){
 			if(has_newlines && !this.comments(prop.cmr)){
 				this.newline()
 			}
-
 		}
 		if(has_newlines){
-		 	this.comments(n.cm2)
-			if(this.lastIsNewline()) this.tab(old_indent)
+		 	//this.comments(n.cm2)
+		 	// check if we are in an argument list
+			if(this.lastIsNewline()) this.tab(indent?old_indent+1:old_indent)
 		}
 		this.indent = old_indent
 		this.braceR(exports._Object, mygroup)
@@ -487,7 +493,10 @@ define.class(function(require, exports){
 		this.parenL(exports._Function, mygroup)
 	
 		if(n.params) for(var i = 0; i < n.params.length; i++){
-			if(i) this.comma(exports._Function), this.space()
+			if(i){
+				this.comma(exports._Function), this.space()
+			}
+
 			this.expand(n.params[i])
 		}
 	
@@ -639,11 +648,30 @@ define.class(function(require, exports){
 		mygroup = this.group++
 		this.parenL(exports._Call, mygroup)
 
+		// if we get an argument with newlines
+		this.indent++
+		var line = this.line
 		for(var i = 0; i < n.args.length; i++){
-			if(i) this.comma(exports._Call), this.space()
-			this.expand(n.args[i])
+			if(i){
+				this.comma(exports._Call), this.space()
+				this.newline()
+				this.tab(this.indent)
+			}
+			var arg = n.args[i]
+			if(arg.type === 'Object'){
+				this.indent--
+				this.expand(arg, i < n.args.length - 1?true:false)
+				this.indent++
+			}
+			else{
+				this.expand(arg)
+			}
 		}
-
+		this.indent--
+		if(line !== this.line && this.lastCharCode() !== 125){
+			this.newline()
+			this.tab(this.indent)
+		}
 		this.parenR(exports._Call, mygroup)
 	}
 

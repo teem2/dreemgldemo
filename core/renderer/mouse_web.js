@@ -51,6 +51,7 @@ define.class('$base/node', function (require, exports, self){
 		window.addEventListener('wheel', function(e){
 			if(e.deltaX !== 0) this.wheelx = e.deltaX
 			if(e.deltaY !== 0) this.wheely = e.deltaY
+			e.preventDefault()
 		}.bind(this))
 
 		var click_count = 0
