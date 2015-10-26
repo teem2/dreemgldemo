@@ -13,6 +13,8 @@ define.class(function(require, constructor){
 	onejsparser.parser_cache = {}
 	var wiredwalker = new WiredWalker()
 	
+	this.rpcproxy = false
+
 	this._atConstructor = function(){
 		// store the args for future reference
 		var args = this.constructor_args = Array.prototype.slice.call(arguments)
@@ -75,7 +77,7 @@ define.class(function(require, constructor){
 			if(!this.constructor_props) this.constructor_props = {}
 			this.constructor_props[key] = prop
 
-			if(key.indexOf('attr_') === 0) key = key.slice(5), type = 1
+			if(key.indexOf('attribute_') === 0) key = key.slice(10), type = 1
 			else if(key.indexOf('set_') === 0) key = key.slice(4), type = 2
 			else if(key.indexOf('get_') === 0) key = key.slice(4), type = 3
 			else if(key.indexOf('handle_') === 0) key = key.slice(7), type = 4
@@ -218,7 +220,7 @@ define.class(function(require, constructor){
 		return this['_cfg_' + key]
 	}
 
-	this.isWired = function(key){
+	this.has_wires = function(key){
 		var wiredfn_key = '_wiredfn_' + key
 		return wiredfn_key in this
 	}
@@ -348,6 +350,16 @@ define.class(function(require, constructor){
 		this['_wiredfn_'+key] = value
 	}
 
+	this.parseWiredString = function(string){
+		if(string.charAt(0) !== '$' || string.charAt(1) !== '{' || string.charAt(string.length - 1) !== '}'){
+			return string
+		}
+		src = "return " + string.slice(2,-1)
+		var fn = new Function(src)
+		fn.is_wired = true
+		return fn
+	}
+
 	this.attribute = function(key, config){
 		if(!this.hasOwnProperty('_attributes')){
 			this._attributes = this._attributes?Object.create(this._attributes):{}
@@ -373,8 +385,14 @@ define.class(function(require, constructor){
 
 		var init_value = key in this? this[key]:config.value
 		if(init_value !== undefined && init_value !== null){
-			if(typeof init_value === 'function') this[init_value.isWired? wiredfn_key: on_key] = init_value
-			else this[value_key] = config.type(init_value)
+			if(typeof init_value === 'string' && init_value.charAt(0) === '$') init_value = this.parseWiredString(init_value)
+			if(typeof init_value === 'function'){
+				if(init_value.is_wired) this.setWiredAttribute(key, init_value)
+				else this[on_key] = init_value
+			}
+			else{
+				this[value_key] = config.type(init_value)
+			}
 		}
 		this._attributes[key] = this[config_key] = config
 		
@@ -387,9 +405,10 @@ define.class(function(require, constructor){
 			var storage_key = '_' + config.storage
 			
 			setter = function(value){
+				if(typeof value === 'string' && value.charAt(0) === '$') value = this.parseWiredString(value)
 				if(this[set_key] !== undefined) value = this[set_key](value)
 				if(typeof value === 'function' && (!value.prototype || Object.getPrototypeOf(value.prototype) === Object.prototype)){
-					if(value.isWired) this.setWiredAttribute(key, value)
+					if(value.is_wired) this.setWiredAttribute(key, value)
 					this[on_key] = value
 					return
 				}
@@ -419,50 +438,12 @@ define.class(function(require, constructor){
 			// initialize value
 			this[value_key] = this[storage_key][config.index]
 		}
-		else if(!config.type){
+		else {
 			setter = function(value){
+				if(typeof value === 'string' && value.charAt(0) === '$') value = this.parseWiredString(value)
 				if(this[set_key] !== undefined) value = this[set_key](value)
 				if(typeof value === 'function' && (!value.prototype || Object.getPrototypeOf(value.prototype) === Object.prototype)){
-					if(value.isWired) this.setWiredAttribute(key, value)
-					this[on_key] = value
-					return
-				}
-				if(typeof value === 'object' && value !== null && value.atAttributeAssign) value.atAttributeAssign(this, key)
-
-				var config = this[config_key]
-
-				this[value_key] = value;
-				
-				if(this.atAttributeSet !== undefined) this.atAttributeSet(key, value)
-				if(on_key in this || listen_key in this)  this.emit(key, value)
-			}
-		}
-		else if (config.type.primitive){
-			setter = function(value){
-				if(this[set_key] !== undefined) value = this[set_key](value)
-				if(typeof value === 'function' && (!value.prototype || Object.getPrototypeOf(value.prototype) === Object.prototype)){
-					if(value.isWired) this.setWiredAttribute(key, value)
-					this[on_key] = value
-					return
-				}
-				if(typeof value === 'object' && value !== null && value.atAttributeAssign) value.atAttributeAssign(this, key)
-
-				var config = this[config_key]
-				value = config.type(value)
-
-				if(config.motion  && this.startMotion(key, value)) return
-
-				this[value_key] = config.type(value)
-				
-				if(this.atAttributeSet !== undefined) this.atAttributeSet(key, value)
-				if(on_key in this || listen_key in this)  this.emit(key, value)
-			}
-		}
-		else{
-			setter = function(value){
-				if(this[set_key] !== undefined) value = this[set_key](value)
-				if(typeof value === 'function' && (!value.prototype || Object.getPrototypeOf(value.prototype) === Object.prototype)){
-					if(value.isWired) this.setWiredAttribute(key, value)
+					if(value.is_wired) this.setWiredAttribute(key, value)
 					this[on_key] = value
 					return
 				}
@@ -470,7 +451,7 @@ define.class(function(require, constructor){
 				
 				var config = this[config_key]
 
-				value = config.type(value)
+				if(config.type) value = config.type(value)
 
 				if(config.motion && this.startMotion(key, value)) return
 				
@@ -500,7 +481,6 @@ define.class(function(require, constructor){
 		var wiredfn_key = '_wiredfn_' + key
 		var wiredcl_key = '_wiredcl_' + key
 		var wiredfn = this[wiredfn_key]
-
 		var ast = onejsparser.parse(wiredfn.toString())
 		var state = wiredwalker.newState()
 
@@ -531,7 +511,7 @@ define.class(function(require, constructor){
 					}
 					obj.addListener(part, bindcall)
 
-					if(obj.isWired(part) && !obj.wiredCall(part)){
+					if(obj.has_wires(part) && !obj.wiredCall(part)){
 						obj.connectWiredAttribute(part)
 						if(!bindcall.deps) bindcall.deps = []
 						bindcall.deps.push(obj.wiredCall(part))
@@ -539,7 +519,6 @@ define.class(function(require, constructor){
 				}
 				else{
 					var newobj = obj[part]
-
 					if(!newobj){
 						if(obj === this){ // lets make an alias on this, scan the parent chain
 							while(obj){
@@ -550,7 +529,6 @@ define.class(function(require, constructor){
 									break
 								}
 								obj = obj.parent
-								if(obj === obj.parent) obj = undefined
 							}
 						}
 					}	
@@ -563,6 +541,7 @@ define.class(function(require, constructor){
 	}
 
 	this.connectWires = function(initarray, depth){
+
 		var immediate = false
 		if(!initarray) initarray = [], immediate = true
 

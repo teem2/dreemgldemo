@@ -679,7 +679,7 @@ define.class('$base/node', function(require, exports, self){
 			if(this.__lookupGetter__(key) || key.indexOf('_') === 0 ) continue
 			var prop = this[key]
 			// ok so, if we are a function
-			if(typeof prop === 'function' && prop.isWired){
+			if(typeof prop === 'function' && prop.is_wired){
 				this.attribute(key, {type:float32, wired:prop})
 			}
 			else if(typeof prop == 'function' || typeof prop === 'string'){

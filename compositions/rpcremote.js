@@ -4,10 +4,11 @@ define.class(function(composition, screens, screen, view, text, draggable){
 	this.render = function(){ return [
 		screens(
 			screen({
-				attr_mousepos:{type:vec2},
+				attribute_mousepos:{type:vec2, value:'${this.main.pos}'},
 				name:'mobile',
 				},
 				view({
+					name:'main',
 					size: vec2(200, 200),
 					bgcolor: vec4('blue'),
 					is: draggable(),
@@ -23,7 +24,8 @@ define.class(function(composition, screens, screen, view, text, draggable){
 				}},
 				view({
 					size: vec2(200, 200),
-					bgcolor: 'blue',
+					pos: '${this.rpc.screens.mobile.mousepos}',
+					bgcolor: 'red',
 					init: function(){
 						console.log("screen2")
 					}

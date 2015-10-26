@@ -23,16 +23,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		else response.send({type:'error', value:'please set type to rpcAttribute or rpcCall'})
 	}
 	
-
-	this.callRpc = function(msg){
-		return new Promise(function(resolve, reject){
-			this.callMethod(msg).then(function(result){
-				resolve(result)
-			}).catch(reject)
-		}.bind(this))
-	}
-
-	this.callMethod = function(msg){
+	this.handleRpcMethod = function(msg){
 		// lets make a promise
 		return new Promise(function(resolve, reject){
 			var parts = msg.rpcid.split('.')
@@ -78,7 +69,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 					})
 				}
 				else{
-					if(!RpcProxy.isJsonSafe(ret)){
+					if(!define.isSafeJSON(ret)){
 						rmsg.error = 'Result not json safe'
 						rmsg.ret = undefined
 						console.log("Rpc result is not json safe "+msg.rpcid+"."+msg.method)
@@ -88,6 +79,35 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				}
 			}
 		}.bind(this))
+	}
+
+	this.callRpcMethod = function(msg){
+		return new Promise(function(resolve, reject){
+			this.handleRpcMethod(msg).then(function(result){
+				resolve(result)
+			}).catch(reject)
+		}.bind(this))
+	}
+
+	this.setRpcAttribute = function(msg, socket){
+		var parts = msg.rpcid.split('.')
+
+		if(parts[0] !== 'screens'){ // set an attribute on a server local thing
+			var obj = this.names[parts[0]]
+			var value = RpcProxy.json
+			obj[msg.attribute] = msg.value
+		}
+		// lets send this attribute to everyone except socket
+		for(var scrkey in this.connected_screens){
+			var array = this.connected_screens[scrkey]
+			for(var i = 0; i < array.length; i++){
+				var sock = array[i]
+				if(sock === socket) continue
+				if(sock.readyState === 1){
+					sock.send(msg)
+				}
+			}
+		}
 	}
 
 	this.atConstructor = function(bus){
@@ -119,14 +139,10 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				socket.send({type:'connectScreenOK', index:index})
 			}
 			else if(msg.type == 'attribute'){
-				//this.rpc.handleAttribute(msg, socket)
-				// ok so if we get a setattribute, what we need is to forward it to all clients, not us
-				//bus.broadcast(msg, socket)
-				//var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
-				//if(obj) obj[msg.attribute] = msg.value
+				this.setRpcAttribute(msg, socket)
 			}
 			else if(msg.type == 'method'){
-				this.callMethod(msg).then(function(result){
+				this.handleRpcMethod(msg).then(function(result){
 					socket.send(result)
 				})
 			}

@@ -27,6 +27,8 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	this.lastx = -1
 	this.lasty = -1
 	
+	this.rpcproxy = false
+
 	this.state("postdraw_registry", "predraw_registry", "free_guids", 'locationhash', 'pic_tex','debug_tex','device','buf','mouse','keyboard','debugtextshader',
 		'utilityrectangle','debugrectangle','utilityframe','_init')
 
@@ -360,9 +362,9 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 
 		this._width = this.device.main_frame.size[0]/ this.device.main_frame.ratio
 		this._height = this.device.main_frame.size[1]/ this.device.main_frame.ratio
-		this.size = [this._width, this._height]
-		this.pos = [0,0]
-		this.flexdirection = "column" 
+		this._size = [this._width, this._height]
+		this._pos = [0,0]
+		this._flexdirection = "column" 
 		
 		this._top = 0
 		this._left = 0

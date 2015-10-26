@@ -92,7 +92,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 		}
 		if(typeof obj === 'string' || typeof obj === 'function'){
 			if(typeof obj === 'function'){
-				if(obj.isWired){
+				if(obj.is_wired){
 					state.uniforms[outname] = node.infer = float32
 					return outname
 				}

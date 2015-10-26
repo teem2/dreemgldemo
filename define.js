@@ -745,6 +745,7 @@
 						return out
 					}
 					// treat as array
+					if(arg0 === null  || arg0 === undefined) return out
 					if(arg0.struct || Array.isArray(arg0)){
 						for(var i = 0; i < mysize; i++) out[i] = arg0[i]
 						return out
@@ -935,6 +936,53 @@
 		}
 
 		return Struct
+	}
+
+	define.structFromJSON = function(node){
+		if (typeof(node) === "object" && node){
+			if  (node.____struct){
+				var lookup  = define.typemap.types[node.____struct] ;
+				return lookup.apply(null, node.data);
+			}
+			else{
+				for(var key in node){
+					node[key] = define.structFromJSON(node[key]);
+				}				
+			}
+		}
+		return node;
+	}
+
+	define.isSafeJSON = function(obj, stack){
+		if(obj === undefined || obj === null) return true
+		if(typeof obj === 'function') return false
+		if(typeof obj !== 'object') return true
+		if(!stack) stack = []
+		stack.push(obj)
+
+		if(Array.isArray(obj)){
+			for(var i = 0; i < obj.length; i++){
+				if(!define.isSafeJSON(obj[i])) return false
+			}
+			stack.pop()
+			return true
+		}
+
+		if(typeof obj.toJSON === 'function') return true
+
+		if(Object.getPrototypeOf(obj) !== Object.prototype) return false
+
+		for(var key in obj){
+			var prop = obj[key]
+			if(typeof prop == 'object'){
+				if(stack.indexOf(prop)!= -1) return false // circular
+				if(!define.isSafeJSON(prop, stack)) return false
+			}
+			else if(typeof prop == 'function') return false
+			// probably json safe then
+		}
+		stack.pop()
+		return true
 	}
 
 	define.struct.array_type = {}
@@ -1481,7 +1529,7 @@
 })(typeof define !== 'undefined' && define)
 
 Object.defineProperty(Function.prototype, 'wired', {get:function(){
-	this.isWired = true
+	this.is_wired = true
 	return this
 }, set:function(){throw new Error('cant set wired')}})
 
