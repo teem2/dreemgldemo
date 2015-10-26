@@ -118,7 +118,7 @@
 	}
 
 	define.localRequire = function(base_path, from_file){
-		function require(dep_path){
+		function require(dep_path, ext){
 			// skip nodejs style includes
 			var abs_path = define.joinPath(base_path, define.expandVariables(dep_path))
 			if(!define.fileExt(abs_path)) abs_path = abs_path + '.js'

@@ -10,13 +10,12 @@ define.class(function(composition, docviewer, fileio, screens, screen, dataset, 
 				init:function(){
 					// lets load the entire directory structure
 					this.rpc.fileio.readalldir('',['fonts','build','lib','server.js','favicon.ico','define.js','textures','gzcache','@/\\.','.git', '.gitignore']).then(function(result){
-						console.log("WE GOT RESULT")
+
 						var filetree = this.find('filetree')
 						var tree = result.value
 						tree.name = 'Documentation'
 						tree.collapsed = false
 						// lets make a dataset
-						console.log(result.value)
 						this.model = filetree.dataset = dataset(tree)
 					}.bind(this))
 					
@@ -24,11 +23,9 @@ define.class(function(composition, docviewer, fileio, screens, screen, dataset, 
 				render:function(){
 					if (this.locationhash && this.locationhash.path){
 						require.async(this.locationhash.path).then(function(module){
-							console.log(this.findChild('splitcontainer'));
 						this.find('docviewer').model = module		
 					}.bind(this))
 					}
-					console.log(this.locationhash);
 					return [
 				splitcontainer({ vertical: false, position: "relative", flexdirection: "row", bgcolor: "black", alignitems:"stretch", alignself: "stretch" , flex:1}
 					,view({flexdirection:"column", padding: 0, flex: 0.2}

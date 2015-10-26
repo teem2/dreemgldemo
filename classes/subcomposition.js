@@ -13,7 +13,7 @@ define.class(function(require, cadgrid){
 			return define.lookupClass(cls)
 		}
 
-		require.async('/compositions/' + this.composition + '/index.js').then(function(TeemClient){
+		require.async('/compositions/' + this.subcomposition + '/index.js').then(function(TeemClient){
 			define.atLookupClass = define.lookupClass
 			// alright lets load this thing up
 			this.sub_teem = new TeemClient(undefined, this)

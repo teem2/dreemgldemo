@@ -60,9 +60,9 @@ define.class(function(view, text){
 			this.setDirty(true);
 		}
 
-		this.mouseleftdown = function(){
+		this.mouseleftdown = function(pos){
 			this.pressed++;
-			this.dragstart = {x: this.mouse.x, y:this.mouse.y};
+			this.dragstart = {x: this.screen.mouse.x, y:this.screen.mouse.y};
 			
 			this.flexstart = 
 				{
@@ -77,8 +77,8 @@ define.class(function(view, text){
 				};
 
 			this.mousemove = function(a){				
-				var dx = this.mouse.x - this.dragstart.x;
-				var dy = this.mouse.y - this.dragstart.y;
+				var dx = this.screen.mouse.x - this.dragstart.x;
+				var dy = this.screen.mouse.y - this.dragstart.y;
 				
 				var leftnode = this.parent.children[this.firstnode];
 				var rightnode = this.parent.children[this.firstnode+2];

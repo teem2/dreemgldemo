@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // mouse debug class
 
-define.class(function(sprite, text, view,icon){
+define.class(function(view, text,icon){
 	
 	this.attribute("items", {type: int, value: 5});
 	this.attribute("cols", {type: int, value: 4});

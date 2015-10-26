@@ -8,6 +8,10 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	var GLTexture = require('$gl/gltexture')
 	var GLText = require('$gl/gltext')
 
+	var Mouse = require('$renderer/mouse_web')
+	var Keyboard = require('$renderer/keyboard_web')
+	var Touch = require('$renderer/touch_web')
+
 	var Text = require('./text_gl')
 	var RenderState = require('./renderstate_gl')
 	var FlexLayout = require('$lib/layout')
@@ -49,24 +53,44 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		this.readGuidTimeout = this.readGuidTimeout.bind(this)
 	}
 
-	this.init = function (parent) {
-		
+	this.init = function (previous) {
+
+		if(previous){
+			this.touch = previous.touch
+			this.mouse = previous.mouse
+			this.keyboard = previous.keyboard
+
+			this.pic_tex = previous.pic_tex
+			this.debug_tex = previous.debug_tex
+			this.device = previous.device
+			
+			this.utilityrectangle = previous.utilityrectangle
+			this.utilityframe = previous.utilityframe
+			this.debugrectangle = previous.debugrectangle
+			this.debugtextshader = previous.debugtextshader
+		}
+		else{
+			// otherwise lets reuse em
+			this.touch = new Touch()
+			this.mouse = new Mouse()
+			this.keyboard = new Keyboard()
+
+			this.pic_tex = GLTexture.rgba_depth_stencil(16, 16)
+			this.debug_tex = GLTexture.rgba_depth_stencil(16, 16)	
+			this.device = new GLDevice()
+
+			this.initDebugShaders()
+		}
+
 		this.debuglabels = []
 		this.decodeLocationHash()
 
-		this.pic_tex = GLTexture.rgba_depth_stencil(16, 16)
-		this.debug_tex = GLTexture.rgba_depth_stencil(16, 16)	
 		this.buf = new Uint8Array(4)
-		this.device = new GLDevice()
 		this.free_guids = []
 		this.predraw_registry = []
 		this.postdraw_registry = []
 		this.modal_stack = []
-
-		this.debugtextshader = new GLText()
-		this.debugtextshader.has_guid = false
 			
-		this.initDebugShaders()
 		this.initVars()
 		this.bindInputs()
 	}
@@ -563,11 +587,6 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		}
 	}
 
-	this.reinit = function(){
-		this.initVars()
-		this.bindInputs()
-	}
-
 	this.setFocus = function(object){
 		if(this.focus_object !== object){
 			if(this.focus_object) this.focus_object.emit('focuslost')
@@ -919,7 +938,6 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		this.utilityframe.height = 100;
 		this.utilityframe.position = function(){return (vec2(mesh.x * width, mesh.y*height)  + vec2(x,y))* matrix * viewmatrix};
 
-		
 		this.utilityrectangle = new GLShader();
 		this.utilityrectangle.has_guid = false;
 		
@@ -939,7 +957,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		this.utilityrectangle.matrix = mat4;
 		
 		this.utilityrectangle.position = function(){return (vec2(mesh.x * width, mesh.y*height)  + vec2(x,y))* matrix * viewmatrix};
-		
+
 		this.debugrectangle = new GLShader();
 		this.debugrectangle.has_guid = false;
 		this.debugrectangle.bgcolor1 = vec4(0.3,0.3,1.0,1.0);
@@ -958,6 +976,10 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		this.debugrectangle.matrix = mat4;
 		
 		this.debugrectangle.position = function(){return (vec2(mesh.x * width, mesh.y*height)  + vec2(x,y))* matrix * viewmatrix};
+
+		
+		this.debugtextshader = new GLText()
+		this.debugtextshader.has_guid = false
 	}
 
 	this.debugSetupUtilityRect = function(w, h){
