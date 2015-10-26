@@ -10,9 +10,14 @@ define.class(function(require, exports){
 		this.uid = 0
 	}
 
-	this.callRpc = function(name, msg){
+	this.methodRpc = function(name, msg){
 		msg.rpcid = name
-		return this.host.callRpc(msg)
+		return this.host.callRpcMethod(msg)
+	}
+
+	this.attributeRpc = function(name, msg){
+		msg.rpcid = name
+		return this.host.setRpcAttribute(msg)
 	}
 
 	this.resolveReturn = function(msg){

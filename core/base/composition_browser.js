@@ -91,11 +91,15 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		this.rendered = true
 	}
 
-	this.callRpc = function(msg){
+	this.callRpcMethod = function(msg){
 		var prom = this.rpc.allocPromise()
 		msg.uid  = prom.uid
 		this.bus.send(msg)
 		return prom
+	}
+
+	this.setRpcAttribute = function(msg){
+		this.bus.send(msg)
 	}
 
 	this.createBus = function(){
@@ -166,8 +170,22 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				//else obj.createIndex(msg.index, msg.rpcid, rpcpromise)
 			}
 			else if(msg.type == 'attribute'){
-				var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
-				if(obj) obj[msg.attribute] = msg.value
+				
+				var split = msg.rpcid.split('.')
+				// lets go set that value on our rpc object, but it cant bounce back.
+				var obj = this.rpc
+				for(var i = 0; i < split.length; i++){
+					obj = obj[split[i]]
+					if(!obj) return console.log("Invalid rpc attribute "+ msg.rpcid)
+				}
+				var value =  define.structFromJSON(msg.value)
+
+				// ok, now, key is that we do NOT want to trigger atAttributeSet?..
+				obj[msg.attribute] = value
+				
+				// so its either 
+				//var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
+				//if(obj) obj[msg.attribute] = msg.value
 			}
 			else if(msg.type == 'method'){
 				// someone is calling a method on us. 
@@ -180,7 +198,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				if(ret && typeof ret === 'object' && ret.then){ // promise
 					ret.then(function(result){
 						var rmsg = {type:'return', uid:uid, value:result}
-						if(!RpcProxy.isJsonSafe(result)){
+						if(!define.isSafeJSON(result)){
 							console.log("Rpc return value not json safe" + msg.method)
 							rmsg.error = 'Return value not json safe'
 							rmsg.value = undefined
@@ -190,7 +208,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				}
 				else{
 					var rmsg = {type:'return', uid:uid, value:ret}
-					if(!RpcProxy.isJsonSafe(ret)){
+					if(!define.isSafeJSON(ret)){
 						console.log("Rpc return value not json safe" + msg.method)
 						rmsg.error = 'Return value not json safe'
 						rmsg.value = undefined

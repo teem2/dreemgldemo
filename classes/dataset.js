@@ -60,26 +60,12 @@ define.class(function(require, node){
 	
 	// Convert all javascript binary arrays in to their correct objects.
 	// <node> the node to clean up.
-	function recursiveCleanup(node){
-		if (typeof(node) === "object"){
-			if  (node.____struct){
-				var lookup  = define.typemap.types[node.____struct] ;
-				return lookup.apply(null, node.data);
-			}
-			else{
-				for(var key in node){
-					node[key] = recursiveCleanup(node[key]);
-				}				
-			}
-		}
-		
-		return node;
-	}
+	
 	
 	// convert a string in to a meaningful javascript object for this dataset. The default is JSON, but you could use this function to accept any format of choice. 
 	this.JSONParse = function(stringdata){
 		var data = JSON.parse(stringdata)
-		recursiveCleanup(data);
+		data = define.structFromJSON(data);
 		return data;
 	}
 	

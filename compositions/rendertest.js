@@ -11,6 +11,7 @@ define.class(function(composition, screens, screen, view, text){
 
 		this.hello = function(){
 			console.log("Received hello call!")
+			this.rpc.screen.default.test()
 		}
 	})
 
@@ -21,8 +22,19 @@ define.class(function(composition, screens, screen, view, text){
 				render: function(){
 					return view({
 						bg:{
+							kali2d: function(pos, steps, space){
+								var v = pos
+								for(var i = 0; i < 130; i ++){
+									if(i > int(steps)) break
+									v = abs(v)
+
+									v = v / (v.x * v.x + v.y * v.y) + space
+								}			
+								return v
+							},
 							color:function(){
-								return demo.highdefblirpy(mesh.xy, time, 1)
+								return mix('red','green',mesh.y)
+								return pal.pal1( kali2d(mesh.xy, 20, vec2(-0.8280193310201044,-0.658019331020104-abs(0.1*cos(time)))).y )
 							}
 						},
 						init: function(){

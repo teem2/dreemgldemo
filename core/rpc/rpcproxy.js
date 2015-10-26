@@ -26,33 +26,16 @@ define.class('$base/node', function(require, exports, self){
 			for(var i = 0; i < arguments.length; i++){
 				var arg = arguments[i]
 				
-				if(typeof arg == 'function' || typeof arg == 'object' && !RpcProxy.isJsonSafe(arg)){
+				if(typeof arg == 'function' || typeof arg == 'object' && !define.isSafeJSON(arg)){
 					throw new Error('RPC call ' + key + ' can only support JSON safe objects')
 				}
 
 				args.push(arg)
 			}
-			return this.parent.callRpc(this.name, msg)
+			return this.parent.methodRpc(this.name, msg)
 		}
 	}
-/*
-	RpcProxy.handleCall = function(object, msg, socket){
-		var ret = object[msg.method].apply(object, msg.args)
-		if(ret && ret.then){ // make the promise resolve to a socket send
-			ret.then(function(result){
-				socket.send({type:'return', uid:msg.uid, value:result})
-			}).catch(function(error){
-				socket.send({type:'return', uid:msg.uid, value:error, error:1})
-			})
-		}
-		else{
-			if(!RpcProxy.isJsonSafe(ret)){
-				console.log('RPC Return value of ' + msg.rpcid + ' ' + msg.method + ' is not json safe')		
-				ret = null
-			}
-			socket.send({type:'return', uid:msg.uid, value:ret})
-		}		
-	}*/
+
 
 	RpcProxy.verifyRpc = function(rpcdef, component, prop, kind){
 		// lets rip off the array index
@@ -68,104 +51,64 @@ define.class('$base/node', function(require, exports, self){
 		}
 		return true
 	}
-	/*
-	RpcProxy.bindSetAttribute = function(object, rpcid, bus){
-		// ok lets now wire our mod.vdom.onSetAttribute
-		Object.defineProperty(object, 'atAttributeSet', {
-			value: function(key, value){
-			if(!RpcProxy.isJsonSafe(value)){
-				console.log('setAttribute not JSON safe ' + name + '.' + key)
-				return
-			}
-			var msg = {
-				type:'attribute',
-				rpcid:rpcid,
-				attribute:key,
-				value: value
-			}
-			if(bus.broadcast){
-				bus.broadcast(msg)
-			}
-			else{
-				bus.send(msg)
-			}
-		}})
-	}*/
-/*
-	RpcProxy.decodeRpcID = function(onobj, rpcid){
-		if(!rpcid) throw new Error('no RPC ID')
-
-		var name = idx
-		if(name.indexOf('.') != -1){
-			var part = name.split('.')
-			var obj = onobj[part[0]]
-			if(!obj) return 
-			obj = obj[part[1]]
-			if(!obj) return
-			if(idx[1]) return obj[idx[1].slice(0,-1)]
-			return obj
-		}
-		return onobj[name]
-	}*/
-
-	RpcProxy.isJsonSafe = function(obj, stack){
-		if(obj === undefined || obj === null) return true
-		if(typeof obj === 'function') return false
-		if(typeof obj !== 'object') return true
-		if(!stack) stack = []
-		stack.push(obj)
-
-		if(Array.isArray(obj)){
-			for(var i = 0; i < obj.length; i++){
-				if(!RpcProxy.isJsonSafe(obj[i])) return false
-			}
-			stack.pop()
-			return true
-		}
-
-		if(Object.getPrototypeOf(obj) !== Object.prototype) return false
-
-		for(var key in obj){
-			var prop = obj[key]
-			if(typeof prop == 'object'){
-				if(stack.indexOf(prop)!= -1) return false // circular
-				if(!RpcProxy.isJsonSafe(prop, stack)) return false
-			}
-			else if(typeof prop == 'function') return false
-			// probably json safe then
-		}
-		stack.pop()
-		return true
-	}
 
 	RpcProxy.createFromObject = function(object, parent){
 		var proxy = new RpcProxy()
 		proxy.parent = parent
 		proxy.name = object.name || object.constructor.name
+		var proto = object
+		while(proto && proto.isAttribute){
+			if(proto.hasOwnProperty('rpcproxy') && proto.rpcproxy === false) break
 
-		// we should walk up till we 
-		for(var key in object){
-			if(key.charAt(0) === '_' || key in Node.prototype) continue
-			if(object.isAttribute(key)){ // we iz attribute
-				proxy.attribute(key, object.getAttributeConfig(key))
-			}
-			else{
-				var prop = object[key]
+			var keys = Object.keys(proto)
+			for(var i = 0; i < keys.length; i++){
+				var key = keys[i]
 
-				if(typeof prop == 'function'){
-					RpcProxy.defineMethod(proxy, key)
+				if(key in proxy || key.charAt(0) === '_') continue
+				if(proto.isAttribute(key)){ // we iz attribute
+					// we have to ignore property binds
+					var props = proto.getAttributeConfig(key)
+					var value = props.value
+					if(value !== undefined){
+						if(typeof value === 'function' && value.is_wired || 
+							typeof value === 'string' && value.charAt(0) == '$' && value.charAt(1) === '{' && value.charAt(value.length - 1) === '}'){
+							props.value = undefined
+						}
+					}
+					proxy.attribute(key, props)
 				}
-				else if(Array.isArray(prop)){
-					// its an array!
+				else{
+					var prop = proto[key]
+
+					if(typeof prop == 'function'){
+						RpcProxy.defineMethod(proxy, key)
+					}
+					else if(Array.isArray(prop)){
+						// its an array!
+					}
 				}
 			}
+
+			proto = Object.getPrototypeOf(proto)
 		}
+
+		object.atAttributeSet = function(key, value){
+			// lets call set attribute
+			if(!(key in proxy)) return
+			var msg = {type:'attribute', attribute:key, value:value}
+			proxy.parent.attributeRpc(proxy.name, msg)
+		}
+
 		return proxy
 	}
 
 	var RpcChildSet = define.class(function RpcChildSet(){
-		this.callRpc = function(rpcid, message){
-			return this.parent.callRpc(this.name +'.' + rpcid, message)
+		this.methodRpc = function(rpcid, message){
+			return this.parent.methodRpc(this.name + '.' + rpcid, message)
+		}
+
+		this.attributeRpc = function(rpcid, message){
+			return this.parent.attributeRpc(this.name + '.' + rpcid, message)
 		}
 	})
 
