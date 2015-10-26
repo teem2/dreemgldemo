@@ -4,7 +4,7 @@ define.class(function(view, require){
 	
 	define.class(this, 'slide', function(view, text){
 		this.render = function(){
-			return view({}, text({fontsize:50,text:this.title}),this.constructor_children)
+			return view({flex:1,flexdirection:'column'}, text({borderwidth:2,fontsize:50,alignself:'center',text:this.title}),view({flex:1,borderwidth:2},this.constructor_children))
 		}
 
 	});
@@ -15,6 +15,7 @@ define.class(function(view, require){
 		// alright we have a keydown!
 		if(key.name == 'leftarrow'){
 			// we need to animate to the left
+
 		}
 		else if(key.name == 'rightarrow'){
 			// animate to the right
@@ -35,7 +36,7 @@ define.class(function(view, require){
 		var count = 0
 		return this.constructor_children.map(function(item){
 			count++
-			return this.slide({width:1024,margin:10,height:1024,title:item.slidetitle}, item)
+			return this.slide({flexdirection:'column',width:1024,margin:10,height:1024,title:item.slidetitle}, item)
 		}.bind(this))
 	}
 })

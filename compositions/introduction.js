@@ -12,8 +12,8 @@ define.class(function(composition, screens, screen, text, view, slideviewer, dra
 					view({
 						slidetitle:'DreamGL introduction'
 					}
-					,perspective3d({pos:[10,300],camera:[0,0,-10],fov:60,size:[50,50]}
-						,teapot({rot3d:[PI/2.6,0,0]})
+					,perspective3d({bgcolor:'red',clipping:true,borderwidth:2,pos2:[200,200],camera:[0,0,-20],fov:60,flex:1,size:[700,600]}
+						,teapot({rot3d:[PI/2,0,0]})
 					))
 					,view({
 						slidetitle:'Rendering 3D'
