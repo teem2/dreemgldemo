@@ -4,7 +4,10 @@ define.class(function(view, require){
 	
 	define.class(this, 'slide', function(view, text){
 		this.render = function(){
-			return view({flex:1,flexdirection:'column'}, text({borderwidth:2,fontsize:50,alignself:'center',text:this.title}),view({flex:1,borderwidth:2},this.constructor_children))
+			return view({flex:1,flexdirection:'column'}
+				,text({borderwidth:2,fontsize:50,alignself:'center',text:this.title})
+				,view({flex:1,borderwidth:2},this.constructor_children)
+			)
 		}
 
 	});
@@ -15,10 +18,11 @@ define.class(function(view, require){
 		// alright we have a keydown!
 		if(key.name == 'leftarrow'){
 			// we need to animate to the left
-
+			this.x += 1024 + this.marginleft + this.marginright
 		}
 		else if(key.name == 'rightarrow'){
 			// animate to the right
+			this.x -= 1024 + this.marginleft + this.marginright
 		}
 	}
 

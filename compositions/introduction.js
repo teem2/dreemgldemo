@@ -10,7 +10,7 @@ define.class(function(composition, screens, screen, text, view, slideviewer, dra
 					bgcolor:'black'
 					},
 					view({
-						slidetitle:'DreamGL introduction'
+						slidetitle:'DreemGL introduction'
 					}
 					,perspective3d({bgcolor:'red',clipping:true,borderwidth:2,pos2:[200,200],camera:[0,0,-20],fov:60,flex:1,size:[700,600]}
 						,teapot({rot3d:[PI/2,0,0]})
@@ -31,7 +31,6 @@ define.class(function(composition, screens, screen, text, view, slideviewer, dra
 			),
 			screen({
 				attribute_mousepos:{type:vec2, value:'${this.main.pos}'},
-				attribute_mouseclk:{type:boolean, value:'${this.mouse.click}'},
 				name:'remote',
 				},
 				view({
