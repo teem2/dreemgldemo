@@ -591,7 +591,7 @@ define.class('./view_base', function(require, exports){
 			if (actuallyclipping) renderstate.stopClipSetup();
 
 			if ((actuallyclipping && onscreen) || actuallyclipping == false) {
-				if (this.threedee){renderstate.setupPerspective();}
+				if (this.threedee) {renderstate.setupPerspective();}
 				if (this.children) for (var i = 0; i < this.children.length; i++) {
 					var child = this.children[i]
 					if (child.draw) {

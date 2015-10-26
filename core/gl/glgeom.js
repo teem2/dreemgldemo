@@ -118,17 +118,17 @@ define(function(require, exports){
 			}
 		}
 		
-		console.log("loaded " + (vertices.length -1) + " vertices and " + faceidx + " triangles");
-		};
-		
-			
+		//console.log("loaded " + (vertices.length -1) + " vertices and " + faceidx + " triangles");
+	};		
+
 	exports.createCube = function(width, height, depth, cb) {
+		
 		if(arguments.length === 2) cb = height, height = depth = width
 		if(arguments.length === 3) cb = depth, depth = height, height = width
-		
-		var hw = width / 2;
+	
+		var hw = width  / 2;
 		var hh = height / 2;
-		var hd = depth / 2;
+		var hd = depth  / 2;
 
 // vertices:		
 //
@@ -225,15 +225,13 @@ define(function(require, exports){
 			}
 		}
 	}
-	
 
-	function B1(t) { return t*t*t }
-	function B2(t) { return 3*t*t*(1-t) }
-	function B3(t) { return 3*t*(1-t)*(1-t) }
-	function B4(t) { return (1-t)*(1-t)*(1-t) }
+	function B1(t) { return t * t * t; }
+	function B2(t) { return 3 * t * t * (1 - t); }
+	function B3(t) { return 3 * t * (1 - t) * (1 - t); }
+	function B4(t) { return (1 - t) * (1 - t) * (1 - t); }
 
-	function getBezier(percent,C1,C2,C3,C4) {
-		
+	function getBezier(percent,C1,C2,C3,C4) {		
 		var pos = vec3();
 		
 		var b1 = B1(percent);
@@ -241,9 +239,9 @@ define(function(require, exports){
 		var b3 = B3(percent);
 		var b4 = B4(percent);
 		
-		pos[0] = C1[0]*b1 + C2[0]*b2 + C3[0]*b3 + C4[0]*b4;
-		pos[1] = C1[1]*b1 + C2[1]*b2 + C3[1]*b3 + C4[1]*b4;
-		pos[2] = C1[2]*b1 + C2[2]*b2 + C3[2]*b3 + C4[2]*b4;
+		pos[0] = C1[0] * b1 + C2[0] * b2 + C3[0] * b3 + C4[0] * b4;
+		pos[1] = C1[1] * b1 + C2[1] * b2 + C3[1] * b3 + C4[1] * b4;
+		pos[2] = C1[2] * b1 + C2[2] * b2 + C3[2] * b3 + C4[2] * b4;
 
 		return pos;
 	}

@@ -99,7 +99,6 @@ define.class(function(require, view, text, icon){
 			if (radius === undefined) radius = 1;
 			if (xdetail === undefined) xdetail = 20;
 			if (ydetail === undefined) ydetail = 20;
-			console.log(radius, xdetail, ydetail);
 			GLGeom.createSphere(radius,xdetail,ydetail,function(triidx,v1,v2,v3,n1,n2,n3,t1,t2,t3,faceidx){
 					this.mesh.push(v1,n1,t1);
 					this.mesh.push(v2,n2,t2);
@@ -108,17 +107,17 @@ define.class(function(require, view, text, icon){
 			)		
 		}
 		
-		/* this.addModel = function(objfile, completioncallback){
+		 this.addModel = function(data, completioncallback){
 						
-			require.async(objfile, 'txt').then(function(data){
-				GLGeom.createModel(data, function(triidx,v1,v2,v3,n1,n2,n3,t1,t2,t3,faceidx){
-					this.mesh.push(v1,n1,t1);
-					this.mesh.push(v2,n2,t2);
-					this.mesh.push(v3,n3,t3);
-				}.bind(this))
-				completioncallback();
-			}.bind(this));						
-		}*/
+			
+			GLGeom.createModel(data, function(triidx,v1,v2,v3,n1,n2,n3,t1,t2,t3,faceidx){
+				this.mesh.push(v1,n1,t1);
+				this.mesh.push(v2,n2,t2);
+				this.mesh.push(v3,n3,t3);
+			}.bind(this))
+			completioncallback();
+					
+		}
 	
 		this.texture = require('$textures/matcap2.png');
 

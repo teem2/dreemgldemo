@@ -8,15 +8,20 @@ define.class(function(require, shape3d, text, view, icon){
 	var GLGeom= require('$gl/glgeom')
 	var GLMat = require('$gl/glmaterial')
 
-	this.attribute("model",{});
+	this.attribute("model",{type:undefined});
 	
 	
 	this.model = function(data){
-		console.log(data);
+		if(this.bg_shader)
+		{
+			this.bg_shader.addModel(data, function(){ this.setDirty()}.bind(this));
+		}
+		
 	}
 	
 	this.init = function(){
-		//this.bg_shader.addModel(this.file, function(){ this.setDirty()}.bind(this));
+		this.bg_shader.addModel(this.model, function(){ this.setDirty()}.bind(this));
+		//console.log("init" ,this.model);
 	}
 
 	this.mouseover  = function(){

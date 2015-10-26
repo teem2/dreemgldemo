@@ -508,7 +508,7 @@
 	define.lookupFileType = function(type){
 		type = type.toLowerCase()
 		if(type === 'json')	return 'json'
-		if(type === 'txt' || type === 'text' || type === 'md') return 'text'
+		if(type === 'txt' || type === 'obj' || type === 'text' || type === 'md') return 'text'
 		return 'arraybuffer'
 	}
 /*
