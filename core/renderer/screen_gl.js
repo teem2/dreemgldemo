@@ -503,14 +503,13 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		return {left:0, right: this.size[0], top:0, bottom:this.size[1]}
 	}
 	
-	
 	this.addDirtyRect = function(rect, tag){				
 		// round to visible pixels.. round up.
 		var w = rect.right - rect.left
 		var h = rect.bottom - rect.top
 
 		if (w == 0 || h == 0) {
-			//zero area rect;	
+			//zero area rect;
 			return
 		}
 		
@@ -570,7 +569,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		}
 		return value
 	}
-
+	/*
 	this.copyProps = function(other){
 		// lets copy the old props
 		var keys = Object.keys(other)
@@ -585,12 +584,13 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 			if(typeof value === 'function') continue
 			this[key] = value
 		}
-	}
+	}*/
 
 	this.setFocus = function(object){
 		if(this.focus_object !== object){
-			if(this.focus_object) this.focus_object.emit('focuslost')
+			var old = this.focus_object
 			this.focus_object = object
+			if(old) old.emit('focuslost')
 			object.emit('focusget')
 		}
 	}
@@ -835,7 +835,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 		document.title = value
 	}
 
-	this.debugRenderBoundingBox = function(node, depth){	
+	this.debugRenderBoundingBox = function(node, depth){
 		
 		var bb = node.getBoundingRect();
 		
