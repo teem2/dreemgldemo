@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // mouse debug class
 
-define.class(function(sprite, text, view){
+define.class(function(view, text){
 	
 	this.attribute("buttoncolor1", {type: vec4, value: vec4("#9090b0")});
 	this.attribute("buttoncolor2", {type: vec4, value: vec4("#8080c0")});

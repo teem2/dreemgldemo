@@ -1,15 +1,17 @@
 define.class(function(require, screen, view,menuitem, menubar, editor, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, subcomposition){
 	
 	this.render = function(){ return [
-		view({rotation:0,position: "relative", flexdirection: "column", height: 20, bgcolor:"black", flex:1},
+		view({rotation:0, position: "relative", flexdirection: "column", height: 20, bgcolor:"black", flex:1},
 			view({position: "relative", cornerradius:"vec4(0,0,0,14)", borderwidth:1, flexdirection: "row",
 				bg:{
 					bgcolor2: vec4("#404080"),
-					bgcolorfn:function(pos,b){
-						return demo.highdefblirpy(pos*vec2(2.,0.1), time * 2, 1.) * vec4(mesh.x * bgcolor.rgb, 1.0)
+					bgcolorfn: function(pos, b){
+						return demo.highdefblirpy(pos * vec2(2., 0.1), time * 2, 1.) * vec4(mesh.x * bgcolor.rgb, 1.0)
 						//return vec4(mesh.x * bgcolor2.rgb, 1.0)
 					}
-				},alignitems:"stretch", alignself: "stretch", flex: undefined}
+				}
+				,alignitems:"stretch", alignself: "stretch", flex: undefined
+				}
 				,icon({icon:"windows", fgcolor:"white", marginleft: 15, fontsize:18})
 				,text({fontsize: 20, text:"Dreem Editor Testing", width: 200, bgcolor: "transparent" , marginbottom:10, marginleft:15})
 			)
@@ -25,7 +27,7 @@ define.class(function(require, screen, view,menuitem, menubar, editor, text, ico
 					,menuitem({text: "Paste"})
 					,menuitem({text: "Undo"})
 					,menuitem({text: "Redo"})
-					,menuitem({text: "Options"})		
+					,menuitem({text: "Options"})
 				)
 				,menuitem({text: "Help"}
 					,menuitem({text: "Manual"})
@@ -41,7 +43,7 @@ define.class(function(require, screen, view,menuitem, menubar, editor, text, ico
 					,view({position: "relative", flex: 1.0, padding: 0, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection: "row" }
 						,ruler({width: 20, vertical: true, offset:0})
 						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"row" ,clipping: false}
-							,subcomposition({flex:1.0,padding:10,  composition:'minidialog', clipping: true})
+							,subcomposition({flex:1.0,padding:10,  subcomposition:'minidialog', clipping: true})
 							,scrollbar({width:15, position:'relative'})
 						)
 					)
@@ -52,7 +54,7 @@ define.class(function(require, screen, view,menuitem, menubar, editor, text, ico
 						text({fontsize: 26, text:"Dreem Editor Testing",bgcolor: "transparent" , margin: 5})
 					)
 					,foldcontainer({title:"Fancy buttons", icon:'gamepad', marginbottom: 2}
-						,view({ position:"relative", flexwrap:"wrap", alignitems: "stretch", bgcolor: "transparent"}
+						,view({position:"relative", flexwrap:"wrap", alignitems: "stretch", bgcolor: "transparent"}
 							,button({text:"Youtube",icon:"youtube", click:function(){
 								this.screen.openModal(
 									view({
