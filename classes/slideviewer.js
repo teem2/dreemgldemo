@@ -4,7 +4,7 @@ define.class(function(view, require){
 	
 	define.class(this, 'slide', function(view, text){
 		this.render = function(){
-			return view({flex:1,flexdirection:'column'}, text({borderwidth:2,fontsize:50,alignself:'center',text:this.title}),view({flex:1,borderwidth:2},this.constructor_children))
+			return view({flex:1,flexdirection:'column'}, text({margin:[10,10,10,10],fontsize:50,alignself:'center',text:this.title}),view({flex:1,borderwidth:2},this.constructor_children))
 		}
 
 	});

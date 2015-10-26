@@ -1,5 +1,5 @@
 // introduction presentation
-define.class(function(composition, screens, screen, text, view, slideviewer, draggable, perspective3d, teapot){
+define.class(function(composition, screens, screen, text, view, slideviewer, draggable, perspective3d, teapot,ballrotate){
 
 	this.render = function(){ return [
 		screens(
@@ -10,11 +10,15 @@ define.class(function(composition, screens, screen, text, view, slideviewer, dra
 					bgcolor:'black'
 					},
 					view({
-						slidetitle:'DreamGL introduction'
-					}
-					,perspective3d({bgcolor:'red',clipping:true,borderwidth:2,pos2:[200,200],camera:[0,0,-20],fov:60,flex:1,size:[700,600]}
-						,teapot({rot3d:[PI/2,0,0]})
-					))
+							flex:1,
+							slidetitle:'DreamGL introduction'
+						}
+						,perspective3d({name:"teapotview", flex:1,flexdirection:"row", clipping:true,camera:[10,-10,-30],fov:60,flex:1}
+							,teapot({rot3d:[PI/2,0,0], pos3d:[0,2,0]})
+							,ballrotate({bgcolor:"transparent", init:function(){this.target= this.find("teapotview");}, flex:1})	
+						
+						)
+					)
 					,view({
 						slidetitle:'Rendering 3D'
 					})
