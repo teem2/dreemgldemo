@@ -313,7 +313,7 @@ define.class(function(require, constructor){
 	this.hasListeners = function(key){
 		var listen_key = '_listen_' + key
 		var on_key = 'on' + key
-		if(on_key in this || listen_key in this) return true
+		if(on_key in this || listen_key in this && this[listen_key].length) return true
 		return false
 	}
 
@@ -509,6 +509,7 @@ define.class(function(require, constructor){
 						console.log("Attribute does not exist: "+ref.join('.')+" in wiring " + this[wiredfn_key].toString())
 						continue
 					}
+
 					obj.addListener(part, bindcall)
 
 					if(obj.has_wires(part) && !obj.wiredCall(part)){

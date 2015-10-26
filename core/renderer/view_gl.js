@@ -14,12 +14,10 @@ define.class('./view_base', function(require, exports){
 	this.threedee = false;
 	this.texturecache = false
 	
-	this.init = function(){
+	this.init = function(previous){
+		
 		this.bg_shader = new this.bg()
 		this.fg_shader = new this.fg()
-	}
-
-	this.reinit = function(obj){
 		
 		this.orientation = {
 			rotation : vec3(0, 0, 0), // (or {0,0,0} for 3d rotation)

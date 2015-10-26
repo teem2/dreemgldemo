@@ -6,8 +6,8 @@ define.class(function(require, screen, view,menuitem, menubar, editor, text, ico
 				bg:{
 					bgcolor2: vec4("#404080"),
 					bgcolorfn: function(pos, b){
-						return demo.highdefblirpy(pos * vec2(2., 0.1), time * 2, 1.) * vec4(mesh.x * bgcolor.rgb, 1.0)
-						//return vec4(mesh.x * bgcolor2.rgb, 1.0)
+						//return demo.highdefblirpy(pos * vec2(2., 0.1), time * 2, 1.) * vec4(mesh.x * bgcolor.rgb, 1.0)
+						return vec4(mesh.x * bgcolor2.rgb, 1.0)
 					}
 				}
 				,alignitems:"stretch", alignself: "stretch", flex: undefined
@@ -43,7 +43,7 @@ define.class(function(require, screen, view,menuitem, menubar, editor, text, ico
 					,view({position: "relative", flex: 1.0, padding: 0, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection: "row" }
 						,ruler({width: 20, vertical: true, offset:0})
 						,view({position: "relative", flex: 1.0, padding: 4, bgcolor: "#f0f0f0", alignitems: "stretch", flexdirection:"row" ,clipping: false}
-							,subcomposition({flex:1.0,padding:10,  subcomposition:'minidialog', clipping: true})
+							//,subcomposition({flex:1.0,padding:10,  subcomposition2:'minidialog', clipping: true})
 							,scrollbar({width:15, position:'relative'})
 						)
 					)

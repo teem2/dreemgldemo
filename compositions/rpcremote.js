@@ -10,18 +10,17 @@ define.class(function(composition, screens, screen, view, text, draggable){
 				view({
 					name:'main',
 					size: vec2(200, 200),
-					bgcolor: vec4('blue'),
+					bgcolor: vec4('yellow'),
 					is: draggable(),
 					init: function(){
+						this.screen.mousepos = function(){
+							console.log("MOVIN")
+						}
 						// alright lets make this draggable. framerjs style
 					}
 				})
 			),
-			screen({name:'desktop',
-				test: function(){
-					console.log("test called on s2")
-					return 20
-				}},
+			screen({name:'desktop'},
 				view({
 					size: vec2(200, 200),
 					pos: '${this.rpc.screens.mobile.mousepos}',

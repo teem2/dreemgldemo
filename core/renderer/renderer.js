@@ -5,83 +5,63 @@ define.class(function(require, exports, module){
 
 	var Node = require('$base/node')
 
-	module.exports = function renderer(new_version, old_version, globals, skip_old, wireinits, allchildren){
+	module.exports = function renderer(new_version, old_version, globals, wireinits, rerender){
+
 		var init_wires = false
 		if(!wireinits){
 			wireinits = []
 			init_wires = true
 		}
-		if(!allchildren){
-			allchildren = []
-		}
-		var object = new_version
-		var old_children
-		var last_children
-		var cleanup
-		if(old_version){
-			if(!skip_old && define.classHash(new_version.constructor) === define.classHash(old_version.constructor) && new_version.constructorPropsEqual(old_version)){
-				// old_version is identical. lets reuse it.
-				object = old_version
-				old_children = object.children
-				// but use new versions instance children
-				old_version.constructor_children = new_version.constructor_children
-			}
-			else{ // we are going to use new_version. lets copy _state properties
-				object = new_version
-				if(new_version !== old_version){
-					old_children = object.children
-					for(var key in new_version._state){
-						new_version[key] = old_version[key]
-					}
-					//console.log("OLD VERSION DESTROY")
-					old_version.emit('destroy')
-				}
-			}
-		}
-		else last_children = object.children
-		
+
 		for(var key in globals){
-			object[key] = globals[key]
+			new_version[key] = globals[key]
 		}
 		
-		allchildren.push(object)
-		
-		object.connectWires(wireinits)
-		
+		// call connect wires before
+		new_version.connectWires(wireinits)
+
+		var old_children = old_version? old_version.children: undefined
+
 		// lets call init only when not already called
-		if(!object._init && (object.oninit || object._listen_init)){
-			object.emit('init', 1)
+		if(!rerender){
+			new_version.emit('init', old_version)// old_version && old_version.constructor == new_version.constructor? old_version: undefined)
 		}
-		if(object.onreinit || object._listen_onreinit)
-			object.emit('reinit')
+		else{
+			old_children = new_version.children
+		}
 
 		// then call render
 		function __atAttributeGet(){
+			//console.log('Rerendering',key)
+			//debugger
 			// we need to call re-render on this
-			renderer(this, undefined, globals, true)
-			this.setDirty(true)
-			if(this.reLayout) this.reLayout()
+			renderer(this, undefined, globals, undefined, true)
+			//this.setDirty(true)
+			//if(this.reLayout) this.reLayout()
 		}
 
 		// store the attribute dependencies
-		object.atAttributeGet = function(key){
+		new_version.atAttributeGet = function(key){
 			// lets find out if we already have a listener on it
 			if(!this.hasListenerName(key, '__atAttributeGet')){
 				this.addListener(key, __atAttributeGet)
 			}
 		}
 
-		object.reRender = __atAttributeGet
+		new_version.reRender = __atAttributeGet
+
 		// lets check if object.constructor  a module, ifso 
-		if(object.classroot === undefined){
-			object.classroot = object
+		if(new_version.classroot === undefined){
+			new_version.classroot = new_version
 			//console.log(object)
  		}
- 		object.children = object.render()
-		object.atAttributeGet = undefined
 
-		if(!Array.isArray(object.children) && object.children) object.children = [object.children]
-		var new_children = object.children
+ 		new_version.children = new_version.render()
+
+		new_version.atAttributeGet = undefined
+
+		if(!Array.isArray(new_version.children) && new_version.children) new_version.children = [new_version.children]
+		var new_children = new_version.children
 
 		if(new_children) for(var i = 0; i < new_children.length; i++){
 			var new_child = new_children[i]
@@ -98,27 +78,21 @@ define.class(function(require, exports, module){
 			var old_child = undefined
 			if(old_children){
 				old_child = old_children[i]
-				if(old_child) old_child.parent = object
 			}
-			new_child.parent = object
+			new_child.parent = new_version
 			// render new child
-			new_child = new_children[i] = renderer(new_child, old_child, globals, false, wireinits)
+			new_child = new_children[i] = renderer(new_child, old_child, globals, wireinits)
 	
 			// set the childs name
 			var name = new_child.name || new_child.constructor.name
-			if(name !== undefined && !(name in object)) object[name] = new_child
+			if(name !== undefined && !(name in new_version)) new_version[name] = new_child
 		}
-		if(old_children) for(;i<old_children.length;i++){
-			var child = old_children[i]
-			child.emitRecursive('destroy')
-		}
-		if(last_children) for(var i = 0; i < last_children.length; i++){
-			var last_child = last_children[i]
 
-			//if(object.constructor_children.indexOf(last_child) === -1 && allchildren.indexOf(last_child) === -1 && new_children.indexOf(last_child) === -1){
-			last_child.emitRecursive('destroy', 1, allchildren)
-			//}
+		if(old_children) for(;i < old_children.length;i++){
+			old_children[i].emitRecursive('deinit')
 		}
+
+		if(old_version) old_version.emit('deinit')
 
 		if(init_wires){
 			for(var i = 0; i < wireinits.length; i++){
@@ -126,7 +100,7 @@ define.class(function(require, exports, module){
 			}
 		}
 
-		return object
+		return new_version
 	}
 
 	module.exports.dump = function(node, depth){

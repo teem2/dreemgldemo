@@ -56,6 +56,7 @@ define.class('$base/node', function(require, exports, self){
 		var proxy = new RpcProxy()
 		proxy.parent = parent
 		proxy.name = object.name || object.constructor.name
+
 		var proto = object
 		while(proto && proto.isAttribute){
 			if(proto.hasOwnProperty('rpcproxy') && proto.rpcproxy === false) break

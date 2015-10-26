@@ -6,8 +6,7 @@ define.class(function(require, node){
 	// To modify a dataset you need to use the "fork" method. The fork method saves the current instance to the undo stack, calls back to your code and then notifies all objects that have this dataset instance bound to them to update themselves.
 
 	// Basic dataset modification example:	
-	define.example(this, function Usage(dataset)
-	{
+	define.example(this, function Usage(dataset){
 		var a = dataset();
 		someitem.dataset = a;
 		a.fork(function(data){data.something = "a value"; })

@@ -33,8 +33,8 @@ define.class(function(composition, screens, screen, view, text){
 								return v
 							},
 							color:function(){
-								return mix('red','green',mesh.y)
-								return pal.pal1( kali2d(mesh.xy, 20, vec2(-0.8280193310201044,-0.658019331020104-abs(0.1*cos(time)))).y )
+								//return mix('red','green',mesh.y)
+								return pal.pal1( kali2d(mesh.xy, 12, vec2(-0.8280193310201044,-0.658019331020104-abs(0.1*cos(time)))).y )
 							}
 						},
 						init: function(){

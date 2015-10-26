@@ -9,9 +9,6 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 
 	var WebRTC = require('$rpc/webrtc')
 	var BusClient = require('$rpc/busclient')
-	var Mouse = require('$renderer/mouse_web')
-	var Keyboard = require('$renderer/keyboard_web')
-	var Touch = require('$renderer/touch_web')
 	var renderer = require('$renderer/renderer')
 
 	this.atConstructor = function(previous, parent){
@@ -31,7 +28,8 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		// web environment
 		if(previous){
 			this.bus = previous.bus
-			this.rpc = previous.rpc//new RpcHub(this.bus)//previous.rpc
+			this.rpc = previous.rpc
+			this.rpc.host = this
 			this.rendered = true
 		}
 		else this.createBus()
@@ -51,37 +49,21 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		
 		var globals = {
 			composition:this,
-			rpc:this.rpc, 
+			rpc:this.rpc,
 			screen:this.screen
 		}
 		globals.globals = globals
 		window.comp = this
-		// copy keyboard and mouse objects from previous
-		if(!previous){
-			if(!parent){
-				this.touch = globals.touch = new Touch()
-				this.mouse = globals.mouse = new Mouse()
-				this.keyboard = globals.keyboard = new Keyboard()
-			}
-		}
-		else{
-			this.touch = globals.touch = previous.touch
-			this.mouse = globals.mouse = previous.mouse
-			this.keyboard = globals.keyboard = previous.keyboard
-			// this isnt exactly right.
-			globals.keyboard.removeAllListeners()
-			globals.mouse.removeAllListeners()
 
-			this.screen.copyProps(previous.screen)
-		}
+		// copy keyboard and mouse objects from previous
 
 		if(parent){
 			this.screen.device = parent.screen.device
 			this.screen.parent = parent
 		}
 		//this.screen.teem = this
-		renderer(this.screen, previous && previous.screen, globals, true)
-
+		renderer(this.screen, previous && previous.screen, globals)
+		
 		if(this.screen.title !== undefined) document.title = this.screen.title 
 				
 		if(previous){
