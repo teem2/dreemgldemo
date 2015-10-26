@@ -3,8 +3,16 @@
 define.class(function(view, require){
 	
 	define.class(this, 'slide', function(view, text){
+		this.cornerradius = vec4(10,10,10,10);
+		this.borderwidth = 2;
+		this.bgcolor ="white";
+		this.flex = 1;
+		this.padding= vec4(6);
 		this.render = function(){
-			return view({flex:1,flexdirection:'column'}, text({margin:[10,10,10,10],fontsize:50,alignself:'center',text:this.title}),view({flex:1,borderwidth:2},this.constructor_children))
+			return view({bg:{bgcolorfn:function(a,b){return vec4(1- a.y*0.4, 1- a.y*0.4,1- a.y*0.2,1);}}, cornerradius:vec4(10),flex:1,flexdirection:'column'}
+				,text({margin:[10,10,10,10],fontsize:50,alignself:'center',text:this.title})
+				,view({flex:1, bgcolor:"transparent", padding:vec4(10)},this.constructor_children)
+			)
 		}
 	});
 

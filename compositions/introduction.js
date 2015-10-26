@@ -16,26 +16,29 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 					bgcolor:'black'
 					},
 					view({
+							bgcolor:"transparent", 
 							flex:1,
 							slidetitle:'DreemGL introduction'
 						}
-						,perspective3d({name:"teapotview", flex:1,flexdirection:"row", clipping:true,camera:[10,-10,-30],fov:60,flex:1}
+						,perspective3d({bgcolor:"transparent", name:"teapotview", flex:1,flexdirection:"row", clipping:true,camera:[10,-10,-30],fov:60,flex:1}
 							,teapot({pos:[0,-100],bg:{diffusecolor:'white'},rot3d:[PI/2,0,0], pos3d:[0,2,0]})
 							,ballrotate({bgcolor:"transparent", init:function(){this.target= this.find("teapotview");}, flex:1})	
 						)
 					)
 					,view({
 						slidetitle:'This presentation'
+						,flex:1
 					}
-						,scrollcontainer({flex:1,width:1024},
+						,scrollcontainer({flex:1},
 							codeviewer({flex:1,margin:vec4(10),code:render.toString(), padding:vec4(4), fontsize: 14, bgcolor:"#000030", multiline: true})
 						)
 					)
 					,view({
 						flex:1,
+						bgcolor:'transparent',
 						slidetitle:'Using shaders to style'
 					}
-					,perspective3d({bgcolor:'gray',name:"teapotview2", flex:1,flexdirection:"row", clipping:true,camera:[10,-10,-30],fov:60,flex:1}
+					,perspective3d({bgcolor:'transparent',name:"teapotview2", flex:1,flexdirection:"row", clipping:true,camera:[10,-10,-30],fov:60,flex:1}
 							,teapot({pos:[0,0],bg:{color:function(){
 								var stripeamt = 7.0
 								var stripes = 5.0
