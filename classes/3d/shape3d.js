@@ -119,7 +119,7 @@ define.class(function(require, view, text, icon){
 					
 		}
 	
-		this.texture = require('$textures/matcap2.png');
+		this.texture = require('$textures/matcap6.png');
 
 		this.matrix = mat4.identity()
 		this.cameraposition = vec3(0,0,0)
@@ -158,8 +158,8 @@ define.class(function(require, view, text, icon){
 			var angle = atan(tn.y, tn.x);
 			//return vec4(res.xyz,1) * diffusecolor;
 			var d = dot(cross(camup, camleft), tn);
-			return vec4(d * vec3(1,1,1)  * 0.5 + vec3(0.5) , 1.0)
-			//return texture.sample(-vec2(dot(tn, r1), dot(tn,r2)) * 0.5 + vec2(0.5)) * diffusecolor;
+			//return vec4(d * vec3(1,1,1)  * 0.5 + vec3(0.5) , 1.0)
+			return texture.sample(-vec2(dot(tn, r1), dot(tn,r2)) * 0.5 + vec2(0.5)) * diffusecolor;
 //			return vec4(dot(raydir, tn)*vec3(1,1,1),1.);
 //			return vec4(vec3(0.5+0.5*sin((1-pow(dot(raydir, tn), 1. )) * 20.)), 1.0)  * diffusecolor + vec4(angle,0,0,0);
 
