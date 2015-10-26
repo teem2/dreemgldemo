@@ -12,10 +12,12 @@ define.class(function(require, screen, view, text, cube, perspective3d, teapot, 
 				,view({flexdirection:"row", flex: 1, bgcolor:"transparent"}
 					,perspective3d({flex: 1,name:"moleculesview", bgcolor:"transparent", aligself:"stretch", clipping: true, fov:45, camera:[53,-10,-53], lookat:[0,0,0],margin:vec4(0), borderwidth:0, bordercolor:"lightgray"}, 
 						ballrotate({init:function(){this.target= this.find("moleculesview");}, width:100, height:100})	,
-						model({file:"molecule.obj", rot3d:[PI,PI/2,0],scale3d:[0.2,0.2,0.2],pos3d:[-1,-15,0]}),
-						model({file:"molecule.obj", rot3d:[PI,PI/2 + 0.1,0],scale3d:[0.2,0.2,0.2],pos3d:[-1,-10,0]}),
-						model({file:"molecule.obj", rot3d:[PI,PI/2 + 0.2,0],scale3d:[0.2,0.2,0.2],pos3d:[-1,-5,0]}),
-						model({file:"molecule.obj", rot3d:[PI,PI/2 + 0.5,0],scale3d:[0.2,0.2,0.2],pos3d:[-1,0,0]}),
+
+						model({model:require("molecule.obj","txt"), rot3d:[PI,PI/2,0],scale3d:[0.2,0.2,0.2],pos3d:[-1,-15,0]}),
+						model({model:require("molecule.obj","txt"), rot3d:[PI,PI/2 + 0.1,0],scale3d:[0.2,0.2,0.2],pos3d:[-1,-10,0]}),
+						model({model:require("molecule.obj","txt"), rot3d:[PI,PI/2 + 0.2,0],scale3d:[0.2,0.2,0.2],pos3d:[-1,-5,0]}),
+						model({model:require("molecule.obj","txt"), rot3d:[PI,PI/2 + 0.5,0],scale3d:[0.2,0.2,0.2],pos3d:[-1,0,0]}),
+
 						plane({xdiv:1, ydiv:1, dimension:vec2(140,140),
 							bg:{
 								color:function(){
@@ -57,7 +59,7 @@ define.class(function(require, screen, view, text, cube, perspective3d, teapot, 
 					)
 					,perspective3d({name:"singlecube", flex:1, clipping: true, bgcolor:"transparent"}
 						, ballrotate({init:function(){this.target= this.find("singlecube");}, width:100, height:100})	
-						, cube({bgcolor: "black", rot3d:[2,1,0]})
+						, sphere({bgcolor: "black", radius: 0.2, rot3d:[2,1,0]})
 					)
 				)
 			)

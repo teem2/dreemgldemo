@@ -22,13 +22,13 @@ define.class(function(require, view, text, icon){
 	this.atDraw = function(renderstate){		
 		var mat =mat4.TSRT2(this.anchor, this.scale3d, this.rot3d, this.pos3d);
 
-		var normalmat = mat3.transpose(mat3.normalFromMat4(mat4.transpose(mat)));
+		var normalmat = mat4.transpose(mat4.normalFromMat4(mat4.transpose(mat)));
 
 		this.bg_shader.modelmatrix =  mat;
 		this.bg_shader.camup =  renderstate.camup;
 		this.bg_shader.camleft =  renderstate.camleft;
 		this.bg_shader.normalmatrix =  normalmat;
-//		this.bg_shader.projectionmatrix = renderstate.projectionmatrix;
+		this.bg_shader.projectionmatrix = renderstate.projectionmatrix;
 		this.bg_shader.lookatmatrix = renderstate.lookatmatrix;
 		this.bg_shader.cameraposition = renderstate.cameraposition;
 	//	this.bg_shader.adjustmatrix1 = renderstate.adjustmatrix1;
@@ -108,7 +108,7 @@ define.class(function(require, view, text, icon){
 			)		
 		}
 		
-		this.addModel = function(objfile, completioncallback){
+		/* this.addModel = function(objfile, completioncallback){
 						
 			require.async(objfile, 'txt').then(function(data){
 				GLGeom.createModel(data, function(triidx,v1,v2,v3,n1,n2,n3,t1,t2,t3,faceidx){
@@ -118,15 +118,16 @@ define.class(function(require, view, text, icon){
 				}.bind(this))
 				completioncallback();
 			}.bind(this));						
-		}
+		}*/
 	
-		this.texture = require('$textures/matcap6.png');
+		this.texture = require('$textures/matcap2.png');
 
 		this.matrix = mat4.identity()
 		this.cameraposition = vec3(0,0,0)
 		this.modelmatrix = mat4.identity();
+		this.projectionmatrix = mat4.identity();
 		this.dimension = vec2(1025,1025);
-		this.normalmatrix = mat3.identity();
+		this.normalmatrix = mat4.identity();
 		this.lookatmatrix = mat4.identity();
 		this.screenup = vec3(0,1,0);
 		this.screenleft = vec3(-1,0,0);
@@ -135,11 +136,13 @@ define.class(function(require, view, text, icon){
 		this.camup = vec3();
 		this.camleft = vec3();
 		this.position = function() {						
-			var temp = (vec3(mesh.norm) * normalmatrix * mat3( lookatmatrix ));						
+			var temp = (vec4(mesh.norm,1.0) * normalmatrix  );						
 			transnorm = temp.xyz;			
-			pos = vec4(mesh.pos, 1) * modelmatrix * flattenmatrix;
-			campos = vec4(cameraposition, 1.0) * flattenmatrix;
-			return pos  * matrix * viewmatrix; // * matrix *viewmatrix
+			
+			pos = vec4(mesh.pos, 1) * modelmatrix * lookatmatrix;
+			
+			campos = vec4(cameraposition, 1.0) * lookatmatrix;
+			return pos  * projectionmatrix * matrix * viewmatrix; // * matrix *viewmatrix
 		}
 				
 		this.color = function() {
@@ -154,7 +157,9 @@ define.class(function(require, view, text, icon){
 			var r1 = cross(raydir, camup);
 			var r2 = cross(raydir, r1);
 			var angle = atan(tn.y, tn.x);
-			return vec4(res.xyz,1) * diffusecolor;
+			//return vec4(res.xyz,1) * diffusecolor;
+			var d = dot(cross(camup, camleft), tn);
+			return vec4(d * vec3(1,1,1)  * 0.5 + vec3(0.5) , 1.0)
 			//return texture.sample(-vec2(dot(tn, r1), dot(tn,r2)) * 0.5 + vec2(0.5)) * diffusecolor;
 //			return vec4(dot(raydir, tn)*vec3(1,1,1),1.);
 //			return vec4(vec3(0.5+0.5*sin((1-pow(dot(raydir, tn), 1. )) * 20.)), 1.0)  * diffusecolor + vec4(angle,0,0,0);

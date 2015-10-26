@@ -54,6 +54,7 @@ define.class(function(require, view, text, icon, teapot){
 
 	this.updateProjectionMatrix = function(){
 		this.updateLookAtMatrix();
+		
 	}
 	
 	this.updateLookAtMatrix = function(){
@@ -64,15 +65,10 @@ define.class(function(require, view, text, icon, teapot){
 
 		var w = this.layout.width>0? this.layout.width: this.layout.right - this.layout.left;
 		var h = this.layout.height>0? this.layout.height: this.layout.bottom - this.layout.top;
-
 		this.projectionmatrix = mat4.perspective(this.fov * 6.283/360, w/h, this.near, this.far);										
 		
-		renderstate.projectionmatrix = this.projectionmatrix;
-		renderstate.lookatmatrix = this.lookatmatrix;
-		renderstate.cameraposition = this.camera;
-		
-		var up = vec3(renderstate.lookatmatrix[1], renderstate.lookatmatrix[5], renderstate.lookatmatrix[9]);
-		var left = vec3(renderstate.lookatmatrix[0], renderstate.lookatmatrix[4], renderstate.lookatmatrix[8]);
+		var up = vec3(this.lookatmatrix[1], this.lookatmatrix[5], this.lookatmatrix[9]);
+		var left = vec3(this.lookatmatrix[0], this.lookatmatrix[4], this.lookatmatrix[8]);
 		renderstate.camup = up;
 		renderstate.camleft = left;
 		var adjust = mat4.identity();
@@ -84,6 +80,11 @@ define.class(function(require, view, text, icon, teapot){
 		renderstate.adjustmatrix  = mat4.mul(adjust,adjust2);		
 		this.flattenmatrix = mat4.mul(mat4.mul(this.lookatmatrix, this.projectionmatrix),renderstate.adjustmatrix); 		
 		renderstate.flattenmatrix = this.flattenmatrix;
+	
+		renderstate.projectionmatrix = mat4.mul(this.projectionmatrix, renderstate.adjustmatrix);
+		renderstate.lookatmatrix = this.lookatmatrix;
+		renderstate.cameraposition = this.camera;
+
 	}
 	
 	this.init = function() {
