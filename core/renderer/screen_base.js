@@ -13,7 +13,7 @@ define.class('$base/node', function(require, exports, self){
 		var trk = new AnimTrack(config, obj, key, first, value)
 		var animkey = obj.interfaceguid + '_' + key
 		this.anims[animkey] = trk
-		obj.dirty = true
+		obj.setDirty(true)
 		return true
 	}
 
@@ -24,17 +24,19 @@ define.class('$base/node', function(require, exports, self){
 			if(anim.start_time === undefined) anim.start_time = time
 			var mytime = time - anim.start_time
 			var value = anim.compute(mytime)
-
 			if(value instanceof anim.End){
 				delete this.anims[key] 
 				//console.log(value.last_value)
 				anim.obj.emit(anim.key, value.last_value)
+				anim.obj.setDirty(true)
 			}
 			else{
 				anim.obj.emit(anim.key, value)
+				anim.obj.setDirty(true)
 				if(!hasanim) hasanim = true
 			}
 		}
+
 		return hasanim
 	}
 	this.event("postLayout")

@@ -249,11 +249,28 @@ define.class(function(require, constructor){
 		}
 	}
 	
-	this.emit = function(key, value){
+	this.emit = function(key, value, recur){
 		var on_key = 'on' + key
 		var listen_key = '_listen_' + key
+		var config = this['_cfg_' + key]
+		var value_key = '_' + key
 
-		if(value !== undefined) this['_' + key] = value
+		if(value !== undefined){ // lets check storage
+			if(config.storage && !recur){
+				var storage_key = '_' + config.storage
+				var store
+				if(!this.hasOwnProperty(storage_key)){
+					store = this[storage_key]
+					store = this[storage_key] = store.struct(store)
+				}
+				else{
+					store = this[storage_key]
+				}
+				this[value_key] = store[config.index] = value
+				//this.emit(config.storage, store)
+			}
+			this[value_key] = value
+		}
 
 		var proto = this
 		var stack
@@ -421,19 +438,22 @@ define.class(function(require, constructor){
 					store = this[storage_key]
 				}
 				var config = this[config_key]
-				if(config.motion && this.startMotion(key, value)) return
+				if(config.motion && this.startMotion(key, value)){
+					return
+				}
 
 				this[value_key] = store[config.index] = value
 
+				// emitting it on storage should emit it back to myself
 				this.emit(config.storage, store)
 
 				if(this.atAttributeSet !== undefined) this.atAttributeSet(key, value)
-				if(on_key in this || listen_key in this) this.emit(key, value)
+				//if(on_key in this || listen_key in this) this.emit(key, value)
 			}
 
 			this.addListener(config.storage, function(value){
 				var myval = this[value_key] = value[config.index]
-				if(on_key in this || listen_key in this)  this.emit(key, myval)
+				if(on_key in this || listen_key in this)  this.emit(key, myval, true)
 			})
 			// initialize value
 			this[value_key] = this[storage_key][config.index]
@@ -453,8 +473,11 @@ define.class(function(require, constructor){
 
 				if(config.type) value = config.type(value)
 
-				if(config.motion && this.startMotion(key, value)) return
-				
+				if(config.motion && this.startMotion(key, value)){
+					// store the end value
+					return
+				}
+
 				this[value_key] = value
 
 				if(this.atAttributeSet !== undefined) this.atAttributeSet(key, value)
@@ -471,6 +494,7 @@ define.class(function(require, constructor){
 				var getter = this[get_key]
 				if(getter !== undefined) return getter()
 				// lets check if we need to map our stored type
+				// if we are in motion, we should return the end value
 				return this[value_key]
 			},
 			set: setter

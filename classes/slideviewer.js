@@ -17,24 +17,27 @@ define.class(function(view, require){
 	});
 
 	// lets put an animation on x
-	//this.attribute('x', {motion:1})
+	this.attribute('x', {motion:'bounce',duration:1})
 
-	this.state('pos')
+	this.state('page')
 	this.constructor.slide = this.slide
 	
 	this.slidewidth = 1024
 	this.slidemargin = 10
 	this.slideheight = 1024
+	this.page = 0
 	this.keydown = function(key){
 		// alright we have a keydown!
 		if(key.name == 'leftarrow'){
 			// we need to animate to the left
-			if(this.x <0)
-			this.x += this.slidewidth + this.slidemargin * 2
+			if(this.page >0) this.page --
+
+			this.x = -this.page * (this.slidewidth + this.slidemargin * 2)
 		}
 		else if(key.name == 'rightarrow'){
 			// animate to the right
-			this.x -= this.slidewidth + this.slidemargin * 2
+			if(this.page < this.constructor_children.length-1)this.page++
+			this.x =  -this.page *  (this.slidewidth + this.slidemargin * 2)
 		}
 	}
 
