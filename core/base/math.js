@@ -1844,34 +1844,34 @@ define(function(require, exports){
 	var ease = exports.ease = {}
 
 	exports.ease.linear = function(t){ return t }
-	exports.ease.inQuad = function(t){ return t*t }
-	exports.ease.outQuad = function(t){ return -t*(t-2.) }
-	exports.ease.inOutQuad = function(t){ return (t/=0.5) < 1. ? 0.5*t*t : -0.5 * ((--t)*(t-2.) - 1.) }
-	exports.ease.inCubic = function(t){ return t*t*t }
-	exports.ease.outCubic = function(t){ return ((t=t-1)*t*t + 1) }
-	exports.ease.inOutCubic = function(t){ return (t/=0.5) < 1. ? 0.5*t*t*t : 1. /2.*((t-=2.)*t*t + 2.) }
-	exports.ease.inQuart = function(t){ return t*t*t*t }
-	exports.ease.outQuart = function(t){ return -((t=t-1.)*t*t*t - 1.) }
-	exports.ease.inOutQuart = function(t){ return (t/=0.5) < 1. ? 0.5*t*t*t*t : -0.5 * ((t-=2.)*t*t*t - 2.) }
-	exports.ease.inQuint = function(t){ return t*t*t*t*t }
-	exports.ease.outQuint = function(t){ return ((t=t-1.)*t*t*t*t + 1.) }
-	exports.ease.inOutQuint = function(t){ return (t/=0.5) < 1. ? 0.5*t*t*t*t*t : 0.5*((t-=2.)*t*t*t*t + 2.) }	
-	exports.ease.inSine = function(t){ return -cos(t * (PI/2.)) + 1. }
-	exports.ease.outSine = function(t){ return sin(t * (PI/2.)) }
-	exports.ease.inOutSine = function(t){ return -0.5 * (cos(PI*t) - 1.) }
-	exports.ease.inExpo = function(t){ return (t==0.)? 0.: pow(2., 10. * (t - 1.)) }
-	exports.ease.outExpo = function(t){ return (t==1.)? 1.: (-pow(2., -10. * t) + 1.) }
-	exports.ease.inCirc = function(t){ return - (sqrt(1. - t*t) - 1.) }
-	exports.ease.outCirc = function(t){ return sqrt(1. - (t=t-1.)*t) }
-	exports.ease.inOutCirc = function(t){ return (t/=0.5) < 1.? -0.5 * (sqrt(1. - t*t) - 1.): 0.5 * (sqrt(1. - (t-=2.)*t) + 1.) }
-	exports.ease.inOutExpo = function(t){
+	exports.ease.inquad = function(t){ return t*t }
+	exports.ease.outquad = function(t){ return -t*(t-2.) }
+	exports.ease.inoutquad = function(t){ return (t/=0.5) < 1. ? 0.5*t*t : -0.5 * ((--t)*(t-2.) - 1.) }
+	exports.ease.incubic = function(t){ return t*t*t }
+	exports.ease.outcubic = function(t){ return ((t=t-1)*t*t + 1) }
+	exports.ease.inoutcubic = function(t){ return (t/=0.5) < 1. ? 0.5*t*t*t : 1. /2.*((t-=2.)*t*t + 2.) }
+	exports.ease.inquart = function(t){ return t*t*t*t }
+	exports.ease.outquart = function(t){ return -((t=t-1.)*t*t*t - 1.) }
+	exports.ease.inoutquart = function(t){ return (t/=0.5) < 1. ? 0.5*t*t*t*t : -0.5 * ((t-=2.)*t*t*t - 2.) }
+	exports.ease.inquint = function(t){ return t*t*t*t*t }
+	exports.ease.outquint = function(t){ return ((t=t-1.)*t*t*t*t + 1.) }
+	exports.ease.inoutquint = function(t){ return (t/=0.5) < 1. ? 0.5*t*t*t*t*t : 0.5*((t-=2.)*t*t*t*t + 2.) }	
+	exports.ease.insine = function(t){ return -cos(t * (PI/2.)) + 1. }
+	exports.ease.outsine = function(t){ return sin(t * (PI/2.)) }
+	exports.ease.inoutsine = function(t){ return -0.5 * (cos(PI*t) - 1.) }
+	exports.ease.inexpo = function(t){ return (t==0.)? 0.: pow(2., 10. * (t - 1.)) }
+	exports.ease.outexpo = function(t){ return (t==1.)? 1.: (-pow(2., -10. * t) + 1.) }
+	exports.ease.incirc = function(t){ return - (sqrt(1. - t*t) - 1.) }
+	exports.ease.outcirc = function(t){ return sqrt(1. - (t=t-1.)*t) }
+	exports.ease.inoutcirc = function(t){ return (t/=0.5) < 1.? -0.5 * (sqrt(1. - t*t) - 1.): 0.5 * (sqrt(1. - (t-=2.)*t) + 1.) }
+	exports.ease.inoutexpo = function(t){
 		if (t==0.) return 0.
 		if (t==1.) return 1.
 		if ((t/=0.5) < 1.) return 0.5 * pow(2., 10. * (t - 1.)) 
 		return 0.5 * (-pow(2., -10. * --t) + 2.) 
 	}
 
-	exports.ease.inElastic = function(t){
+	exports.ease.inelastic = function(t){
 		var s=1.70158, p=0., a=1.;
 		if (t==0.) return 0.
 		if (t==1.) return 1.
@@ -1881,7 +1881,7 @@ define(function(require, exports){
 		return -(a*pow(2.,10.*(t-=1.)) * sin( (t*1.-s)*(2.*PI)/p )) 
 	}
 
-	exports.ease.outElastic = function(t){
+	exports.ease.outelastic = function(t){
 		var s=1.70158, p=0., a=1.
 		if (t==0.) return 0.
 		if (t==1.) return 1.
@@ -1891,7 +1891,7 @@ define(function(require, exports){
 		return a*pow(2.,-10.*t) * sin( (t*1.-s)*(2.*PI)/p ) + 1. 
 	}
 
-	exports.ease.inOutElastic = function(t){
+	exports.ease.inoutelastic = function(t){
 		var s=1.70158, p=0., a=1.
 		if (t==0.) return 0.
 		if ((t/=0.5)==2.) return 1.
@@ -1902,40 +1902,40 @@ define(function(require, exports){
 		return a*pow(2.,-10.*(t-=1.)) * sin( (t*1.-s)*(2.*PI)/p )*0.5 + 1.
 	}
 
-	exports.ease.inBack = function(t){ var s = 1.70158; return (t/=1.)*t*((s+1.)*t - s) }
-	exports.ease.outBack = function(t){ var s = 1.70158; return ((t=t/1-1)*t*((s+1)*t + s) + 1) }
-	exports.ease.inOutBack = function(t){
+	exports.ease.inback = function(t){ var s = 1.70158; return (t/=1.)*t*((s+1.)*t - s) }
+	exports.ease.outback = function(t){ var s = 1.70158; return ((t=t/1-1)*t*((s+1)*t + s) + 1) }
+	exports.ease.inoutback = function(t){
 		var s = 1.70158
 		if ((t/=0.5) < 1.) return 0.5*(t*t*(((s*=(1.525))+1.)*t - s)) 
 		return 0.5*((t-=2.)*t*(((s*=(1.525))+1.)*t + s) + 2.) 
 	}
 
-	exports.ease.inBounce = function(t){
-		return 1. - exports.ease.outBounce(1.-t) 
+	exports.ease.inbounce = function(t){
+		return 1. - exports.ease.outbounce(1.-t) 
 	}
 
-	exports.ease.outBounce = function(t){
+	exports.ease.outbounce = function(t){
 		if (t < (1./2.75)) return (7.5625*t*t) 
 		else if (t < (2./2.75)) return (7.5625*(t-=(1.5/2.75))*t + 0.75) 
 		else if (t < (2.5/2.75)) return (7.5625*(t-=(2.25/2.75))*t + 0.9375) 
 		return (7.5625*(t-=(2.625/2.75))*t + .984375) 
 	}
 
-	exports.ease.inOutBounce = function(t){
-		if (t < 0.5) return ease.inBounce (t*2.) * 0.5 
-		return ease.outBounce (t*2.-1.) * 0.5 + 0.5 
+	exports.ease.inoutbounce = function(t){
+		if (t < 0.5) return ease.inbounce (t*2.) * 0.5 
+		return ease.outbounce (t*2.-1.) * 0.5 + 0.5 
 	}
 
-	exports.ease.quad = function(t){ return ease.outQuad(t)}
-	exports.ease.cubic = function(t){ return ease.inOutCubic(t) }
-	exports.ease.quart = function(t){ return ease.outQuart(t) }
-	exports.ease.quint = function(t){ return ease.outQuint(t) }
-	exports.ease.sine = function(t){ return ease.outSine(t) }
-	exports.ease.expo = function(t){ return ease.outExpo(t) }
-	exports.ease.elastic = function(t){return ease.outElastic(t) }
-	exports.ease.circ = function(t){ return ease.outCirc(t) }
-	exports.ease.back = function(t){ return ease.inOutBack(t) }
-	exports.ease.bounce = function(t){ return ease.outBounce(t) }
+	exports.ease.quad = function(t){ return ease.outquad(t)}
+	exports.ease.cubic = function(t){ return ease.inoutcubic(t) }
+	exports.ease.quart = function(t){ return ease.outquart(t) }
+	exports.ease.quint = function(t){ return ease.outquint(t) }
+	exports.ease.sine = function(t){ return ease.outsine(t) }
+	exports.ease.expo = function(t){ return ease.outexpo(t) }
+	exports.ease.elastic = function(t){return ease.outelastic(t) }
+	exports.ease.circ = function(t){ return ease.outcirc(t) }
+	exports.ease.back = function(t){ return ease.inoutback(t) }
+	exports.ease.bounce = function(t){ return ease.outbounce(t) }
 
 	exports.ease.bezier = function(control){
 		var b = {}

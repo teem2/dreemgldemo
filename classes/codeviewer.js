@@ -137,7 +137,7 @@ define.class(function codeviewerbody(require, text){
 
 			if(this.font) textbuf.font = this.font
 
-			textbuf.font_size = this.fontsize
+			textbuf.fontsize = this.fontsize
 			textbuf.add_y = textbuf.line_height
 			textbuf.align = 'left'
 			textbuf.start_y = textbuf.line_height
