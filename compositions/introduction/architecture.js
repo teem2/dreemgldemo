@@ -18,12 +18,14 @@ define.class(function(view, require, screens){
 	}
 		
 	define.class(this, 'rectshader', GLShader, function(){
-		this.color = function(){return vec4("#809080");};
+		this.color = function(){
+			return vec4("#809080") + mesh.w *vec4(1,0,0,0);
+		};
 		
 		this.addRect  = function(x,y,w,h){
-			this.mesh.pushQuad(x,y, x+w, y, x, y+h,x+w, y+h)
+			this.mesh.pushQuad(x,y,0,0, x+w, y,1,0, x, y+h,0,1, x+w, y+h, 1,1)
 		}
-		this.mesh = vec2.array();
+		this.mesh = vec4.array();
 		this.matrix = mat4.identity()
 		this.viewmatrix = mat4.identity()
 		
@@ -45,15 +47,11 @@ define.class(function(view, require, screens){
 	})
 	
 	define.class(this, 'textshader', GLText, function(){
-		this.mesh = vec2.quad(0, 0, 1, 0, 0, 1, 1, 1)
 		this.matrix = mat4.identity()
 		this.viewmatrix = mat4.identity()
 		
 		//this.color = function(){return vec4("red");};
-		this.position = function(){
-			sized = vec2(mesh.x , mesh.y )
-			return vec4(sized.x, sized.y, 0, 1) * matrix * viewmatrix
-		}
+	
 	})
 
 	this.attribute("file",{});
@@ -66,16 +64,20 @@ define.class(function(view, require, screens){
 		this.rects = new this.rectshader();
 		this.texts = new this.textshader();
 		this.arrows = new this.arrowshader();
-		
+
 		this.textbuf = this.texts.newText()
+		this.texts.mesh = this.textbuf;
+	
+		this.texts.fgcolor = vec4("black" );
+		this.textbuf.fontsize = 20;
 	}
 	
 	this.doDraw = function(renderstate){
 		this.rects._time = this.screen.time
-		this.fg_shader._time = this.screen.time
+		this.texts._time = this.screen.time
 
 		this.rects.draw(this.screen.device)
-		this.fg_shader.draw(this.screen.device)
+		this.texts.draw(this.screen.device)
 
 		// lets check if we have a reference on time
 		if(this.rects.shader && this.rects.shader.unilocs.time || 
@@ -96,19 +98,32 @@ define.class(function(view, require, screens){
 	}
 	
 	this.BuildTree = function(startx, starty, node) {
-		this.rects.addRect(startx,starty,100,50);
 		var newx = startx;
-		var newy = starty + 60;
+		var newy = starty + 80;
+		
+		var wh = this.textbuf.measurestring(node.source.name);
+		
+		
+		
+		
+		var maxR = startx;
 		
 		for(var i = 0;i<node.children.length;i++)
 		{
 			var c = node.children[i];
-			var R = this.BuildTree(newx, newy, c);
-			console.log(c);
-			
+			var R = this.BuildTree(maxR+5, newy, c);
+			maxR = Math.max(R.x+10, maxR);			
 		}
+
+var blockw = Math.max(110,maxR-newx );
 		
-		return {x:startx + 110, y: starty + 60};
+		this.rects.addRect(startx,starty,blockw,50);
+		this.textbuf.add_x = startx - wh.w /2 + blockw/2;
+		this.textbuf.add_y = starty + 50/2 + this.textbuf.fontsize-  this.textbuf.fontsize / 2;
+		this.textbuf.add(node.source.name);
+
+		
+		return {x: Math.max(maxR,  startx + 110), y: starty + 60};
 	}	
 
 	
@@ -130,10 +145,10 @@ define.class(function(view, require, screens){
 			var connection = this.file.connections[i];
 			var from = this.nodes[connection.from];
 			var to = this.nodes[connection.to];										
-			if (to)
+			if (from)
 			{
-				to.tocount++;
-				if (from) from.children.push(to);
+				from.tocount++;
+				if (to) to.children.push(from);
 			}
 		}		
 		

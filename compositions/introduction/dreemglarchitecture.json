@@ -5,13 +5,14 @@
 		{"name":"Clients"},
 		{"name":"GPU"},
 		{"name":"Composition"},
-		{"name":"CPU"},
-		{"name":"Browser"},
-		{"name":"RPC Hub"}
+		{"name":"CPU"}
 	],
 	"connections":[
-		{"from":"DreemGL","to":"Server"},
-		{"from":"Clients","to":"Server"},
-		{"from":"CPU","to":"Clients"}
+		{"from":"Server","to":"Composition"},
+		{"from":"Composition","to":"DreemGL"},
+		{"from":"Clients","to":"Composition"},
+		{"from":"CPU","to":"Clients"},
+		{"from":"CPU","to":"Server"},
+		{"from":"GPU","to":"Clients"}
 	]
 }

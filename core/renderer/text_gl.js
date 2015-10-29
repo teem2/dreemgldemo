@@ -52,7 +52,7 @@ define.class('./view_gl', function(require, exports, self){
 
 			if(this.font) textbuf.font = this.font
 
-			textbuf.font_size = this.fontsize;
+			textbuf.fontsize = this.fontsize;
 			textbuf.add_y = textbuf.line_height;
 			textbuf.align = this.align;
 			textbuf.start_y = textbuf.line_height
