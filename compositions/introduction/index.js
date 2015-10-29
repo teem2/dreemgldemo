@@ -1,4 +1,4 @@
-define.class(function(composition, require, screens, screen, docviewer, text, scrollcontainer, codeviewer, view, slideviewer, draggable, perspective3d, teapot,ballrotate, architecture){
+define.class(function(composition, require, screens, screen, docviewer, button, text, scrollcontainer, codeviewer, view, slideviewer, draggable, perspective3d, teapot,ballrotate, architecture){
 	// Live coding presentation docs!
 
 	this.attribute('testattr', {type:vec4,value:'red'})
@@ -6,7 +6,12 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 	this.render = function render(){ 
 		return [
 			screens(
-				screen({name:'desktop'},
+				screen({name:'desktop',
+					init:function(){
+						this.rpc.screens.remote.pager = function(value){
+							this.children[0].page += value
+						}.bind(this)
+					}},
 					slideviewer({
 						init:function(){
 							console.log()
@@ -35,11 +40,23 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 						)
 					)
 					,view({
+							slidetitle:'High level overview'
+							,flex:1 , bgcolor:"transparent" 
+						}
+						,view({left:100, top:100,width:800, height:450, bgimage:require('./graph.png'),
+							bg:{
+								bgcolorfn:function(pos,dist){
+									return texture.sample(pos)
+									//return texture.sample(pos+0.1*noise.noise3d(vec3(pos, time)))
+								}
+							}})
+					)
+					/*,view({
 							slidetitle:'Architecture overview'
 							,flex:1 , bgcolor:"transparent" 
 						}
 						,architecture({flex:1, file:require("./dreemglarchitecture.json")})
-					)
+					)*/
 					,view({
 							flex:1,
 							bgcolor:'transparent',
@@ -143,21 +160,31 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 			)
 		),
 		screen({
-				attribute_mousepos:{type:vec2, value:'${this.main.pos}'},
+				attribute_pager:{type:int, value:0},
 				name:'remote',
 			}
-			,view({
-				name:'main',
-				size: vec2(200, 200),
-				bgcolor: vec4('yellow'),
-				is: draggable(),
-				init: function(){
-					this.screen.mousepos = function(){
-						console.log("MOVIN")
+			,view({flex:1, bgcolor:'black'}
+				,button({
+					text:'Left',
+					flex:1,
+					size: vec2(200, 200),
+					bgcolor: vec4('yellow'),
+					//is: draggable(),
+					click: function(){
+						this.screen.pager = -1
 					}
-					// alright lets make this draggable. framerjs style
-				}
-			})
+				})
+				,button({
+					text:'Right',
+					flex:1,
+					size: vec2(200, 200),
+					bgcolor: vec4('red'),
+					//is: draggable(),
+					click: function(){
+						this.screen.pager = 1
+					}
+				})
+			)
 		)
 		)]
 	}

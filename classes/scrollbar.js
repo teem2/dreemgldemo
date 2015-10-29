@@ -73,7 +73,7 @@ define.class(function(view, text){
 		}		
 	}
 
-	this.borderwidth = 2
+	this.borderwidth = 0
 	this.margin = 1
 	this.bordercolor = vec4("#303060")
 	
