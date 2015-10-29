@@ -36,7 +36,7 @@ define.class(function(view, text){
 	
 	this.hslider = function(){
 		// we have a rectangle
-		var rel = vec2(mesh.pos.x*width, mesh.pos.y*height)
+		var rel = vec2(uv.x*width, uv.y*height)
 		var edge = min(length(vec2(length(dFdx(rel)), length(dFdy(rel)))) * SQRT_1_2, 0.001)		
 		var field = shape.roundbox(rel, offset * width, 0.05*height,page*width, .9*height,4)
 		var fg = vec4(draggercolor.rgb, smoothstep(edge, -edge, field)*draggercolor.a)
@@ -47,7 +47,7 @@ define.class(function(view, text){
 	
 	this.vslider = function(){
 		// we have a rectangle
-		var rel = vec2(mesh.pos.x*width, mesh.pos.y*height)
+		var rel = vec2(uv.x*width, uv.y*height)
 		var edge = min(length(vec2(length(dFdx(rel)), length(dFdy(rel)))) * SQRT_1_2, 0.001)
 		var field = shape.roundbox(rel, 0.05 * width, offset*height,.9*width, page*height,4)
 		var fg = vec4(draggercolor.rgb, smoothstep(edge, -edge, field)*draggercolor.a)
@@ -73,7 +73,7 @@ define.class(function(view, text){
 		}		
 	}
 
-	this.borderwidth = 2
+	this.borderwidth = 0
 	this.margin = 1
 	this.bordercolor = vec4("#303060")
 	

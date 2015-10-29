@@ -6,7 +6,12 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 	this.render = function render(){ 
 		return [
 			screens(
-				screen({name:'desktop'},
+				screen({name:'desktop',
+					init:function(){
+						//this.rpc.remote.pager = function(value){
+						//	console.log(value)
+						//}
+					}},
 					slideviewer({
 						init:function(){
 							console.log()
@@ -35,11 +40,23 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 						)
 					)
 					,view({
+							slidetitle:'High level overview'
+							,flex:1 , bgcolor:"transparent" 
+						}
+						,view({left:100, top:100,width:800, height:450, bgimage:require('./graph.png'),
+							bg:{
+								bgcolorfn:function(pos,dist){
+									return texture.sample(pos)
+									//return texture.sample(pos+0.1*noise.noise3d(vec3(pos, time)))
+								}
+							}})
+					)
+					/*,view({
 							slidetitle:'Architecture overview'
 							,flex:1 , bgcolor:"transparent" 
 						}
 						,architecture({flex:1, file:require("./dreemglarchitecture.json")})
-					)
+					)*/
 					,view({
 							flex:1,
 							bgcolor:'transparent',
@@ -106,7 +123,7 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 							this.bg = {
 								value:0,
 								color:function(){
-									return mix('red', 'green', abs(sin(mesh.pos.y*0.01+value)))
+									return mix('red', 'green', abs(sin(mesh.pos.y * 0.01 + value)))
 								}
 							}
 						}.toString(), padding:vec4(4), fontsize: 14, bgcolor:"#000030", multiline: true})
@@ -142,21 +159,29 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 			)
 		),
 		screen({
-				attribute_mousepos:{type:vec2, value:'${this.main.pos}'},
+				attribute_pager:{type:vec2, value:0},
 				name:'remote',
 			}
-			,view({
-				name:'main',
-				size: vec2(200, 200),
-				bgcolor: vec4('yellow'),
-				is: draggable(),
-				init: function(){
-					this.screen.mousepos = function(){
-						console.log("MOVIN")
+			,view({flex:1, bgcolor:'black'}
+				,view({
+					flex:1,
+					size: vec2(200, 200),
+					bgcolor: vec4('yellow'),
+					//is: draggable(),
+					click: function(){
+						this.screen.pager++
 					}
-					// alright lets make this draggable. framerjs style
-				}
-			})
+				},text({text:'Left'}))
+				,view({
+					flex:1,
+					size: vec2(200, 200),
+					bgcolor: vec4('red'),
+					//is: draggable(),
+					click: function(){
+						this.screen.pager--
+					}
+				},text({text:'Right'}))
+			)
 		)
 		)]
 	}

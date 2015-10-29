@@ -25,9 +25,9 @@ define.class(function(view, require){
 	this.page = function(){
 		this.x = -this.page * (this.slidewidth + this.slidemargin * 2)
 	}
+
 	this.state('pos')
 	this.state('page')
-
 
 	this.constructor.slide = this.slide
 	

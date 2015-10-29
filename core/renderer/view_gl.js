@@ -46,11 +46,11 @@ define.class('./view_base', function(require, exports){
 			
 			if(this.bg_shader.bgcolorfn === this.plaincolor){
 				this.bg_shader.bgcolorfn = function(pos, dist){
-					var aspect = texture.size.y / texture.size.x
-					var center = (1. - aspect) * .5
-					var sam = vec2(pos.x * aspect + center, pos.y)
-					var col = texture.sample(sam)
-					if(sam.x< 0. || sam.x > 1.) col.a = 0.
+					//var aspect = texture.size.y / texture.size.x
+					//var center = (1. - aspect) * .5
+					//var sam = vec2(pos.x * aspect + center, pos.y)
+					var col = texture.sample(pos)
+					//if(sam.x< 0. || sam.x > 1.) col.a = 0.
 					return col
 				}
 			}
