@@ -1107,6 +1107,7 @@
 			}
 		}
 
+		// Optional params: topleft, topright, bottomleft, bottomright
 		self.pushQuad = function(){
 			this.clean = false
 			var slots = this.slots

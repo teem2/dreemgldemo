@@ -1,0 +1,17 @@
+{
+	"nodes":[
+		{"name":"DreemGL"}, 
+		{"name":"Server"},
+		{"name":"Clients"},
+		{"name":"GPU"},
+		{"name":"Composition"},
+		{"name":"CPU"},
+		{"name":"Browser"},
+		{"name":"RPC Hub"}
+	],
+	"connections":[
+		{"from":"DreemGL","to":"Server"},
+		{"from":"Clients","to":"Server"},
+		{"from":"CPU","to":"Clients"}
+	]
+}

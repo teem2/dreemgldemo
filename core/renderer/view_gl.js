@@ -378,10 +378,18 @@ define.class('./view_base', function(require, exports){
 
 	this.renderQuad = function(texture, rect) {}
 
+	this.setMatrixUniforms = function(renderstate){
+		var bg = this.bg_shader;
+		var fg = this.fg_shader;		
+		bg._matrix = renderstate.matrix;
+		fg._matrix = renderstate.matrix;
+		bg._viewmatrix = renderstate.viewmatrix;
+		fg._viewmatrix = renderstate.viewmatrix;
+
+	}
+	
 	this.drawStencil = function (renderstate) {
-		this.bg_shader.matrix = renderstate.matrix
-		this.bg_shader.viewmatrix = renderstate.viewmatrix
-		
+		this.setMatrixUniforms(renderstate);
 		if (this.layout){
 			this.bg_shader.width = this.layout.width? this.layout.width:this.width
 			this.bg_shader.height = this.layout.height? this.layout.height:this.height
@@ -435,8 +443,6 @@ define.class('./view_base', function(require, exports){
 		//mat4.debug(this.orientation.matrix);
 		var bg = this.bg_shader
 		var fg = this.fg_shader
-		bg._viewmatrix = renderstate.viewmatrix
-		fg._viewmatrix = renderstate.viewmatrix
 		
 		var bound = this.getBoundingRect()
 
@@ -449,8 +455,8 @@ define.class('./view_base', function(require, exports){
 			// idea reference outer node using shader.node
 			// and 
 			if (this.matrixdirty) this.recomputeMatrix()
-			fg._matrix = bg._matrix = renderstate.matrix
-
+			this.setMatrixUniforms(renderstate);
+			
 			if(this.layout){
 				this.bg_shader._width = this.layout.width? this.layout.width: this._width
 				this.bg_shader._height = this.layout.height? this.layout.height: this._height

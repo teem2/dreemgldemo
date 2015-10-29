@@ -1,8 +1,8 @@
-define.class(function(composition, require, screens, screen, docviewer, text, scrollcontainer, codeviewer, view, slideviewer, draggable, perspective3d, teapot,ballrotate){
+define.class(function(composition, require, screens, screen, docviewer, text, scrollcontainer, codeviewer, view, slideviewer, draggable, perspective3d, teapot,ballrotate, architecture){
 	// Live coding presentation
 
 	this.attribute('testattr', {type:vec4,value:'blue'})
-
+	
 	this.render = function render(){ 
 		return [
 			screens(
@@ -38,7 +38,9 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 							slidetitle:'Architecture overview'
 							,flex:1
 						}
-						,scrollcontainer({flex:1})
+						,scrollcontainer({flex:1}, 
+						architecture({file:require("./dreemglarchitecture.json")})
+						)
 					)
 					,view({
 							flex:1,
@@ -53,7 +55,7 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 										var stripex = floor(mod((mesh.uv.x )* stripes  + 0.05,1.0) *stripeamt ) / stripeamt < 0.1?1.0:0.0;
 										var stripey = floor(mod((mesh.uv.y  )*stripes + 0.05, 1.0)*stripeamt ) / stripeamt < 0.1?1.0:0.0;
 										var maxstripe = max(stripex, stripey);
-										return vec4(0 , maxstripe*  pow(gl_FragCoord.z/2.5,2.0),maxstripe * 0.9,1)//0.5 + 0.9*maxstripe);
+										return vec4(0 , maxstripe * pow(gl_FragCoord.z/2.5,2.0),maxstripe * 0.9,1)//0.5 + 0.9*maxstripe);
 									}
 								}
 								,rot3d:[PI/3,0,0], pos3d:[0,2,0]

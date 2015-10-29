@@ -168,6 +168,7 @@ define.class('./screen_base', function screen(require, exports, self, baseclass)
 	this.readGuid = function(){
 		//return
 		//return
+		this.device.gl.flush();
 		this.device.gl.readPixels(1 * this.device.ratio, 1 * this.device.ratio, 1, 1, this.device.gl.RGBA, this.device.gl.UNSIGNED_BYTE, this.buf);
 		var id = this.buf[0] + (this.buf[1] << 8) + (this.buf[2] << 16)
 		this.lastidundermouse = id
