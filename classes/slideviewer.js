@@ -16,6 +16,9 @@ define.class(function(view, require){
 		}
 	});
 
+	// lets put an animation on x
+	this.attribute('x', {motion:1})
+
 	this.state('pos')
 	this.constructor.slide = this.slide
 	

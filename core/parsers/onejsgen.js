@@ -1,18 +1,19 @@
 // reserializes the AST to oneJS as is
 
-define.class(function(require, exports, self){
+define.class(function(require, exports){
 
-	self.space = ' '
-	self.newline = '\n'
-	self.indent = '\t'
-	self.line = 0
-	self.comma = ',' + self.space
-	self.term = ';'
+	this.space = ' '
+	this.newline = '\n'
+	this.indent = '\t'
+	this.line = 0
+	this.comma = ',' + this.space
+	this.term = ';'
 
-	self.expand = function(node, parent, state){ // recursive expansion
+	this.expand = function(node, parent, state){ // recursive expansion
 		if(!state) throw new Error('Please pass in state {depth:""}')
 		if(!node || !node.type) return ''
 
+		node.parent = parent
 		node.infer = undefined
 
 		if(!this[node.type]) throw new Error('Undefined type in OneJSGen:' + node.type)
@@ -39,7 +40,7 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.block = function(array, parent, state, noindent){ // term split array
+	this.block = function(array, parent, state, noindent){ // term split array
 		state = Object.create(state)
 		if(!noindent) state.depth += this.indent
 
@@ -60,7 +61,7 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.flat = function(array, parent, state){
+	this.flat = function(array, parent, state){
 		var ret = ''
 		for(var i = 0; i < array.length; i++){
 			if(i) ret += this.comma
@@ -69,7 +70,7 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.list = function(array, parent, state){
+	this.list = function(array, parent, state){
 		var ret = ''
 		for(var i = 0; i < array.length; i++){
 			if(ret !== '') ret += this.comma
@@ -82,7 +83,7 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.needsParens = function(node, other, isleft){
+	this.needsParens = function(node, other, isleft){
 		var other_t = other.type
 
 		if(other_t == 'Assign' || other_t == 'List' || other_t == 'Condition' || 
@@ -92,15 +93,15 @@ define.class(function(require, exports, self){
 		}
 	}
 
-	self.Program = function(node, parent, state){ 
+	this.Program = function(node, parent, state){ 
 		return this.block(node.steps, node, state, true)
 	}
 
-	self.Empty = function(node, parent, state){
+	this.Empty = function(node, parent, state){
 		return ''
 	}
 
-	self.Id = function(node, parent, state){
+	this.Id = function(node, parent, state){
 		var flag = node.flag
 		if(flag){
 			if(flag === -1) return '..'
@@ -114,24 +115,24 @@ define.class(function(require, exports, self){
 		return node.name
 	}
 
-	self.Define = function(node, parent, state){ throw new Error('depricated') }
+	this.Define = function(node, parent, state){ throw new Error('depricated') }
 
-	self.Value = function(node, parent, state){
+	this.Value = function(node, parent, state){
 		return node.raw 
 	}
 	 // string, number, bool
-	self.This = function(node, parent, state){
+	this.This = function(node, parent, state){
 		return 'this'
 	}
 
-	self.Array = function(node, parent, state){
+	this.Array = function(node, parent, state){
 		var ret = '[' +
 			this.list(node.elems, node, state) +
 		']'
 		return ret
 	}
 
-	self.Object = function(node, parent, state){ 
+	this.Object = function(node, parent, state){ 
 
 		var nstate = Object.create(state)
 		nstate.depth += this.indent
@@ -165,7 +166,7 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.Index = function(node, parent, state){
+	this.Index = function(node, parent, state){
 		var obj = node.object
 		var object_t = obj.type
 		var object = this.expand(obj, node, state)
@@ -176,7 +177,7 @@ define.class(function(require, exports, self){
 		return object + '[' + this.expand(node.index, node, state) + ']'
 	}
 
-	self.Key = function(node, parent, state){
+	this.Key = function(node, parent, state){
 		var obj = node.object
 		var object_t = obj.type
 		var object = this.expand(obj, node, state)
@@ -187,7 +188,7 @@ define.class(function(require, exports, self){
 		return  object + (this.exist?'?.':'.') + this.expand(node.key, node, state)
 	}
 
-	self.ThisCall = function(node, parent, state){
+	this.ThisCall = function(node, parent, state){
 		var obj = node.object
 		var object_t = obj.type
 		var object = this.expand(obj, node)
@@ -198,20 +199,20 @@ define.class(function(require, exports, self){
 		return  object + '::' + this.expand(node.key, node)
 	}
 
-	self.Block = function(node, parent, state){
+	this.Block = function(node, parent, state){
 		var ret = '{' + this.newline + this.block(node.steps, node, state) + state.depth + '}'
 		return ret
 	}
 
-	self.List = function(node, parent, state){
+	this.List = function(node, parent, state){
 		return this.list(node.items, node, state)
 	}
 
-	self.Comprehension = function(node, parent, state){
+	this.Comprehension = function(node, parent, state){
 		return '1'
 	}
 
-	self.Template = function(node, parent, state){
+	this.Template = function(node, parent, state){
 		var ret = '`'
 		var chain = node.chain
 		var len = chain.length 
@@ -231,19 +232,19 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.Break = function(node, parent, state){
+	this.Break = function(node, parent, state){
 		return 'break' + (node.label? ' ' + this.expand(node.label, node, state): '')
 	}
 
-	self.Continue = function(node, parent, state){
+	this.Continue = function(node, parent, state){
 		return 'continue'+(node.label?' '+this.expand(node.label, node, state): '')
 	}
 
-	self.Label = function(node, parent, state){
+	this.Label = function(node, parent, state){
 		return this.expand(node.label, node, state) + ':' + this.expand(node.body, node, state)
 	}
 
-	self.If = function(node, parent, state){
+	this.If = function(node, parent, state){
 		var ret = 'if('
 		ret += this.expand(node.test, node, state)
 
@@ -260,7 +261,7 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.Switch = function(node, parent, state){
+	this.Switch = function(node, parent, state){
 		var ret = 'switch(' + this.expand(node.on, node, state) + '){'
 		ret += this.newline
 
@@ -275,7 +276,7 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.Case = function(node, parent, state){
+	this.Case = function(node, parent, state){
 		if(!node.test){
 			return 'default:' + (node.steps.length? this.newline+this.block(node.steps, node, state): this.newline)
 		}
@@ -289,11 +290,11 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.Throw = function(node, parent, state){
+	this.Throw = function(node, parent, state){
 		return 'throw ' + this.expand(node.arg, node)
 	}
 
-	self.Try = function(node, parent, state){
+	this.Try = function(node, parent, state){
 		var ret = 'try' + this.expand(node.try, node)
 		if(node.catch){
 			if(node.arg.type !== 'Id') throw new Error("unsupported catch type")
@@ -305,73 +306,73 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.While = function(node, parent, state){
+	this.While = function(node, parent, state){
 		return 'while(' + this.expand(node.test, node, state) + ')' + 
 			this.expand(node.loop, node, state)
 	}
 
-	self.DoWhile = function(node, parent, state){
+	this.DoWhile = function(node, parent, state){
 		return 'do' + this.expand(node.loop, node, state) + 
 			'while(' + this.expand(node.test, node, state) + ')'
 	}
 
-	self.For = function(node, parent, state){
+	this.For = function(node, parent, state){
 		return 'for(' + this.expand(node.init, node, state)+';'+
 				this.expand(node.test, node, state) + ';' +
 				this.expand(node.update, node, state) + ')' + 
 				this.expand(node.loop, node, state)
 	}
 
-	self.ForIn = function(node, parent, state){
+	this.ForIn = function(node, parent, state){
 		return 'for(' + this.expand(node.left, node, state) + ' in ' +
 			this.expand(node.right, node, state) + ')' + 
 			this.expand(node.loop, node, state)
 	}
 
-	self.ForOf = function(node, parent, state){
+	this.ForOf = function(node, parent, state){
 
 		return 'for(' + this.expand(node.left, node, state) + ' of ' +
 			this.expand(node.right, node, state) + ')' + 
 			this.expand(node.loop, node, state)
 	}
 
-	self.ForFrom = function(node, parent, state){
+	this.ForFrom = function(node, parent, state){
 		return 'for(' + this.expand(node.left, node, state) + ' from ' +
 			this.expand(node.right, node, state) + ')' + 
 			this.expand(node.loop, node, state)
 	}
 
-	self.ForTo = function(node, parent, state){
+	this.ForTo = function(node, parent, state){
 		return 'for(' + this.expand(node.left, node, state) + ' to ' +
 			this.expand(node.right, node, state) + 
 			(node.in?' in ' + this.expand(node.in, node, state):'') + ')' + 
 			this.expand(node.loop, node, state)
 	}
 
-	self.Var = function(node, parent, state){
+	this.Var = function(node, parent, state){
 		return 'var ' + this.flat(node.defs, node, state)
 	}
 
-	self.TypeVar = function(node, parent, state){
+	this.TypeVar = function(node, parent, state){
 		return this.expand(node.typing, node, state) + ' ' + 
 			this.flat(node.defs, node, state)
 	}
 
-	self.Def = function(node, parent, state){
+	this.Def = function(node, parent, state){
 		return this.expand(node.id, node, state) + 
 			(node.init ? this.space + '=' + this.space + this.expand(node.init, node, state) : '')
 	}
 
-	self.Struct = function(node, parent, state){
+	this.Struct = function(node, parent, state){
 		return 'struct ' + this.expand(node.id, node, state) + this.expand(node.struct, node, state)
 	}
 
-	self.Enum = function(node, parent, state){
+	this.Enum = function(node, parent, state){
 		return 'enum ' + this.expand(node.id, node) + '{' + this.newline + 
 			state.depth + this.indent + this.list(node.enums, node, state) +'}'
 	}
 
-	self.Function = function(node, parent, state){
+	this.Function = function(node, parent, state){
 		if(node.arrow){
 			var arrow = node.arrow
 			// if an arrow has just one Id as arg leave off ( )
@@ -400,22 +401,22 @@ define.class(function(require, exports, self){
 		return ret
 	}
 
-	self.Return = function(node, parent, state){
+	this.Return = function(node, parent, state){
 		if(!node.arg) return 'return'
 		return 'return ' + this.expand(node.arg, node, state)
 	}
 
-	self.Yield = function(node, parent, state){
+	this.Yield = function(node, parent, state){
 		if(!node.arg) return 'yield'
 		return 'yield ' + this.expand(node.arg, node, state)
 	}
 
-	self.Await = function(node, parent, state){
+	this.Await = function(node, parent, state){
 		if(!node.arg) return 'await'
 		return 'await ' + this.expand(node.arg, node, state)
 	}
 
-	self.Unary = function(node, parent, state){
+	this.Unary = function(node, parent, state){
 		var arg = this.expand(node.arg, node, state)
 		var atype = node.arg.type
 
@@ -432,7 +433,7 @@ define.class(function(require, exports, self){
 	}
 
 	// alright so how are we going to do parens?
-	self.Binary = function(node, parent, state){
+	this.Binary = function(node, parent, state){
 		var left = this.expand(node.left, node, state)
 		var right = this.expand(node.right, node, state)
 
@@ -442,7 +443,7 @@ define.class(function(require, exports, self){
 		return left + this.space + node.op + this.space + right
 	}
 
-	self.Logic = function(node, parent, state){
+	this.Logic = function(node, parent, state){
 		var left = this.expand(node.left, node, state)
 		var right = this.expand(node.right, node, state)
 
@@ -452,18 +453,18 @@ define.class(function(require, exports, self){
 		return left + this.space + node.op + this.space + right
 	}
 
-	self.Assign = function(node, parent, state){
+	this.Assign = function(node, parent, state){
 		var left = this.expand(node.left, node, state)
 		var right = this.expand(node.right, node, state)
 		return left + this.space + node.op + this.space + right
 	}
 
-	self.Update = function(node, parent, state){
+	this.Update = function(node, parent, state){
 		if(node.prefix) return node.op + this.expand(node.arg, node, state)
 		return this.expand(node.arg, node, state) + node.op
 	}
 
-	self.Condition = function(node, parent, state){
+	this.Condition = function(node, parent, state){
 		// if we have a test of logic or binary 
 		var test = this.expand(node.test, node, state)
 		var test_t = node.test.type
@@ -481,7 +482,7 @@ define.class(function(require, exports, self){
 			this.space + else_v
 	}
 
-	self.New = function(node, parent, state){
+	this.New = function(node, parent, state){
 		var fn = this.expand(node.fn, node, state)
 		var fn_t = node.fn.type
 		if(fn_t == 'List' || fn_t == 'Logic' || fn_t == 'Condition') 
@@ -489,7 +490,7 @@ define.class(function(require, exports, self){
 		return 'new ' + fn + '(' + this.list(node.args, node, state) + ')'
 	}
 
-	self.callArgs = function(node, parent, state){
+	this.callArgs = function(node, parent, state){
 		var arg = ''
 		if(node.first_args) arg += this.list(node.first_args, node, state)
 		if(node.args && node.args.length){
@@ -503,7 +504,7 @@ define.class(function(require, exports, self){
 		return arg
 	}
 
-	self.Call = function(node, parent, state){
+	this.Call = function(node, parent, state){
 		var fn = this.expand(node.fn, node, state)
 		var fn_t = node.fn.type
 		if(fn_t == 'Function' || fn_t == 'List' || fn_t == 'Logic' || fn_t == 'Condition') 
@@ -512,47 +513,47 @@ define.class(function(require, exports, self){
 		return fn + '(' + this.callArgs(node, parent, state) + ')'
 	}
 
-	self.Nest = function(node, parent, state){
+	this.Nest = function(node, parent, state){
 		return this.expand(node.fn, node, state) + this.expand(node.body, node, state)
 	}
 
-	self.Class = function(node, parent, state){
+	this.Class = function(node, parent, state){
 		var ret = 'class ' + node.id.name
 		if(node.base) ret += ' extends ' + node.base.name 
 		ret += this.expand(node.body, node, state)
 		return ret
 	}
 
-	self.Quote = function(node, parent, state){
+	this.Quote = function(node, parent, state){
 		var ret = ':' + this.expand(node.quote, node, state)
 		return ret
 	}
 
-	self.Signal = function(node, parent, state){
+	this.Signal = function(node, parent, state){
 		var left = this.expand(node.left, node, state)
 		var right = this.expand(node.right, node, state)
 		return left + ':=' + this.space + quote
 	}
 
-	self.AssignQuote = function(node, parent, state){
+	this.AssignQuote = function(node, parent, state){
 		var left = this.expand(node.left, node, state)
 		var quote = this.expand(node.quote, node, state)
 		return left + ':' + this.space + quote
 	}
 	
-	self.Rest = function(node, parent, state){
+	this.Rest = function(node, parent, state){
 		return '...' + this.expand(node.id, node, state)
 	}
 
-	self.CallBlock = function(node, parent, state){
+	this.CallBlock = function(node, parent, state){
 		return this.expand(node.object, node, state) + this.expand(node.body, node, state)
 	}
 
-	self.Debugger = function(node, parent, state){
+	this.Debugger = function(node, parent, state){
 		return 'debugger'
 	}
 
-	self.With = function(node, parent, state){
+	this.With = function(node, parent, state){
 		return 'with(' + this.expand(node.object, node, state) + ')' + this.expand(node.body, node, state)
 	}
 })

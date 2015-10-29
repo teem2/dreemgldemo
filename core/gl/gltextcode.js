@@ -654,8 +654,10 @@ define.class(function(require, exports){
 		for(var i = 0; i < n.args.length; i++){
 			if(i){
 				this.comma(exports._Call), this.space()
-				this.newline()
-				this.tab(this.indent)
+				if(line !== this.line){
+					this.newline()
+					this.tab(this.indent)
+				}
 			}
 			var arg = n.args[i]
 			if(arg.type === 'Object'){

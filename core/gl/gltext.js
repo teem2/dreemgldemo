@@ -6,7 +6,7 @@ define.class('$gl/glshader', function(require, exports, self){
 	var glfontParser = require('$gl/glfontparser')
 
 	// our font blob
-	this.font = glfontParser(require('$fonts/code_font3_1024.glf'))
+	this.font = glfontParser(require('$fonts/code_font1_ascii_baked.glf'))
 
 	//this.has_guid = false
 
@@ -367,6 +367,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		// load the font
 		// check if the font has a loaded texture
 		buf.font = this.font
+		buf.clear()
 		return buf
 	}
 
@@ -376,20 +377,6 @@ define.class('$gl/glshader', function(require, exports, self){
 
 	this.atConstructor = function(){
 		// lets check 
-		/*
-		if(this.font.baked){
-			this.glyphy_mesh = this.glyphy_mesh_sdf
-			// load the sdf texture
-			if(this.subpixel){
-				this.glyphy_pixel = this.glyphy_sdf_draw_subpixel_5tap
-			}
-			else{
-				this.glyphy_pixel = this.glyphy_sdf_draw
-			}
-		}
-		else{
-			// load the atlas
-		}*/
 	}
 
 	this.glyphy_mesh_sdf = function(){
@@ -401,6 +388,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		glyph = glyph_vertex_transcode(mesh.tex)
 		return (mesh.pos+vec2(mesh.shift_x,mesh.shift_y)) * matrix * viewmatrix
 	}
+
 
 	// glyphy shader library
 	this.GLYPHY_INFINITY = '1e9'
@@ -688,20 +676,20 @@ define.class('$gl/glshader', function(require, exports, self){
 	}
 
 	this.glyph_vertex_transcode = function(v){
-	  var g = ivec2 (v)
-	  var corner = ivec2 (mod (v, 2.))
+	  var g = ivec2(v)
+	  var corner = ivec2(mod (v, 2.))
 	  g /= 2
-	  var nominal_size = ivec2 (mod (vec2(g), 64.))
+	  var nominal_size = ivec2(mod (vec2(g), 64.))
 	  return vec4(corner * nominal_size, g * 4)
 	}
 
 	this.glyphy_sdf_encode = function(value){
-		var enc = .75-.25*value
+		var enc = .75-.25 * value
 		return vec4(enc,enc,enc,1.)
 	}
 
 	this.glyphy_sdf_decode = function(value){
-		return ((.75-value.r)*4.) 
+		return ((.75-value.r)*4.)
 	}
 
 	this.glyphy_sdf_generate = function(){
@@ -809,6 +797,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		if(max_alpha >0.2) max_alpha = 1.
 		return vec4(mix(mesh.bgcolor, mesh.fgcolor, alpha), max_alpha)
 	}
+
 	// draw using SDF texture
 	this.glyphy_sdf_draw = function(){
 		var pos = mesh.tex
@@ -817,7 +806,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		var dpdy = dFdy(pos)
 		var m = length(vec2(length(dpdx), length(dpdy))) * SQRT_1_2
 		// screenspace length
-		mesh.scaling = 500.*m 
+		mesh.scaling = 500. * m 
 		var dist_sample = mesh.font.texture.sample(pos)
 		var gsdist = glyphy_sdf_decode(dist_sample)
 
@@ -833,18 +822,20 @@ define.class('$gl/glshader', function(require, exports, self){
 		mesh.distance -= mesh.boldness / 300.
 		mesh.distance = mesh.distance / m * mesh.contrast
 
-		if(mesh.outline)
+		if(mesh.outline){
 			mesh.distance = abs(mesh.distance) - mesh.outline_thickness
+		}
 
-		if(mesh.distance > 1.)
+		if(mesh.distance > 1.){
 			discard
+		}
 
 		var alpha = glyphy_antialias(-mesh.distance)
 		
 		//if(u_gamma_adjust != 1.)
 		var alpha3 = pow(vec3(alpha), mesh.gamma_adjust)
 		
-		return vec4(mesh.fgcolor.rgb, alpha3) 
+		return vec4(fgcolor.rgb, alpha3) 
 	}
 
 	this.glyphy_atlas_lookup = function(offset, _atlas_pos){
@@ -862,7 +853,6 @@ define.class('$gl/glshader', function(require, exports, self){
 
 	// draw using atlas
 	this.time = 0
-	this.glyphy_pixel = 
 	this.glyphy_atlas_draw = function(){
 		//'trace'
 		var nominal_size = (ivec2(mod(glyph.zw, 256.)) + 2) / 4
@@ -905,4 +895,15 @@ define.class('$gl/glshader', function(require, exports, self){
 		
 		return vec4(fgcolor.rgb, alpha * fgcolor.a)
 	}
+
+
+	if(this.font.baked){
+		this.glyphy_mesh = this.glyphy_mesh_sdf
+		this.glyphy_pixel = this.glyphy_sdf_draw
+	}
+	else{
+		this.glyphy_pixel = this.glyphy_atlas_draw
+		this.glyphy_mesh = this.glyphy_mesh_atlas
+	}
+
 })

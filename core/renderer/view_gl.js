@@ -16,9 +16,14 @@ define.class('./view_base', function(require, exports){
 	
 	this.init = function(previous){
 		
-		this.bg_shader = new this.bg()
-		this.fg_shader = new this.fg()
-		
+		//if(previous){
+		//	this.bg_shader = previous.bg_shader
+		//	this.fg_shader = previous.fg_shader
+		//}
+		//else{
+			this.bg_shader = new this.bg()
+			this.fg_shader = new this.fg()
+		//}
 		this.orientation = {
 			rotation : vec3(0, 0, 0), // (or {0,0,0} for 3d rotation)
 			translation : vec3(this.x != undefined? this.x: 0, this.y != undefined? this.y: 0, 0),

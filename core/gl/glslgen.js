@@ -4,6 +4,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 
 	var gltypes = require('$gl/gltypes')
 	var OneJSParser =  require('$parsers/onejsparser')
+	var OneJSGen = require('$parsers/onejsgen.js')
 	var GLTexture = require('$gl/gltexture')
 	var vectorParser = require('$parsers/vectorparser')
 	var onejsparser = new OneJSParser()
@@ -173,8 +174,13 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 			throw new Error('Id cannot be resolved: "'+name +'", but exists on the current context (set to undefined)')
 		}
 		else {
-			console.log(node)
-			throw new Error('Id cannot be resolved '+name)
+			var gen = new OneJSGen() 
+			// lets find the parent
+			var p = node
+			while(p.parent) p = p.parent
+			var str = gen.expand(p, null, {})
+			var name = gen.expand(node, null, {})
+			throw new Error('Id cannot be resolved '+name+' - '+str)
 		}
 	}
 
@@ -378,7 +384,7 @@ define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
 				// ok well we have a function. lets expand it
 				var fnast = type.ast
 
-				fnobj.code = this.expand(type.ast, null, fstate),
+				fnobj.code = this.expand(type.ast, undefined, fstate),
 				fnobj.return_t = fstate.call.return_t
 
 				if(fstate.call.dump){
