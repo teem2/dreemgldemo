@@ -17,14 +17,14 @@ define.class(function(view, require){
 	});
 
 	// lets put an animation on x
-	this.attribute('x', {motion:'bounce',duration:1})
+	this.attribute('x', {motion:'inOutSine',duration:0.2})
 
 	this.attribute('page',{type:int})
 
 	this.page = function(){
 		this.x = -this.page * (this.slidewidth + this.slidemargin * 2)
 	}
-
+	this.state('pos')
 	this.state('page')
 
 
@@ -53,7 +53,6 @@ define.class(function(view, require){
 
 	this.init = function(){
 		this.screen.setFocus(this)
-		console.log(this.pos)
 	}
 
 	this.render = function(){

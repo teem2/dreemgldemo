@@ -610,10 +610,13 @@ define.class(function(require, exports){
 	}
 
 	this.Update = function(n){//: { op:0, prio:0, arg:1, prefix:0 },
-		if(prefix)
+		if(n.prefix){
 			this.operator(n.op, exports._Update), this.expand(n.arg)
-		else
-			this.expand(n.arg), Operator(n.op, exports._Update)
+		}
+		else{
+			this.expand(n.arg)
+			this.operator(n.op, exports._Update)
+		}
 	}
 
 	this.Condition = function(n){//: { test:1, then:1, else:1 },

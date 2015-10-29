@@ -947,6 +947,7 @@ define.class('$base/node', function(require, exports, self){
 			if(gen.args == 2) out += ',uni[0], uni[1])\n'
 			if(gen.args == 3) out += ',uni[0], uni[1], uni[2])\n'
 			if(gen.args == 4) out += ',uni[0], uni[1], uni[2], uni[3])\n'
+			if(gen.args === this.loguni) out += 'if(typeof uni === "number")console.log(uni)\n'
 		}
 		tpl = tpl.replace(/SET\_UNIFORMS/, out)
 

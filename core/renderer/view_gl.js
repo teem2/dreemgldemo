@@ -312,8 +312,7 @@ define.class('./view_base', function(require, exports){
 		if (v4[1] < miny) miny = v4[1];else if (v4[1] > maxy) maxy = v4[1]
 		
 		var ret = {left: minx, top: miny, right: maxx, bottom: maxy}
-		//if (ret.left === 0 && ret.right === 0 && ret.top === 0 && ret.bottom === 0){
-		//}
+
 		return ret
 	}
 	
@@ -432,6 +431,8 @@ define.class('./view_base', function(require, exports){
 	this.doDraw = function(renderstate){
 		this.bg_shader._time = this.screen.time
 		this.fg_shader._time = this.screen.time
+		this.bg_shader.view = this
+		this.fg_shader.view = this
 
 		this.bg_shader.draw(this.screen.device)
 		this.fg_shader.draw(this.screen.device)
@@ -484,8 +485,7 @@ define.class('./view_base', function(require, exports){
 				var actuallyvisible = true
 				if (renderstate.cliprect){
 					actuallyvisible = rect.intersects(myrect, renderstate.cliprect);
-					if (actuallyvisible == false) 
-					{
+					if (actuallyvisible == false){
 				//		console.log("rects: ", myrect, renderstate.cliprect);
 					}
 				} 

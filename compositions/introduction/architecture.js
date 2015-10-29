@@ -3,28 +3,34 @@ define.class(function(view, require, screens){
 	var GLText = require('$gl/gltext')
 	var GLShader = require('$gl/glshader')
 
-	
+	this.bgcolor = vec4("red");
 	this.setMatrixUniforms = function(renderstate){
 		var r = this.rects;
 		var a = this.arrows;		
 		var t = this.texts;		
+		this.bg_shader._matrix = 
+		this.fg_shader._matrix = 
 		r._matrix = renderstate.matrix;
 		a._matrix = renderstate.matrix;
 		t._matrix = renderstate.matrix;
+
+		this.fg_shader._viewmatrix =
+		this.bg_shader._viewmatrix =
 		r._viewmatrix = renderstate.viewmatrix;
 		a._viewmatrix = renderstate.viewmatrix;
 		t._viewmatrix = renderstate.viewmatrix;
-
 	}
 		
 	define.class(this, 'rectshader', GLShader, function(){
-		this.color = function(){
+		
+		this.color = function(){			
 			return vec4("#809080") + mesh.w *vec4(1,0,0,0);
 		};
 		
 		this.addRect  = function(x,y,w,h){
 			this.mesh.pushQuad(x,y,0,0, x+w, y,1,0, x, y+h,0,1, x+w, y+h, 1,1)
 		}
+		
 		this.mesh = vec4.array();
 		this.matrix = mat4.identity()
 		this.viewmatrix = mat4.identity()
@@ -115,7 +121,7 @@ define.class(function(view, require, screens){
 			maxR = Math.max(R.x+10, maxR);			
 		}
 
-var blockw = Math.max(110,maxR-newx );
+		var blockw = Math.max(110,maxR-newx );
 		
 		this.rects.addRect(startx,starty,blockw,50);
 		this.textbuf.add_x = startx - wh.w /2 + blockw/2;
@@ -133,8 +139,7 @@ var blockw = Math.max(110,maxR-newx );
 		
 		this.nodes = {};
 		this.nodeslist = [];
-		for(var i = 0;i<this.file.nodes.length;i++)
-		{
+		for(var i = 0; i < this.file.nodes.length; i++){
 			var node = this.file.nodes[i];
 			var nodestruct =  {source: node, tocount:0, fromcount:0, children:[]};
 			this.nodes[node.name] =nodestruct;
