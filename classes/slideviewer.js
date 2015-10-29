@@ -17,7 +17,7 @@ define.class(function(view, require){
 	});
 
 	// lets put an animation on x
-	this.attribute('x', {motion:'bounce',duration:1})
+	this.attribute('x', {motion:'inOutSine',duration:0.2})
 
 	this.state('page')
 	this.constructor.slide = this.slide

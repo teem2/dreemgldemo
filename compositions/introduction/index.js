@@ -36,11 +36,10 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 					)
 					,view({
 							slidetitle:'Architecture overview'
-							,flex:1
-						}
-						,scrollcontainer({flex:1}, 
-						architecture({file:require("./dreemglarchitecture.json")})
-						)
+							,flex:1 , bgcolor:"transparent" 
+						},
+						architecture({flex:1, file:require("./dreemglarchitecture.json")})
+						
 					)
 					,view({
 							flex:1,

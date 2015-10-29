@@ -3,7 +3,7 @@ define.class(function(view, require, screens){
 	var GLText = require('$gl/gltext')
 	var GLShader = require('$gl/glshader')
 
-	
+	this.bgcolor = vec4("red");
 	this.setMatrixUniforms = function(renderstate){
 		var r = this.rects;
 		var a = this.arrows;		
@@ -14,19 +14,22 @@ define.class(function(view, require, screens){
 		r._viewmatrix = renderstate.viewmatrix;
 		a._viewmatrix = renderstate.viewmatrix;
 		t._viewmatrix = renderstate.viewmatrix;
-
 	}
 		
 	define.class(this, 'rectshader', GLShader, function(){
-		this.color = function(){
+		
+		this.color = function(){			
 			return vec4("#809080") + mesh.w *vec4(1,0,0,0);
 		};
 		
 		this.addRect  = function(x,y,w,h){
 			this.mesh.pushQuad(x,y,0,0, x+w, y,1,0, x, y+h,0,1, x+w, y+h, 1,1)
 		}
+		
 		this.mesh = vec4.array();
+		
 		this.matrix = mat4.identity()
+		
 		this.viewmatrix = mat4.identity()
 		
 		this.position = function(){
