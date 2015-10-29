@@ -19,7 +19,15 @@ define.class(function(view, require){
 	// lets put an animation on x
 	this.attribute('x', {motion:'bounce',duration:1})
 
+	this.attribute('page',{type:int})
+
+	this.page = function(){
+		this.x = -this.page * (this.slidewidth + this.slidemargin * 2)
+	}
+
 	this.state('page')
+
+
 	this.constructor.slide = this.slide
 	
 	this.slidewidth = 1024
@@ -31,13 +39,10 @@ define.class(function(view, require){
 		if(key.name == 'leftarrow'){
 			// we need to animate to the left
 			if(this.page >0) this.page --
-
-			this.x = -this.page * (this.slidewidth + this.slidemargin * 2)
 		}
 		else if(key.name == 'rightarrow'){
 			// animate to the right
 			if(this.page < this.constructor_children.length-1)this.page++
-			this.x =  -this.page *  (this.slidewidth + this.slidemargin * 2)
 		}
 	}
 

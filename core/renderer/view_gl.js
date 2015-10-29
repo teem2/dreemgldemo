@@ -148,6 +148,11 @@ define.class('./view_base', function(require, exports){
 		this.bgcolorfn = ViewGL.prototype.plaincolor 
 
 		this.color = function(){
+
+			return bgcolorfn(mesh.xy, 0)
+			/*
+			if(mesh.x>0.1) return bgcolorfn(mesh.xy, 0)
+
 			var dist = shape.roundedrectdistance(sized.xy + vec2( -1.,0.), width-1., height, radius.r, radius.a, radius.g, radius.b)
 			//dump = dist*0.01
 			//dist += noise.s2d(mesh*32)*5
@@ -161,6 +166,7 @@ define.class('./view_base', function(require, exports){
 			col.a *= clamped * opacity
 			
 			return col
+			*/
 		}
 
 		this.color_blend = 'src_alpha * src_color + (1 - src_alpha) * dst_color'
