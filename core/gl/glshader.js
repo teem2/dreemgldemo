@@ -542,7 +542,7 @@ define.class('$base/node', function(require, exports, self){
 		if(vtx_ast.type == 'Function') vtx_ast = onejsparser.parse('position()').steps[0]
 		// ok lets run the vertex codegen.
 		var vtx_state = glslgen.newState(this)
-		var vtx_code = glslgen.expand(vtx_ast, null, vtx_state)
+		var vtx_code = glslgen.expand(vtx_ast, undefined, vtx_state)
 
 		// pixel
 		var pix_state = glslgen.newState(this, vtx_state.varyings)
@@ -560,7 +560,7 @@ define.class('$base/node', function(require, exports, self){
 		else{
 			var pix_ast = onejsparser.parse(this.color).steps[0]
 			if(pix_ast.type == 'Function') pix_ast = onejsparser.parse('color()').steps[0]
-			var pix_code = glslgen.expand(pix_ast, null, pix_state)
+			var pix_code = glslgen.expand(pix_ast, undefined, pix_state)
 		}
 
 		// support imediate alpha value and alpha expressions
@@ -574,7 +574,7 @@ define.class('$base/node', function(require, exports, self){
 			var alpha_code = ''
 			if(alpha_ast && alpha_ast.type == 'Function') alpha_ast = onejsparser.parse('alpha()').steps[0]
 			if(alpha_ast){
-				alpha_code = glslgen.expand(alpha_ast, null, pix_state)
+				alpha_code = glslgen.expand(alpha_ast, undefined, pix_state)
 			}
 		}
 		var vtx = ''

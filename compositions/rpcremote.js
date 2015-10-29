@@ -11,13 +11,7 @@ define.class(function(composition, screens, screen, view, text, draggable){
 					name:'main',
 					size: vec2(200, 200),
 					bgcolor: vec4('yellow'),
-					is: draggable(),
-					init: function(){
-						this.screen.mousepos = function(){
-							console.log("MOVIN")
-						}
-						// alright lets make this draggable. framerjs style
-					}
+					is: draggable()
 				})
 			),
 			screen({name:'desktop'},

@@ -19,7 +19,7 @@ define.class(function codeviewerbody(require, text){
 	var GLTextCode = require('$gl/gltextcode')	
 
 	var Parser = require('$parsers/onejsparser')
-	this.font = require('$fonts/code_font1_ascii.glf')
+//	this.font = require('$fonts/code_font1_ascii.glf')
 	//this.bg = {color:undefined}
 	this.fontsize = 14
 	// syntax highlighting shader
