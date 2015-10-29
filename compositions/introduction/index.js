@@ -106,7 +106,7 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 							this.bg = {
 								value:0,
 								color:function(){
-									return mix('red', 'green', abs(sin(mesh.pos.y+value)))
+									return mix('red', 'green', abs(sin(mesh.pos.y*0.01+value)))
 								}
 							}
 						}.toString(), padding:vec4(4), fontsize: 14, bgcolor:"#000030", multiline: true})
@@ -120,7 +120,7 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 								bg:{
 								value:1,
 								color:function(){
-									return mix('red', 'green', abs(sin(mesh.pos.y+value)))
+									return mix('red', 'green', abs(sin(mesh.pos.y*0.01+value)))
 								}
 							}
 						})

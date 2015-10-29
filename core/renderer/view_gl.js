@@ -533,19 +533,17 @@ define.class('./view_base', function(require, exports){
 		bg._viewmatrix = renderstate.viewmatrix;
 		fg._viewmatrix = renderstate.viewmatrix;
 		brd._viewmatrix = renderstate.viewmatrix;
-		
-
 	}
 	
 	this.drawStencil = function (renderstate) {
 		this.setMatrixUniforms(renderstate);
 			if(this.layout){
 				if (this.bg_shader.setupSize) this.bg_shader.setupSize(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius);
-				if (this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
+				if (this._borderwidth[0] > 0 && this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
 			}
 			else{
 				if (this.bg_shader.setupSize) this.bg_shader.setupSize(this._width, this._height, this._cornerradius);
-				if (this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
+				if (this._borderwidth[0] > 0 && this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
 			}
 
 		this.bg_shader.draw(renderstate.device)
@@ -596,7 +594,7 @@ define.class('./view_base', function(require, exports){
 		this.border_shader._viewmatrix = renderstate.viewmatrix;		
 		
 		this.bg_shader.drawGuid(this.screen.device)
-		this.border_shader.drawGuid(this.screen.device)
+		if (this._borderwidth[0] > 0)this.border_shader.drawGuid(this.screen.device)
 	}
 
 	this.drawContentGL = function(renderstate){
@@ -620,11 +618,11 @@ define.class('./view_base', function(require, exports){
 			
 			if(this.layout){
 				if (this.bg_shader.setupSize) this.bg_shader.setupSize(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius);
-				if (this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
+				if (this._borderwidth[0] > 0 && this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
 			}
 			else{
 				if (this.bg_shader.setupSize) this.bg_shader.setupSize(this._width, this._height, this._cornerradius);
-				if (this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
+				if (this._borderwidth[0] > 0 && this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
 			}
 	
 			if (this.texturecache == false){

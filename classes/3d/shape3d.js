@@ -24,20 +24,20 @@ define.class(function(require, view, text, icon){
 
 		var normalmat = mat4.transpose(mat4.normalFromMat4(mat4.transpose(mat)));
 
-		this.bg_shader.modelmatrix =  mat;
-		this.bg_shader.camup =  renderstate.camup;
-		this.bg_shader.camleft =  renderstate.camleft;
-		this.bg_shader.normalmatrix =  normalmat;
-		this.bg_shader.projectionmatrix = renderstate.projectionmatrix;
-		this.bg_shader.lookatmatrix = renderstate.lookatmatrix;
-		this.bg_shader.cameraposition = renderstate.cameraposition;
+		this.bg_shader._modelmatrix =  mat;
+		this.bg_shader._camup =  renderstate.camup;
+		this.bg_shader._camleft =  renderstate.camleft;
+		this.bg_shader._normalmatrix =  normalmat;
+		this.bg_shader._projectionmatrix = renderstate.projectionmatrix;
+		this.bg_shader._lookatmatrix = renderstate.lookatmatrix;
+		this.bg_shader._cameraposition = renderstate.cameraposition;
 	//	this.bg_shader.adjustmatrix1 = renderstate.adjustmatrix1;
 		//this.bg_shader.adjustmatrix2 = renderstate.adjustmatrix2;
-		this.bg_shader.flattenmatrix = renderstate.flattenmatrix;
+		this.bg_shader._flattenmatrix = renderstate.flattenmatrix;
 		var adjust = mat4.identity();;
 		
 			//adjust[3] = 300;
-		this.bg_shader.scaler = renderstate.adjustmatrix;
+		this.bg_shader._scaler = renderstate.adjustmatrix;
 		
 		
 	}
