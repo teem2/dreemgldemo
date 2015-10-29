@@ -1,7 +1,9 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Parts copyright 2012 Google, Inc. All Rights Reserved. (APACHE 2.0 license)
 define.class('$gl/glshader', function(require, exports, self){
-	
+
+	if(define.$environment === 'nodejs') return
+
 	var GLTexture = require('$gl/gltexture')
 	var glfontParser = require('$gl/glfontparser')
 
@@ -897,7 +899,7 @@ define.class('$gl/glshader', function(require, exports, self){
 	}
 
 
-	if(this.font.baked){
+	if(this.font && this.font.baked){
 		this.glyphy_mesh = this.glyphy_mesh_sdf
 		this.glyphy_pixel = this.glyphy_sdf_draw
 	}

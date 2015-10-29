@@ -1,6 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 define.class('$base/node', function(require, exports, self){
+	if(define.$environment === 'nodejs') return
 
 	var GLTexture = require('$gl/gltexture')
 	var OneJSParser =  require('$parsers/onejsparser')
