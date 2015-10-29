@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Parts copyright 2012 Google, Inc. All Rights Reserved. (APACHE 2.0 license)
-define.class('$gl/glshader', function(require, exports, self){
+define.class('$gl/glshader', function(require, exports, baseclass){
 
 	if(define.$environment === 'nodejs') return
 
@@ -809,7 +809,9 @@ define.class('$gl/glshader', function(require, exports, self){
 		var m = length(vec2(length(dpdx), length(dpdy))) * SQRT_1_2
 		// screenspace length
 		mesh.scaling = 500. * m 
+		
 		var dist_sample = mesh.font.texture.sample(pos)
+		//var dist_sample = vec4(0,0,0,0)
 		var gsdist = glyphy_sdf_decode(dist_sample)
 
 		mesh.distance = gsdist * 0.003
@@ -898,14 +900,22 @@ define.class('$gl/glshader', function(require, exports, self){
 		return vec4(fgcolor.rgb, alpha * fgcolor.a)
 	}
 
+	this.decideFontType = function(){
+		if(this.font && this.font.baked){
+			this.glyphy_mesh = this.glyphy_mesh_sdf
+			this.glyphy_pixel = this.glyphy_sdf_draw
+		}
+		else{
+			this.glyphy_pixel = this.glyphy_atlas_draw
+			this.glyphy_mesh = this.glyphy_mesh_atlas
+		}
+	}
 
-	if(this.font && this.font.baked){
-		this.glyphy_mesh = this.glyphy_mesh_sdf
-		this.glyphy_pixel = this.glyphy_sdf_draw
+	this.atExtend = function(){
+		baseclass.prototype.atExtend.call(this)
+		this.decideFontType()
 	}
-	else{
-		this.glyphy_pixel = this.glyphy_atlas_draw
-		this.glyphy_mesh = this.glyphy_mesh_atlas
-	}
+
+	this.decideFontType()
 
 })

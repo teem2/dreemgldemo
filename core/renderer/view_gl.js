@@ -287,8 +287,6 @@ define.class('./view_base', function(require, exports){
 		this.bgcolorfn = ViewGL.prototype.plaincolor 
 
 		this.color = function(){
-			
-				//	return vec4("red");
 			var bgcolor =  bgcolorfn(uv.xy, 0)
 			
 			
@@ -449,8 +447,7 @@ define.class('./view_base', function(require, exports){
 		if (v4[1] < miny) miny = v4[1];else if (v4[1] > maxy) maxy = v4[1]
 		
 		var ret = {left: minx, top: miny, right: maxx, bottom: maxy}
-		//if (ret.left === 0 && ret.right === 0 && ret.top === 0 && ret.bottom === 0){
-		//}
+
 		return ret
 	}
 	
@@ -552,7 +549,7 @@ define.class('./view_base', function(require, exports){
 			}
 
 		this.bg_shader.draw(renderstate.device)
-		if (vec4.equals(this._borderwidth, vec4(0)) == false) this.border_shader.draw(renderstate.device)
+		if (this._borderwidth[0] > 0) this.border_shader.draw(renderstate.device)
 	}
 
 	this.show = function(){
@@ -577,9 +574,13 @@ define.class('./view_base', function(require, exports){
 		this.fg_shader._time = this.screen.time
 		this.border_shader._time = this.screen.time
 
+		this.bg_shader.view = this
+		this.border_shader.view = this
+		this.fg_shader.view = this
+
 		this.bg_shader.draw(this.screen.device)
-		this.fg_shader.draw(this.screen.device)
-		this.border_shader.draw(this.screen.device)
+		if (this.fg_shader) this.fg_shader.draw(this.screen.device)
+		if (this._borderwidth[0] > 0) this.border_shader.draw(this.screen.device)
 		
 		// lets check if we have a reference on time
 		if(this.bg_shader.shader && this.bg_shader.shader.unilocs.time || 
@@ -632,8 +633,7 @@ define.class('./view_base', function(require, exports){
 				var actuallyvisible = true
 				if (renderstate.cliprect){
 					actuallyvisible = rect.intersects(myrect, renderstate.cliprect);
-					if (actuallyvisible == false) 
-					{
+					if (actuallyvisible == false){
 				//		console.log("rects: ", myrect, renderstate.cliprect);
 					}
 				} 
