@@ -86,6 +86,7 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 					},
 					view({flexdirection:'row', flex:1},
 						codeviewer({flex:1,alignself:'stretch',margin:vec4(10),code:function(){
+							
 							// Rendering returns scenegraph structures
 							this.render = function(){
 								return view({}, view({}))
@@ -106,11 +107,11 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 							this.bg = {
 								value:0,
 								color:function(){
-									return mix('red', 'green', abs(sin(mesh.pos.y*0.01+value)))
+									return mix('blue', 'yellow', abs(sin(uv.y*10.+value)))
 								}
 							}
 						}.toString(), padding:vec4(4), fontsize: 14, bgcolor:"#000030", multiline: true})
-						,view({flex:1,padding:4,margin:10,
+						,view({flex:1,padding:4,margin:10, cornerradius:0,
 								mousemove:function(){
 									this.setDirty(true)
 								},
@@ -120,7 +121,7 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 								bg:{
 								value:1,
 								color:function(){
-									return mix('red', 'green', abs(sin(mesh.pos.y*0.01+value)))
+									return mix('blue', 'yellow', abs(sin(uv.y*10.+value)))
 								}
 							}
 						})
