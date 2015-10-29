@@ -19,7 +19,7 @@ define.class(function(view, require, screens){
 	define.class(this, 'rectshader', GLShader, function(){
 		
 		this.color = function(){			
-			return vec4("#809080") + mesh.w *vec4(1,0,0,0);
+			return vec4(mesh.w*0.1 + 0.9, mesh.z*0.1 + 0.9, 0,1.0) ;
 		};
 		
 		this.addRect  = function(x,y,w,h){
@@ -60,7 +60,6 @@ define.class(function(view, require, screens){
 	this.attribute("file",{});
 	
 	this.file = function(){
-		console.log(this.file);
 	}
 	
 	this.init = function(){
@@ -88,7 +87,6 @@ define.class(function(view, require, screens){
 			
 			this.arrows.shader && this.arrows.shader.unilocs.time 
 			){
-			//console.log('here')
 			this.screen.node_timers.push(this)
 		}
 		
@@ -104,10 +102,7 @@ define.class(function(view, require, screens){
 		var newx = startx;
 		var newy = starty + 80;
 		
-		var wh = this.textbuf.measurestring(node.source.name);
-		
-		
-		
+		var wh = this.textbuf.measurestring(node.source.name);				
 		
 		var maxR = startx;
 		
@@ -155,12 +150,10 @@ var blockw = Math.max(110,maxR-newx );
 			}
 		}		
 		
-		console.log(this.nodeslist);
 		var x = 10;
 		var y = 10;
 		for(var i =0 ;i<this.nodeslist.length;i++) {
 			var n = this.nodeslist[i];
-			console.log(n);
 			if (n.tocount ==0){
 				x = this.BuildTree(x, y, n).x + 10;
 

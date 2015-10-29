@@ -16,14 +16,11 @@ define.class('./view_base', function(require, exports){
 	
 	this.init = function(previous){
 		
-		//if(previous){
-		//	this.bg_shader = previous.bg_shader
-		//	this.fg_shader = previous.fg_shader
-		//}
-		//else{
-			this.bg_shader = new this.bg()
-			this.fg_shader = new this.fg()
-		//}
+
+		this.bg_shader = new this.bg()
+		this.border_shader = new this.border()			
+		this.fg_shader = new this.fg()
+
 		this.orientation = {
 			rotation : vec3(0, 0, 0), // (or {0,0,0} for 3d rotation)
 			translation : vec3(this.x != undefined? this.x: 0, this.y != undefined? this.y: 0, 0),
@@ -36,11 +33,7 @@ define.class('./view_base', function(require, exports){
 			//console.log("setting texturecaching: ", this.texturecache);
 			this.enableTextureCache(this.texturecache);
 		}
-		/*
-		this.emit('rotation')
-		this.emit('y')
-		this.emit('x')
-	*/
+
 		this.visible = true
 		this.backgroundTexture = false;
 		this.texturecache = false;
@@ -123,23 +116,169 @@ define.class('./view_base', function(require, exports){
 		return bgcolor
 	}
 
+	define.class(this, 'border', GLShader, function(){
+		this.vertexstruct = define.struct({
+			pos: vec2,
+			angle: float,
+			radmult: vec4,			
+			uv:vec2
+		})
+		
+		this.matrix = mat4.identity()
+		this.viewmatrix = mat4.identity()
+		this.mesh = this.vertexstruct.array();
+		this.radius = vec4(0.0);
+		this.width = 0.0;
+		this.height = 0.0;
+		this.bordercolor = vec4("black");
+		this.borderwidth = 0.0;
+		this.has_guid = true
+		this.geomradius = vec4(0);
+		this.geomwidth = 0;
+		this.geomheight =0;
+		this.geomborder = 0;
+		this.draw_type ="TRIANGLE_STRIP";
+		this.setupBorder = function(width, height, radius, borderwidth){	
+			//console.log(width, height, radius, borderwidth);
+			this._width = width;
+			this._height = height;		
+			if (borderwidth != this.geomborder || this.geomheight != height || this.geomwidth != width || vec4.equals(radius, 	this.geomradius) == false){
+				
+				this.geomborder  = borderwidth;
+				this._radius = radius;
+				this._borderwidth = borderwidth;
+				this.buildGeometry(width, height);
+				this.geomradius = radius;
+				this.geomheight = height;
+				this.geomwidth = width;
+			}
+		}
+		
+		this.buildGeometry = function(width, height){
+			
+			//this.mesh.clear();
+			this.mesh = this.vertexstruct.array();
+			
+			var scale0 = (Math.max(0, this._radius[0]-this._borderwidth[0]))/this._radius[0];
+			var scale1 = (Math.max(0, this._radius[1]-this._borderwidth[0]))/this._radius[1];
+			var scale2 = (Math.max(0, this._radius[2]-this._borderwidth[0]))/this._radius[2];
+			var scale3 = (Math.max(0, this._radius[3]-this._borderwidth[0]))/this._radius[3];
+			
+			var pidiv = 10;
+				
+				for(var p = 0;p<PI/2;p+= PI/pidiv)
+				{
+					this.mesh.push(vec2( this._radius[0] ,this._radius[0]), p, vec4(1,0,0,0), 1,0);
+					this.mesh.push(vec2( this._radius[0] ,this._radius[0]), p, vec4(scale0,0,0,0), 1,0);
+				}
+				
+				for(var p = 0;p<PI/2;p+= PI/pidiv){
+					this.mesh.push(vec2(width-this._radius[1],this._radius[1]), p + PI/2, vec4(0,1,0,0), 1,0);
+					this.mesh.push(vec2(width-this._radius[1],this._radius[1]), p + PI/2, vec4(0,scale1,0,0), 1,0);
+				}
+				for(var p = 0;p<PI/2;p+= PI/pidiv){
+					this.mesh.push(vec2(width-this._radius[2],height-this._radius[2]), p + PI, vec4(0,0,1,0), 1,1);
+					this.mesh.push(vec2(width-this._radius[2],height-this._radius[2]), p + PI, vec4(0,0,scale2,0), 1,1);
+				}
+				for(var p = 0;p<PI/2;p+= PI/pidiv){
+					this.mesh.push(vec2(this._radius[3],height-this._radius[3]), p + PI + PI/2, vec4(0,0,0,1), 0,1);
+					this.mesh.push(vec2(this._radius[3],height-this._radius[3]), p + PI + PI/2, vec4(0,0,0,scale3), 0,1);
+				}				
+					this.mesh.push(vec2( this._radius[0] ,this._radius[0]), 0, vec4(1,0,0,0), 1,0);
+					this.mesh.push(vec2( this._radius[0] ,this._radius[0]), 0, vec4(scale0,0,0,0), 1,0);
+				
+			
+		}
+		this.color = function(){return bordercolor;};
+		this.position = function(){
+			var pos = mesh.pos.xy;
+			var ca = cos(mesh.angle + PI);
+			var sa = sin(mesh.angle+PI);
+			
+			var rad  = dot(mesh.radmult, radius);
+			pos.x += ca * rad;
+			pos.y += sa * rad;
+			
+			uv = vec2(pos.x/width,  pos.y/height);
+			
+			sized = vec2(pos.x, pos.y)
+			return vec4(sized.x, sized.y, 0, 1) * matrix * viewmatrix
+		}
+		
+		
+		
+	})
 	define.class(this, 'bg', GLShader, function(){
+
+		this.vertexstruct = define.struct({
+			pos: vec2,
+			angle: float,
+			radmult: vec4,
+			uv:vec2
+		})
+		
+		
+
 		this.has_guid = true
 		this.depth_test = "";
 		this.texture = new GLTexture()
 
-		this.mesh = vec2.quad(0, 0, 1, 0, 0, 1, 1, 1)
-		this.tex = vec2.quad(0, 0, 1, 0, 0, 1, 1, 1)
-	
+		this.mesh = this.vertexstruct.array();
+		
 		this.bgcolor = vec4(1)
 		
 		this.bordercolor = vec4(0, 0, 0, 0)
 		this.borderwidth = 0.0,
 		
-		this.width = 0.0
+		this.width = 0.0;
+		this.height = 0.0;
+		this.geomwidth =0 ;
+		this.geomheight =0 ;
+		this.geomradius = vec4(0,0,0,0);
+		this.draw_type ="TRIANGLE_FAN";
+		this.setupSize = function(width, height, radius){	
+			this._width = width;
+			this._height = height;		
+			if (this.geomheight != height || this.geomwidth != width || vec4.equals(radius, this.geomradius) == false){
+				
+				this._radius = radius;
+				this.buildGeometry(width, height);
+				this.geomradius = radius;
+				this.geomheight = height;
+				this.geomwidth = width;
+			}
+		}
+		
+		this.buildGeometry = function(width, height){
+			
+			//this.mesh.clear();
+			this.mesh = this.vertexstruct.array();
+			if (vec4.equals(this._radius, vec4(0,0,0,0))) {
+				this.mesh.push(vec2(width/2,height/2), 0, vec4(1,0,0,0), 0.5,0.5);
+				this.mesh.push(vec2(0,0), 0, vec4(1,0,0,0), 0,0);
+				this.mesh.push(vec2(width,0), 0, vec4(1,0,0,0), 1,0);
+				this.mesh.push(vec2(width,height), 0, vec4(1,0,0,0), 1,1);
+				this.mesh.push(vec2(0,height), 0, vec4(1,0,0,0), 0,1);
+				this.mesh.push(vec2(0,0), 0, vec4(1,0,0,0), 0,0);
+			}
+			else{
+				var pidiv = 10;
+				this.mesh.push(vec2(width/2,height/2), 0, vec4(0,0,0,0), 0.5,0.5);
+				
+				for(var p = 0;p<PI/2;p+= PI/pidiv) this.mesh.push(vec2( this._radius[0] ,this._radius[0]), p, vec4(1,0,0,0), 1,0);			
+				for(var p = 0;p<PI/2;p+= PI/pidiv) this.mesh.push(vec2(width-this._radius[1],this._radius[1]), p + PI/2, vec4(0,1,0,0), 1,0);
+				for(var p = 0;p<PI/2;p+= PI/pidiv) this.mesh.push(vec2(width-this._radius[2],height-this._radius[2]), p + PI, vec4(0,0,1,0), 1,1);
+				for(var p = 0;p<PI/2;p+= PI/pidiv) this.mesh.push(vec2(this._radius[3],height-this._radius[3]), p + PI + PI/2, vec4(0,0,0,1), 0,1);
+				
+				this.mesh.push(vec2( this._radius[0] ,this._radius[0]), 0, vec4(1,0,0,0), 1,0);
+				//this.mesh.push(vec2(0,0), 0, vec4(1,0,0,0), 1,0);
+				
+			}
+			
+		}
+		
 		this.radius = vec4(4, 14, 4, 14)
 		//this.dump = 1
-		this.height = 0
 		this.matrix = mat4.identity()
 		this.viewmatrix = mat4.identity()
 		this.opacity = 0.0;
@@ -148,25 +287,29 @@ define.class('./view_base', function(require, exports){
 		this.bgcolorfn = ViewGL.prototype.plaincolor 
 
 		this.color = function(){
-			var dist = shape.roundedrectdistance(sized.xy + vec2( -1.,0.), width-1., height, radius.r, radius.a, radius.g, radius.b)
-			//dump = dist*0.01
-			//dist += noise.s2d(mesh*32)*5
-			var bgcolor =  bgcolorfn(mesh.xy, dist)
-			var clamped = 1.0 - (clamp(dist, -0.5, 0.5) + 0.5)
-			if (clamped == 0.) discard
-			if(borderwidth < 0.001) return bgcolor
-			var b = clamp(- dist - (borderwidth - 0.5), 0., 1.)
-			var precol = mix(bordercolor, bgcolor, b)
-			var col =  precol //pal.dither(precol);
-			col.a *= clamped * opacity
 			
-			return col
+				//	return vec4("red");
+			var bgcolor =  bgcolorfn(uv.xy, 0)
+			
+			
+			
+			return bgcolor;
 		}
 
 		this.color_blend = 'src_alpha * src_color + (1 - src_alpha) * dst_color'
 		//this.color_blend = 'src_alpha * src_color + dst_color'
 		this.position = function(){
-			sized = vec2(mesh.x * width, mesh.y * height)
+			var pos = mesh.pos.xy;
+			var ca = cos(mesh.angle + PI);
+			var sa = sin(mesh.angle+PI);
+			
+			var rad  = (mesh.radmult.x * radius.x + mesh.radmult.y * radius.y + mesh.radmult.z * radius.z + mesh.radmult.w * radius.w) ;;
+			pos.x += ca * rad;
+			pos.y += sa * rad;
+			
+			uv = vec2(pos.x/width,  pos.y/height);
+			
+			sized = vec2(pos.x, pos.y)
 			return vec4(sized.x, sized.y, 0, 1) * matrix * viewmatrix
 		}
 	})
@@ -386,24 +529,30 @@ define.class('./view_base', function(require, exports){
 	this.setMatrixUniforms = function(renderstate){
 		var bg = this.bg_shader;
 		var fg = this.fg_shader;		
+		var brd = this.border_shader;		
 		bg._matrix = renderstate.matrix;
 		fg._matrix = renderstate.matrix;
+		brd._matrix = renderstate.matrix;
 		bg._viewmatrix = renderstate.viewmatrix;
 		fg._viewmatrix = renderstate.viewmatrix;
+		brd._viewmatrix = renderstate.viewmatrix;
+		
 
 	}
 	
 	this.drawStencil = function (renderstate) {
 		this.setMatrixUniforms(renderstate);
-		if (this.layout){
-			this.bg_shader.width = this.layout.width? this.layout.width:this.width
-			this.bg_shader.height = this.layout.height? this.layout.height:this.height
-		}
-		else{
-			this.bg_shader.width = this.width
-			this.bg_shader.height = this.height
-		}
+			if(this.layout){
+				if (this.bg_shader.setupSize) this.bg_shader.setupSize(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius);
+				if (this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
+			}
+			else{
+				if (this.bg_shader.setupSize) this.bg_shader.setupSize(this._width, this._height, this._cornerradius);
+				if (this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
+			}
+
 		this.bg_shader.draw(renderstate.device)
+		if (vec4.equals(this._borderwidth, vec4(0)) == false) this.border_shader.draw(renderstate.device)
 	}
 
 	this.show = function(){
@@ -426,12 +575,15 @@ define.class('./view_base', function(require, exports){
 	this.doDraw = function(renderstate){
 		this.bg_shader._time = this.screen.time
 		this.fg_shader._time = this.screen.time
+		this.border_shader._time = this.screen.time
 
 		this.bg_shader.draw(this.screen.device)
 		this.fg_shader.draw(this.screen.device)
-
+		this.border_shader.draw(this.screen.device)
+		
 		// lets check if we have a reference on time
 		if(this.bg_shader.shader && this.bg_shader.shader.unilocs.time || 
+			this.border_shader.shader && this.border_shader.shader.unilocs.time || 
 			this.fg_shader.shader && this.fg_shader.shader.unilocs.time){
 			//console.log('here')
 			this.screen.node_timers.push(this)
@@ -440,14 +592,17 @@ define.class('./view_base', function(require, exports){
 
 	this.doDrawGuid = function(renderstate){
 		this.bg_shader._viewmatrix = renderstate.viewmatrix;		
+		this.border_shader._viewmatrix = renderstate.viewmatrix;		
 		
 		this.bg_shader.drawGuid(this.screen.device)
+		this.border_shader.drawGuid(this.screen.device)
 	}
 
 	this.drawContentGL = function(renderstate){
 		//mat4.debug(this.orientation.matrix);
 		var bg = this.bg_shader
 		var fg = this.fg_shader
+		var brd = this.border_shader
 		
 		var bound = this.getBoundingRect()
 
@@ -463,13 +618,12 @@ define.class('./view_base', function(require, exports){
 			this.setMatrixUniforms(renderstate);
 			
 			if(this.layout){
-				this.bg_shader._width = this.layout.width? this.layout.width: this._width
-				this.bg_shader._height = this.layout.height? this.layout.height: this._height
+				if (this.bg_shader.setupSize) this.bg_shader.setupSize(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius);
+				if (this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
 			}
 			else{
-				//console.log(this.layout.width);
-				this.bg_shader._width = this._width
-				this.bg_shader._height = this._height
+				if (this.bg_shader.setupSize) this.bg_shader.setupSize(this._width, this._height, this._cornerradius);
+				if (this.border_shader.setupBorder) this.border_shader.setupBorder(this.layout.width? this.layout.width: this._width, this.layout.height? this.layout.height: this._height, this._cornerradius, this._borderwidth);
 			}
 	
 			if (this.texturecache == false){
@@ -496,18 +650,21 @@ define.class('./view_base', function(require, exports){
 			}
 			
 			bg._borderwidth = this._borderwidth[0]
+			brd._borderwidth = this._borderwidth[0]
 			//console.log(this.effectiveopacity);
-			fg._alpha = bg._alpha = this.effectiveopacity
-			fg._opacity = bg._opacity = this.effectiveopacity
+			brd._alpha = fg._alpha = bg._alpha = this.effectiveopacity
+			brd._opacity = fg._opacity = bg._opacity = this.effectiveopacity
 
 			fg._fgcolor = this._fgcolor
 			bg._bgcolor = this._bgcolor
 
-			bg._bordercolor = this._bordercolor
+			brd._bordercolor = this._bordercolor
 			bg._radius = this._cornerradius
+			brd._radius = this._cornerradius
 
 			fg.screen = this.screen
 			bg.screen = this.screen
+			brd.screen = this.screen
 			
 			
 			if(renderstate.drawmode === 2){

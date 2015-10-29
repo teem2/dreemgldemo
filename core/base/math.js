@@ -601,6 +601,14 @@ define(function(require, exports){
 	}, 'vec4')
 	vecApi(exports.vec4)
 
+	exports.vec4.equals = function(a,b)
+	{
+		if (a[0] != b[0]) return false;
+		if (a[1] != b[1]) return false;
+		if (a[2] != b[2]) return false;
+		if (a[3] != b[3]) return false;
+		return true;
+	}
 	exports.vec4.fromString = function(color, alpha){
 		var o = this
 		if(this === exports.vec4) o = exports.vec4()

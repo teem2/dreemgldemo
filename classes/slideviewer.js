@@ -4,7 +4,8 @@ define.class(function(view, require){
 	
 	define.class(this, 'slide', function(view, text){
 		this.cornerradius = vec4(10,10,10,10);
-		this.borderwidth = 2;
+		this.borderwidth = 0;
+		this.bordercolor = vec4("blue");
 		this.bgcolor ="white";
 		this.flex = 1;
 		this.padding= vec4(6);
@@ -17,7 +18,7 @@ define.class(function(view, require){
 	});
 
 	// lets put an animation on x
-	this.attribute('x', {motion:'inOutSine',duration:0.2})
+	this.attribute('x', {motion:'inoutsine',duration:0.2})
 
 	this.state('page')
 	this.constructor.slide = this.slide
