@@ -1911,7 +1911,7 @@ define(function(require, exports){
 	}
 
 	exports.ease.inbounce = function(t){
-		return 1. - exports.ease.outBounce(1.-t) 
+		return 1. - exports.ease.outbounce(1.-t) 
 	}
 
 	exports.ease.outbounce = function(t){
@@ -1922,20 +1922,20 @@ define(function(require, exports){
 	}
 
 	exports.ease.inoutbounce = function(t){
-		if (t < 0.5) return ease.inBounce (t*2.) * 0.5 
-		return ease.outBounce (t*2.-1.) * 0.5 + 0.5 
+		if (t < 0.5) return ease.inbounce (t*2.) * 0.5 
+		return ease.outbounce (t*2.-1.) * 0.5 + 0.5 
 	}
 
-	exports.ease.quad = function(t){ return ease.outQuad(t)}
-	exports.ease.cubic = function(t){ return ease.inOutCubic(t) }
-	exports.ease.quart = function(t){ return ease.outQuart(t) }
-	exports.ease.quint = function(t){ return ease.outQuint(t) }
-	exports.ease.sine = function(t){ return ease.outSine(t) }
-	exports.ease.expo = function(t){ return ease.outExpo(t) }
-	exports.ease.elastic = function(t){return ease.outElastic(t) }
-	exports.ease.circ = function(t){ return ease.outCirc(t) }
-	exports.ease.back = function(t){ return ease.inOutBack(t) }
-	exports.ease.bounce = function(t){ return ease.outBounce(t) }
+	exports.ease.quad = function(t){ return ease.outquad(t)}
+	exports.ease.cubic = function(t){ return ease.inoutcubic(t) }
+	exports.ease.quart = function(t){ return ease.outquart(t) }
+	exports.ease.quint = function(t){ return ease.outquint(t) }
+	exports.ease.sine = function(t){ return ease.outsine(t) }
+	exports.ease.expo = function(t){ return ease.outexpo(t) }
+	exports.ease.elastic = function(t){return ease.outelastic(t) }
+	exports.ease.circ = function(t){ return ease.outcirc(t) }
+	exports.ease.back = function(t){ return ease.inoutback(t) }
+	exports.ease.bounce = function(t){ return ease.outbounce(t) }
 
 	exports.ease.bezier = function(control){
 		var b = {}
