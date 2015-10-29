@@ -1,4 +1,4 @@
-define.class(function(composition, require, screens, screen, docviewer, text, scrollcontainer, codeviewer, view, slideviewer, draggable, perspective3d, teapot,ballrotate, architecture){
+define.class(function(composition, require, screens, screen, docviewer, button, text, scrollcontainer, codeviewer, view, slideviewer, draggable, perspective3d, teapot,ballrotate, architecture){
 	// Live coding presentation docs!
 
 	this.attribute('testattr', {type:vec4,value:'red'})
@@ -8,9 +8,9 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 			screens(
 				screen({name:'desktop',
 					init:function(){
-						//this.rpc.remote.pager = function(value){
-						//	console.log(value)
-						//}
+						this.rpc.screens.remote.pager = function(value){
+							this.children[0].page += value
+						}.bind(this)
 					}},
 					slideviewer({
 						init:function(){
@@ -159,28 +159,30 @@ define.class(function(composition, require, screens, screen, docviewer, text, sc
 			)
 		),
 		screen({
-				attribute_pager:{type:vec2, value:0},
+				attribute_pager:{type:int, value:0},
 				name:'remote',
 			}
 			,view({flex:1, bgcolor:'black'}
-				,view({
+				,button({
+					text:'Left',
 					flex:1,
 					size: vec2(200, 200),
 					bgcolor: vec4('yellow'),
 					//is: draggable(),
 					click: function(){
-						this.screen.pager++
+						this.screen.pager = -1
 					}
-				},text({text:'Left'}))
-				,view({
+				})
+				,button({
+					text:'Right',
 					flex:1,
 					size: vec2(200, 200),
 					bgcolor: vec4('red'),
 					//is: draggable(),
 					click: function(){
-						this.screen.pager--
+						this.screen.pager = 1
 					}
-				},text({text:'Right'}))
+				})
 			)
 		)
 		)]
