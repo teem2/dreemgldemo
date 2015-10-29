@@ -34,7 +34,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		this.add_x = 0
 		this.add_y = 0
 
-		this.font_size = 10
+		this.fontsize = 10
 		this.line_spacing = 1.3
 		this.italic_ness = 0
 		// defines the line 
@@ -57,15 +57,15 @@ define.class('$gl/glshader', function(require, exports, self){
 		this.fgcolor = vec4('white')
 		
 		this.__defineGetter__('line_height', function(){
-			return this.font_size * this.line_spacing
+			return this.fontsize * this.line_spacing
 		})
 		
 		this.__defineGetter__('min_y', function(){
-			return this.font_size * this.line_spacing
+			return this.fontsize * this.line_spacing
 		})
 		
 		this.__defineGetter__('block_y', function(){
-			return this.add_y - this.line_height + this.cursor_sink * this.font_size
+			return this.add_y - this.line_height + this.cursor_sink * this.fontsize
 		})
 
 		this.__defineGetter__('bound_w', function(){
@@ -73,7 +73,7 @@ define.class('$gl/glshader', function(require, exports, self){
 		})
 
 		this.__defineGetter__('bound_h', function(){
-			return this.text_h + this.cursor_sink * this.font_size
+			return this.text_h + this.cursor_sink * this.fontsize
 		})
 
 		
@@ -94,7 +94,7 @@ define.class('$gl/glshader', function(require, exports, self){
 				var unicode = string.struct? string.array[i * 4]: string.charCodeAt(i)
 				var info = this.font.glyphs[unicode]
 				if(!info) info = this.font.glyphs[32]
-				res.w += info.advance * this.font_size
+				res.w += info.advance * this.fontsize
 				
 			}
 			
@@ -135,7 +135,7 @@ define.class('$gl/glshader', function(require, exports, self){
 					for (var j = 0;j<line.length;j++) this.add(line[j] + ((j<line.length-1)?' ':'') , m1, m2, m3);
 					if (i < lines.length -1) 
 					{
-						this.add_y += this.font_size * this.line_spacing
+						this.add_y += this.fontsize * this.line_spacing
 						this.add_x = indent;
 					}
 				} 
@@ -144,14 +144,14 @@ define.class('$gl/glshader', function(require, exports, self){
 					this.add_x = maxwidth - widths[i];
 					var line = lines[i];
 					for (var j = 0;j<line.length;j++) this.add(line[j] + ' ', m1, m2, m3);
-					this.add_y += this.font_size * this.line_spacing
+					this.add_y += this.fontsize * this.line_spacing
 				} 
 			} else if (this.align === "center") {
 				for (var i = 0;i<lines.length;i++) {
 					this.add_x = maxwidth/2 - widths[i]/2;
 					var line = lines[i];
 					for (var j = 0;j<line.length;j++) this.add(line[j] + ' ', m1, m2, m3);
-					this.add_y += this.font_size * this.line_spacing
+					this.add_y += this.fontsize * this.line_spacing
 				}
 			} else if (this.align === "justify") {
 				for (var i = 0;i<lines.length;i++) {
@@ -165,17 +165,17 @@ define.class('$gl/glshader', function(require, exports, self){
 						this.add(line[j]+' ', m1, m2, m3);
 						this.add_x += spacer;
 					}
-					this.add_y += this.font_size * this.line_spacing
+					this.add_y += this.fontsize * this.line_spacing
 				} 
 			}
 		}
 
 		this.addGlyph = function(info, unicode, m1, m2, m3) {
-			var x1 = this.add_x + this.font_size * info.min_x
-			var x2 = this.add_x + this.font_size * info.max_x
-			var y1 = this.add_y - this.font_size * info.min_y
-			var y2 = this.add_y - this.font_size * info.max_y
-			var italic = this.italic_ness * info.height * this.font_size
+			var x1 = this.add_x + this.fontsize * info.min_x
+			var x2 = this.add_x + this.fontsize * info.max_x
+			var y1 = this.add_y - this.fontsize * info.min_y
+			var y2 = this.add_y - this.fontsize * info.max_y
+			var italic = this.italic_ness * info.height * this.fontsize
 
 			if(this.font.baked){
 				this.pushQuad(
@@ -195,7 +195,7 @@ define.class('$gl/glshader', function(require, exports, self){
 					x2 + italic, y2, gx|1, gy|1, unicode, m1, m2, m3
 				)
 			}
-			this.add_x += info.advance * this.font_size
+			this.add_x += info.advance * this.fontsize
 			if(this.add_x > this.text_w) this.text_w = this.add_x
 		}
 
@@ -211,7 +211,7 @@ define.class('$gl/glshader', function(require, exports, self){
 				this.addGlyph(info, unicode, m1, m2, m3)
 				if(unicode == 10){ // newline
 					this.add_x = this.start_x
-					this.add_y += this.font_size * this.line_spacing
+					this.add_y += this.fontsize * this.line_spacing
 				}
 			}
 			if(this.add_y > this.text_h) this.text_h = this.add_y	
@@ -226,16 +226,16 @@ define.class('$gl/glshader', function(require, exports, self){
 			if(off >= this.lengthQuad()){
 				return {
 					x:this.add_x,
-					y:this.add_y, //- this.line_height +this.font_size * this.cursor_sink,
+					y:this.add_y, //- this.line_height +this.fontsize * this.cursor_sink,
 					w:0,
 					h:this.line_height
 				}
 			}			
 			var info = this.font.glyphs[this.charCodeAt(off)]
 			var coords = {
-				x: this.array[off*6*8 + 0] - this.font_size * info.min_x,
-				y: this.array[off*6*8 + 1] + this.font_size * info.min_y,
-				w: info.advance * this.font_size,
+				x: this.array[off*6*8 + 0] - this.fontsize * info.min_x,
+				y: this.array[off*6*8 + 1] + this.fontsize * info.min_y,
+				w: info.advance * this.fontsize,
 				h: this.line_height
 			}
 			return coords
@@ -259,7 +259,7 @@ define.class('$gl/glshader', function(require, exports, self){
 				var char_code = this.charCodeAt(o)
 				var info = this.font.glyphs[char_code]
 
-				var y2 = this.array[o*6*8 + 1] + this.font_size * info.min_y + this.font_size * this.cursor_sink
+				var y2 = this.array[o*6*8 + 1] + this.fontsize * info.min_y + this.fontsize * this.cursor_sink
 				var y1 = y2 - this.line_height
 				
 
@@ -304,7 +304,7 @@ define.class('$gl/glshader', function(require, exports, self){
 
 		this.cursorRect = function(off){
 			var coords = this.charCoords(off)
-			coords.y -= coords.h - this.font_size * this.cursor_sink
+			coords.y -= coords.h - this.fontsize * this.cursor_sink
 			return coords
 		}
 
