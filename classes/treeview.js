@@ -158,7 +158,7 @@ define.class(function(view,  text, button, icon){
 			fgcolor: vec4(0.5, 0.5, 0.5, 1.),
 			last: 0,
 			bgcolorfn: function(a, b){
-				var pos = mesh.xy * vec2(width, height)
+				var pos = uv.xy * vec2(width, height)
 				var center = 18
 				var left = 11
 				var field = shape.union(
