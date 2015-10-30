@@ -164,9 +164,9 @@ define.class('./view_base', function(require, exports){
 			var scale2 = (Math.max(0, this._radius[2]-this._borderwidth[0]))/this._radius[2];
 			var scale3 = (Math.max(0, this._radius[3]-this._borderwidth[0]))/this._radius[3];
 			
-			var pidiv = 10;
+			var pidiv = 20;
 				
-			for(var p = 0;p<PI/2;p+= PI/pidiv){
+			for(var p = 0; p < PI / 2; p += PI / pidiv){
 				this.mesh.push(vec2( this._radius[0] ,this._radius[0]), p, vec4(1,0,0,0), 1,0);
 				this.mesh.push(vec2( this._radius[0] ,this._radius[0]), p, vec4(scale0,0,0,0), 1,0);
 			}
@@ -185,8 +185,7 @@ define.class('./view_base', function(require, exports){
 			}				
 			this.mesh.push(vec2( this._radius[0] ,this._radius[0]), 0, vec4(1,0,0,0), 1,0);
 			this.mesh.push(vec2( this._radius[0] ,this._radius[0]), 0, vec4(scale0,0,0,0), 1,0);
-			
-			
+		
 		}
 		this.color = function(){return bordercolor;};
 		this.position = function(){
@@ -215,8 +214,6 @@ define.class('./view_base', function(require, exports){
 			radmult: vec4,
 			uv:vec2
 		})
-		
-		
 
 		this.has_guid = true
 		this.depth_test = "";
@@ -298,7 +295,7 @@ define.class('./view_base', function(require, exports){
 		this.position = function(){
 			var pos = mesh.pos.xy;
 			var ca = cos(mesh.angle + PI);
-			var sa = sin(mesh.angle+PI);
+			var sa = sin(mesh.angle + PI);
 			
 			var rad  = (mesh.radmult.x * radius.x + mesh.radmult.y * radius.y + mesh.radmult.z * radius.z + mesh.radmult.w * radius.w) ;;
 			pos.x += ca * rad;
