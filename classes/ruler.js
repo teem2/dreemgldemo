@@ -28,12 +28,12 @@ define.class(function(view, text){
 	
 	// horizontal ruler shader
 	this.hruler = function(){
-		var dist =(mesh.x *	width) - offset;
+		var dist =(uv.x *	width) - offset;
 		if (dist > 0.){ 
 			if(floor(mod(dist  ,100.) ) < 1.) {
 				return vec4(0.8,0.8,0.8,1);	
 			}else{
-				if (mesh.y >0.5 && floor(mod(dist ,10.) ) < 1.) {
+				if (uv.y >0.5 && floor(mod(dist ,10.) ) < 1.) {
 					return vec4(0.75,0.75,0.75,1.0);
 				}
 			}
@@ -43,12 +43,12 @@ define.class(function(view, text){
 	
 	// vertical ruler shader
 	this.vruler = function(){
-		var dist =(mesh.y *	height) - offset;
+		var dist =(uv.y *	height) - offset;
 		if (dist > 0.)	{ 		
 			if (floor(mod(dist ,100.) ) < 1.) {
 				return vec4(0.8,0.8,0.8,1);
 			}else{
-				if (mesh.x >0.5 && floor(mod(dist ,10.) ) < 1.) {
+				if (uv.x >0.5 && floor(mod(dist ,10.) ) < 1.) {
 					return vec4(0.75,0.75,0.75,1.0);
 				}
 			}

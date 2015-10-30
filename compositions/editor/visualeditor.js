@@ -7,7 +7,7 @@ define.class(function(require, screen, view,menuitem, menubar, editor, text, ico
 					bgcolor2: vec4("#404080"),
 					bgcolorfn: function(pos, b){
 						//return demo.highdefblirpy(pos * vec2(2., 0.1), time * 2, 1.) * vec4(mesh.x * bgcolor.rgb, 1.0)
-						return vec4(mesh.x * bgcolor2.rgb, 1.0)
+						return vec4(uv.x * bgcolor2.rgb, 1.0)
 					}
 				}
 				,alignitems:"stretch", alignself: "stretch", flex: undefined
