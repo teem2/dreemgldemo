@@ -166,27 +166,26 @@ define.class('./view_base', function(require, exports){
 			
 			var pidiv = 10;
 				
-				for(var p = 0;p<PI/2;p+= PI/pidiv)
-				{
-					this.mesh.push(vec2( this._radius[0] ,this._radius[0]), p, vec4(1,0,0,0), 1,0);
-					this.mesh.push(vec2( this._radius[0] ,this._radius[0]), p, vec4(scale0,0,0,0), 1,0);
-				}
-				
-				for(var p = 0;p<PI/2;p+= PI/pidiv){
-					this.mesh.push(vec2(width-this._radius[1],this._radius[1]), p + PI/2, vec4(0,1,0,0), 1,0);
-					this.mesh.push(vec2(width-this._radius[1],this._radius[1]), p + PI/2, vec4(0,scale1,0,0), 1,0);
-				}
-				for(var p = 0;p<PI/2;p+= PI/pidiv){
-					this.mesh.push(vec2(width-this._radius[2],height-this._radius[2]), p + PI, vec4(0,0,1,0), 1,1);
-					this.mesh.push(vec2(width-this._radius[2],height-this._radius[2]), p + PI, vec4(0,0,scale2,0), 1,1);
-				}
-				for(var p = 0;p<PI/2;p+= PI/pidiv){
-					this.mesh.push(vec2(this._radius[3],height-this._radius[3]), p + PI + PI/2, vec4(0,0,0,1), 0,1);
-					this.mesh.push(vec2(this._radius[3],height-this._radius[3]), p + PI + PI/2, vec4(0,0,0,scale3), 0,1);
-				}				
-					this.mesh.push(vec2( this._radius[0] ,this._radius[0]), 0, vec4(1,0,0,0), 1,0);
-					this.mesh.push(vec2( this._radius[0] ,this._radius[0]), 0, vec4(scale0,0,0,0), 1,0);
-				
+			for(var p = 0;p<PI/2;p+= PI/pidiv){
+				this.mesh.push(vec2( this._radius[0] ,this._radius[0]), p, vec4(1,0,0,0), 1,0);
+				this.mesh.push(vec2( this._radius[0] ,this._radius[0]), p, vec4(scale0,0,0,0), 1,0);
+			}
+			
+			for(var p = 0;p<PI/2;p+= PI/pidiv){
+				this.mesh.push(vec2(width-this._radius[1],this._radius[1]), p + PI/2, vec4(0,1,0,0), 1,0);
+				this.mesh.push(vec2(width-this._radius[1],this._radius[1]), p + PI/2, vec4(0,scale1,0,0), 1,0);
+			}
+			for(var p = 0;p<PI/2;p+= PI/pidiv){
+				this.mesh.push(vec2(width-this._radius[2],height-this._radius[2]), p + PI, vec4(0,0,1,0), 1,1);
+				this.mesh.push(vec2(width-this._radius[2],height-this._radius[2]), p + PI, vec4(0,0,scale2,0), 1,1);
+			}
+			for(var p = 0;p<PI/2;p+= PI/pidiv){
+				this.mesh.push(vec2(this._radius[3],height-this._radius[3]), p + PI + PI/2, vec4(0,0,0,1), 0,1);
+				this.mesh.push(vec2(this._radius[3],height-this._radius[3]), p + PI + PI/2, vec4(0,0,0,scale3), 0,1);
+			}				
+			this.mesh.push(vec2( this._radius[0] ,this._radius[0]), 0, vec4(1,0,0,0), 1,0);
+			this.mesh.push(vec2( this._radius[0] ,this._radius[0]), 0, vec4(scale0,0,0,0), 1,0);
+			
 			
 		}
 		this.color = function(){return bordercolor;};
