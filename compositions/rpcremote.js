@@ -34,7 +34,7 @@ define.class(function(composition, screens, screen, server, view, text, draggabl
 					pos: '${this.rpc.screens.mobile.mousepos}',
 					bgcolor: 'red',
 					init: function(){
-						console.log("screen2")
+						console.log("screen2", this.rpc.server.test)
 					}
 				})
 			)

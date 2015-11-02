@@ -92,6 +92,8 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	this.setRpcAttribute = function(msg, socket){
 
 		var parts = msg.rpcid.split('.')
+		// keep it around for new joins
+		this.server_attributes[msg.rpcid] = msg
 
 		if(socket){
 			if(parts[0] !== 'screens'){ // set an attribute on a server local thing
@@ -121,6 +123,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		this.session = Math.random() * 100000
 		this.rpc = new RpcHub(this)
 		this.connected_screens = {}
+		this.server_attributes = {}
 
 		bus.broadcast({type:'sessionCheck', session:this.session})
 
@@ -139,7 +142,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				this.bus.broadcast({type:'connectScreen', name:msg.name, index:index}, socket)
 
 				// and send the OK back to the screen
-				socket.send({type:'connectScreenOK', index:index})
+				socket.send({type:'connectScreenOK', attributes:this.server_attributes, index:index})
 			}
 			else if(msg.type == 'attribute'){
 				this.setRpcAttribute(msg, socket)

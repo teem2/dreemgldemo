@@ -144,6 +144,12 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 					this.bus.send({type:'webrtcOffer', offer:offer, index: this.index})
 				}.bind(this)
 
+				for(var key in msg.attributes){
+					var attrmsg = msg.attributes[key]
+					// process it
+					this.bus.atMessage(attrmsg, socket)
+				}
+
 				if(!this.rendered) this.doRender()
 			}
 			else if(msg.type == 'connectScreen'){
@@ -164,7 +170,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 
 				// ok, now, key is that we do NOT want to trigger atAttributeSet?..
 				var attrset = obj.atAttributeSet
-				obj.atAttributeSet = null
+				obj.atAttributeSet = undefined
 				obj[msg.attribute] = value
 				obj.atAttributeSet = attrset
 				
