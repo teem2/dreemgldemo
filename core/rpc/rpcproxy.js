@@ -100,6 +100,12 @@ define.class('$base/node', function(require, exports, self){
 			proxy.parent.attributeRpc(proxy.name, msg)
 		}
 
+		proxy.atAttributeSet = function(key, value){
+			if(!(key in proxy)) return
+			var msg = {type:'attribute', attribute:key, value:value}
+			this.parent.attributeRpc(this.name, msg)
+		}
+
 		return proxy
 	}
 

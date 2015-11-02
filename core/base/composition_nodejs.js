@@ -90,7 +90,6 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	}
 
 	this.setRpcAttribute = function(msg, socket){
-
 		var parts = msg.rpcid.split('.')
 		// keep it around for new joins
 		this.server_attributes[msg.rpcid] = msg
@@ -102,6 +101,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				obj[msg.attribute] = msg.value
 			}
 		}
+
 		// lets send this attribute to everyone except socket
 		for(var scrkey in this.connected_screens){
 			var array = this.connected_screens[scrkey]

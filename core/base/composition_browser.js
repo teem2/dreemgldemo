@@ -158,14 +158,21 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				//else obj.createIndex(msg.index, msg.rpcid, rpcpromise)
 			}
 			else if(msg.type == 'attribute'){
-				
+
 				var split = msg.rpcid.split('.')
-				// lets go set that value on our rpc object, but it cant bounce back.
-				var obj = this.rpc
-				for(var i = 0; i < split.length; i++){
-					obj = obj[split[i]]
-					if(!obj) return console.log("Invalid rpc attribute "+ msg.rpcid)
+				var obj
+				// see if its a set attribute on ourself
+				if(split[0] === 'screens' && split[1] === this.screenname){
+					obj = this.screen
 				}
+				else{
+					obj = this.rpc
+					for(var i = 0; i < split.length; i++){
+						obj = obj[split[i]]
+						if(!obj) return console.log("Invalid rpc attribute "+ msg.rpcid)
+					}
+				}
+
 				var value =  define.structFromJSON(msg.value)
 
 				// ok, now, key is that we do NOT want to trigger atAttributeSet?..
