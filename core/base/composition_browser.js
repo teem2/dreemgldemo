@@ -163,7 +163,10 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				var value =  define.structFromJSON(msg.value)
 
 				// ok, now, key is that we do NOT want to trigger atAttributeSet?..
+				var attrset = obj.atAttributeSet
+				obj.atAttributeSet = null
 				obj[msg.attribute] = value
+				obj.atAttributeSet = attrset
 				
 				// so its either 
 				//var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
