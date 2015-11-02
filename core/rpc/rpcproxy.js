@@ -108,8 +108,8 @@ define.class('$base/node', function(require, exports, self){
 			return this.parent.methodRpc(this.name + '.' + rpcid, message)
 		}
 
-		this.attributeRpc = function(rpcid, message){
-			return this.parent.attributeRpc(this.name + '.' + rpcid, message)
+		this.attributeRpc = function(rpcid, message, recur){
+			return this.parent.attributeRpc(this.name + '.' + rpcid, message, recur)
 		}
 	})
 

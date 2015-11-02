@@ -25,6 +25,9 @@ define.class(function(composition, screens, screen, view, text){
 		fileio({name:'fileio'}),
 		screens(
 			screen({
+				init:function(){
+					console.log(this.rpc.fileio.bla)
+				},
 				name:'s1',
 				test:function(){
 					console.log("test called on s1!")

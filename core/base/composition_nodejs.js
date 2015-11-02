@@ -90,12 +90,15 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	}
 
 	this.setRpcAttribute = function(msg, socket){
+
 		var parts = msg.rpcid.split('.')
 
-		if(parts[0] !== 'screens'){ // set an attribute on a server local thing
-			var obj = this.names[parts[0]]
-			var value = RpcProxy.json
-			obj[msg.attribute] = msg.value
+		if(socket){
+			if(parts[0] !== 'screens'){ // set an attribute on a server local thing
+				var obj = this.names[parts[0]]
+				var value = RpcProxy.json
+				obj[msg.attribute] = msg.value
+			}
 		}
 		// lets send this attribute to everyone except socket
 		for(var scrkey in this.connected_screens){

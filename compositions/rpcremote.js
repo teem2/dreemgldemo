@@ -1,9 +1,23 @@
 //Pure JS based composition
-define.class(function(composition, screens, screen, view, text, draggable){
+define.class(function(composition, screens, screen, server, view, text, draggable){
 
 	this.render = function(){ return [
+		server({
+			attribute_test:{type:int, value:10},
+			dosomething:function(){
+				console.log("dosomething called on server")
+				this.test = 40
+			}
+
+		}),
 		screens(
 			screen({
+				init:function(){
+					this.rpc.server.test = function(value){
+						console.log("Got server attribute!"+value)
+					}
+					this.rpc.server.dosomething()
+				},
 				attribute_mousepos:{type:vec2, value:'${this.main.pos}'},
 				name:'mobile',
 				},
