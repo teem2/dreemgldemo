@@ -7,9 +7,9 @@ define.class( function(node, require){
 	var Shader = require('$draw/$drawdevice/shader$drawdevice')
 
 	// lets make a default bg shader
+	define.class(this, 'bg', Shader, function(){
 
-
-	// lets give view a 
+	})
 
 	this.event("postLayout")
 
@@ -55,8 +55,15 @@ define.class( function(node, require){
 	this.attribute("alignself", {type:String, value:"stretch"});  // 	'flex-start', 'center', 'flex-end', 'stretch'
 	this.attribute("position", {type: String, value: "relative" });	//'relative', 'absolute'
 
+	this.attribute("layer", {type:boolean, value:0})
+
 	this.attribute("model", {type: Object})
 	this.state('model')
+
+	// generates the draw layers for this view, done post-render
+	this.generate = function(device){
+		//device.
+	}
 
 	this.init = function(){
 		this.anims = {}

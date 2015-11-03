@@ -1,7 +1,7 @@
 // Copyright 2015 this2 LLC, MIT License (see LICENSE)
 // this class
 
-define.class('$base/composition_client', function(require, baseclass){
+define.class('$base/composition_base', function(require, baseclass){
 
 	var Node = require('$base/node')
 	var RpcProxy = require('$rpc/rpcproxy')
@@ -9,7 +9,7 @@ define.class('$base/composition_client', function(require, baseclass){
 
 	var WebRTC = require('$rpc/webrtc')
 	var BusClient = require('$rpc/busclient')
-	var Render = require('$render/render')
+	var Render = require('$base/render')
 
 	this.atConstructor = function(previous, parent){
 		this.parent = parent
@@ -171,12 +171,9 @@ define.class('$base/composition_client', function(require, baseclass){
 				var value =  define.structFromJSON(msg.value)
 
 				var attrset = obj.atAttributeSet
-				obj.atAttributeSet = null
+				obj.atAttributeSet = undefined
 				obj[msg.attribute] = value
 				obj.atAttributeSet = attrset
-				// so its either 
-				//var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
-				//if(obj) obj[msg.attribute] = msg.value
 			}
 			else if(msg.type == 'method'){
 				// someone is calling a method on us. 

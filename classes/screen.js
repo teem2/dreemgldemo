@@ -4,15 +4,18 @@ define.class(function(view, require) {
 	var Text = require('./text')
 	var FlexLayout = require('$lib/layout')
 	var Render = require('$base/render')
+	
+	this.layer = 1
+
+	this.generate = function(device){
+		// call baseclass
+		view.prototype.generate.call(this, device)		
+	}
 
 	this.atConstructor = function(){
 	}
 
 	this.init = function (previous) {
-		if(previous){
-		}
-		else{
-		}
 	}
 
 	// close top level modal view.

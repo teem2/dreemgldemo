@@ -45,6 +45,7 @@ define.class(function(require, exports, self){
 		this.gl = this.canvas.getContext('webgl', options) || 
 			this.canvas.getContext('webgl-experimental', options) || 
 			this.canvas.getContext('experimental-webgl', options)
+
 		if(!this.gl){
 			console.log(this.canvas)
 			console.log("Could not get webGL context!")
@@ -98,9 +99,6 @@ define.class(function(require, exports, self){
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT|this.gl.DEPTH_BUFFER_BIT|this.gl.STENCIL_BUFFER_BIT)
 	}
 
-	this.atRedraw = function(time){}
-	this.atResize = function(callback){}
-
 	this.getExtension = function(name){
 		var ext = this.extensions[name]
 		if(ext) return ext
@@ -127,4 +125,6 @@ define.class(function(require, exports, self){
 		this.gl.readPixels(x * this.ratio, y * this.ratio, w * this.ratio, h * this.ratio, this.gl.RGBA, this.gl.UNSIGNED_BYTE, buf);
 		return buf
 	}
+
+	this.atRedraw = function(time){}
 })
