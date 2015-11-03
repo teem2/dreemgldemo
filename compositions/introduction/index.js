@@ -60,7 +60,7 @@ define.class(function(composition, require, screens, screen, docviewer, button, 
 					,view({
 							flex:1,
 							bgcolor:'transparent',
-							slidetitle:'Using shaders to style'
+							slidetitle:'LIVE'
 						}
 						,perspective3d({bgcolor:'transparent',name:"teapotview2", flex:1,flexdirection:"row", clipping:true,camera:[10,-10,-70],fov:60,flex:1,
 							render:function(){
@@ -86,6 +86,7 @@ define.class(function(composition, require, screens, screen, docviewer, button, 
 											view:{vanim:0},
 											patterns: require('./shaderpatterns').prototype,
 											color:function(){
+												//return 'red'
 												return vec4( patterns.wave(mesh.uv, i*.1 + view.vanim * 10., i*.1 + view.vanim * 10.) * pal.pal1(i*.1).xyz, 1.)
 											//	return vec4( patterns.stripe(mesh.uv, 10., i*.1 + view.vanim * 10.) * pal.pal1(i*0.1).xyz, 1.) 
 											}

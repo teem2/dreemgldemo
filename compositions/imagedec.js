@@ -1,6 +1,6 @@
 //Pure JS based composition
 define.class(function(composition, require, screens, screen, view, text){
-	var imgload = require('$parsers/imageparser')
+	var imgload = require('$parse/imageparser')
 
 function Pluck( ctx ) {
   this.sr = ctx.sampleRate;

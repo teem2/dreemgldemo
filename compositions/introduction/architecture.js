@@ -4,15 +4,17 @@ define.class(function(view, require, screens){
 	var GLShader = require('$gl/glshader')
 
 	this.bgcolor = vec4("red");
+
+	// this? yes this can go into the substrate
 	this.setMatrixUniforms = function(renderstate){
-		var r = this.rects;
-		var a = this.arrows;		
-		var t = this.texts;		
-		this.bg_shader._matrix = 
-		this.fg_shader._matrix = 
-		r._matrix = renderstate.matrix;
-		a._matrix = renderstate.matrix;
-		t._matrix = renderstate.matrix;
+		var r = this.rects
+		var a = this.arrows
+		var t = this.texts
+		this.bg_shader._matrix =
+		this.fg_shader._matrix =
+		r._matrix = renderstate.matrix
+		a._matrix = renderstate.matrix
+		t._matrix = renderstate.matrix
 
 		this.fg_shader._viewmatrix =
 		this.bg_shader._viewmatrix =
@@ -20,23 +22,23 @@ define.class(function(view, require, screens){
 		a._viewmatrix = renderstate.viewmatrix;
 		t._viewmatrix = renderstate.viewmatrix;
 	}
-		
+
 	define.class(this, 'rectshader', GLShader, function(){
+
+		this.color = function(){
+			return mix(vec4("#ddddff"), vec4("white"), (sin(mesh.z*PI)*0.5 + 0.5)*sin(mesh.w*PI))
+		}
 		
-		this.color = function(){			
-			return mix( vec4("#ddddff"), vec4("white"),(sin(mesh.z*PI)*0.5 + 0.5)*sin(mesh.w*PI));
-		};
-		
-		this.addRect  = function(x,y,w,h){
+		this.addRect = function(x, y, w, h){
 			this.mesh.pushQuad(x,y,0,0, x+w, y,1,0, x, y+h,0,1, x+w, y+h, 1,1)
 		}
 		
-		this.mesh = vec4.array();
+		this.mesh = vec4.array()
 		this.matrix = mat4.identity()
 		this.viewmatrix = mat4.identity()
 		
 		this.position = function(){
-			sized = vec2(mesh.x , mesh.y )
+			sized = vec2(mesh.x, mesh.y)
 			return vec4(sized.x, sized.y, 0, 1) * matrix * viewmatrix
 		}
 	})

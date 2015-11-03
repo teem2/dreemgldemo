@@ -9,8 +9,8 @@ define.class(function(require){
 	var ExternalApps = require('$server/externalapps')
 	var BusServer = require('$rpc/busserver')
 	var FileWatcher = require('$server/filewatcher')
-	var HTMLParser = require('$parsers/htmlparser')
-	var ScriptError = require('$parsers/scripterror')
+	var HTMLParser = require('$parse/htmlparser')
+	var ScriptError = require('$parse/scripterror')
 	var legacy_support = 0
 
 	this.atConstructor = function(

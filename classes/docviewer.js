@@ -9,7 +9,7 @@ define.class(function(view, require, text,foldcontainer,icon, markdown, codeview
 
 	this.flex = 1.0
 	this.padding=20;
-	var Parser = require("$parsers/onejsparser");
+	var Parser = require("$parse/onejsparser");
 	
 	// this.flex = 0.5;	
 	// A single documentation block with name and bodytext.

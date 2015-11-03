@@ -1,17 +1,23 @@
 //Pure JS based composition
-define.class(function(composition, screens, screen, view, text, draggable){
+define.class(function(composition, screens, screen, server, view, text, draggable){
 
 	this.render = function(){ return [
+		server({
+			attribute_test:{type:int, value:10}
+		})
 		screens(
 			screen({
+				init:function(){
+					console.log('hi!',this.rpc.server)
+				},
 				attribute_mousepos:{type:vec2, value:'${this.main.pos}'},
 				name:'mobile',
 				},
 				view({
 					name:'main',
-					size: vec2(200, 200),
-					bgcolor: vec4('yellow'),
-					is: draggable()
+					size:vec2(200, 200),
+					bgcolor:vec4('yellow'),
+					is:draggable()
 				})
 			),
 			screen({name:'desktop'},

@@ -9,7 +9,9 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 
 	var WebRTC = require('$rpc/webrtc')
 	var BusClient = require('$rpc/busclient')
-	var renderer = require('$renderer/renderer')
+	var render = require('$render/render')
+
+	var Device = require('$draw/gl/gldevice')
 
 	this.atConstructor = function(previous, parent){
 
@@ -18,6 +20,10 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		if(previous){
 			this.reload = (previous.reload || 0) + 1
 			console.log("Reload " + this.reload)
+		}
+		else{
+			// spawn up a device
+			this.device = new Device()
 		}
 
 		// how come this one doesnt get patched up?
@@ -62,7 +68,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 			this.screen.parent = parent
 		}
 		//this.screen.teem = this
-		renderer(this.screen, previous && previous.screen, globals)
+		render(this.screen, previous && previous.screen, globals)
 		
 		if(this.screen.title !== undefined) document.title = this.screen.title 
 				
@@ -162,9 +168,10 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				}
 				var value =  define.structFromJSON(msg.value)
 
-				// ok, now, key is that we do NOT want to trigger atAttributeSet?..
+				var attrset = obj.atAttributeSet
+				obj.atAttributeSet = null
 				obj[msg.attribute] = value
-				
+				obj.atAttributeSet = attrset
 				// so its either 
 				//var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
 				//if(obj) obj[msg.attribute] = msg.value

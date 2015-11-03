@@ -5,8 +5,8 @@ define.class(function(require, constructor){
 
 	var Node = constructor
 
-	var OneJSParser =  require('$parsers/onejsparser')
-	var WiredWalker = require('$parsers/wiredwalker')
+	var OneJSParser =  require('$parse/onejsparser')
+	var WiredWalker = require('$parse/wiredwalker')
 	var RpcProxy = require('$rpc/rpcproxy')
 
 	var onejsparser = new OneJSParser()

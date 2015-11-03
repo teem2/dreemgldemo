@@ -1,6 +1,6 @@
 define.class(function(require){
 
-	var parse = new (require('$parsers/onejsparser'))()
+	var parse = new (require('$parse/onejsparser'))()
 
 	this.atConstructor = function(cursorset, editor, textbuf){
 		this.cursorset = cursorset

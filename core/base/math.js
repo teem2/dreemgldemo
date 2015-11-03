@@ -1,6 +1,6 @@
 define(function(require, exports){
 
-	var vectorParser = require('$parsers/vectorparser')
+	var vectorParser = require('$parse/vectorparser')
 //	exports.$$ = console.log.bind(console)
 	// constants
 	exports.RAD = 1

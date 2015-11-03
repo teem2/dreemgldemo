@@ -1,7 +1,7 @@
 "use strict";
 define.class(function(require, screen, node, dataset, spline, blokjesgrid, menubar,screenoverlay,scrollcontainer,menuitem, view, edit, text, icon, treeview, ruler, foldcontainer,button, splitcontainer, scrollbar, editlayout){	
 
-	var Xml = require('$parsers/htmlparser')
+	var Xml = require('$parse/htmlparser')
 
 	this.title = "Flowgraph Builder"
 	

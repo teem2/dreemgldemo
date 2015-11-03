@@ -2,7 +2,7 @@ define.mixin(function(require){
 
 	var CursorSet = require('$edit/cursorset')
 	var Cursor = require('./cursor')
-	var parse = new (require('$parsers/onejsparser'))()
+	var parse = new (require('$parse/onejsparser'))()
 
 	this.addUndoInsert = function(start, end, stack){
 		if(!stack) stack = this.undo_stack
