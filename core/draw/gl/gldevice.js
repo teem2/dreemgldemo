@@ -2,8 +2,8 @@
 
 define.class(function(require, exports, self){
 
-	var Shader = require('$gl/glshader')
-	var Texture = require('$gl/gltexture')
+	var Shader = require('./glshader')
+	var Texture = require('./gltexture')
 
 	this.frame = 
 	this.main_frame = Texture.rgb_depth_stencil()

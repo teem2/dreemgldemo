@@ -32,7 +32,7 @@
 	define.$base = '$core/base'
 	define.$async = '$core/async'
 	define.$debug = '$core/debug'
-	define.$dreem = '$core/dreem'
+	define.$draw = '$core/draw'
 	define.$gl = '$core/gl'
 	define.$edit = '$core/edit'
 	define.$parse = '$core/parse'
