@@ -2,12 +2,13 @@
 
 define.class(function(require, exports, self){
 
+	var Keyboard = require('./keyboardwebgl')
+	var Mouse = require('./mousewebgl')
+	var Touch = require('./touchwebgl')
+
 	// require embedded classes	
 	this.shader = require('./shaderwebgl')
 	this.texture = require('./texturewebgl')
-	this.keyboard = require('./keyboardwebgl')
-	this.mouse = require('./mousewebgl')
-	this.touch = require('./touchwebgl')
 	this.layer = require('./layerwebgl')
 
 	this.frame = 
@@ -82,6 +83,10 @@ define.class(function(require, exports, self){
 		setTimeout(function(){
 			this.redraw()
 		}.bind(this),0)
+
+		this.mouse = new Mouse()
+		this.keyboard = new Keyboard()
+		this.touch = new Touch()
 	}
 
 	this.clear = function(r, g, b, a){

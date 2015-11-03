@@ -11,7 +11,9 @@ define.class('$base/composition_base', function(require, baseclass){
 	var BusClient = require('$rpc/busclient')
 	var Render = require('$base/render')
 
-	var Device = require('$draw/webgl/devicewebgl')
+	var Device = require('$draw/$drawdevice/device$drawdevice')
+	var Shader = require('$draw/$drawdevice/shader$drawdevice')
+	var View = require('$classes/view')
 
 	this.atConstructor = function(previous, parent){
 
@@ -22,10 +24,14 @@ define.class('$base/composition_base', function(require, baseclass){
 		else{
 			// lets spawn up a webGL device
 			this.device = new Device()
+			// add a bg class on the view prototype
+			define.class(View.prototype, 'bg', this.device.shader, function(){
+
+			})
 		}
 
-		// how come this one doesnt get patched up?
 		baseclass.prototype.atConstructor.call(this)
+
 
 	}
 })

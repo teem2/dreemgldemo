@@ -44,7 +44,8 @@ define.class('$base/composition_client', function(require, baseclass){
 		var globals = {
 			composition:this,
 			rpc:this.rpc,
-			screen:this.screen
+			screen:this.screen,
+			device:this.device
 		}
 		globals.globals = globals
 		window.comp = this

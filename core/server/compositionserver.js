@@ -88,7 +88,7 @@ define.class(function(require){
 
 		// ok, we will need to compute the local classes thing
 		define.system_classes = this.system_classes
-
+		define.$drawdevice = 'headless'
 		// lets figure out if we are a direct .js file or a 
 		// directory with an index.js 
 		var scan = [
@@ -147,7 +147,7 @@ define.class(function(require){
 			'  </style>'+
 			'  <script type="text/javascript">\n'+
 			'    window.define = {\n'+
-			'	   $rendermode:"gl",\n'+
+			'	   $drawdevice:"webgl",\n'+
 			'      system_classes:' + JSON.stringify(this.system_classes) + ',\n' + 
 			'      main:["$base/math", "' + boot + '"],\n'+
 			'      atMain:function(require, modules){\n'+

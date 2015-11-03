@@ -4,6 +4,13 @@ define.class( function(node, require){
 	var Animate = require('$base/animate')
 	var FlexLayout = require('$lib/layout')
 
+	var Shader = require('$draw/$drawdevice/shader$drawdevice')
+
+	// lets make a default bg shader
+
+
+	// lets give view a 
+
 	this.event("postLayout")
 
 	this.hideProperty(Object.keys(this))
