@@ -39,7 +39,7 @@
 	define.$render = '$core/render'
 	define.$rpc = '$core/rpc'
 	define.$server = '$core/server'
-	define.$animation = '$core/animation'
+	define.$animate = '$core/animate'
 
 	define.local_classes = {}
 	define.local_require_stack = []

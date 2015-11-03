@@ -2,5 +2,5 @@
 // screen class
 
 define(function(require, exports, module){
-	module.exports = require('$renderer/screen_$rendermode.js')
+	module.exports = require('$render/view.js')
 })
