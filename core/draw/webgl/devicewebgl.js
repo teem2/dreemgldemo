@@ -127,4 +127,6 @@ define.class(function(require, exports, self){
 	}
 
 	this.atRedraw = function(time){}
+
+	this.atResize = function(){}
 })
