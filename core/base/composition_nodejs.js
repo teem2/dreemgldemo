@@ -12,15 +12,31 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	// ok now what. well we need to build our RPC interface
 	this.postAPI = function(msg, response){
 		if(msg.type == 'attribute'){
-			var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
-			if(obj) obj[msg.attribute] = msg.value
-			response.send({type:'return',value:'OK'})
+			if (msg.value) { //setter
+				this.setRpcAttribute(msg)
+				response.send({type:'return', value:'OK'})
+			} else { //getter
+				var parts = msg.rpcid.split('.');
+				var value;
+				if (parts[0] !== 'screens'){
+					var obj = this.names[parts[0]];
+					if (obj) {
+						value = obj[msg.attribute]
+					}
+				}
+				response.send({type:'return', value:value})
+			}
 		}
 		else if(msg.type == 'method'){
-			var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
-			if(obj) RpcProxy.handleCall(obj, msg, response)
+			var prom = this.callRpcMethod(msg);
+			prom.then(function(ret) {
+				var value = ret.value;
+				response.send({type:'return', value:value})
+			}, function(ret) {
+				response.send({type:'error', value:ret})
+			});
 		}
-		else response.send({type:'error', value:'please set type to rpcAttribute or rpcCall'})
+		else response.send({type:'error', value:'please set "msg.type" to "attribute" or "method"'})
 	}
 	
 	this.handleRpcMethod = function(msg){
@@ -94,11 +110,12 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		// keep it around for new joins
 		this.server_attributes[msg.rpcid] = msg
 
-		if(socket){
+		if (socket) {
 			if(parts[0] !== 'screens'){ // set an attribute on a server local thing
 				var obj = this.names[parts[0]]
-				var value = RpcProxy.json
-				obj[msg.attribute] = msg.value
+				if (obj) {
+					obj[msg.attribute] = msg.value
+				}
 			}
 		}
 
