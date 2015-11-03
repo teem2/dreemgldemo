@@ -1,5 +1,5 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
-// Node class provides JSONML and attributes (events)
+// Node class provides events and constructor semantics
 
 define.class(function(require, constructor){
 
@@ -9,6 +9,7 @@ define.class(function(require, constructor){
 	var WiredWalker = require('$parse/wiredwalker')
 	var RpcProxy = require('$rpc/rpcproxy')
 
+	// parser and walker for wired attributes
 	var onejsparser = new OneJSParser()
 	onejsparser.parser_cache = {}
 	var wiredwalker = new WiredWalker()

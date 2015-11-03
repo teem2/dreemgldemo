@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // teem class
 
-define.class(function(require, node){
+define.class(function(node, require){
 
 	var RpcHub = require('$rpc/rpchub')
 

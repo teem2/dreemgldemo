@@ -7,7 +7,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	var RpcProxy = require('$rpc/rpcproxy')
 	var RpcHub = require('$rpc/rpchub')
 
-	var render = require('$render/render')
+	var Render = require('$base/render')
 
 	// ok now what. well we need to build our RPC interface
 	this.postAPI = function(msg, response){
@@ -15,7 +15,8 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 			if (msg.value) { //setter
 				this.setRpcAttribute(msg)
 				response.send({type:'return', value:'OK'})
-			} else { //getter
+			} 
+			else { //getter
 				var parts = msg.rpcid.split('.');
 				var value;
 				if (parts[0] !== 'screens'){
@@ -106,25 +107,12 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 
 	this.setRpcAttribute = function(msg, socket){
 		var parts = msg.rpcid.split('.')
-<<<<<<< HEAD
 
 		// only feed back if we are from a socoket
 		if(socket && parts[0] !== 'screens'){ // set an attribute on a server local thing
 			var obj = this.names[parts[0]]
 			var value = RpcProxy.json
 			obj[msg.attribute] = msg.value
-=======
-		// keep it around for new joins
-		this.server_attributes[msg.rpcid] = msg
-
-		if (socket) {
-			if(parts[0] !== 'screens'){ // set an attribute on a server local thing
-				var obj = this.names[parts[0]]
-				if (obj) {
-					obj[msg.attribute] = msg.value
-				}
-			}
->>>>>>> 52648e02fe754fbcd20359da9e49e547e0508905
 		}
 
 		// lets send this attribute to everyone except socket
