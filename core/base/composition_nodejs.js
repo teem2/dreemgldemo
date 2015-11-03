@@ -28,8 +28,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 			}
 		}
 		else if(msg.type == 'method'){
-			var prom = this.callRpcMethod(msg);
-			prom.then(function(ret) {
+			this.callRpcMethod(msg).then(function(ret) {
 				var value = ret.value;
 				response.send({type:'return', value:value})
 			}, function(ret) {
