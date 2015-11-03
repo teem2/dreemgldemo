@@ -3,21 +3,21 @@
 define.class('$base/node', function(require, exports, self){
 	if(define.$environment === 'nodejs') return
 
-	var GLTexture = require('$gl/gltexture')
+	var GLTexture = require('./gltexture')
 	var OneJSParser =  require('$parse/onejsparser')
-	var GLSLGen = require('$gl/glslgen')
-	var gltypes = require('$gl/gltypes')
+	var GLSLGen = require('./glslgen')
+	var gltypes = require('./gltypes')
 	var dump = require('$parse/astdumper')
 	var astdef = require('$parse/onejsdef')
 
 	this.default_texture = GLTexture.fromArray(new Float32Array(4*4*4), 4,4)
 
-	this.noise = require('$gl/glnoise')
-	this.pal = require('$gl/glpalette')
-	this.shape = require('$gl/glshape')
-	this.math = require('$gl/glmath')
-	this.demo = require('$gl/gldemo')
-	this.material = require('$gl/glmaterial')
+	this.noise = require('./glnoise')
+	this.pal = require('./glpalette')
+	this.shape = require('./glshape')
+	this.math = require('./glmath')
+	this.demo = require('./gldemo')
+	this.material = require('./glmaterial')
 
 	this.RAD = '1'
 	this.DEG = '0.017453292519943295'

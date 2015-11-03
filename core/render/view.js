@@ -1,7 +1,7 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 define.class( function(node, require){
-	var AnimTrack = require('$animation/animtrack')
+	var AnimTrack = require('$animate/animtrack')
 	var FlexLayout = require('$lib/layout')
 
 	this.init = function(){
@@ -43,7 +43,7 @@ define.class( function(node, require){
 
 	this.event("postLayout")
 
-	this.hideProperty(Object.keys(self))
+	this.hideProperty(Object.keys(this))
 
 	this.attribute("pos", {type:vec2, value:vec2(0,0)})
 	this.attribute("x", {storage:'pos', index:0})

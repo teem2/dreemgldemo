@@ -7,7 +7,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	var RpcProxy = require('$rpc/rpcproxy')
 	var RpcHub = require('$rpc/rpchub')
 
-	var renderer = require('$renderer/renderer')
+	var render = require('$render/render')
 
 	// ok now what. well we need to build our RPC interface
 	this.postAPI = function(msg, response){

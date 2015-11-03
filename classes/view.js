@@ -2,5 +2,5 @@
 // view class
 
 define(function(require){
-	return require('$renderer/view_$rendermode')
+	return require('$render/view')
 })

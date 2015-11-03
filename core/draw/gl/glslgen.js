@@ -1,11 +1,11 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class('$parsers/onejsgen', function(require, exports, self, baseclass){
+define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 
-	var gltypes = require('$gl/gltypes')
+	var gltypes = require('./gltypes')
 	var OneJSParser =  require('$parse/onejsparser')
 	var OneJSGen = require('$parse/onejsgen.js')
-	var GLTexture = require('$gl/gltexture')
+	var GLTexture = require('./gltexture')
 	var vectorParser = require('$parse/vectorparser')
 	var onejsparser = new OneJSParser()
 	onejsparser.parser_cache = {}

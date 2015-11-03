@@ -86,7 +86,7 @@ define.class(function(require, exports, module){
 			}
 			new_child.parent = new_version
 			// render new child
-			new_child = new_children[i] = renderer(new_child, old_child, globals, wireinits)
+			new_child = new_children[i] = render(new_child, old_child, globals, wireinits)
 	
 			// set the childs name
 			var name = new_child.name || new_child.constructor.name

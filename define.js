@@ -32,14 +32,14 @@
 	define.$base = '$core/base'
 	define.$async = '$core/async'
 	define.$debug = '$core/debug'
-	define.$dreem = '$core/dreem'
+	define.$draw = '$core/draw'
 	define.$gl = '$core/gl'
 	define.$edit = '$core/edit'
 	define.$parse = '$core/parse'
 	define.$render = '$core/render'
 	define.$rpc = '$core/rpc'
 	define.$server = '$core/server'
-	define.$animation = '$core/animation'
+	define.$animate = '$core/animate'
 
 	define.local_classes = {}
 	define.local_require_stack = []
