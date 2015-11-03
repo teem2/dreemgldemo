@@ -100,6 +100,12 @@ define.class('$base/node', function(require, exports, self){
 			proxy.parent.attributeRpc(proxy.name, msg)
 		}
 
+		proxy.atAttributeSet = function(key, value){
+			if(!(key in proxy)) return
+			var msg = {type:'attribute', attribute:key, value:value}
+			this.parent.attributeRpc(this.name, msg)
+		}
+
 		return proxy
 	}
 
@@ -108,8 +114,8 @@ define.class('$base/node', function(require, exports, self){
 			return this.parent.methodRpc(this.name + '.' + rpcid, message)
 		}
 
-		this.attributeRpc = function(rpcid, message){
-			return this.parent.attributeRpc(this.name + '.' + rpcid, message)
+		this.attributeRpc = function(rpcid, message, recur){
+			return this.parent.attributeRpc(this.name + '.' + rpcid, message, recur)
 		}
 	})
 

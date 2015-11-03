@@ -5,3 +5,6 @@ cache/
 gzcache/
 .DS_Store
 *.marks
+compositions/estimote
+compositions/sample
+

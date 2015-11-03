@@ -85,11 +85,11 @@ define.class(function(composition, screens, screen, view, text){
           name:'s1', 
 
           // Attributes
-          s1_str: 's1_str',
-          s1_num: 111.11,
+          attribute_s1_str:{type:string, value:'s1_str'},
+          attribute_s1_num:{type:Number, value:111.11},
           
           // Count of server calls
-          s1_calls: 100,
+   	  attribute_s1_calls:{type:Number, value:100},
 
           // client method s1_init: re-init client state
           s1_init: function() {

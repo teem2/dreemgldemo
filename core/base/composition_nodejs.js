@@ -12,15 +12,30 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	// ok now what. well we need to build our RPC interface
 	this.postAPI = function(msg, response){
 		if(msg.type == 'attribute'){
-			var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
-			if(obj) obj[msg.attribute] = msg.value
-			response.send({type:'return',value:'OK'})
+			if (msg.value) { //setter
+				this.setRpcAttribute(msg)
+				response.send({type:'return', value:'OK'})
+			} else { //getter
+				var parts = msg.rpcid.split('.');
+				var value;
+				if (parts[0] !== 'screens'){
+					var obj = this.names[parts[0]];
+					if (obj) {
+						value = obj[msg.attribute]
+					}
+				}
+				response.send({type:'return', value:value})
+			}
 		}
 		else if(msg.type == 'method'){
-			var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
-			if(obj) RpcProxy.handleCall(obj, msg, response)
+			this.callRpcMethod(msg).then(function(ret) {
+				var value = ret.value;
+				response.send({type:'return', value:value})
+			}, function(ret) {
+				response.send({type:'error', value:ret})
+			});
 		}
-		else response.send({type:'error', value:'please set type to rpcAttribute or rpcCall'})
+		else response.send({type:'error', value:'please set "msg.type" to "attribute" or "method"'})
 	}
 	
 	this.handleRpcMethod = function(msg){
@@ -91,13 +106,27 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 
 	this.setRpcAttribute = function(msg, socket){
 		var parts = msg.rpcid.split('.')
+<<<<<<< HEAD
 
 		// only feed back if we are from a socoket
 		if(socket && parts[0] !== 'screens'){ // set an attribute on a server local thing
 			var obj = this.names[parts[0]]
 			var value = RpcProxy.json
 			obj[msg.attribute] = msg.value
+=======
+		// keep it around for new joins
+		this.server_attributes[msg.rpcid] = msg
+
+		if (socket) {
+			if(parts[0] !== 'screens'){ // set an attribute on a server local thing
+				var obj = this.names[parts[0]]
+				if (obj) {
+					obj[msg.attribute] = msg.value
+				}
+			}
+>>>>>>> 52648e02fe754fbcd20359da9e49e547e0508905
 		}
+
 		// lets send this attribute to everyone except socket
 		for(var scrkey in this.connected_screens){
 			var array = this.connected_screens[scrkey]
@@ -119,6 +148,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		this.session = Math.random() * 100000
 		this.rpc = new RpcHub(this)
 		this.connected_screens = {}
+		this.server_attributes = {}
 
 		bus.broadcast({type:'sessionCheck', session:this.session})
 
@@ -137,7 +167,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				this.bus.broadcast({type:'connectScreen', name:msg.name, index:index}, socket)
 
 				// and send the OK back to the screen
-				socket.send({type:'connectScreenOK', index:index})
+				socket.send({type:'connectScreenOK', attributes:this.server_attributes, index:index})
 			}
 			else if(msg.type == 'attribute'){
 				this.setRpcAttribute(msg, socket)

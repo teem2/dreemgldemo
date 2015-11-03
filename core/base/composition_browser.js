@@ -29,7 +29,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		// how come this one doesnt get patched up?
 		baseclass.prototype.atConstructor.call(this)
 
-		this.screenname = location.search?location.search.slice(1):'browser'
+		this.screenname = location.search && location.search.slice(1)
 
 		// web environment
 		if(previous){
@@ -150,6 +150,12 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 					this.bus.send({type:'webrtcOffer', offer:offer, index: this.index})
 				}.bind(this)
 
+				for(var key in msg.attributes){
+					var attrmsg = msg.attributes[key]
+					// process it
+					this.bus.atMessage(attrmsg, socket)
+				}
+
 				if(!this.rendered) this.doRender()
 			}
 			else if(msg.type == 'connectScreen'){
@@ -158,14 +164,21 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				//else obj.createIndex(msg.index, msg.rpcid, rpcpromise)
 			}
 			else if(msg.type == 'attribute'){
-				
+
 				var split = msg.rpcid.split('.')
-				// lets go set that value on our rpc object, but it cant bounce back.
-				var obj = this.rpc
-				for(var i = 0; i < split.length; i++){
-					obj = obj[split[i]]
-					if(!obj) return console.log("Invalid rpc attribute "+ msg.rpcid)
+				var obj
+				// see if its a set attribute on ourself
+				if(split[0] === 'screens' && split[1] === this.screenname){
+					obj = this.screen
 				}
+				else{
+					obj = this.rpc
+					for(var i = 0; i < split.length; i++){
+						obj = obj[split[i]]
+						if(!obj) return console.log("Invalid rpc attribute "+ msg.rpcid)
+					}
+				}
+
 				var value =  define.structFromJSON(msg.value)
 
 				var attrset = obj.atAttributeSet

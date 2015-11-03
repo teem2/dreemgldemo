@@ -12,12 +12,12 @@ define.class('$base/node', function(require, exports, self){
 
 	this.default_texture = GLTexture.fromArray(new Float32Array(4*4*4), 4,4)
 
-	this.noise = require('./glnoise')
-	this.pal = require('./glpalette')
-	this.shape = require('./glshape')
-	this.math = require('./glmath')
-	this.demo = require('./gldemo')
-	this.material = require('./glmaterial')
+	this.noise = require('$shaderlib/noiselib')
+	this.pal = require('$shaderlib/palettelib')
+	this.shape = require('$shaderlib/shapelib')
+	this.math = require('$shaderlib/mathlib')
+	this.demo = require('$shaderlib/demolib')
+	this.material = require('$shaderlib/materiallib')
 
 	this.RAD = '1'
 	this.DEG = '0.017453292519943295'

@@ -17,7 +17,7 @@ define.class(function(require, exports){
 
 	this.attributeRpc = function(name, msg){
 		msg.rpcid = name
-		return this.host.setRpcAttribute(msg)
+		return this.host.setRpcAttribute(msg, null )
 	}
 
 	this.resolveReturn = function(msg){

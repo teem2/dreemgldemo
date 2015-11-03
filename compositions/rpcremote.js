@@ -1,32 +1,48 @@
 //Pure JS based composition
-define.class(function(composition, screens, screen, server, view, text, draggable){
+define.class(function(composition, screens, screen, server, view, text, draggable){ this.render = function(){ return [
 
-	this.render = function(){ return [
-		screens(
-			screen({
-				init:function(){
-					console.log('hi!',this.rpc.server)
-				},
-				attribute_mousepos:{type:vec2, value:'${this.main.pos}'},
-				name:'mobile',
-				},
-				view({
-					name:'main',
-					size:vec2(200, 200),
-					bgcolor:vec4('yellow'),
-					is:draggable()
-				})
-			),
-			screen({name:'desktop'},
-				view({
-					size: vec2(200, 200),
-					pos: '${this.rpc.screens.mobile.mousepos}',
-					bgcolor: 'red',
-					init: function(){
-						console.log("screen2")
-					}
-				})
-			)
+	server({
+		attribute_test: {type:int, value:10},
+		dosomething: function(){
+			console.log("dosomething called on server")
+			this.test = 40
+			console.log("Setting attribute on screen")
+			this.rpc.screens.mobile.test1 = {my:'obj'}
+		}
+	}),
+	screens(
+		screen({
+			init: function(){
+				this.rpc.server.test = function(value){
+					console.log("Got server attribute!"+value)
+				}
+				this.test1 = function(value){
+					console.log('Got attribute set!', value, this.test1)
+				}
+
+				this.rpc.server.dosomething()
+			},
+			attribute_test1:{type:Object, value:{}},
+			attribute_mousepos:{type:vec2, value:'${this.main.pos}'},
+			name:'mobile',
+			},
+			view({
+				name:'main',
+				size: vec2(200, 200),
+				bgcolor: vec4('yellow'),
+				is: draggable()
+			})
+		),
+		screen({name:'desktop'},
+			view({
+				size: vec2(200, 200),
+				pos: '${this.rpc.screens.mobile.mousepos}',
+				bgcolor: 'red',
+				init: function(){
+					console.log("screen2", this.rpc.server.test)
+				}
+			})
 		)
-	]}
-})
+	)
+
+]}})

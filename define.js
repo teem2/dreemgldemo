@@ -40,6 +40,7 @@
 	define.$rpc = '$core/rpc'
 	define.$server = '$core/server'
 	define.$animate = '$core/animate'
+	define.$shaderlib = '$core/shaderlib'
 
 	define.local_classes = {}
 	define.local_require_stack = []
