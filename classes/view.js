@@ -8,7 +8,6 @@ define.class( function(node, require){
 
 	// lets make a default bg shader
 	define.class(this, 'bg', Shader, function(){
-
 	})
 
 	this.event("postLayout")
