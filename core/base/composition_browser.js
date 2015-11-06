@@ -9,6 +9,7 @@ define.class('$base/composition_client', function(require, baseclass){
 		
 		if(previous){
 			this.reload = (previous.reload || 0) + 1
+			this.device = new Device(previous.device) //previous.device
 			console.log("Reload " + this.reload)
 		}
 		else{
@@ -17,10 +18,5 @@ define.class('$base/composition_client', function(require, baseclass){
 		}
 
 		baseclass.prototype.atConstructor.call(this)
-
-		// we haz device.. 
-		//this.device.process(this.screen)
-		//this.screen.process(this.device)
-		
 	}
 })

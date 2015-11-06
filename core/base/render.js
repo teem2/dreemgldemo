@@ -101,6 +101,11 @@ define.class(function(exports){
 			for(var i = 0; i < wireinits.length; i++){
 				wireinits[i]()
 			}
+
+			// signal to our device we have a newly rendered node
+			if(globals.device){
+				globals.device.atNewlyRendered(new_version)
+			}
 		}
 
 		return new_version

@@ -5,8 +5,8 @@ define.class(function(composition, screens, screen, view, text){
 		screens(
 			screen({},
 				view({
-					w:100, h:100,
-					bgcolor:'red'
+					w:100, h:100, borderradius:1,
+					bgcolor:'blue'
 				})
 			)
 		)

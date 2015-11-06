@@ -37,6 +37,8 @@ define.class('$base/node', function(require, exports, self){
 
 	this.atConstructor = function(obj){
 		if(obj) for(var key in obj) this[key] = obj[key]
+		// forward the outer object to the view object
+		this.view = this.outer
 	}
 
 	this.extensions = ''
@@ -421,6 +423,10 @@ define.class('$base/node', function(require, exports, self){
 		// get uniform locations
 		var uniset = shader.uniset = {}
 		var unilocs = shader.unilocs = {}
+		var refattr = shader.refattr = {}
+		for(var key in vtx_state.reference_is_attr) refattr[key] = 1
+		for(var key in pix_state.reference_is_attr) refattr[key] = 1
+			
 		this.mapUniforms(gl, shader, vtx_state.uniforms, uniset, unilocs)
 		this.mapUniforms(gl, shader, pix_state.uniforms, uniset, unilocs)
 
@@ -622,6 +628,8 @@ define.class('$base/node', function(require, exports, self){
 	}		
 
 	this.atExtend = function(){
+		// forward the view reference
+		this.view = this.constructor.outer
 		if(this !== self) this.compile()
 	}
 })

@@ -17,6 +17,7 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 			stack: 0, 
 			context: context, 
 			attributes: {}, 
+			reference_is_attr: {},
 			varyings: varyings || {},
 			uniforms: uniforms || {},
 			structs: [],
@@ -38,16 +39,28 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 		return gltypes.getType(infer)
 	}
 
-	this.resolveContext = function(node, context, name, outname, basename, state){
+	this.resolveContext = function(node, context, name, basename, state){
+		// compute output name
+		var outname
+		if(basename) outname = basename + "_DOT_" + name
+		else outname = name
+
 		// uniform
 		if(name === 'super'){
 			node.infer = {fn_t:'object', object:Object.getPrototypeOf(context)}
-			return outname
+			return name
 		}
 
-		var attr = context['_on'+name]
-		var obj = attr? attr.value: context[name]
-
+		var attr_name = '_' + name
+		var obj
+		if(attr_name in context){ // its an attribute reference
+			obj = context[attr_name]
+			state.reference_is_attr[outname] = 1
+		}
+		else{
+			obj = context[name]
+		}
+		
 		if(typeof obj === 'number'){
 			state.uniforms[outname] = node.infer = float32
 			return outname
@@ -145,7 +158,7 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 		}
 		// gl functions
 		// resolve on context
-		var res = this.resolveContext(node, state.context, name, name, '', state)
+		var res = this.resolveContext(node, state.context, name, '', state)
 		if(res !== undefined) return res
 
 		var varying = state.varyings[name]
@@ -196,7 +209,7 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 		// we can also be referencing another object
 		if(infer.fn_t === 'object'){
 			// lets switch context and expand id
-			var ret =  this.resolveContext(node, infer.object, key, obj + '_DOT_' + key, obj, state)
+			var ret =  this.resolveContext(node, infer.object, key, obj, state)
 			if(ret === undefined) throw new Error('Cannot resolve '+obj + '.' + key)
 			return ret		
 		}
@@ -204,7 +217,7 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 		if(infer.fn_t === 'attribute'){
 			// we can access uniform properties on arrays
 			if(key in infer.array){
-				return this.resolveContext(node, infer.array, key, obj + '_DOT_' + key, obj, state)
+				return this.resolveContext(node, infer.array, key, obj, state)
 			}
 			// otherwise fall through to attribute struct access
 			struct = infer.array.struct

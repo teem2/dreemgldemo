@@ -3,6 +3,12 @@
 define.class('../shader', function(require, exports, self){
 	if(define.$environment === 'nodejs') return
 
+	var gltypes = require('../gltypes')
+
+	var Texture = require('./texturewebgl')
+
+	this.Texture = Texture
+
 	this.compileShader = function(gldevice){
 		var vtx_state = this.vtx_state
 		var pix_state = this.pix_state
@@ -310,20 +316,30 @@ define.class('../shader', function(require, exports, self){
 		var tpl = this.useShaderTemplate.toString()
 		// ok lets replace shit.
 		// set uniforms
-		var out = ''
+		var out = 'var loc, uni\n'
 		var uniset = shader.uniset
 		var unilocs = shader.unilocs
+		var refattr = shader.refattr
+
 		for(var key in uniset){
 			var loc = unilocs[key]
 			var split = loc.split
+			var isattr = key in refattr
 			if(split){
-				var name = split.join('.')
-				out += '\t\tvar uni = root.' + name + '\n'
+				var name = ''
+				for(var i = 0; i < split.length; i++){
+					if(i) name += '.'
+					if(isattr && i === split.length - 1) name += '_'
+					name += split[i]
+				}
+				out += '\t\tuni = root.' + name + '\n'
 			}
 			else{
-				out += '\t\tvar uni = root._' + key + '\n'
+				out += '\t\tuni = root.' 
+				if(isattr) out += '_' 
+				out += key + '\n'
 			}
-			out += '\t\tvar loc = shader.unilocs.' + key + '\n'
+			out += '\t\tloc = shader.unilocs.' + key + '\n'
 			var gen = gltypes.uniform_gen[loc.type]
 			//if(gen.args == 1){
 			out += '\t\tif(loc.value !== uni) loc.value = uni, '
@@ -402,45 +418,28 @@ define.class('../shader', function(require, exports, self){
 		tpl = tpl.replace(/gl.[A-Z][A-Z0-9_]+/g, function(m){
 			return gltypes.gl[m.slice(3)]
 		})
-
 		shader.use = new Function('return ' + tpl)()
 	}
+
+	Object.defineProperty(this, 'draw_type',{
+		get:function(){
+			return this._draw_type
+		},
+		set:function(value){
+			this._draw_type = value
+			this._draw_type_gl = gltypes.gl[value]
+		}
+	})
 
 	this.draw_type = 'TRIANGLES'//POINTS:0x0,LINES:0x1,LINE_LOOP:0x2,LINE_STRIP:0x3,TRIANGLES:0x4,TRIANGLE_STRIP:0x5,TRIANGLE_FAN:0x6
 	
 	// lets draw ourselves
-	this.draw = function(gldevice, start, end){
-		if(this.color === undefined) return
+	this.drawArrays = function(devicewebgl, sub, start, end){
 		//if(this.mydbg) debugger
-		if(!this.hasOwnProperty('shader') || !this.shader) this.compile(gldevice)
-		var gl = gldevice.gl
-		var len = this.useShader(gl, this.shader)
-		// draw
-		gl.drawArrays(gl[this.draw_type], start || 0, end === undefined?len: end)
+		if(!this.hasOwnProperty('shader') || this.shader === undefined) this.compile(devicewebgl)
+		var gl = devicewebgl.gl
+		var len = this.useShader(gl, sub? this.shader[sub]: this.shader)
+		gl.drawArrays(this._draw_type_gl, start || 0, end === undefined?len: end)
 	}
-
-	this.drawGuid = function(gldevice, start, end){
-		if(this.color === undefined) return
-		//if(this.mydbg) debugger
-
-		if(!this.hasOwnProperty('shader') || !this.shader) this.compile(gldevice)
-		if (!this.shader.guid) return;
-		var gl = gldevice.gl
-		var len = this.useShader(gl, this.shader.guid)
-		// draw
-		gl.drawArrays(gl[this.draw_type], start || 0, end === undefined?len: end)
-	}
-
-	this.drawDebug = function(gldevice, start, end){
-		if(this.color === undefined) return
-		if(!this.hasOwnProperty('shader') || !this.shader) this.compile(gldevice)
-		if(!this.shader || !this.shader.debug) return
-		var gl = gldevice.gl
-		var len = this.useShader(gl, this.shader.debug)
-		// draw
-		gl.drawArrays(gl[this.draw_type], start || 0, end === undefined?len: end)
-		return this.debug_type
-	}
-
 
 })

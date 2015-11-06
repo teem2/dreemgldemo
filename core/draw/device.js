@@ -1,6 +1,8 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
 define.class(function(){
+	this.atConstructor = function(){}
+
 	// Base class for all implementations of the device subsystem
 
 	// a device should:

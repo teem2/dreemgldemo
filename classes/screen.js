@@ -6,7 +6,8 @@ define.class(function(view, require) {
 	var Render = require('$base/render')
 	
 	this.layer = 1
-
+	this.dirty = true
+	
 	this.generate = function(device){
 		// call baseclass
 		view.prototype.generate.call(this, device)		

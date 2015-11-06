@@ -94,7 +94,7 @@ define.class('$base/composition_base', function(require, baseclass){
 				}
 			}  
 			else if(msg.type == 'webrtcOffer'){
-				if(msg.index != this.index){ // we got a webrtcOffer
+				if(msg.index != this.index && this.webrtc_offer){ // we got a webrtcOffer
 					this.webrtc_answer = WebRTC.acceptOffer(msg.offer)
 					this.webrtc_answer.onIceCandidate = function(candidate){
 						//console.log('sending answer candidate')

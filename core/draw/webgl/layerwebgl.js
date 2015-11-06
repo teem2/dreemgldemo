@@ -9,44 +9,47 @@ define.class('../layer', function(require, baseclass){
 		baseclass.prototype.atConstructor.call(this)
 		this.device = gldevice
 		this.view = view
-		this.texturesize = {w:0, h:0}
+		// lets do the flatten
+		this.draw_list = []
+		this.addToDrawList(this.view, true)
 	}
 	
 	this.atDestroy = function(){
 		this.releaseTexture()
 	}
-	
+
+	// lets draw!
+	this.draw = function(){
+		// gotta draw!
+	}
+		
 	this.allocateTexture = function(width, height){
-		if (this.texturesize.w < width || this.texturesize.h < height){
-			this.texturesize = {w:width, h:height}
-			
-			this.texture = this.device.allocRenderTarget(width, height)
-			this.dirty = true
+		if (this.texture_w < width || this.texture_h < height){
+			this.texture_w = width, this.texture_h = height
+			this.color_target = this.device.allocRenderTarget(width, height)
+			this.guid_target = this.device.allocRenderTarget(width, height)
 		}
 	}
 	
 	this.releaseTexture = function(){
-		if (this.texture){
-			this.device.disposeRenderTarget(this.texture)
-			this.texture = undefined
+		if (this.pixels){
+			this.device.disposeRenderTarget(this.color_target)
+			this.device.disposeRenderTarget(this.guid_target)
+			this.pixels = undefined
+			this.guid = undefined
 		}
 	}
 	
-	this.addToDrawList = function(view, matrix){
-		matrix = matrix? matrix: mat4.identity()
-		
-		view.draw_matrix = mat4.mul_mat4(view.layout_matrix, matrix)
-		
+	this.addToDrawList = function(view, isroot){
+		//matrix = matrix? matrix: mat4.identity()
+		//view.draw_matrix = mat4.mul_mat4(view.layout_matrix, matrix)
 		this.draw_list.push(view)
 		
-		if (!view.layer){
+		if(isroot || !view.layer){
 			var children = view.children
 			for(var i = 0; i < children.length; i++){
-				this.addToDrawList(children[i], view.draw_matrix)
+				this.addToDrawList(children[i])
 			}
-		}
-		else{
-			this.draw_list.push(view.layer)
 		}
 	}
 	
@@ -68,35 +71,25 @@ define.class('../layer', function(require, baseclass){
 		this.draw_list.sort(function(a,b){return a.zorder < b.zorder})
 	}
 
-	// called AFTER layout engine is done.
-	this.flatten = function(){
-	
-		var children = this.view.children
-		this.draw_list = []
-		
-		this.addToDrawList(this.view)
-		for(var i = 0; i < children.length; i++){
-			this.addToDrawList(children[i])
-		}
-
-		this.orderDrawList()
-	}
-	
-	this.prepareDrawing = function(){
-		if (this.layoutdirty){
-			this.performLayout()
-		}
-		this.allocateTexture(this.layout_width, this.layout_height)
-		this.flatten()
-	}
 
 	this.drawInside = function(){
-		if (this.texture) this.texture.bindAsRenderTarget()
+		if(!this.view.dirty) return
+		this.view.dirty = false
+
+		if (this.texture) this.device.bindRenderTarget(this.texture)
 		var dl = this.draw_list
 		for(var i = 0; i < dl.length; i++){
-			dl[i].draw()
+			var drawview = dl[i]
+			drawview.update()
+			// alright lets iterate the shaders and call em
+			var shaders =  drawview.shader_list
+			for(var j = 0; j < shaders.length; j++){
+				// lets draw em
+				var shader = shaders[j]
+				shader.drawArrays(this.device)
+			}
 		}
-		if (this.texture) this.texture.unbindAsRenderTarget()
+		if (this.texture) this.device.unbindRenderTarget()
 	}
 	
 	this.drawOutside = function(){

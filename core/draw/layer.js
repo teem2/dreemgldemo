@@ -2,6 +2,7 @@
 
 
 define.class(function(){
+	this.atConstructor = function(){}
 // Baseclass for all implementations of the layer subsystem
 
 // Layer should render its output to 1 or more hidden buffers.

@@ -7,9 +7,9 @@ define.class(function(require, exports, self){
 	var Touch = require('./touchwebgl')
 
 	// require embedded classes	
-	this.shader = require('./shaderwebgl')
-	this.texture = require('./texturewebgl')
-	this.layer = require('./layerwebgl')
+	var Shader = this.shader = require('./shaderwebgl')
+	var Texture = this.texture = require('./texturewebgl')
+	var Layer =this.layer = require('./layerwebgl')
 
 	this.frame = 
 	this.main_frame = this.texture.fromType('rgb_depth_stencil')
@@ -17,49 +17,68 @@ define.class(function(require, exports, self){
 	this.preserveDrawingBuffer = true
 	this.antialias = false
 	
-	this.atConstructor = function(){
-		this.extensions = {}
-		this.shadercache = {}
-		
+	this.atConstructor = function(previous){
+		this.extensions = previous && previous.extensions || {}
+		this.shadercache = previous &&  previous.shadercache || {}
+		this.layer_list = previous && previous.layer_list || []
+		this.layout_list = previous && previous.layout_list || []
+
 		this.animFrame = function(time){
 			this.anim_req = false
 			this.atRedraw(time)
 		}.bind(this)
 	
-		if(!this.parent) this.parent = document.body
-
-		this.canvas = document.createElement("canvas")
-		this.canvas.className = 'unselectable'
-		this.parent.appendChild(this.canvas)
-		
-		var options = {
-			alpha: this.frame.type.indexOf('rgba') != -1,
-			depth: this.frame.type.indexOf('depth') != -1,
-			stencil: this.frame.type.indexOf('stencil') != -1,
-			antialias: this.antialias,
-			premultipliedAlpha: this.premultipliedAlpha,
-			preserveDrawingBuffer: this.preserveDrawingBuffer,
-			preferLowPowerToHighPerformance: this.preferLowPowerToHighPerformance
+		if(previous){
+			this.canvas = previous.canvas
+			this.gl = previous.gl
+			this.mouse = previous.mouse
+			this.keyboard = previous.keyboard
+			this.touch = previous.touch
+			this.parent = previous.parent
 		}
+		else{
+			this.mouse = new Mouse()
+			this.keyboard = new Keyboard()
+			this.touch = new Touch()
 
-		this.gl = this.canvas.getContext('webgl', options) || 
-			this.canvas.getContext('webgl-experimental', options) || 
-			this.canvas.getContext('experimental-webgl', options)
+			if(!this.parent) this.parent = document.body
 
-		if(!this.gl){
-			console.log(this.canvas)
-			console.log("Could not get webGL context!")
+			this.canvas = document.createElement("canvas")
+			this.canvas.className = 'unselectable'
+			this.parent.appendChild(this.canvas)
+			
+			var options = {
+				alpha: this.frame.type.indexOf('rgba') != -1,
+				depth: this.frame.type.indexOf('depth') != -1,
+				stencil: this.frame.type.indexOf('stencil') != -1,
+				antialias: this.antialias,
+				premultipliedAlpha: this.premultipliedAlpha,
+				preserveDrawingBuffer: this.preserveDrawingBuffer,
+				preferLowPowerToHighPerformance: this.preferLowPowerToHighPerformance
+			}
+
+			this.gl = this.canvas.getContext('webgl', options) || 
+				this.canvas.getContext('webgl-experimental', options) || 
+				this.canvas.getContext('experimental-webgl', options)
+
+			if(!this.gl){
+				console.log(this.canvas)
+				console.log("Could not get webGL context!")
+			}
+			// require derivatives
+			this.getExtension('OES_standard_derivatives')
 		}
-		// require derivatives
-		this.getExtension('OES_standard_derivatives')
 
 		//canvas.webkitRequestFullscreen()
 		var resize = function(){
 			var pixelRatio = window.devicePixelRatio
+	
 			var w = this.parent.offsetWidth
 			var h = this.parent.offsetHeight
+	
 			var sw = w * pixelRatio
 			var sh = h * pixelRatio
+	
 			this.gl.width = this.canvas.width = sw
 			this.gl.height = this.canvas.height = sh
 			this.canvas.style.width = w + 'px'
@@ -67,10 +86,12 @@ define.class(function(require, exports, self){
 
 			this.gl.viewport(0, 0, sw, sh)
 			// store our w/h and pixelratio on our frame
+
 			this.main_frame.ratio = pixelRatio
 			this.main_frame.size = vec2(sw, sh) // actual size
 			this.size = vec2(w, h)
 			this.ratio = this.main_frame.ratio
+
 		}.bind(this)
 
 		window.onresize = function(){
@@ -81,13 +102,6 @@ define.class(function(require, exports, self){
 
 		resize()
 
-		setTimeout(function(){
-			this.redraw()
-		}.bind(this), 0)
-
-		this.mouse = new Mouse()
-		this.keyboard = new Keyboard()
-		this.touch = new Touch()
 	}
 
 	this.clear = function(r, g, b, a){
@@ -121,16 +135,59 @@ define.class(function(require, exports, self){
 	}
 
 	this.readPixels = function(x, y, w, h){
-		var buf = new Uint8Array(w*this.ratio*h*this.ratio*4);
-		this.gl.readPixels(x * this.ratio, y * this.ratio, w * this.ratio, h * this.ratio, this.gl.RGBA, this.gl.UNSIGNED_BYTE, buf);
+		var buf = new Uint8Array(w * this.ratio * h * this.ratio * 4)
+		this.gl.readPixels(x * this.ratio, y * this.ratio, w * this.ratio, h * this.ratio, this.gl.RGBA, this.gl.UNSIGNED_BYTE, buf)
 		return buf
 	}
 
 	this.atRedraw = function(time){
-		// shall we redraw our scene?
+
+		// lets layout shit that needs layouting.
+		for(var i = 0; i < this.layout_list.length; i++){
+			// lets do a layout?
+		}
+
+		for(var i = 0; i < this.layer_list.length; i++){
+			this.layer_list[i].drawInside()
+		}
 	}
 
-	this.atResize = function(){}
+	this.atNewlyRendered = function(view){
+		// hum. so. if we are the root, lets wipe it all.
+		// todo fix this
+		// if view is not a layer we have to find the layer
+		this.regenerateLayers(view)
+		// layout view
+
+	}
+
+	this.regenerateLayers = function(view){
+		this.layer_list = []
+		this.layout_list = []
+		// lets walk over the root
+		this.addLayerRecursive(view)
+		this.redraw()
+	}
+
+	this.addLayerRecursive = function(view){
+		// lets first walk our children( depth first)
+		var children = view.children
+		for(var i = 0; i < children.length; i++){
+			this.addLayerRecursive(children[i])
+		}
+
+		// lets create a layer
+		if(view._layer){
+			this.layer_list.push(new Layer(this, view))
+			if(!view._flex){
+				this.layout_list.push(view)
+			}
+		}
+	}
+
+	this.atResize = function(){
+		// do stuff
+	}
 	
 	// remote nesting syntax
 	this.allocRenderTarget = function(width, height, type){
