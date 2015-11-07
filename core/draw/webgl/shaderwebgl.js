@@ -342,9 +342,16 @@ define.class('../shader', function(require, exports, self){
 			out += '\t\tloc = shader.unilocs.' + key + '\n'
 			var gen = gltypes.uniform_gen[loc.type]
 			//if(gen.args == 1){
-			out += '\t\tif(loc.value !== uni) loc.value = uni, '
+
+			var call = gen.call
+			if(call !== 'uniformMatrix4fv' && call !== 'uniformMatrix3fv' && call !== 'uniformMatrix2fv'){
+				out += '\t\tif(loc.value !== uni) loc.value = uni, '
+			}
+
 			out += 'gl.' + gen.call + '(loc.loc'
+
 			if(gen.mat) out += ', false'
+
 			if(gen.args == 1) out += ',uni)\n'
 			if(gen.args == 2) out += ',uni[0], uni[1])\n'
 			if(gen.args == 3) out += ',uni[0], uni[1], uni[2])\n'

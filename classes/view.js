@@ -138,8 +138,8 @@ define.class( function(node, require){
 		}
 
 		// do the matrix mul
-		this.totalmatrix = this.modelmatrix
-		//if(parentmatrix) mat4.mat4_mul_mat4(parentmatrix, this.modelmatrix, this.totalmatrix)
+		//this.totalmatrix = this.modelmatrix
+		if(parentmatrix) mat4.mat4_mul_mat4(parentmatrix, this.modelmatrix, this.totalmatrix)
 
 		var children = this.children
 		for(var i = 0; i < children.length; i++){
