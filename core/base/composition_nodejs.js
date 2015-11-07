@@ -12,30 +12,37 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	// ok now what. well we need to build our RPC interface
 	this.postAPI = function(msg, response){
 		if(msg.type == 'attribute'){
+			var parts = msg.rpcid.split('.');
+			var isServer = parts[0] !== 'screens';
 			if (msg.value) { //setter
-				this.setRpcAttribute(msg)
-				response.send({type:'return', value:'OK'})
+				if (isServer) {
+					response.send({type:'error', message:'SERVER SETTER NOT IMPLEMENTED'})
+				} else {
+					this.setRpcAttribute(msg);
+					response.send({type:'return', attribute:msg.attribute, value:'OK'})
+				}
 			} else { //getter
-				var parts = msg.rpcid.split('.');
-				var value;
-				if (parts[0] !== 'screens'){
+				if (isServer){
+					var value;
 					var obj = this.names[parts[0]];
 					if (obj) {
 						value = obj[msg.attribute]
 					}
+					response.send({type:'return', attribute:msg.attribute, value:value})
+				} else {
+					response.send({type:'error', message:"SCREEN GETTER NOT IMPLEMENTED"})
 				}
-				response.send({type:'return', value:value})
 			}
 		}
 		else if(msg.type == 'method'){
 			this.callRpcMethod(msg).then(function(ret) {
 				var value = ret.value;
-				response.send({type:'return', value:value})
+				response.send({type:'return', method:msg.method, value:value})
 			}, function(ret) {
-				response.send({type:'error', value:ret})
+				response.send({type:'error', message:ret})
 			});
 		}
-		else response.send({type:'error', value:'please set "msg.type" to "attribute" or "method"'})
+		else response.send({type:'error', message:'please set "msg.type" to "attribute" or "method"'})
 	}
 	
 	this.handleRpcMethod = function(msg){
