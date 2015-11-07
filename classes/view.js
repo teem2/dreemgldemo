@@ -14,6 +14,8 @@ define.class( function(node, require){
 	this.attribute("top", {storage:'pos', index:1})
 
 	this.attribute("bgcolor", {type:vec4, value: vec4(0,0,0.1,1)})
+	this.attribute("clearcolor", {type:vec4, value: vec4('transparent')})
+
 	this.attribute("size", {type:vec2, value:vec2(NaN, NaN)})
 
 	this.attribute("w", {storage:'size', index:0})
@@ -33,6 +35,10 @@ define.class( function(node, require){
 	this.attribute("paddingright", {storage:'padding', index:2})
 	this.attribute("paddingbottom", {storage:'padding', index:3})
 
+	this.attribute("scale", {type: vec3, value: vec3(1)})
+	this.attribute("rotate", {type: vec3, value: vec3(0)})
+	this.attribute("translate", {type: vec3, value: vec3(0)})
+
 	this.attribute("borderwidth", {type: vec4, value: vec4(0,0,0,0)})
 	this.attribute("borderradius", {type: vec4, value: vec4(0,0,0,0)})
 	this.attribute("borderleftwidth", {storage:'borderwidth', index:0})
@@ -48,17 +54,20 @@ define.class( function(node, require){
 	this.attribute("alignself", {type:String, value:"stretch"});  // 	'flex-start', 'center', 'flex-end', 'stretch'
 	this.attribute("position", {type: String, value: "relative" });	//'relative', 'absolute'
 
-	this.attribute("layer", {type:boolean, value:0})
-
+	this.attribute("mode", {type:Enum('','2D','3D'), value:''})
+	
 	this.attribute("model", {type: Object})
 	this.state('model')
 
-	this.matrix = mat4.identity()
+	this.modelmatrix = mat4.identity()
+	this.totalmatrix = mat4.identity()
 	this.viewmatrix = mat4.identity()
 
 	this.init = function(){
 		this.anims = {}
 		this.shader_list = []
+		this.modelmatrix = mat4.identity()
+		this.totalmatrix = mat4.identity()
 		this.atInit()
 	}
 
@@ -90,8 +99,7 @@ define.class( function(node, require){
 		// we can wire up the shader 
 		if(!this._shaderswired){
 			this.atAttributeGet = function(attrname){
-				// we are accessing attribute attr, in shadername
-				// go wire shiz up
+				// monitor attribute wires for geometry
 			}.bind(this)
 		}
 		var shaders = this.shader_list
@@ -103,6 +111,47 @@ define.class( function(node, require){
 			this._shaderswired = true
 			this.atAttributeGet = undefined
 		}
+	}
+
+	this.updateMatrices = function(parentmatrix){
+
+		// compute TSRT matrix
+		if(this.layout){
+			var s = this._scale
+			var r = this._rotate
+			var t0 = this.layout.left, t1 = this.layout.top, t2 = 0
+			if (this._position === "absolute"){
+				t0 = this._pos[0]
+				t1 = this._pos[1]
+			}
+			var hw = ( this.layout.width !== undefined? this.layout.width: this._size[0] ) / 2
+			var hh = ( this.layout.height !== undefined ? this.layout.height: this._size[1]) / 2
+			mat4.TSRT(-hw, -hh, 0, s[0], s[1], s[2], r[0], r[1], r[2], t0 + hw * s[0], t1 + hh * s[1], t2, this.modelmatrix);
+		}
+		else{
+			var s = this._scale
+			var r = this._rotate
+			var t = this._translate
+			var hw = this._size[0] / 2
+			var hh = this._size[1] / 2
+			mat4.TSRT(-hw, -hh, 0, s[0], s[1], s[2], 0, 0, r[2], t[0] + hw * s[0], t[1] + hh * s[1], t[2], this.modelmatrix);
+		}
+
+		// do the matrix mul
+		this.totalmatrix = this.modelmatrix
+		//if(parentmatrix) mat4.mat4_mul_mat4(parentmatrix, this.modelmatrix, this.totalmatrix)
+
+		var children = this.children
+		for(var i = 0; i < children.length; i++){
+			children[i].updateMatrices(this.totalmatrix)
+		}
+	}
+
+	this.doLayout = function(width, height){
+		FlexLayout.fillNodes(this)
+		var layouted = FlexLayout.computeLayout(this)
+		// recursively update matrices?
+		this.updateMatrices()
 	}
 
 	this.update = this.updateShaders
@@ -128,9 +177,10 @@ define.class( function(node, require){
 		this.color_blend = 'src_alpha * src_color + (1 - src_alpha) * dst_color'
   
 		this.update = function(){
+
 			var view = this.view
-			var width = view.width
-			var height = view.height
+			var width = view.layout?view.layout.width:view.width
+			var height = view.layout?view.layout.height:view.height
 			var radius = view.borderradius
 
 			var mesh = this.mesh = this.vertexstruct.array()
@@ -172,7 +222,7 @@ define.class( function(node, require){
 			uv = vec2(pos.x/view.width,  pos.y/view.height)
 			
 			sized = vec2(pos.x, pos.y)
-			return vec4(sized.x, sized.y, 0, 1) * view.matrix * view.viewmatrix
+			return vec4(sized.x, sized.y, 0, 1) * view.totalmatrix * view.viewmatrix
 		}
 	})
 	/*

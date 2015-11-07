@@ -5,8 +5,10 @@ define.class(function(view, require) {
 	var FlexLayout = require('$lib/layout')
 	var Render = require('$base/render')
 	
-	this.layer = 1
+	this.mode = '2D'
 	this.dirty = true
+	this.flex = 0
+	this.flexdirection = "column"
 	
 	this.generate = function(device){
 		// call baseclass

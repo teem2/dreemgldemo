@@ -3,11 +3,18 @@ define.class(function(composition, screens, screen, view, text){
 
 	this.render = function(){ return [
 		screens(
-			screen({},
+			screen({clearcolor:'black'},
 				view({
-					w:100, h:100, borderradius:1,
-					bgcolor:'blue'
-				})
+//					size:[100,100],
+					flexdirection:'column',
+					margin:10,
+					flex:1,
+					borderradius:30, 
+					bgcolor:'red'
+					} 
+					,view({flex:1,margin:10,bgcolor:'blue'})
+					,view({flex:1,margin:10,bgcolor:'orange'})
+				)
 			)
 		)
 	]}

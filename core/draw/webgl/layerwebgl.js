@@ -4,6 +4,7 @@ define.class('../layer', function(require, baseclass){
 	// drawing
 
 	var Texture = require("./texturewebgl")
+	var FlexLayout = require('$lib/layout')
 	
 	this.atConstructor = function(gldevice, view){
 		baseclass.prototype.atConstructor.call(this)
@@ -12,6 +13,7 @@ define.class('../layer', function(require, baseclass){
 		// lets do the flatten
 		this.draw_list = []
 		this.addToDrawList(this.view, true)
+		this.viewprojection_matrix = mat4.identity()
 	}
 	
 	this.atDestroy = function(){
@@ -44,8 +46,7 @@ define.class('../layer', function(require, baseclass){
 		//matrix = matrix? matrix: mat4.identity()
 		//view.draw_matrix = mat4.mul_mat4(view.layout_matrix, matrix)
 		this.draw_list.push(view)
-		
-		if(isroot || !view.layer){
+		if(isroot || !view._mode){
 			var children = view.children
 			for(var i = 0; i < children.length; i++){
 				this.addToDrawList(children[i])
@@ -71,25 +72,36 @@ define.class('../layer', function(require, baseclass){
 		this.draw_list.sort(function(a,b){return a.zorder < b.zorder})
 	}
 
-
 	this.drawInside = function(){
-		if(!this.view.dirty) return
-		this.view.dirty = false
+		var view = this.view
 
-		if (this.texture) this.device.bindRenderTarget(this.texture)
+		//if (this.texture) this.device.bindRenderTarget(this.texture)
+
+		this.device.clear(view._clearcolor)
+
+		// 2d/3d switch
+		if(view._mode === '2D'){
+			mat4.ortho(0, this.device.size[0], 0, this.device.size[1], -100, 100, this.viewprojection_matrix)
+		}
+		else if(view._mode === '3D'){
+
+		}
+
+		// each view has a reference to its layer
 		var dl = this.draw_list
 		for(var i = 0; i < dl.length; i++){
-			var drawview = dl[i]
-			drawview.update()
+			var draw = dl[i]
+			draw.viewmatrix = this.viewprojection_matrix
+			draw.update()
 			// alright lets iterate the shaders and call em
-			var shaders =  drawview.shader_list
+			var shaders =  draw.shader_list
 			for(var j = 0; j < shaders.length; j++){
 				// lets draw em
 				var shader = shaders[j]
 				shader.drawArrays(this.device)
 			}
 		}
-		if (this.texture) this.device.unbindRenderTarget()
+		//if (this.texture) this.device.unbindRenderTarget()
 	}
 	
 	this.drawOutside = function(){

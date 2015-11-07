@@ -75,12 +75,12 @@ define.class(function(require, exports, self){
 	
 			var w = this.parent.offsetWidth
 			var h = this.parent.offsetHeight
-	
+
 			var sw = w * pixelRatio
 			var sh = h * pixelRatio
 	
-			this.gl.width = this.canvas.width = sw
-			this.gl.height = this.canvas.height = sh
+			this.canvas.width = sw
+			this.canvas.height = sh
 			this.canvas.style.width = w + 'px'
 			this.canvas.style.height = h + 'px'
 
@@ -91,7 +91,6 @@ define.class(function(require, exports, self){
 			this.main_frame.size = vec2(sw, sh) // actual size
 			this.size = vec2(w, h)
 			this.ratio = this.main_frame.ratio
-
 		}.bind(this)
 
 		window.onresize = function(){
@@ -143,8 +142,14 @@ define.class(function(require, exports, self){
 	this.atRedraw = function(time){
 
 		// lets layout shit that needs layouting.
+		var screen = this.layout_list[this.layout_list.length - 1]
+		
+		screen._size = this.size//
+
 		for(var i = 0; i < this.layout_list.length; i++){
 			// lets do a layout?
+			var view = this.layout_list[i]
+			view.doLayout()
 		}
 
 		for(var i = 0; i < this.layer_list.length; i++){
@@ -175,9 +180,8 @@ define.class(function(require, exports, self){
 		for(var i = 0; i < children.length; i++){
 			this.addLayerRecursive(children[i])
 		}
-
 		// lets create a layer
-		if(view._layer){
+		if(view._mode){
 			this.layer_list.push(new Layer(this, view))
 			if(!view._flex){
 				this.layout_list.push(view)
@@ -186,6 +190,7 @@ define.class(function(require, exports, self){
 	}
 
 	this.atResize = function(){
+		this.redraw()
 		// do stuff
 	}
 	
