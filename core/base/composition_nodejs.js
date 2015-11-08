@@ -12,29 +12,24 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	// ok now what. well we need to build our RPC interface
 	this.postAPI = function(msg, response){
 		if(msg.type == 'attribute'){
-			var parts = msg.rpcid.split('.');
-			var isServer = parts[0] !== 'screens';
-			if (msg.value) { //setter
-				if (isServer) {
-					var obj = this.names[parts[0]];
-					if (obj) {
-						obj[msg.attribute] = msg.value
-					}
-					response.send({type:'return', attribute:msg.attribute, value:'OK'})
-				} else {
-					this.setRpcAttribute(msg);
-					response.send({type:'return', attribute:msg.attribute, value:'OK'})
+			if (!msg.get) { //setter
+				this.setRpcAttribute(msg)
+				response.send({type:'return', attribute:msg.attribute, value:'OK'})
+			} 
+			else { //getter
+				var parts = msg.rpcid.split('.');
+				var obj
+				if(parts[0] === 'screens'){
+					obj = this.rpc.screens[parts[1]]
 				}
-			} else { //getter
-				if (isServer){
-					var value;
-					var obj = this.names[parts[0]];
-					if (obj) {
-						value = obj[msg.attribute]
-					}
-					response.send({type:'return', attribute:msg.attribute, value:value})
-				} else {
-					response.send({type:'error', message:"SCREEN GETTER NOT IMPLEMENTED"})
+				else{
+					obj = this.names[parts[0]]
+				}
+				if(!obj){
+					response.send({type:'error', message:"Cannot find object"})
+				}
+				else{
+					response.send({type:'return', attribute:msg.attribute, value:obj[msg.attribute]})
 				}
 			}
 		}
