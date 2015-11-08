@@ -5,7 +5,7 @@ define.class( function(node, require){
 	var FlexLayout = require('$lib/layout')
 
 	// store the device shader on drawdevice
-	var Shader = this.Shader = require('$draw/$drawdevice/shader$drawdevice')
+	var Shader = this.Shader = require('$draw/$drawmode/shader$drawmode')
 
 	this.attribute("pos", {type:vec2, value:vec2(0,0)})
 	this.attribute("x", {storage:'pos', index:0})

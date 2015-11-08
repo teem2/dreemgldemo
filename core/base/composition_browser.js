@@ -3,7 +3,7 @@
 
 define.class('$base/composition_client', function(require, baseclass){
 
-	var Device = require('$draw/$drawdevice/device$drawdevice')
+	var Device = require('$draw/$drawmode/device$drawmode')
 
 	this.atConstructor = function(previous, parent){
 		
