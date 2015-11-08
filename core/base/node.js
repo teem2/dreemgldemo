@@ -408,7 +408,13 @@ define.class(function(require, constructor){
 				else this[on_key] = init_value
 			}
 			else{
-				this[value_key] = config.type?config.type(init_value):init_value
+				var type = config.type
+				if(type && type !== Object && type !== Array){
+					this[value_key] = type(init_value)
+				}
+				else{
+					this[value_key] = init_value
+				}
 			}
 		}
 		this._attributes[key] = this[config_key] = config
@@ -471,7 +477,10 @@ define.class(function(require, constructor){
 				
 				var config = this[config_key]
 
-				if(config.type) value = config.type(value)
+				var type = config.type
+				if(type){
+					if(type !== Object && type !== Array) value = type(value)
+				}
 
 				if(config.motion && this.startMotion(key, value)){
 					// store the end value
