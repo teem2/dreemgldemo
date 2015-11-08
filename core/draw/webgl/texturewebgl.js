@@ -15,13 +15,6 @@ define.class(function(exports){
 		return new Texture(type,0,0)
 	}
 
-	exports.fromGLTexture = function(type, gltex, width, height, fb){
-		var tex = new Texture(type, width, height)
-		tex.frame_buf = fb
-		tex.AL_IL_SC_TC = tex.gltex = gltex
-		return tex
-	}
-	
 	exports.fromImage = function(img){
 		var tex = new Texture('rgba', img.width, img.height)
 		tex.image = img
@@ -32,6 +25,120 @@ define.class(function(exports){
 		var tex = new Texture('rgba', w, h)
 		tex.array = array
 		return tex
+	}
+
+	exports.createRenderTarget = function(device, width, height, type){
+
+		var gl = device.gl
+		
+		type = type? type: "rgba_depth_stencil"
+			
+		var fb = this.frame_buf = gl.createFramebuffer()
+		var gltex = gl.createTexture()
+
+		// our normal render to texture thing
+		gl.bindTexture(gl.TEXTURE_2D, gltex)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+
+		var buf_type = gl.RGB
+		if(type.indexOf('luminance') != -1){
+			buf_type = gl.LUMINANCE
+			if(type.indexOf('alpha') != -1) buf_type = gl.LUMINANCE_ALPHA
+		}
+		else if(type.indexOf('alpha') != -1) buf_type = gl.ALPHA
+		else if(type.indexOf('rgba') != -1) buf_type = gl.RGBA
+
+		var data_type = gl.UNSIGNED_BYTE
+		if(type.indexOf('half_float_linear') != -1){
+			var ext = gl._getExtension('OES_texture_half_float_linear')
+			if(!ext) throw new Error('No OES_texture_half_float_linear')
+			data_type = ext.HALF_FLOAT_LINEAR_OES
+		}
+		else if(type.indexOf('float_linear') != -1){
+			var ext = gl._getExtension('OES_texture_float_linear')
+			if(!ext) throw new Error('No OES_texture_float_linear')
+			data_type = ext.FLOAT_LINEAR_OES
+		}
+		else if(type.indexOf('half_float') != -1){
+			var ext = gl._getExtension('OES_texture_half_float')
+			if(!ext) throw new Error('No OES_texture_half_float')
+			data_type = ext.HALF_FLOAT_OES
+		}
+		else if(type.indexOf('float') != -1){
+			var ext = gl._getExtension('OES_texture_float')
+			if(!ext) throw new Error('No OES_texture_float')
+			data_type = gl.FLOAT
+		}
+
+		gl.texImage2D(gl.TEXTURE_2D, 0, buf_type, width, height, 0, buf_type, data_type, null)
+		gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, gltex, 0)
+
+		var has_depth = type.indexOf('depth') != -1 
+		var has_stencil = type.indexOf('stencil') != -1
+		if(has_depth || has_stencil){
+
+			if(!this.depth_buf) this.depth_buf = gl.createRenderbuffer()
+
+			var depth_type = gl.DEPTH_COMPONENT16, attach_type = gl.DEPTH_ATTACHMENT
+			if(has_depth && has_stencil) depth_type = gl.DEPTH_STENCIL, attach_type = gl.DEPTH_STENCIL_ATTACHMENT
+			else if(has_stencil) depth_type = gl.STENCIL_INDEX, attach_type = gl.STENCIL_ATTACHMENT
+
+			gl.bindRenderbuffer(gl.RENDERBUFFER, this.depth_buf)
+			gl.renderbufferStorage(gl.RENDERBUFFER, depth_type, width, height)
+			gl.framebufferRenderbuffer(gl.FRAMEBUFFER, attach_type, gl.RENDERBUFFER, this.depth_buf)
+
+			gl.bindRenderbuffer(gl.RENDERBUFFER, null)
+		}
+		gl.bindTexture(gl.TEXTURE_2D, null)
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+			
+		var tex = new Texture('type', width, height)
+		tex.buf_type = buf_type
+		tex.depth_type = depth_type
+		tex.data_type = data_type
+		tex.attach_type = attach_type
+		tex.frame_buf = fb
+		tex.IL_AL_SC_TC = tex.gltex = gltex
+		tex.device = device
+		return tex
+	}
+	
+	this.resize = function(width, height){
+		if(this.device && this.frame_buf){
+			var gl = this.device.gl
+			gl.deleteFramebuffer(this.frame_buf)
+			this.frame_buf = gl.createFramebuffer()
+			gl.bindTexture(gl.TEXTURE_2D, this.gltex)
+			gl.texImage2D(gl.TEXTURE_2D, 0, this.buf_type, width, height, 0, this.buf_type, this.data_type, null)
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this.frame_buf)
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.gltex, 0)
+			if(this.depth_buf){
+				gl.bindRenderbuffer(gl.RENDERBUFFER, this.depth_buf)
+				gl.renderbufferStorage(gl.RENDERBUFFER, this.depth_type, width, height)
+			}
+			gl.bindTexture(gl.TEXTURE_2D, undefined)
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+			this.size = vec2(width, height)
+		}
+	}
+
+	this.deleteTexture = function(){
+		if(this.device && this.gltex){
+			this.device.deleteTexture(this.gltex)
+			this.gltex = undefined
+			if(this.frame_buf){
+				this.device.deleteFramebuffer(this.frame_buf)
+				this.frame_buf = undefined
+			}
+			if(this.depth_buf){
+				this.device.deleteRenderbuffer(this.depth_buf)
+				this.depth_buf = undefined
+			}
+		}
 	}
 
 	var buf_list = [

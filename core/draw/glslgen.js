@@ -293,7 +293,7 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 			tex_obj = tex_ast.infer.object
 		}
 		//else throw new Error('texture2D can only resolve single identifiers or this')
-		if(!(tex_obj instanceof GLTexture)) throw new Error('texture2D only accepts GLTexture')
+		//if(!(tex_obj instanceof Texture)) throw new Error('texture2D only accepts GLTexture')
 
 		// lets get the sampler info
 		var sampler = {}

@@ -10,6 +10,7 @@ define.class('../layer', function(require, baseclass){
 		baseclass.prototype.atConstructor.call(this)
 		this.device = gldevice
 		this.view = view
+		view.layer = this
 		// lets do the flatten
 		this.draw_list = []
 		this.addToDrawList(this.view, true)
@@ -72,16 +73,46 @@ define.class('../layer', function(require, baseclass){
 		this.draw_list.sort(function(a,b){return a.zorder < b.zorder})
 	}
 
-	this.drawInside = function(){
+	this.nextPowerTwo = function(value){
+		var v = value - 1
+		v 
+		v |= v >> 1
+		v |= v >> 2
+		v |= v >> 4
+		v |= v >> 8
+		v |= v >> 16
+		return v + 1
+	}
+
+	this.draw = function(root, shaderpass){
 		var view = this.view
+		var device = this.device
+		var layout = view.layout
 
-		//if (this.texture) this.device.bindRenderTarget(this.texture)
+		// lets see if we need to allocate our framebuffer..
+		if(!root){
+			var main_ratio = device.main_frame.ratio
+			var twidth = layout.width * main_ratio, theight = layout.height * main_ratio
+			//var twidth = this.nextPowerTwo(layout.width* main_ratio), theight = this.nextPowerTwo(layout.height* main_ratio)
+			if(!this.texture){
+				this.texture = this.device.Texture.createRenderTarget(this.device, twidth, theight)
+			} 
+			else{
+				var tsize = this.texture.size
+				if(twidth > tsize[0] || theight > tsize[1]){
+					this.texture.resize(twidth, theight)
+				}
+			}
+		}
 
-		this.device.clear(view._clearcolor)
+		if (this.texture) this.device.bindFramebuffer(this.texture)
+		else this.device.bindFramebuffer()
+
+		device.clear(view._clearcolor)
 
 		// 2d/3d switch
 		if(view._mode === '2D'){
-			mat4.ortho(0, this.device.size[0], 0, this.device.size[1], -100, 100, this.viewprojection_matrix)
+			mat4.ortho(0, layout.width, 0, layout.height, -100, 100, this.viewprojection_matrix)
 		}
 		else if(view._mode === '3D'){
 
@@ -92,26 +123,26 @@ define.class('../layer', function(require, baseclass){
 		for(var i = 0; i < dl.length; i++){
 			var draw = dl[i]
 			draw.viewmatrix = this.viewprojection_matrix
-			draw.update()
-			// alright lets iterate the shaders and call em
-			var shaders =  draw.shader_list
-			for(var j = 0; j < shaders.length; j++){
-				// lets draw em
-				var shader = shaders[j]
-				shader.drawArrays(this.device)
+			if(draw._mode && draw.layer !== this && draw.layer.texture){
+				// lets render the view as a layer
+				var blendshader = draw.blendshader
+				blendshader.texture = draw.layer.texture
+				blendshader._size = vec2(draw.layout.width, draw.layout.height)
+				blendshader.drawArrays(this.device)
+			}
+			else{
+				draw.update()
+				// alright lets iterate the shaders and call em
+				var shaders =  draw.shader_list
+				for(var j = 0; j < shaders.length; j++){
+					// lets draw em
+					var shader = shaders[j]
+					shader.drawArrays(this.device, shaderpass)
+				}
 			}
 		}
-		//if (this.texture) this.device.unbindRenderTarget()
 	}
 	
 	this.drawOutside = function(){
-		if (!this.texture){
-			this.drawInside()
-			return
-		}
-		
-		this.texture.bindAsTexture()
-		this.device.drawSomeQuad()
-		this.texture.unbindAsTexture()
 	}
 })

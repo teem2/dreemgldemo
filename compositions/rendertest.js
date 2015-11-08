@@ -7,13 +7,16 @@ define.class(function(composition, screens, screen, view, text){
 				view({
 //					size:[100,100],
 					flexdirection:'column',
-					margin:10,
+					margin:0,
 					flex:1,
 					borderradius:30, 
 					bgcolor:'red'
 					} 
-					,view({flex:1,margin:10,bgcolor:'blue'})
-					,view({flex:1,margin:10,bgcolor:'orange'})
+					,view({flex:1,margin:20,bgcolor:'blue'})
+					,view({
+						flex:1,borderradius:20,
+						margin:20,mode:'2D',bgcolor:'purple'
+					})
 				)
 			)
 		)

@@ -62,12 +62,14 @@ define.class( function(node, require){
 	this.modelmatrix = mat4.identity()
 	this.totalmatrix = mat4.identity()
 	this.viewmatrix = mat4.identity()
+	this.layermatrix = mat4.identity()
 
 	this.init = function(){
 		this.anims = {}
 		this.shader_list = []
 		this.modelmatrix = mat4.identity()
 		this.totalmatrix = mat4.identity()
+		this.layermatrix = mat4.identity()
 		this.atInit()
 	}
 
@@ -75,6 +77,10 @@ define.class( function(node, require){
 		for(var key in this.shaders){
 			var shader = this[key]
 			this.shader_list.push(this[key+'shader'] = new shader())
+		}
+		if(this._mode){
+			// give it a blendshader
+			this.blendshader = new this.blend()
 		}
 	}
 
@@ -88,7 +94,9 @@ define.class( function(node, require){
 		}
 		if(inner.prototype instanceof Shader){
 			if(!this.hasOwnProperty('shaders')) this.shaders = Object.create(this.shaders || {})
-			this.shaders[name] = inner
+			if(!inner.prototype.omit_from_shader_list){
+				this.shaders[name] = inner
+			}
 		}
 	}
 
@@ -138,8 +146,15 @@ define.class( function(node, require){
 		}
 
 		// do the matrix mul
-		//this.totalmatrix = this.modelmatrix
-		if(parentmatrix) mat4.mat4_mul_mat4(parentmatrix, this.modelmatrix, this.totalmatrix)
+		if(this._mode){
+			//mat4.identity(this.totalmatrix)
+			//this.layermatrix = mat4.identity()
+			if(parentmatrix) mat4.mat4_mul_mat4(parentmatrix, this.modelmatrix, this.layermatrix)
+			else this.layermatrix = this.modelmatrix
+		}
+		else{
+			if(parentmatrix) mat4.mat4_mul_mat4(parentmatrix, this.modelmatrix, this.totalmatrix)
+		}
 
 		var children = this.children
 		for(var i = 0; i < children.length; i++){
@@ -223,6 +238,24 @@ define.class( function(node, require){
 			
 			sized = vec2(pos.x, pos.y)
 			return vec4(sized.x, sized.y, 0, 1) * view.totalmatrix * view.viewmatrix
+		}
+	})
+
+	// the blending shader
+	define.class(this, 'blend', this.Shader, function(){
+		this.omit_from_shader_list = true
+		this.texture = Shader.prototype.Texture.fromType('rgba_depth_stencil')
+		this.mesh = vec2.array()
+		this.mesh.pushQuad(0,0, 0,1, 1,0, 1,1)
+		this.pos = vec2(0,0)
+		this.size = vec2(0,0)
+
+		this.color = function(){
+			return texture.sample(mesh.xy)
+		}
+
+		this.position = function(){
+			return vec4( mesh.x * size.x, mesh.y * size.y, 0, 1) * view.layermatrix * view.viewmatrix
 		}
 	})
 	/*

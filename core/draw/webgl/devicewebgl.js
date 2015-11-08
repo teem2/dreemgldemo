@@ -7,12 +7,12 @@ define.class(function(require, exports, self){
 	var Touch = require('./touchwebgl')
 
 	// require embedded classes	
-	var Shader = this.shader = require('./shaderwebgl')
-	var Texture = this.texture = require('./texturewebgl')
-	var Layer =this.layer = require('./layerwebgl')
+	var Shader = this.Shader = require('./shaderwebgl')
+	var Texture = this.Texture = require('./texturewebgl')
+	var Layer =this.Layer = require('./layerwebgl')
 
 	this.frame = 
-	this.main_frame = this.texture.fromType('rgb_depth_stencil')
+	this.main_frame = this.Texture.fromType('rgb_depth_stencil')
 	
 	this.preserveDrawingBuffer = true
 	this.antialias = false
@@ -124,7 +124,7 @@ define.class(function(require, exports, self){
 		window.requestAnimationFrame(this.animFrame)
 	}
 
-	this.setTargetFramebuffer = function(frame){
+	this.bindFramebuffer = function(frame){
 		if(!frame) frame = this.main_frame
 		this.frame = frame
 		this.size = vec2(frame.size[0]/frame.ratio, frame.size[1]/frame.ratio)
@@ -143,7 +143,6 @@ define.class(function(require, exports, self){
 
 		// lets layout shit that needs layouting.
 		var screen = this.layout_list[this.layout_list.length - 1]
-		
 		screen._size = this.size//
 
 		for(var i = 0; i < this.layout_list.length; i++){
@@ -152,8 +151,8 @@ define.class(function(require, exports, self){
 			view.doLayout()
 		}
 
-		for(var i = 0; i < this.layer_list.length; i++){
-			this.layer_list[i].drawInside()
+		for(var i = 0, len = this.layer_list.length; i < len; i++){
+			this.layer_list[i].draw(i === len - 1)
 		}
 	}
 
@@ -194,79 +193,8 @@ define.class(function(require, exports, self){
 		// do stuff
 	}
 	
-	// remote nesting syntax
-	this.allocRenderTarget = function(width, height, type){
-		
-		var gl = this.gl
-		
-		type = type? type: "rgb_depth_stencil"
-			
-		var fb = this.frame_buf = gl.createFramebuffer()
-		var tex = gl.createTexture()
-
-		// our normal render to texture thing
-		gl.bindTexture(gl.TEXTURE_2D, tex)
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-
-		var buf_type = gl.RGB
-		if(type.indexOf('luminance') != -1){
-			buf_type = gl.LUMINANCE
-			if(type.indexOf('alpha') != -1) buf_type = gl.LUMINANCE_ALPHA
-		}
-		else if(type.indexOf('alpha') != -1) buf_type = gl.ALPHA
-		else if(type.indexOf('rgba') != -1) buf_type = gl.RGBA
-
-		var data_type = gl.UNSIGNED_BYTE
-		if(type.indexOf('half_float_linear') != -1){
-			var ext = gl._getExtension('OES_texture_half_float_linear')
-			if(!ext) throw new Error('No OES_texture_half_float_linear')
-			data_type = ext.HALF_FLOAT_LINEAR_OES
-		}
-		else if(type.indexOf('float_linear') != -1){
-			var ext = gl._getExtension('OES_texture_float_linear')
-			if(!ext) throw new Error('No OES_texture_float_linear')
-			data_type = ext.FLOAT_LINEAR_OES
-		}
-		else if(type.indexOf('half_float') != -1){
-			var ext = gl._getExtension('OES_texture_half_float')
-			if(!ext) throw new Error('No OES_texture_half_float')
-			data_type = ext.HALF_FLOAT_OES
-		}
-		else if(type.indexOf('float') != -1){
-			var ext = gl._getExtension('OES_texture_float')
-			if(!ext) throw new Error('No OES_texture_float')
-			data_type = gl.FLOAT
-		}
-
-		gl.texImage2D(gl.TEXTURE_2D, 0, buf_type, width, height, 0, buf_type, data_type, null)
-		gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0)
-
-		var has_depth = type.indexOf('depth') != -1 
-		var has_stencil = type.indexOf('stencil') != -1
-		if(has_depth || has_stencil){
-
-			if(!this.depth_buf) this.depth_buf = gl.createRenderbuffer()
-
-			var dt = gl.DEPTH_COMPONENT16, at = gl.DEPTH_ATTACHMENT
-			if(has_depth && has_stencil) dt = gl.DEPTH_STENCIL, at = gl.DEPTH_STENCIL_ATTACHMENT
-			else if(has_stencil) dt = gl.STENCIL_INDEX, at = gl.STENCIL_ATTACHMENT
-
-			gl.bindRenderbuffer(gl.RENDERBUFFER, this.depth_buf)
-			gl.renderbufferStorage(gl.RENDERBUFFER, dt, width, height)
-			gl.framebufferRenderbuffer(gl.FRAMEBUFFER, at, gl.RENDERBUFFER, this.depth_buf)
-
-			gl.bindRenderbuffer(gl.RENDERBUFFER, null)
-		}
-		gl.bindTexture(gl.TEXTURE_2D, null)
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-		
-		return this.texture.fromGLTexture(type, tex, width, height, fb)
-	}
 	
-	this.disposeRenderTarget = function(rendertarget){
+	this.disposeRenderTarget = function(texture){
+		this.deleteTexture()
 	}
 })
