@@ -1,7 +1,7 @@
 define.class(function(composition, require, screens, screen, docviewer, button, text, scrollcontainer, codeviewer, view, slideviewer, draggable, perspective3d, teapot,ballrotate, architecture){
 	// Live coding presentation docs!
 
-	this.attribute('testattr', {type:vec4,value:'red'})
+	this.attribute('HELLO', {type:vec4,value:'red'})
 	
 	this.render = function render(){ 
 		return [
@@ -24,7 +24,7 @@ define.class(function(composition, require, screens, screen, docviewer, button, 
 					,view({
 							bgcolor:"transparent", 
 							flex:1,
-							slidetitle:'DreemGL introduction'
+							slidetitle:'DreemGL test'
 						}
 						,perspective3d({bgcolor:"transparent", name:"teapotview", flex:1,flexdirection:"row", clipping:true,camera:[10,-10,-30],fov:60,flex:1}
 							,teapot({pos:[0,-100],bg:{diffusecolor:'white'},rot3d:[PI/2,0,0], pos3d:[0,2,0]})
@@ -32,7 +32,7 @@ define.class(function(composition, require, screens, screen, docviewer, button, 
 						)
 					)
 					,view({
-						slidetitle:'This presentation'
+						slidetitle:'This thing'
 						,flex:1
 						}
 						,scrollcontainer({flex:1},
@@ -124,7 +124,7 @@ define.class(function(composition, require, screens, screen, docviewer, button, 
 							this.bg = {
 								value:0,
 								color:function(){
-									return mix('blue', 'yellow', abs(sin(uv.y*10.+value)))
+									return mix('blue', 'red', abs(sin(uv.y*10.+value)))
 								}
 							}
 						}.toString(), padding:vec4(4), fontsize: 14, bgcolor:"#000030", multiline: true})
@@ -138,7 +138,7 @@ define.class(function(composition, require, screens, screen, docviewer, button, 
 								bg:{
 								value:1,
 								color:function(){
-									return mix('blue', 'yellow', abs(sin(uv.y*10.+value)))
+									return mix('blue', 'red', abs(sin(uv.y*10.+value)))
 								}
 							}
 						})

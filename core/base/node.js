@@ -408,7 +408,7 @@ define.class(function(require, constructor){
 				else this[on_key] = init_value
 			}
 			else{
-				this[value_key] = config.type(init_value)
+				this[value_key] = config.type?config.type(init_value):init_value
 			}
 		}
 		this._attributes[key] = this[config_key] = config
@@ -481,7 +481,9 @@ define.class(function(require, constructor){
 				this[value_key] = value
 
 				if(this.atAttributeSet !== undefined) this.atAttributeSet(key, value)
-				if(on_key in this || listen_key in this)  this.emit(key, value)
+				if(!this.environment || this.environment === define.$environment){
+					if(on_key in this || listen_key in this)  this.emit(key, value)
+				}
 			}
 		}
 		
@@ -502,6 +504,7 @@ define.class(function(require, constructor){
 	}
 
 	this.connectWiredAttribute = function(key, initarray){
+
 		var wiredfn_key = '_wiredfn_' + key
 		var wiredcl_key = '_wiredcl_' + key
 		var wiredfn = this[wiredfn_key]
@@ -529,11 +532,13 @@ define.class(function(require, constructor){
 				var part = ref[k]
 				if(k === ref.length - 1){
 					// lets add a listener 
+					if(!obj.isAttribute){
+						console.log("Does not have isAttribute", obj, state.references)
+					}
 					if(!obj.isAttribute(part)){
 						console.log("Attribute does not exist: "+ref.join('.')+" in wiring " + this[wiredfn_key].toString())
 						continue
 					}
-
 					obj.addListener(part, bindcall)
 
 					if(obj.has_wires(part) && !obj.wiredCall(part)){
@@ -575,14 +580,7 @@ define.class(function(require, constructor){
 				this.connectWiredAttribute(key, initarray)
 			}
 		}
-		// lets initialize bindings on all nested classes
-		var nested = this.constructor.nested
-		if(nested) for(var name in nested){
-			var nest = this[name.toLowerCase()]
-			if(nest.connectWires){
-				nest.connectWires(initarray, depth)
-			}
-		}
+
 		if(immediate === true){
 			for(var i = 0; i < initarray.length; i++){
 				initarray[i]()

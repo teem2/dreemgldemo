@@ -69,12 +69,14 @@ define.class('$base/node', function(require, exports, self){
 				if(proto.isAttribute(key)){ // we iz attribute
 					// we have to ignore property binds
 					var props = proto.getAttributeConfig(key)
-					var value = props.value
+					var value = object['_' + key]
 					if(value !== undefined){
+						if(!props) props = {}
 						if(typeof value === 'function' && value.is_wired || 
 							typeof value === 'string' && value.charAt(0) == '$' && value.charAt(1) === '{' && value.charAt(value.length - 1) === '}'){
 							props.value = undefined
 						}
+						else props.value = value
 					}
 					proxy.attribute(key, props)
 				}

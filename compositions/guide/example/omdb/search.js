@@ -23,7 +23,8 @@ define.class(function(screen, view, button, editor, text, guide$omdb$movie) {
             // TODO this should work | editor({ name:'search', width:300, height:30, text:'Aliens'}),
             text({ name:'search', width:300, height:30, text:'Aliens'}),
             button({text:'Search', width:90, click:function() {
-              this.screen.term = this.parent.search.text;
+                // sets the term on our screen, this should fire the server thing
+                this.screen.term = this.parent.search.text;
             }}),
             view(this.renderMovies())
         )

@@ -4,6 +4,8 @@
 define.class(function(require, exports, module){
 
 	var Node = require('$base/node')
+	
+	var initializing = false
 
 	module.exports = function renderer(new_version, old_version, globals, wireinits, rerender){
 
@@ -18,7 +20,8 @@ define.class(function(require, exports, module){
 		}
 		
 		// call connect wires before
-		new_version.connectWires(wireinits)
+		
+		if(!rerender) new_version.connectWires(wireinits)
 
 		var old_children = old_version? old_version.children: undefined
 
@@ -37,12 +40,10 @@ define.class(function(require, exports, module){
 
 		// then call render
 		function __atAttributeGet(){
-			//console.log('Rerendering',key)
-			//debugger
-			// we need to call re-render on this
-			renderer(this, undefined, globals, undefined, true)
-			//this.setDirty(true)
-			//if(this.reLayout) this.reLayout()
+			// make sure we block render when we are initializing
+			if(!initializing){
+				renderer(this, undefined, globals, undefined, true)
+			}
 		}
 
 		// store the attribute dependencies
@@ -100,9 +101,11 @@ define.class(function(require, exports, module){
 		if(old_version) old_version.emit('deinit')
 
 		if(init_wires){
+			initializing  = true
 			for(var i = 0; i < wireinits.length; i++){
 				wireinits[i]()
 			}
+			initializing = false
 		}
 
 		return new_version

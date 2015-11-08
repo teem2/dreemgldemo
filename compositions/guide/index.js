@@ -3,13 +3,14 @@ define.class(function(composition, screens, screen, guide$omdb$search, guide$exa
     this.render = function() { return [
         guide$omdb$search({
             name:'omdb',
-            onfound: function(found) { this.rpc.screens.main.movies = found; }
+            keyword:'${this.rpc.screens.main.term}'
             // TODO this should work instead | keyword:'${this.rpc.screens.main.term}'
         }),
         screens(
             guide$example$omdb$search({
                 name:'main',
-                onterm: function(term) { this.rpc.omdb.keyword = term; }
+                term:'Aliens',
+                movies:'${this.rpc.omdb.found}'
                 // TODO this should work instead | movies:'${this.rpc.omdb.found}'
             })
         )
