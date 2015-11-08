@@ -16,7 +16,11 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 			var isServer = parts[0] !== 'screens';
 			if (msg.value) { //setter
 				if (isServer) {
-					response.send({type:'error', message:'SERVER SETTER NOT IMPLEMENTED'})
+					var obj = this.names[parts[0]];
+					if (obj) {
+						obj[msg.attribute] = msg.value
+					}
+					response.send({type:'return', attribute:msg.attribute, value:'OK'})
 				} else {
 					this.setRpcAttribute(msg);
 					response.send({type:'return', attribute:msg.attribute, value:'OK'})
