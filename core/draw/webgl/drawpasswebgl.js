@@ -79,7 +79,9 @@ define.class(function(require, baseclass){
 		var view = this.view
 		var device = this.device
 		var layout = view.layout
-		if(!layout) return
+
+		if(!layout || layout.width === 0 || isNaN(layout.width) || layout.height === 0 || isNaN(layout.height)) return
+
 		if(isroot){
 			if(!debug) this.allocDrawTarget(4, 4, 'pick_buffer')
 		}
@@ -143,6 +145,8 @@ define.class(function(require, baseclass){
 		var device = this.device
 		var layout = view.layout
 
+		if(!layout || layout.width === 0 || isNaN(layout.width) || layout.height === 0 || isNaN(layout.height)) return
+
 		// lets see if we need to allocate our framebuffer..
 		if(!isroot){
 			var main_ratio = device.main_frame.ratio, twidth = layout.width * main_ratio, theight = layout.height * main_ratio
@@ -150,6 +154,8 @@ define.class(function(require, baseclass){
 		}
 
 		this.device.bindFramebuffer(this.color_buffer)
+
+		if(layout.width === 0 || layout.height === 0) return
 
 		device.clear(view._clearcolor)
 		// 2d/3d switch

@@ -1,7 +1,7 @@
 //Pure JS based composition
-define.class(function(composition, screens, screen, view){
+define.class(function(composition, screens, screen, view, label){
 
-	define.class(this, "mousedebug", function(view){	
+	var mousedebug = define.class(function(view){	
 		
 		this.attribute("buttoncolor1", {type: vec4, value: vec4("#9090b0")});		
 		this.attribute("buttoncolor2", {type: vec4, value: vec4("#8080c0")});
@@ -61,8 +61,9 @@ define.class(function(composition, screens, screen, view){
 				
 					bgcolor:'#CBD6D9'
 					} 
+					//,label({text:'hello'})
 					,view({flex:1,margin:20,bgcolor:'#8FA4A6',name:'view1', borderwidth:4, bordercolor:"#F2E5C9", borderradius:12})
-					,this.mousedebug({flex:1, margin:20})
+					,mousedebug({flex:1, margin:20})
 					,view({
 						flex:1,borderradius:vec4(10,20,30,40),name:'view2',
 						margin:20,mode:'2D',bgcolor:'#A39565', bordercolor:"#484230", borderwidth: 20
