@@ -79,7 +79,7 @@ define.class(function(require, baseclass){
 		var view = this.view
 		var device = this.device
 		var layout = view.layout
-
+		if(!layout) return
 		if(isroot){
 			if(!debug) this.allocDrawTarget(4, 4, 'pick_buffer')
 		}

@@ -3,7 +3,7 @@ define.class(function(composition, screens, screen, view){
 
 	this.render = function(){ return [
 		screens(
-			screen({clearcolor:'#484230', bgcolor: "#484230"},
+			screen({clearcolor:'#484230'},
 				view({
 //					size:[100,100],
 					name:'viewbg',

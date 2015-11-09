@@ -61,6 +61,27 @@ define.class( function(node, require){
 	this.attribute("model", {type: Object})
 	this.state('model')
 
+	this.event("click")
+	this.event("dblclick")
+	this.event("miss")
+	this.event("mouseout")
+	this.event("mouseover")
+	this.event("mousemove")
+	this.event("mouseleftdown")
+	this.event("mouseleftup")
+	this.event("mouserightdown")
+	this.event("mouserightup")
+	this.event("mousewheelx")
+	this.event("mousewheely")
+
+	this.event("keyup")
+	this.event("keydown")
+	this.event("keypress")
+	this.event("keypaste")
+
+	this.event("focusget")
+	this.event("focuslost")
+
 	this.modelmatrix = mat4.identity()
 	this.totalmatrix = mat4.identity()
 	this.viewmatrix = mat4.identity()

@@ -255,7 +255,7 @@ define.class(function(require, constructor){
 		var listen_key = '_listen_' + key
 		var config = this['_cfg_' + key]
 		var value_key = '_' + key
-
+		if(!config) throw new Error("Cannot emit "+key+" attribute not found")
 		if(value !== undefined){ // lets check storage
 			if(config.storage && !recur){
 				var storage_key = '_' + config.storage
