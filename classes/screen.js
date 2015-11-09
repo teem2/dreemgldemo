@@ -29,26 +29,34 @@ define.class(function(view, require) {
 	}
 
 	this.remapmatrix = mat4();
+	this.invertedmousecoords = vec2();
 	this.remapMouse = function(node){
 
 		var M = node._mode?  node.layoutmatrix: node.totalmatrix;		
 		var P = node.parent;
 		if (!M) return [0,0];
-
 		while(P){
 			if (P._mode || !P.parent)
 			{
 				if (P._mode){
 					//console.log("layer!");
 					//console.log (node.viewmatrix);
-					M = mat4.mat4_mul_mat4(M, node.viewmatrix);
+					M = mat4.mat4_mul_mat4(M, P.viewmatrix);
 				}
 			}
 			P = P.parent;
 		}
 		
 		mat4.invert(M, this.remapmatrix)
-		return [this.mouse._x, this.mouse._y];
+		
+		var sx =this.device.main_frame.size[0]  / this.device.ratio;
+		var sy =this.device.main_frame.size[1]  / this.device.ratio;
+		var mx = this.mouse._x/(sx/2) - 1.0
+		var my = -1 * (this.mouse._y/(sy/2) - 1.0)
+		//console.log(mx,my);
+		vec2.mul_mat4([mx*100,my], this.remapmatrix, this.invertedmousecoords)
+		
+		return this.invertedmousecoords;
 	}
 
 	this.bindInputs = function(){
