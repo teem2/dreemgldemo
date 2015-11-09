@@ -153,8 +153,8 @@ define.class(function(require, exports, self){
 		// now lets read the pixel under the mouse
 		var pick_resolve = this.pick_resolve
 		this.pick_resolve = []
-		setTimeout(function(){
-			this.bindFramebuffer(this.drawpass_list[this.drawpass_list.length - 1].pick_buffer)
+		//setTimeout(function(){
+			//this.bindFramebuffer(this.drawpass_list[this.drawpass_list.length - 1].pick_buffer)
 
 			if(this.debug_pick){
 				var data = this.readPixels(x*this.ratio,this.main_frame.size[1] - y*this.ratio,1,1)
@@ -175,7 +175,7 @@ define.class(function(require, exports, self){
 			for(var i = 0; i < pick_resolve.length; i++){
 				pick_resolve[i](view)
 			}
-		}.bind(this),0)
+		//}.bind(this),0)
 	}
 
 	this.pickScreen = function(x, y){
