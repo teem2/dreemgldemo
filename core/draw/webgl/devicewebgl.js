@@ -22,10 +22,11 @@ define.class(function(require, exports, self){
 		this.shadercache = previous &&  previous.shadercache || {}
 		this.drawpass_list = previous && previous.layer_list || []
 		this.layout_list = previous && previous.layout_list || []
-
+		this.pick_resolve = []
 		this.animFrame = function(time){
 			this.anim_req = false
 			this.doDraw(time)
+			if(this.pick_resolve.length) this.doPick()
 		}.bind(this)
 	
 		if(previous){
@@ -141,41 +142,52 @@ define.class(function(require, exports, self){
 
 	this.debug_pick = false
 
+	this.doPick = function(){
+
+		for(var i = 0, len = this.drawpass_list.length; i < len; i++){
+			var last = i === len - 1 
+			// lets set up glscissor on last
+			// and then read the goddamn pixel
+			this.drawpass_list[i].drawPick(last, i, x, y, this.debug_pick)
+		}
+		// now lets read the pixel under the mouse
+		if(this.debug_pick){
+			var data = this.readPixels(x*this.ratio,this.main_frame.size[1] - y*this.ratio,1,1)
+		}
+		else{
+			var data = this.readPixels(0,0,1,1)
+		}
+		
+		// decode the pass and drawid
+		var passid = (data[0]*43)%256 - 1
+		var drawid = (((data[2]<<8) | data[1])*60777)%65536 - 1
+
+		// lets find the view.
+		var pass = this.drawpass_list[passid]
+		var view = pass && pass.draw_list[drawid]
+
+		for(var i = 0; i < this.pick_resolve.length; i++){
+			this.pick_resolve[i](view)
+		}
+
+		this.pick_resolve = []
+	}
+
 	this.pickScreen = function(x, y){
 		// promise based pickray rendering
 		return new Promise(function(resolve, reject){
-			for(var i = 0, len = this.drawpass_list.length; i < len; i++){
-				var last = i === len - 1 
-				// lets set up glscissor on last
-				// and then read the goddamn pixel
-				this.drawpass_list[i].drawPick(last, i, x, y, this.debug_pick)
-			}
-			// now lets read the pixel under the mouse
-			if(this.debug_pick){
-				var data = this.readPixels(x*this.ratio,this.main_frame.size[1] - y*this.ratio,1,1)
-			}
-			else{
-				var data = this.readPixels(0,0,1,1)
-			}
-			
-			// decode the pass and drawid
-			var passid = (data[0]*43)%256 - 1
-			var drawid = (((data[2]<<8) | data[1])*60777)%65536 - 1
-
-			// lets find the view.
-			var pass = this.drawpass_list[passid]
-			var view = pass && pass.draw_list[drawid]
-			// set it back
-			this.bindFramebuffer()
-
-			resolve(view)
+			this.pick_resolve.push(resolve)
+			this.pick_x = x
+			this.pick_y = y
+			this.atPick = this.pickScreenInner
+			this.redraw()
 		}.bind(this))
 	}
 
 	this.doDraw = function(time){
 		// lets layout shit that needs layouting.
 		var screen = this.layout_list[this.layout_list.length - 1]
-		screen._size = this.size//
+		screen._size = vec2(this.main_frame.size[0]/this.ratio, this.main_frame.size[1]/this.ratio)
 
 		for(var i = 0; i < this.layout_list.length; i++){
 			// lets do a layout?
