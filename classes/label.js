@@ -31,10 +31,10 @@ define.class(function(view, require){
 			var text = view.text
 			var align = view.align
 
-			this.lastmaxwidth = maxwidth
+			//this.lastmaxwidth = maxwidth
 			this.lastalign = this.align
 			
-			var textbuf = this.fontshader.newText()
+			var textbuf = this.newText()
 
 			if(this.typeface) textbuf.typeface = this.typeface
 
@@ -45,13 +45,13 @@ define.class(function(view, require){
 			textbuf.clear()
 
 			if (this.multiline){
-				textbuf.addWithinWidth(this.text, maxwidth? maxwidth: this.layout.width)
+				textbuf.addWithinWidth(text, maxwidth? maxwidth: this.layout.width)
 			}
 			else{
-				textbuf.add(this.text)
+				textbuf.add(text)
 			}
 			//this.fg.textcolor = this.color;
-			this.fg_shader.mesh = textbuf
+			this.mesh = textbuf
 		}
 	})
 
@@ -64,8 +64,9 @@ define.class(function(view, require){
 	}
 
 	this.sizetocontent = function(width){
-		this.lazyInit(width)
-		return {width: this.fg_shader.mesh.bound_w, height: this.fg_shader.mesh.bound_h};
+		console.log("HERE")
+		//this.lazyInit(width)
+		return {width: this.fontshader.mesh.bound_w, height: this.fontshader.mesh.bound_h};
 	}
 
 	this.atDraw = function(renderstate){

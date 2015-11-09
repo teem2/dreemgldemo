@@ -630,7 +630,7 @@ define.class('$base/node', function(require, exports, self){
 
 	this.atExtend = function(){
 		// forward the view reference
-		this.view = this.constructor.outer
+		if(this.constructor.outer) this.view = this.constructor.outer
 		if(this !== self) this.compile()
 	}
 })

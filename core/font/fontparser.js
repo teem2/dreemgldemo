@@ -1,6 +1,6 @@
 define(function(require, exports, module){
 	
-	var GLTexture = require('$gl/gltexture')
+	var Texture = require('$draw/$drawmode/texture$drawmode')
 
 	module.exports = function parseFont(blob){
 		if(!blob) return
@@ -127,7 +127,7 @@ define(function(require, exports, module){
 			height: 1
 		}
 
-		font.texture = GLTexture.fromArray(font.tex_array, font.tex_geom[0], font.tex_geom[1])
+		font.texture = Texture.fromArray(font.tex_array, font.tex_geom[0], font.tex_geom[1])
 
 		return font
 	}

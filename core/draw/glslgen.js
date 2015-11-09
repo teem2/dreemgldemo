@@ -117,7 +117,7 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 			var ast = onejsparser.parse(obj).steps[0]
 			// lets check what thing we have
 			if(ast.type === 'Function'){
-				node.infer = {fn_t:'ast', context:context, basename:basename, name:outname, ast:ast}
+				node.infer = {fn_t:'ast', context:context, basename:basename, name:outname, ast:ast, source:obj}
 				return outname
 			}
 			// otherwise we recur on the ast in place
@@ -184,16 +184,17 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 			return name
 		}
 		if(name in state.context){
-			throw new Error('Id cannot be resolved: "'+name +'", but exists on the current context (set to undefined)')
+			console.log(state.context)
+			throw new Error('Identifier "'+name +'" exists but is undefined in '+state.callname+'(...)\n'+state.source)
 		}
 		else {
-			var gen = new OneJSGen() 
+			//var gen = new OneJSGen() 
 			// lets find the parent
-			var p = node
-			while(p.parent) p = p.parent
-			var str = gen.expand(p, null, {})
-			var name = gen.expand(node, null, {})
-			throw new Error('Id cannot be resolved '+name+' - '+str)
+			//var p = node
+			//while(p.parent) p = p.parent
+			//var str = gen.expand(p, null, {})
+			//var name = gen.expand(node, null, {})
+			throw new Error('Identifier cannot be resolved '+name+' - '+str+' in ' +state.callname+'()\n'+state.source)
 		}
 	}
 
@@ -210,7 +211,7 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 		if(infer.fn_t === 'object'){
 			// lets switch context and expand id
 			var ret =  this.resolveContext(node, infer.object, key, obj, state)
-			if(ret === undefined) throw new Error('Cannot resolve '+obj + '.' + key)
+			if(ret === undefined) throw new Error('Cannot resolve '+obj + '.' + key + ' in '+state.callname+'(...)\n'+state.source)
 			return ret		
 		}
 		var struct = infer
@@ -226,7 +227,7 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 		node.infer = struct.keyType(key)
 		if(!node.infer){
 			console.log(infer.array.font)
-			throw new Error('Cannot find property ' + obj + '.' + key + ' on ' + struct.id)
+			throw new Error('Cannot find property ' + obj + '.' + key + ' on ' + struct.id + ' in '+state.callname+'(...)\n'+state.source)
 		}
 
 		if(!struct.id && infer.fn_t === 'attribute'){
@@ -389,6 +390,8 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 				var fstate = Object.create(state)
 				// mark it 
 				fstate.depth = ''
+				fstate.source = type.source
+				fstate.callname = fn
 				fstate.scope = {}
 				// we need to switch context
 				fstate.context = type.context

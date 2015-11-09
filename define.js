@@ -41,6 +41,7 @@
 	define.$server = '$core/server'
 	define.$animate = '$core/animate'
 	define.$shaderlib = '$core/shaderlib'
+	define.$font = '$core/font'
 
 	define.local_classes = {}
 	define.local_require_stack = []

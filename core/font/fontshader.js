@@ -13,6 +13,10 @@ define.class('$draw/$drawmode/shader$drawmode', function(require, exports, basec
 	this.color = "glyphy_pixel()"
 
 	this.fgcolor = vec4("blue");
+	//this.__defineSetter__('view', function(){
+	//	debugger
+	//})
+	this.view = {_modelmatrix:mat4(),_viewmatrix:mat4()}
 
 	// lets define a custom struct and subclass the array
 	this.textgeom = define.struct({
@@ -388,7 +392,7 @@ define.class('$draw/$drawmode/shader$drawmode', function(require, exports, basec
 	this.GLYPHY_EPSILON = '1e-5'
 	this.GLYPHY_MAX_NUM_ENDPOINTS = '32'
 	
-	this.paint = function(p, dpdx, dpdy, m){
+	this.paint = function(p, m){
 		if(mesh.tag.x == 32.) discard
 		return vec4(-1.)
 	}
@@ -693,11 +697,11 @@ define.class('$draw/$drawmode/shader$drawmode', function(require, exports, basec
 		var p = glyph.xy
 		return glyphy_sdf_encode(glyphy_sdf(p, nominal_size, atlas_pos))
 	}
-
+	/*
 	this.glyphy_sdf_draw_subpixel_3tap = function(){
 
 		var pos = mesh.tex
-		/* isotropic antialiasing */
+		
 		var dpdx = dFdx(pos) // this should mark it pixel and redo the function with a new highmark
 		var dpdy = dFdy(pos)
 		var m = length(vec2(length(dpdx), length(dpdy))) * SQRT_1_2
@@ -742,7 +746,7 @@ define.class('$draw/$drawmode/shader$drawmode', function(require, exports, basec
 	this.glyphy_sdf_draw_subpixel_5tap = function(){
 
 		var pos = mesh.tex
-		/* isotropic antialiasing */
+		
 		var dpdx = dFdx(pos) // this should mark it pixel and redo the function with a new highmark
 		var dpdy = dFdy(pos)
 		var m = min(length(vec2(length(dpdx), length(dpdy))) * SQRT_1_2, 0.03)
@@ -790,24 +794,26 @@ define.class('$draw/$drawmode/shader$drawmode', function(require, exports, basec
 		if(max_alpha >0.2) max_alpha = 1.
 		return vec4(mix(mesh.bgcolor, mesh.fgcolor, alpha), max_alpha)
 	}
+	*/
 
 	// draw using SDF texture
 	this.glyphy_sdf_draw = function(){
 		var pos = mesh.tex
-		/* isotropic antialiasing */
-		var dpdx = dFdx(pos) // this should mark it pixel and redo the function with a new highmark
-		var dpdy = dFdy(pos)
-		var m = length(vec2(length(dpdx), length(dpdy))) * SQRT_1_2
+
+		//var dpdx = dFdx(pos) // this should mark it pixel and redo the function with a new highmark
+		//var dpdy = dFdy(pos)
+		//var m = length(vec2(length(dpdx), length(dpdy))) * SQRT_1_2
+		var m = 0.1
 		// screenspace length
 		mesh.scaling = 500. * m 
 		
-		var dist_sample = mesh.font.texture.sample(pos)
+		var dist_sample = mesh.typeface.texture.sample(pos)
 		//var dist_sample = vec4(0,0,0,0)
 		var gsdist = glyphy_sdf_decode(dist_sample)
 
 		mesh.distance = gsdist * 0.003
 		
-		var exit = paint(pos, dpdx, dpdx, m)
+		var exit = paint(pos,m)
 		if(exit.a >= 0.){
 			return exit
 		}
