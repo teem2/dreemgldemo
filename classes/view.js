@@ -3,8 +3,6 @@
 define.class( function(node, require){
 	var Animate = require('$base/animate')
 	var FlexLayout = require('$lib/layout')
-
-	// store the device shader on drawdevice
 	var Shader = this.Shader = require('$draw/$drawmode/shader$drawmode')
 
 	this.attribute("pos", {type:vec2, value:vec2(0,0)})
@@ -194,6 +192,42 @@ define.class( function(node, require){
 
 	this.update = this.updateShaders
 
+
+	this.startMotion = function(obj, key, value){
+		var config = obj.getAttributeConfig(key)
+		var first = obj['_' + key]
+		var trk = new Animate(config, obj, key, first, value)
+		var animkey = obj.interfaceguid + '_' + key
+		this.anims[animkey] = trk
+		obj.setDirty(true)
+		return true
+	}
+
+	this.doAnimation = function(time){
+		var hasanim = false
+		for(var key in this.anims){
+			var anim = this.anims[key]
+			if(anim.start_time === undefined) anim.start_time = time
+			var mytime = time - anim.start_time
+			var value = anim.compute(mytime)
+			if(value instanceof anim.End){
+				delete this.anims[key] 
+				//console.log(value.last_value)
+				anim.obj.emit(anim.key, value.last_value)
+				anim.obj.setDirty(true)
+			}
+			else{
+				anim.obj.emit(anim.key, value)
+				anim.obj.setDirty(true)
+				if(!hasanim) hasanim = true
+			}
+		}
+
+		return hasanim
+	}
+
+	// shaders
+
 	// rounded corner shader
 	define.class(this, 'bg', this.Shader, function(){
 
@@ -206,7 +240,6 @@ define.class( function(node, require){
 
 		this.mesh = this.vertexstruct.array()
 	
-		this.has_pick = true
 		this.depth_test = ""
 
 		// matrix and viewmatrix should be referenced on view
@@ -301,7 +334,6 @@ define.class( function(node, require){
 			radmult: vec4,			
 			uv:vec2
 		})
-		this.has_pick = 1;
 		this.mesh = this.vertexstruct.array()
 
 		this.draw_type = "TRIANGLE_STRIP"
@@ -382,40 +414,6 @@ define.class( function(node, require){
 			return vec4(sized.x, sized.y, 0, 1) * view.totalmatrix * view.viewmatrix
 		}
 	})
-
-
-	this.startMotion = function(obj, key, value){
-		var config = obj.getAttributeConfig(key)
-		var first = obj['_' + key]
-		var trk = new Animate(config, obj, key, first, value)
-		var animkey = obj.interfaceguid + '_' + key
-		this.anims[animkey] = trk
-		obj.setDirty(true)
-		return true
-	}
-
-	this.doAnimation = function(time){
-		var hasanim = false
-		for(var key in this.anims){
-			var anim = this.anims[key]
-			if(anim.start_time === undefined) anim.start_time = time
-			var mytime = time - anim.start_time
-			var value = anim.compute(mytime)
-			if(value instanceof anim.End){
-				delete this.anims[key] 
-				//console.log(value.last_value)
-				anim.obj.emit(anim.key, value.last_value)
-				anim.obj.setDirty(true)
-			}
-			else{
-				anim.obj.emit(anim.key, value)
-				anim.obj.setDirty(true)
-				if(!hasanim) hasanim = true
-			}
-		}
-
-		return hasanim
-	}
 
 
 })

@@ -398,7 +398,7 @@ define.class('$base/node', function(require, exports, self){
 		return vec4(0,0,0,0)
 	}
 
-	this.has_pick = false
+	this.has_pick = true
 
 	this.monitorCompiledProperty = function(name, init){
 		var get = '_' + name
