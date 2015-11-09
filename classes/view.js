@@ -39,6 +39,8 @@ define.class( function(node, require){
 	this.attribute("rotate", {type: vec3, value: vec3(0)})
 	this.attribute("translate", {type: vec3, value: vec3(0)})
 
+	this.attribute("bordercolor", {type: vec4, value: vec4(0,0,0,0)})
+
 	this.attribute("borderwidth", {type: vec4, value: vec4(0,0,0,0)})
 	this.attribute("borderradius", {type: vec4, value: vec4(0,0,0,0)})
 	this.attribute("borderleftwidth", {storage:'borderwidth', index:0})
@@ -209,13 +211,24 @@ define.class( function(node, require){
 				mesh.push([0,0], 0, [1,0,0,0], 0,0)
 			}
 			else{
-				var pidiv = 10
-				this.mesh.push([width/2,height/2], 0, [0,0,0,0], 0.5,0.5)
 				
-				for(var p = 0;p<PI/2;p+= PI/pidiv) this.mesh.push(vec2(radius[0] ,radius[0]), p, vec4(1,0,0,0), 1,0)	
-				for(var p = 0;p<PI/2;p+= PI/pidiv) this.mesh.push(vec2(width - radius[1], radius[1]), p + PI/2, vec4(0,1,0,0), 1,0)
-				for(var p = 0;p<PI/2;p+= PI/pidiv) this.mesh.push(vec2(width - radius[2], height - radius[2]), p + PI, vec4(0,0,1,0), 1,1)
-				for(var p = 0;p<PI/2;p+= PI/pidiv) this.mesh.push(vec2(radius[3], height - radius[3]), p + PI + PI/2, vec4(0,0,0,1), 0,1)
+				var divbase = 0.15;
+				var pidiv1 = Math.floor(Math.max(2, divbase* PI * radius[0]));
+				var pidiv2 = Math.floor(Math.max(2, divbase* PI * radius[1]));
+				var pidiv3 = Math.floor(Math.max(2, divbase* PI * radius[2]));
+				var pidiv4 = Math.floor(Math.max(2, divbase* PI * radius[3]));
+				
+				var pimul1 = (PI*0.5)/(pidiv1-1);
+				var pimul2 = (PI*0.5)/(pidiv2-1);
+				var pimul3 = (PI*0.5)/(pidiv3-1);
+				var pimul4 = (PI*0.5)/(pidiv4-1);
+
+				this.mesh.push([width/2,height/2], 0, [0,0,0,0], 0.5,0.5)
+
+				for(var p = 0;p<pidiv1;p++) this.mesh.push(vec2(radius[0] ,radius[0]), p*pimul1, vec4(1,0,0,0), 1,0)	
+				for(var p = 0;p<pidiv2;p++) this.mesh.push(vec2(width - radius[1]-1, radius[1]), p*pimul2 + PI/2, vec4(0,1,0,0), 1,0)
+				for(var p = 0;p<pidiv3;p++) this.mesh.push(vec2(width - radius[2]-1, height - radius[2]-1), p*pimul3+ PI, vec4(0,0,1,0), 1,1)
+				for(var p = 0;p<pidiv4;p++) this.mesh.push(vec2(radius[3], height - radius[3]-1), p*pimul4 + PI + PI/2, vec4(0,0,0,1), 0,1)
 				
 				this.mesh.push(vec2( radius[0] ,radius[0]), 0, vec4(1,0,0,0), 1,0)
 			}	
@@ -258,7 +271,7 @@ define.class( function(node, require){
 			return vec4( mesh.x * width, mesh.y * height, 0, 1) * view.layermatrix * view.viewmatrix
 		}
 	})
-	/*
+	
 	// rounded corner border shader
 	define.class(this, 'border', this.Shader, function(){
 		this.vertexstruct = define.struct({
@@ -267,98 +280,88 @@ define.class( function(node, require){
 			radmult: vec4,			
 			uv:vec2
 		})
-		
-		this.matrix = mat4.identity()
-		this.viewmatrix = mat4.identity()
-
+		this.has_pick = 1;
 		this.mesh = this.vertexstruct.array()
 
-		this.width = 0.0
-		this.height = 0.0
-
-		this.bordercolor = vec4("black")
-		this.borderwidth = 0.0
-		this.borderradius = vec4(0.0)
-
-		this.has_guid = true
-
-		this.geomradius = vec4(0)
-		this.geomwidth = 0
-		this.geomheight = 0
-		this.geomborder = 0
-
 		this.draw_type = "TRIANGLE_STRIP"
-
-		this.update = function(view){
-			// copy over view properties
-			var width = this._width = view._size[0]
-			var height = this._height= view._size[1]
-			var borderradius = this._borderradius = view._borderradius
-			var borderwidth = this._borderwidth = view._bordewrwidth
-
-			if (borderwidth != this.geomborder || this.geomheight != height || this.geomwidth != width || vec4.equals(radius, this.geomradius) == false){
-				
-				this.geomborder  = borderwidth;
-				this._radius = radius;
-				this._borderwidth = borderwidth;
-
-
-				this.geomradius = radius;
-				this.geomheight = height;
-				this.geomwidth = width;
-			}
-		}
 		
-		this.buildGeometry = function(width, height){
+		this.update = function(){
+
+			var view = this.view
+			var width = view.layout?view.layout.width:view.width
+			var height = view.layout?view.layout.height:view.height
+			var radius = view.borderradius
+
+			var mesh = this.mesh = this.vertexstruct.array()
+						
+			var borderradius = view.borderradius
+			var borderwidth = view.borderwidth
 			
-			//this.mesh.clear();
-			this.mesh = this.vertexstruct.array();
 			
-			var scale0 = (Math.max(0, this._radius[0]-this._borderwidth[0]))/this._radius[0];
-			var scale1 = (Math.max(0, this._radius[1]-this._borderwidth[0]))/this._radius[1];
-			var scale2 = (Math.max(0, this._radius[2]-this._borderwidth[0]))/this._radius[2];
-			var scale3 = (Math.max(0, this._radius[3]-this._borderwidth[0]))/this._radius[3];
+			var scale0 = ((borderradius[0]-borderwidth[0]))/Math.max(0.01, borderradius[0]);
+			var scale1 = ((borderradius[1]-borderwidth[0]))/Math.max(0.01, borderradius[1]);
+			var scale2 = ((borderradius[2]-borderwidth[0]))/Math.max(0.01, borderradius[2]);
+			var scale3 = ((borderradius[3]-borderwidth[0]))/Math.max(0.01, borderradius[3]);
 			
 			var pidiv = 20;
 				
-			for(var p = 0; p < PI / 2; p += PI / pidiv){
-				this.mesh.push(vec2( this._radius[0] ,this._radius[0]), p, vec4(1,0,0,0), 1,0);
-				this.mesh.push(vec2( this._radius[0] ,this._radius[0]), p, vec4(scale0,0,0,0), 1,0);
+			
+			var divbase = 0.15;
+			var pidiv1 = Math.floor(Math.max(2, divbase* PI * radius[0]));
+			var pidiv2 = Math.floor(Math.max(2, divbase* PI * radius[1]));
+			var pidiv3 = Math.floor(Math.max(2, divbase* PI * radius[2]));
+			var pidiv4 = Math.floor(Math.max(2, divbase* PI * radius[3]));
+			
+			var pimul1 = (PI*0.5)/(pidiv1-1);
+			var pimul2 = (PI*0.5)/(pidiv2-1);
+			var pimul3 = (PI*0.5)/(pidiv3-1);
+			var pimul4 = (PI*0.5)/(pidiv4-1);
+
+			
+			
+			for(var p = 0; p < pidiv1; p ++){
+				this.mesh.push(vec2( borderradius[0] ,borderradius[0]), p*pimul1, vec4(1,0,0,0), 1,0);
+				this.mesh.push(vec2( borderradius[0] ,borderradius[0]), p*pimul1, vec4(scale0,0,0,0), 1,0);
 			}
 			
-			for(var p = 0;p<PI/2;p+= PI/pidiv){
-				this.mesh.push(vec2(width-this._radius[1],this._radius[1]), p + PI/2, vec4(0,1,0,0), 1,0);
-				this.mesh.push(vec2(width-this._radius[1],this._radius[1]), p + PI/2, vec4(0,scale1,0,0), 1,0);
+			for(var p = 0;p<pidiv2;p++){
+				this.mesh.push(vec2(width-borderradius[1],borderradius[1]), p*pimul2 + PI/2, vec4(0,1,0,0), 1,0);
+				this.mesh.push(vec2(width-borderradius[1],borderradius[1]), p*pimul2 + PI/2, vec4(0,scale1,0,0), 1,0);
 			}
-			for(var p = 0;p<PI/2;p+= PI/pidiv){
-				this.mesh.push(vec2(width-this._radius[2],height-this._radius[2]), p + PI, vec4(0,0,1,0), 1,1);
-				this.mesh.push(vec2(width-this._radius[2],height-this._radius[2]), p + PI, vec4(0,0,scale2,0), 1,1);
+			for(var p = 0;p<pidiv3;p++){
+				this.mesh.push(vec2(width-borderradius[2],height-borderradius[2]), p*pimul3 + PI, vec4(0,0,1,0), 1,1);
+				this.mesh.push(vec2(width-borderradius[2],height-borderradius[2]), p*pimul3 + PI, vec4(0,0,scale2,0), 1,1);
 			}
-			for(var p = 0;p<PI/2;p+= PI/pidiv){
-				this.mesh.push(vec2(this._radius[3],height-this._radius[3]), p + PI + PI/2, vec4(0,0,0,1), 0,1);
-				this.mesh.push(vec2(this._radius[3],height-this._radius[3]), p + PI + PI/2, vec4(0,0,0,scale3), 0,1);
+			for(var p = 0;p<pidiv4;p++){
+				this.mesh.push(vec2(borderradius[3],height-borderradius[3]), p*pimul4 + PI + PI/2, vec4(0,0,0,1), 0,1);
+				this.mesh.push(vec2(borderradius[3],height-borderradius[3]), p*pimul4 + PI + PI/2, vec4(0,0,0,scale3), 0,1);
 			}				
-			this.mesh.push(vec2( this._radius[0] ,this._radius[0]), 0, vec4(1,0,0,0), 1,0);
-			this.mesh.push(vec2( this._radius[0] ,this._radius[0]), 0, vec4(scale0,0,0,0), 1,0);
+			this.mesh.push(vec2( borderradius[0] ,borderradius[0]), 0, vec4(1,0,0,0), 1,0);
+			this.mesh.push(vec2( borderradius[0] ,borderradius[0]), 0, vec4(scale0,0,0,0), 1,0);
 		
 		}
-		this.color = function(){return bordercolor;};
+		
+		this.color = function(){
+			return view.bordercolor;
+			};
+		
 		this.position = function(){
 			var pos = mesh.pos.xy;
 			var ca = cos(mesh.angle + PI);
 			var sa = sin(mesh.angle+PI);
 			
-			var rad  = dot(mesh.radmult, radius);
+			var rad  = dot(mesh.radmult, view.borderradius);
+			
 			pos.x += ca * rad;
 			pos.y += sa * rad;
 			
-			uv = vec2(pos.x/width,  pos.y/height);
+			uv = vec2(pos.x/view.width,  pos.y/view.height);
 			
 			sized = vec2(pos.x, pos.y)
-			return vec4(sized.x, sized.y, 0, 1) * matrix * viewmatrix
+			return vec4(sized.x, sized.y, 0, 1) * view.totalmatrix * view.viewmatrix
 		}
 	})
-*/
+
 
 	this.startMotion = function(obj, key, value){
 		var config = obj.getAttributeConfig(key)
