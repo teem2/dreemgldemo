@@ -184,7 +184,6 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 			return name
 		}
 		if(name in state.context){
-			console.log(state.context)
 			throw new Error('Identifier "'+name +'" exists but is undefined in '+state.callname+'(...)\n'+state.source)
 		}
 		else {
@@ -194,7 +193,7 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 			//while(p.parent) p = p.parent
 			//var str = gen.expand(p, null, {})
 			//var name = gen.expand(node, null, {})
-			throw new Error('Identifier cannot be resolved '+name+' - '+str+' in ' +state.callname+'()\n'+state.source)
+			throw new Error('Identifier cannot be resolved '+name+' in ' +state.callname+'()\n'+state.source)
 		}
 	}
 
@@ -370,6 +369,7 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 
 		if(type.fn_t === 'ast'){ // we have to expand the function
 			fn = type.name
+			var undecorated = fn
 			// lets annotate the function name by arg type
 			if(node.args) for(var i = 0; i<node.args.length; i++){
 				var infer = node.args[i].infer
@@ -383,6 +383,7 @@ define.class('$parse/onejsgen', function(require, exports, self, baseclass){
 				state.functions[fn] = fnobj = {
 					args: node.args,
 					name: fn,
+					undecorated:undecorated,
 					deps: {}
 				}
 				state.call.deps[fn] = fnobj

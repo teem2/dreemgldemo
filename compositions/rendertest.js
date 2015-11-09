@@ -1,5 +1,5 @@
 //Pure JS based composition
-define.class(function(composition, screens, screen, view, label){
+define.class(function(composition, screens, screen, view, label, button){
 
 	var mousedebug = define.class(function mousedebug(view){	
 		
@@ -41,8 +41,7 @@ define.class(function(composition, screens, screen, view, label){
 			this.redraw();
 			//this.screen.addDirtyNode(this);
 			
-			if (this.children.length > 0)
-			{
+			if (this.children.length > 0){
 				this.children[0].text = Math.round(a[0]) + ", " + Math.round(a[1]);
 				this.children[0].pos = vec2(a[0],a[1]);						
 			}
@@ -60,10 +59,9 @@ define.class(function(composition, screens, screen, view, label){
 					margin:4,
 					flex:1,
 					borderradius:30, 
-				
 					bgcolor:'#CBD6D9'
 					} 
-					//,label({text:'hello'})
+					,button({text:'i iz button', flex:1})
 					,view({flex:1,margin:20,bgcolor:'#8FA4A6',name:'view1', borderwidth:4, bordercolor:"#F2E5C9", borderradius:12})
 					,mousedebug({flex:1, margin:20})
 					,view({

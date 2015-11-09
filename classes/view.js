@@ -100,11 +100,11 @@ define.class( function(node, require){
 	this.atInit = function(){
 		for(var key in this.shaders){
 			var shader = this[key]
-			if(shader) this.shader_list.push(this[key+'shader'] = new shader())
+			if(shader) this.shader_list.push(this[key+'shader'] = new shader(this))
 		}
 		if(this._mode){
 			// give it a blendshader
-			this.blendshader = new this.blend()
+			this.blendshader = new this.blend(this)
 		}
 	}
 
@@ -122,6 +122,11 @@ define.class( function(node, require){
 				this.shaders[name] = inner
 			}
 		}
+	}
+
+	// redraw our view
+	this.redraw = function(){
+		this.device.redraw()
 	}
 
 	// when do we call this?..

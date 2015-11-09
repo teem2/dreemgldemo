@@ -82,13 +82,10 @@ define.class(function(view, require) {
 			// ok so. lets query the renderer for the view thats under the mouse
 			if(!this.mouse_capture){
 				this.device.pickScreen(this.mouse.x, this.mouse.y).then(function(view){
-					// result!
-					//console.log(view.name)
-					// ah so. we might need to do mouseover/mouseout
 					if(this.mouse_view !== view){
 						if(this.mouse_view) this.mouse_view.emit('mouseout', this.remapMouse(this.mouse_view))
 						this.mouse_view = view
-						this.mouse_view.emit('mouseover', this.remapMouse(this.mouse_view))
+						if(view) this.mouse_view.emit('mouseover', this.remapMouse(this.mouse_view))
 					}
 					if(view) view.emit('mousemove', this.remapMouse(view))
 

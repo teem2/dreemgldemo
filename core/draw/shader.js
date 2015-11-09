@@ -35,9 +35,7 @@ define.class('$base/node', function(require, exports, self){
 	onejsparser.parser_cache = {}
 	var glslgen = new GLSLGen()
 
-	this.atConstructor = function(obj){
-		if(obj) for(var key in obj) this[key] = obj[key]
-		// forward the outer object to the view object
+	this._atConstructor = function(){
 		this.view = this.outer
 	}
 
@@ -400,9 +398,10 @@ define.class('$base/node', function(require, exports, self){
 
 	this.has_pick = true
 
-	this.monitorCompiledProperty = function(name, init){
+	this.monitorCompiledProperty = function(name){
+		if(this.__lookupSetter__(name)) return
 		var get = '_' + name
-		this[get] = init
+		this[get] = this[name]
 		Object.defineProperty(this, name, {
 			enumerable:false,
 			configurable:false,
@@ -596,28 +595,17 @@ define.class('$base/node', function(require, exports, self){
 
 		//if(!this.device){
 		// turn shader into dirty observed thing
-		var keys = Object.keys(this)
-		for(var i = 0; i < keys.length; i++){
-			var key = keys[i]
-			if(this.__lookupGetter__(key) || key.indexOf('_') === 0 ) continue
-			var prop = this[key]
-			// ok so, if we are a function
-			if(typeof prop === 'function' && prop.is_wired){
-				this.attribute(key, {type:float32, wired:prop})
-			}
-			else if(typeof prop == 'function' || typeof prop === 'string'){
-				this.monitorCompiledProperty(key, prop)
-			}
-			else if(typeof prop === 'boolean' && key !== 'dirty'){
-				this.attribute(key, {type:boolean, value:prop})
-			}
-			else if(typeof prop === 'number'){
-				this.attribute(key, {type:float, value:prop})
-			}
-			else if(prop && prop.struct && !prop.isArray){ // dont do it for 
-				this.attribute(key, {type:prop.struct, value:prop})
-			}
+		// lets look at our local funciton refs
+		for(var key in vtx_state.functions){
+			var name = vtx_state.functions[key].undecorated
+			if(name.indexOf('_DOT_') === -1) this.monitorCompiledProperty(name)
 		}
+
+		for(var key in pix_state.functions){
+			var name = pix_state.functions[key].undecorated
+			if(name.indexOf('_DOT_') === -1) this.monitorCompiledProperty(name)
+		}
+
 		this.dirty = false
 
 		if(!gldevice){

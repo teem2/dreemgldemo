@@ -26,32 +26,27 @@ define.class(function(view, require){
 	this.attribute("align", {type: String,  value: "left"})
 	
 	define.class(this, 'font', Font, function(){
+
 		this.update = function(){
 			var view = this.view
-			var text = view.text
-			var align = view.align
-
-			//this.lastmaxwidth = maxwidth
-			this.lastalign = this.align
 			
-			var textbuf = this.newText()
+			var mesh = this.newText()
 
-			if(this.typeface) textbuf.typeface = this.typeface
+			if(this.typeface) mesh.typeface = this.typeface
 
-			textbuf.fontsize = this.fontsize
-			textbuf.add_y = textbuf.line_height
-			textbuf.align = this.align
-			textbuf.start_y = textbuf.line_heigh
-			textbuf.clear()
+			mesh.fontsize = view.fontsize
+			mesh.add_y = mesh.line_height
+			mesh.align = view.align
+			mesh.start_y = mesh.line_height
+			mesh.clear()
 
 			if (this.multiline){
-				textbuf.addWithinWidth(text, maxwidth? maxwidth: this.layout.width)
+				mesh.addWithinWidth(text, maxwidth? maxwidth: this.layout.width)
 			}
 			else{
-				textbuf.add(text)
+				mesh.add(view.text,0 ,0 ,0)
 			}
-			//this.fg.textcolor = this.color;
-			this.mesh = textbuf
+			this.mesh = mesh
 		}
 	})
 
@@ -64,8 +59,7 @@ define.class(function(view, require){
 	}
 
 	this.sizetocontent = function(width){
-		console.log("HERE")
-		//this.lazyInit(width)
+		this.fontshader.update()
 		return {width: this.fontshader.mesh.bound_w, height: this.fontshader.mesh.bound_h};
 	}
 

@@ -1,6 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 
-define.class(function(view, text, view, icon){
+define.class(function(view, label, icon){
 	// Simple button: a rectangle with a textlabel and an icon
 	
 	// The label for the button
@@ -52,14 +52,13 @@ define.class(function(view, text, view, icon){
 	// the shader for the inside fill
 	// <mesh> Texture coordinate from vertex (in 0,0 -> 1,1 space) 
 	// <distance> Distance to outside border (in pixels) 
-	this.buttonfill = function(mesh,distance){
-		var fill = mix(col1, col2, (mesh.y)/0.8);
-		return fill;
-	}
+	this.buttonfill = 
 
 	this.bg = {
-		wobbleamount: 0.0,
-		bgcolorfn: this.buttonfill,
+		color: function(){
+			var fill = mix(col1, col2, (mesh.pos.y)/0.8)
+			return fill
+		},
 		col1: vec4("yellow"),
 		col2: vec4("yellow")
 	}
@@ -73,32 +72,31 @@ define.class(function(view, text, view, icon){
 	
 	this.pressed = 0;
 	this.hovered = 0;
-		
+	
 	// The icon class used for the icon display. Exposed to allow overloading/replacing from the outside.
-	define.class(this, 'icon_class', function(icon){
-		
+	define.class(this, 'iconclass', function(icon){
 	})
 
 	this.mouseover  = function(){
-		this.hovered++;
-		this.setDirty(true)
+		this.hovered = 1
+		this.redraw()
 	}
 	
 	this.attribute("bgcolor", {duration: 1.0});
 	
 	this.mouseout = function(){
-		if(this.hovered>0)this.hovered--;
-		this.setDirty(true)
+		this.hovered = 0
+		this.redraw()
 	}
 	
 	this.mouseleftdown = function(){
 		this.pressed++
-		this.setDirty(true)
+		this.redraw()
 	}
 	
 	this.mouseleftup = function(){
-		this.pressed--;
-		this.setDirty(true)
+		this.pressed--
+		this.redraw()
 	}
 	
 	this.atDraw = function(){
@@ -126,7 +124,7 @@ define.class(function(view, text, view, icon){
 	}
 
 	this.render = function(){
-		this.buttonres =  text({rotation: 0, bgcolor:"transparent",fgcolor:"white", marginleft: 4,fontsize: this.fontsize, position: "relative", text: this.text})
+		this.buttonres =  label({rotation: 0, bgcolor:"transparent",fgcolor:"white", marginleft: 4,fontsize: this.fontsize, position: "relative", text: this.text})
 		if (!this.icon || this.icon.length == 0){
 			this.iconres = undefined;
 			return [this.buttonres];

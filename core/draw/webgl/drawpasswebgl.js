@@ -152,7 +152,6 @@ define.class(function(require, baseclass){
 			var main_ratio = device.main_frame.ratio, twidth = layout.width * main_ratio, theight = layout.height * main_ratio
 			this.allocDrawTarget(twidth, theight, 'color_buffer')
 		}
-
 		this.device.bindFramebuffer(this.color_buffer)
 
 		if(layout.width === 0 || layout.height === 0) return
@@ -170,6 +169,7 @@ define.class(function(require, baseclass){
 		else if(view._mode === '3D'){
 
 		}
+		console.log(layout)
 
 		// each view has a reference to its layer
 		for(var dl = this.draw_list, i = 0; i < dl.length; i++){
@@ -180,8 +180,8 @@ define.class(function(require, baseclass){
 				// lets render the view as a layer
 				var blendshader = draw.blendshader
 				blendshader.texture = draw.layer.color_buffer
-				blendshader._width = draw.layout.width
-				blendshader._height = draw.layout.height
+				blendshader.width = draw.layout.width
+				blendshader.height = draw.layout.height
 				blendshader.drawArrays(this.device)
 			}
 			else{

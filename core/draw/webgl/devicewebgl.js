@@ -165,13 +165,14 @@ define.class(function(require, exports, self){
 			// lets find the view.
 			var pass = this.drawpass_list[passid]
 			var view = pass && pass.draw_list[drawid]
+			// set it back
+			this.bindFramebuffer()
 
 			resolve(view)
 		}.bind(this))
 	}
 
 	this.doDraw = function(time){
-
 		// lets layout shit that needs layouting.
 		var screen = this.layout_list[this.layout_list.length - 1]
 		screen._size = this.size//
