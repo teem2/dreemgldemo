@@ -1,24 +1,19 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 // Parts copyright 2012 Google, Inc. All Rights Reserved. (APACHE 2.0 license)
-define.class('$gl/glshader', function(require, exports, baseclass){
-
+define.class('$draw/$drawmode/shader$drawmode', function(require, exports, baseclass){
 	if(define.$environment === 'nodejs') return
 
-	var GLTexture = require('$gl/gltexture')
-	var glfontParser = require('$gl/glfontparser')
+	var glfontParser = require('$font/fontparser')
 
-	// our font blob
-	this.font = glfontParser(require('$fonts/code_font1_ascii_baked.glf'))
-
-	//this.has_guid = false
+	// the font
+	this.typeface = glfontParser(require('$fonts/code_font1_ascii_baked.glf'))
 
 	// initial pixel and vertex shaders
-	this.matrix = mat4.identity();
-	this.viewmatrix = mat4.identity();
 	this.position = "glyphy_mesh() "
-	this.textcolor = vec4(0.9, 0.9, 0.9, 1);
-	this.color = "glyphy_pixel()"//" * textcolor"
+	this.color = "glyphy_pixel()"
+
 	this.fgcolor = vec4("blue");
+
 	// lets define a custom struct and subclass the array
 	this.textgeom = define.struct({
 		pos:vec2,
@@ -94,8 +89,8 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 			// alright lets convert some text babeh!
 			for(var i = 0; i < length; i++){
 				var unicode = string.struct? string.array[i * 4]: string.charCodeAt(i)
-				var info = this.font.glyphs[unicode]
-				if(!info) info = this.font.glyphs[32]
+				var info = this.typeface.glyphs[unicode]
+				if(!info) info = this.typeface.glyphs[32]
 				res.w += info.advance * this.fontsize
 				
 			}
@@ -179,7 +174,7 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 			var y2 = this.add_y - this.fontsize * info.max_y
 			var italic = this.italic_ness * info.height * this.fontsize
 
-			if(this.font.baked){
+			if(this.typeface.baked){
 				this.pushQuad(
 					x1, y1, info.tmin_x, info.tmin_y, unicode, m1, m2, m3,
 					x2, y1, info.tmax_x, info.tmin_y, unicode, m1, m2, m3,
@@ -207,8 +202,8 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 			// alright lets convert some text babeh!
 			for(var i = 0; i < length; i++){
 				var unicode = string.struct? string.array[i * 4]: string.charCodeAt(i)
-				var info = this.font.glyphs[unicode]
-				if(!info) info = this.font.glyphs[32]
+				var info = this.typeface.glyphs[unicode]
+				if(!info) info = this.typeface.glyphs[32]
 				// lets add some vertices
 				this.addGlyph(info, unicode, m1, m2, m3)
 				if(unicode == 10){ // newline
@@ -233,7 +228,7 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 					h:this.line_height
 				}
 			}			
-			var info = this.font.glyphs[this.charCodeAt(off)]
+			var info = this.typeface.glyphs[this.charCodeAt(off)]
 			var coords = {
 				x: this.array[off*6*8 + 0] - this.fontsize * info.min_x,
 				y: this.array[off*6*8 + 1] + this.fontsize * info.min_y,
@@ -259,7 +254,7 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 			for(var len = this.lengthQuad(), o = len - 1; o >= 0; o--){
 
 				var char_code = this.charCodeAt(o)
-				var info = this.font.glyphs[char_code]
+				var info = this.typeface.glyphs[char_code]
 
 				var y2 = this.array[o*6*8 + 1] + this.fontsize * info.min_y + this.fontsize * this.cursor_sink
 				var y1 = y2 - this.line_height
@@ -361,14 +356,12 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 
 	// for type information
 	this.mesh = this.textgeom.array()
-	this.mesh.font = this.font
+	this.mesh.typeface = this.typeface
 
 	// this thing makes a new text array buffer
-	this.newText = function(font, length){
+	this.newText = function(){
 		var buf = this.textgeom.array() 
-		// load the font
-		// check if the font has a loaded texture
-		buf.font = this.font
+		buf.typeface = this.typeface
 		buf.clear()
 		return buf
 	}
@@ -378,19 +371,17 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 	this.glyphy_pixel = this.glyphy_atlas_draw
 
 	this.atConstructor = function(){
-		// lets check 
 	}
 
 	this.glyphy_mesh_sdf = function(){
-		return (mesh.pos+vec2(mesh.shift_x,mesh.shift_y)) * matrix  * viewmatrix
+		return (mesh.pos + vec2(mesh.shift_x,mesh.shift_y)) * view.modelmatrix  * view.viewmatrix
 	}
 
 	this.glyphy_mesh = 
 	this.glyphy_mesh_atlas = function(){
 		glyph = glyph_vertex_transcode(mesh.tex)
-		return (mesh.pos+vec2(mesh.shift_x,mesh.shift_y)) * matrix * viewmatrix
+		return (mesh.pos + vec2(mesh.shift_x,mesh.shift_y)) * view.modelmatrix * view.viewmatrix
 	}
-
 
 	// glyphy shader library
 	this.GLYPHY_INFINITY = '1e9'
@@ -409,7 +400,7 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 		p0:vec2,
 		p1:vec2,
 		d:float
-	},'glyphy_arc_t')
+	}, 'glyphy_arc_t')
 
 	this.glyphy_arc_endpoint_t = define.struct({
 		/* Second arc endpoint */
@@ -418,7 +409,7 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 		 * endpoint.  Ie. a "move_to".  Test with glyphy_isinf().
 		 * Arc depth otherwise.  */
 		d:float
-	},'glyphy_arc_endpoint_t')
+	}, 'glyphy_arc_endpoint_t')
 
 	this.glyphy_arc_list_t = define.struct({
 		/* Number of endpoints in the list.
@@ -435,7 +426,7 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 		/* A single line is all we care about.  It's right here. */
 		line_angle:float,
 		line_distance:float /* From nominal glyph center */
-	},'glyphy_arc_list_t')
+	}, 'glyphy_arc_list_t')
 
 	this.glyphy_isinf = function(v){
 		return abs(v) >= GLYPHY_INFINITY * .5
@@ -847,7 +838,7 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 			ivec2(mod(float(offset), mesh.font.item_geom_f.x), offset / mesh.font.item_geom.x)) +
 			vec2(.5, .5)) / mesh.font.tex_geom_f
 
-		return texture2D(mesh.font.texture, pos, {
+		return texture2D(mesh.typeface.texture, pos, {
 			MIN_FILTER: 'NEAREST',
 			MAG_FILTER: 'NEAREST',
 			WRAP_S: 'CLAMP_TO_EDGE',
@@ -901,7 +892,7 @@ define.class('$gl/glshader', function(require, exports, baseclass){
 	}
 
 	this.decideFontType = function(){
-		if(this.font && this.font.baked){
+		if(this.typeface && this.typeface.baked){
 			this.glyphy_mesh = this.glyphy_mesh_sdf
 			this.glyphy_pixel = this.glyphy_sdf_draw
 		}

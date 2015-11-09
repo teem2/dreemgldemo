@@ -85,8 +85,11 @@ define.class( function(node, require){
 	this.viewmatrix = mat4.identity()
 	this.layermatrix = mat4.identity()
 
+	this.layout = {width:0, height:0, left:0, top:0, right:0, bottom:0}
+
 	this.init = function(){
 		this.anims = {}
+		this.layout = {width:0, height:0, left:0, top:0, right:0, bottom:0}
 		this.shader_list = []
 		this.modelmatrix = mat4.identity()
 		this.totalmatrix = mat4.identity()
