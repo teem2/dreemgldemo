@@ -12,7 +12,7 @@ this is your first time through the guide, besure to install any thirsd party mo
      
     npm install
     
-Once the dependancies have been installed, the example provided by the guide can be found mointed on [/guide](http://localhost:2000/guide).    
+Once the dependancies have been installed, the example provided by the guide can be found mounted on [/guide](http://localhost:2000/guide).    
     
 The guide will walk you through building a simple component that talks to a server-side web service. This component will 
 provide a search object and simple UI for the [OMDB](http://omdbapi.com/) database, but a more generic (and synchronous) 
