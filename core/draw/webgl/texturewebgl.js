@@ -211,7 +211,7 @@ define.class(function(exports){
 			WRAP_T: 'CLAMP_TO_EDGE'
 		})
 	}
-
+	
 	this.createGLTexture = function(gl, texid, texinfo){
 		var samplerid = texinfo.samplerid
 

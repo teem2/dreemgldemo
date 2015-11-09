@@ -16,7 +16,7 @@ define.class('$draw/$drawmode/shader$drawmode', function(require, exports, basec
 	//this.__defineSetter__('view', function(){
 	//	debugger
 	//})
-	this.view = {_modelmatrix:mat4(),_viewmatrix:mat4()}
+	this.view = {_totalmatrix:mat4(),_viewmatrix:mat4(),_fgcolor:vec4()}
 
 	// lets define a custom struct and subclass the array
 	this.textgeom = define.struct({
@@ -25,7 +25,7 @@ define.class('$draw/$drawmode/shader$drawmode', function(require, exports, basec
 		tag:vec4,
 	}).extend(function(exports, self){
 		
-		this.align = "left";
+		this.align = "left"
 		this.start_x = 0
 		this.start_y = 0
 		this.text_x = 0
@@ -185,7 +185,8 @@ define.class('$draw/$drawmode/shader$drawmode', function(require, exports, basec
 					x1 + italic, y2, info.tmin_x, info.tmax_y, unicode, m1, m2, m3,
 					x2 + italic, y2, info.tmax_x, info.tmax_y, unicode, m1, m2, m3
 				)
-			} else {
+			} 
+			else {
 				var gx = ((info.atlas_x<<6) | info.nominal_w)<<1
 				var gy = ((info.atlas_y<<6) | info.nominal_h)<<1
 				
@@ -374,17 +375,14 @@ define.class('$draw/$drawmode/shader$drawmode', function(require, exports, basec
 	this.glyphy_mesh = this.glyphy_mesh_atlas
 	this.glyphy_pixel = this.glyphy_atlas_draw
 
-	this.atConstructor = function(){
-	}
-
 	this.glyphy_mesh_sdf = function(){
-		return (mesh.pos + vec2(mesh.shift_x,mesh.shift_y)) * view.modelmatrix  * view.viewmatrix
+		return vec4(mesh.pos + vec2(mesh.shift_x,mesh.shift_y),0,1) * view.totalmatrix  * view.viewmatrix
 	}
 
 	this.glyphy_mesh = 
 	this.glyphy_mesh_atlas = function(){
 		glyph = glyph_vertex_transcode(mesh.tex)
-		return (mesh.pos + vec2(mesh.shift_x,mesh.shift_y)) * view.modelmatrix * view.viewmatrix
+		return vec4(mesh.pos + vec2(mesh.shift_x,mesh.shift_y),0,1) * view.totalmatrix * view.viewmatrix
 	}
 
 	// glyphy shader library
@@ -799,11 +797,10 @@ define.class('$draw/$drawmode/shader$drawmode', function(require, exports, basec
 	// draw using SDF texture
 	this.glyphy_sdf_draw = function(){
 		var pos = mesh.tex
-
 		//var dpdx = dFdx(pos) // this should mark it pixel and redo the function with a new highmark
 		//var dpdy = dFdy(pos)
 		//var m = length(vec2(length(dpdx), length(dpdy))) * SQRT_1_2
-		var m = 0.1
+		var m = 0.005
 		// screenspace length
 		mesh.scaling = 500. * m 
 		
@@ -836,7 +833,7 @@ define.class('$draw/$drawmode/shader$drawmode', function(require, exports, basec
 		//if(u_gamma_adjust != 1.)
 		var alpha3 = pow(vec3(alpha), mesh.gamma_adjust)
 		
-		return vec4(fgcolor.rgb, alpha3) 
+		return vec4(view.fgcolor.rgb, alpha3) 
 	}
 
 	this.glyphy_atlas_lookup = function(offset, _atlas_pos){

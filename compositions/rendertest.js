@@ -1,5 +1,5 @@
 //Pure JS based composition
-define.class(function(composition, screens, screen, view, label){
+define.class(function(composition, screens, screen, view, label, button){
 
 	var mousedebug = define.class(function(view){	
 		
@@ -21,7 +21,7 @@ define.class(function(composition, screens, screen, view, label){
 			bordercolor: vec4("#c0c0c0"),
 			borderwidth: 1,
 			cornerradius: 14,
-			color: function() {							
+			color: function() {
 				var dx = abs(pos.x  * view.layout.width - mousepos.x);
 				var dy = abs(pos.y  * view.layout.height - mousepos.y);
 				var mindist = min(dx,  dy);
@@ -35,8 +35,8 @@ define.class(function(composition, screens, screen, view, label){
 		}
 		
 		this.mousemove = function(a){
-			this.bgshader.mousepos = vec2(a[0],a[1]);		
-			this.setDirty(true);
+			this.bgshader.mousepos = vec2(a[0],a[1])
+			this.setDirty(true)
 			//this.screen.addDirtyNode(this);
 			
 			if (this.children.length > 0){
@@ -57,10 +57,9 @@ define.class(function(composition, screens, screen, view, label){
 					margin:4,
 					flex:1,
 					borderradius:30, 
-				
 					bgcolor:'#CBD6D9'
 					} 
-					,label({text:'hello'})
+					,button({text:'i iz button', flex:1})
 					,view({flex:1,margin:20,bgcolor:'#8FA4A6',name:'view1', borderwidth:4, bordercolor:"#F2E5C9", borderradius:12})
 					,mousedebug({flex:1, margin:20})
 					,view({

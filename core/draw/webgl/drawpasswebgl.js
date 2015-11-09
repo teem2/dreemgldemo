@@ -180,8 +180,8 @@ define.class(function(require, baseclass){
 				// lets render the view as a layer
 				var blendshader = draw.blendshader
 				blendshader.texture = draw.layer.color_buffer
-				blendshader._width = draw.layout.width
-				blendshader._height = draw.layout.height
+				blendshader.width = draw.layout.width
+				blendshader.height = draw.layout.height
 				blendshader.drawArrays(this.device)
 			}
 			else{

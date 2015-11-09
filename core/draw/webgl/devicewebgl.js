@@ -171,7 +171,6 @@ define.class(function(require, exports, self){
 	}
 
 	this.doDraw = function(time){
-
 		// lets layout shit that needs layouting.
 		var screen = this.layout_list[this.layout_list.length - 1]
 		screen._size = this.size//

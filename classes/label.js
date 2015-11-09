@@ -26,6 +26,7 @@ define.class(function(view, require){
 	this.attribute("align", {type: String,  value: "left"})
 	
 	define.class(this, 'font', Font, function(){
+
 		this.update = function(){
 			var view = this.view
 			
@@ -36,16 +37,15 @@ define.class(function(view, require){
 			mesh.fontsize = view.fontsize
 			mesh.add_y = mesh.line_height
 			mesh.align = view.align
-			mesh.start_y = mesh.line_heigh
+			mesh.start_y = mesh.line_height
 			mesh.clear()
 
 			if (this.multiline){
 				mesh.addWithinWidth(text, maxwidth? maxwidth: this.layout.width)
 			}
 			else{
-				mesh.add(view.text)
+				mesh.add(view.text,0 ,0 ,0)
 			}
-			//this.fg.textcolor = this.color;
 			this.mesh = mesh
 		}
 	})
