@@ -750,7 +750,13 @@
 						for(var i = 0; i < mysize; i++) out[i] = arg0[i]
 						return out
 					}
-					throw new Error("TODO implement object constructing for types")
+					if(arg0.____struct && arg0.data){
+						var data = arg0.data
+						for(var i = 0; i < mysize; i++) out[i] = data[i]
+						return out
+					}
+					console.log("TODO implement object constructing for types" + typeof arg0)
+					return out
 				}
 				if(len === mysize){
 					for(var i = 0; i < len; i++) out[i] = arguments[i]

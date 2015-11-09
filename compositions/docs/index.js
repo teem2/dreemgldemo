@@ -2,15 +2,14 @@
 define.class(function(composition, docviewer, fileio, screens, screen, dataset, splitcontainer, treeview, view, text, require, scrollcontainer){
 
 	this.render = function(){
-		//console.log(t)
 		return [
 		fileio(),
 		screens(
-			thescreen = screen({
+			screen({
 				init:function(){
 					// lets load the entire directory structure
 					this.rpc.fileio.readalldir('',['fonts','build','lib','server.js','favicon.ico','define.js','textures','gzcache','@/\\.','.git', '.gitignore']).then(function(result){
-
+						console.log("HERE")
 						var filetree = this.find('filetree')
 						var tree = result.value
 						tree.name = 'Documentation'
@@ -36,7 +35,8 @@ define.class(function(composition, docviewer, fileio, screens, screen, dataset, 
 							view({flex:1, flexdirection:"column"}
 								,treeview({
 									init:function(){
-										this.dataset = this.find('screen').model
+										var dataset = this.find('screen').model
+										if(dataset) this.dataset = dataset
 									},
 									name:'filetree', 
 									flex:1, 
@@ -46,7 +46,7 @@ define.class(function(composition, docviewer, fileio, screens, screen, dataset, 
 										for(var i = sel.path.length - 1; i >= 1; i--){
 											path = sel.path[i].name + (path!==''?'/' + path:'')
 										}
-										thescreen.locationhash = {path : '$root/'+path};
+										this.find('screen').locationhash = {path : '$root/'+path};
 									}
 								})
 							)
