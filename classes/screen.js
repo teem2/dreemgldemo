@@ -62,9 +62,14 @@ define.class(function(view, require) {
 			if(!this.mouse_capture){
 				this.device.pickScreen(this.mouse.x, this.mouse.y).then(function(view){
 					// result!
-					console.log(view.name)
+					//console.log(view.name)
+					// ah so. we might need to do mouseover/mouseout
+					if(this.mouse_view && this.mouse_view !== view){
+						this.mouse_view.emit('mouseout', this.remapMouse(this.mouse_view))
+					}
 					this.mouse_view = view
-				})
+					if(view) this.mouse_view.emit('mouseover', this.remapMouse(this.mouse_view))
+				}.bind(this))
 			}
 		}.bind(this)
 
@@ -87,8 +92,8 @@ define.class(function(view, require) {
 		}.bind(this)
 
 		this.mouse.leftup = function(){ 
-			if (this.mouse_view && this.inModalChain(this.mouse_view)) this.mouse_view.emit('mouseleftup')
-			this.mousecapture = false
+			if (this.mouse_view && this.inModalChain(this.mouse_view)) this.mouse_view.emit('mouseleftup', this.remapMouse(this.mouse_view))
+			this.mouse_capture = false
 		}.bind(this)
 /*
 		this.mouse.click = function () {
