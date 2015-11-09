@@ -138,12 +138,12 @@ define.class( function(node, require){
 			this.atAttributeGet = function(attrname){
 				// monitor attribute wires for geometry
 			}.bind(this)
-			var shaders = this.shader_list
-			for(var i = 0; i < shaders.length; i ++){
-				var shader = shaders[i]			
-				shader.update()
-			}
 		}
+		var shaders = this.shader_list
+		for(var i = 0; i < shaders.length; i ++){
+			var shader = shaders[i]			
+			shader.update()
+		}		
 		if(!this._shaderswired){
 			this._shaderswired = true
 			this.atAttributeGet = undefined
@@ -192,8 +192,6 @@ define.class( function(node, require){
 	}
 
 	this.doLayout = function(width, height){
-		if(this._layout) return
-		this._layout = 1
 		FlexLayout.fillNodes(this)
 		var layouted = FlexLayout.computeLayout(this)
 		// recursively update matrices?
