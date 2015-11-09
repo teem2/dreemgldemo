@@ -1,4 +1,4 @@
-define.class(function(screen, view, button, editor, text, guide$omdb$movie) {
+define.class(function(screen, view, button, editor, text, guide$movie) {
 
     this.attribute('term', {type:String});
     this.attribute('movies', {type:Array});
@@ -9,7 +9,7 @@ define.class(function(screen, view, button, editor, text, guide$omdb$movie) {
         if (this.movies) {
             for (var i=0;i<this.movies.length;i++) {
                 var movieData = this.movies[i];
-                mviews.push(guide$omdb$movie(movieData));
+                mviews.push(guide$movie(movieData));
             }
         }
 

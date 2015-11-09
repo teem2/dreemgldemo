@@ -31,7 +31,7 @@ The name you choose for `<componentname>` is important as it will be the namespa
 instantiate it's classes later.  For example, this guide is in the `./compositions/guide/` directory, so all of the 
 classes provided by this directory can then be accessed using `guide$<classname>` syntax.  For example, a class in a file 
 `./compositons/guide/foo.js` would be accessible via `guide$foo`.  This syntax acts as a path seperator to traverse
-directories, for example `./compositons/guide/omdb/search.js` is accessible via `guide$omdb$search`.
+directories, for example `./compositons/guide/search.js` is accessible via `guide$search`.
 
 Be sure to include a `README.md` with instructions for use and a package.json to help manage dependancies, like so:
 
@@ -53,7 +53,7 @@ If required, be sure to install any dependancies in the component directory:
 
 Dreem components are collections of server objects and UI widgets that can be used by other Dreem compositions.  This
 example provides a simple way to access and display movies from the [OMDB](http://omdbapi.com/) database.  Here is a simple 
-object that encapsulates a single "search" within the database (see `./compositons/guide/omdb/search.js` for more detailed version):
+object that encapsulates a single "search" within the database (see `./compositons/guide/search.js` for more detailed version):
 
     define.class(function(server, require) {
 
@@ -76,7 +76,7 @@ search API and sets it's own found attribute upon return.
 #### Screen Side
 
 Client-side UI views are also an important part of external components, and this example provies a simple view
-to consume the data coming from it's server component (see `./compositons/guide/omdb/movie.js` for complete code):
+to consume the data coming from it's server component (see `./compositons/guide/movie.js` for complete code):
 
     define.class(function (view, text) {
     
@@ -99,19 +99,21 @@ The server returns blocks of JSON which look like this:
      "Type":"movie",
      "Poster":"..."}
     
-When rendered into a javascript object these blocks can be consumed directly by the `guide$omdb$movie()` object to create
+When rendered into a javascript object these blocks can be consumed directly by the `guide$movie()` object to create
 new movies views which can be added directly to the heirarchy.  An example of how this can be accomplished is provided 
 in the next section.
 
 ### Including Examples and Usage
 
 In addition to a `REAMDE.md` components often provide one or more example compositions.  Typically only the `index.js`
-is kept at the root for technical reasons (this may be changed soon), and all other compositions, 
-supporting screens and other views kept in the `./example` or `./examples` directory.
+is kept at the root for technical reasons (this may be changed soon to example.js), and all other compositions, 
+supporting screens and other views not intended to be used except as examples are typically kept in the 
+`./example` or `./examples` directory.
 
-For this guide one screen will be used to gather user input and display the list of movies (as `guide$omdb$movie` views):
+For this guide one simple screen (see `./compositons/guide/screens/search.js` for complete code) gathers user input 
+and displays the list of movies (as `guide$movie` views):
               
-    define.class(function(screen, view, button, editor, text, guide$omdb$movie) {
+    define.class(function(screen, view, button, editor, text, guide$movie) {
     
         this.attribute('term', {type:String});
         this.attribute('movies', {type:Array});
@@ -119,7 +121,7 @@ For this guide one screen will be used to gather user input and display the list
         this.renderMovies = function() {
             var mviews = [];
             for (var i=0;i<this.movies.length;i++) {
-                mviews.push(guide$omdb$movie(this.movies[i]));
+                mviews.push(guide$movie(this.movies[i]));
             }    
             return mviews;
         };
@@ -138,15 +140,15 @@ For this guide one screen will be used to gather user input and display the list
     
 And finally, the `index.js` wires all the components together:
 
-    define.class(function(composition, screens, guide$omdb$search, guide$example$omdb$search) {
+    define.class(function(composition, screens, guide$search, guide$screens$search) {
     
         this.render = function() { return [
-            guide$omdb$search({
+            guide$search({
                 name:'omdb',
                 keyword:'${this.rpc.screens.main.term}'
             }),
             screens(
-                guide$example$omdb$search({
+                guide$screens$search({
                     name:'main',
                     movies:'${this.rpc.omdb.found}'
                 })
