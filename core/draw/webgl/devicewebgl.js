@@ -140,7 +140,7 @@ define.class(function(require, exports, self){
 		return buf
 	}
 
-	this.debug_pick = false
+	this.debug_pick = true
 
 	this.doPick = function(){
 		this.pick_timer = 0
