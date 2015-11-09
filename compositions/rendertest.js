@@ -7,13 +7,14 @@ define.class(function(composition, screens, screen, view){
 		this.attribute("buttoncolor2", {type: vec4, value: vec4("#8080c0")});
 		
 		this.bg  = {
+			
 			mousepos: vec2(0), 
 			gridcolor: vec4("#ffffff"),
 			grid:function(a){
-				if (floor(mod(a.x * view.layout.width,50. )) == 0. ||floor(mod(a.y * view.layout.height,50. )) == 0.)	{
+				if (floor(mod(a.x ,50. )) == 0. ||floor(mod(a.y ,50. )) == 0.)	{
 					return mix(gridcolor, vec4(0.9,0.9,1.0,1.0), 0.5);
 				}
-				if (floor(mod(a.x * view.layout.width,10. )) == 0. ||floor(mod(a.y * view.layout.height,10. )) == 0.)	{
+				if (floor(mod(a.x ,10. )) == 0. ||floor(mod(a.y ,10. )) == 0.)	{
 					return mix(gridcolor, vec4(0.9,0.9,1.0,1.0), 0.2);
 				}
 				return gridcolor;
@@ -22,8 +23,8 @@ define.class(function(composition, screens, screen, view){
 			borderwidth: 1,
 			cornerradius: 14,
 			color: function() {							
-				var dx = abs(pos.x  * view.layout.width - mousepos.x);
-				var dy = abs(pos.y  * view.layout.height - mousepos.y);
+				var dx = abs(pos.x   - mousepos.x);
+				var dy = abs(pos.y   - mousepos.y);
 				var mindist = min(dx,  dy);
 				var a = pos.xy;				
 				return mix(grid(a), mix(vec4(1,1,0.8,1),vec4(0,0,0,1),clamp((1.-mindist)*1.0, 0.,1. )),clamp((1.-mindist/5.0)*1.0, 0.,1. )/2.);
@@ -35,6 +36,7 @@ define.class(function(composition, screens, screen, view){
 		}
 		
 		this.mousemove = function(a){
+			console.log(a);
 			this.bgshader.mousepos = vec2(a[0],a[1]);		
 			this.setDirty(true);
 			//this.screen.addDirtyNode(this);
