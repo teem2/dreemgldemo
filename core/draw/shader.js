@@ -58,7 +58,7 @@ define.class('$base/node', function(require, exports, self){
 	}
 	for(var key in gltypes.extensions) defExt(key)
 
-	this.OES_standard_derivatives = 1
+	//this.OES_standard_derivatives = 1
 
 	this.precision = 'highp'
 

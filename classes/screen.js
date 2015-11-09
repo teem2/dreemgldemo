@@ -1,7 +1,6 @@
 // Copyright 2015 Teem2 LLC, MIT License (see LICENSE)
 define.class(function(view, require) {
 	
-	var Text = require('./text')
 	var FlexLayout = require('$lib/layout')
 	var Render = require('$base/render')
 	
@@ -63,6 +62,7 @@ define.class(function(view, require) {
 			if(!this.mouse_capture){
 				this.device.pickScreen(this.mouse.x, this.mouse.y).then(function(view){
 					// result!
+					console.log(view.name)
 					this.mouse_view = view
 				})
 			}

@@ -25,7 +25,7 @@ define.class(function(require, exports, self){
 
 		this.animFrame = function(time){
 			this.anim_req = false
-			this.atRedraw(time)
+			this.doDraw(time)
 		}.bind(this)
 	
 		if(previous){
@@ -139,6 +139,8 @@ define.class(function(require, exports, self){
 		return buf
 	}
 
+	this.debug_pick = false
+
 	this.pickScreen = function(x, y){
 		// promise based pickray rendering
 		return new Promise(function(resolve, reject){
@@ -146,27 +148,29 @@ define.class(function(require, exports, self){
 				var last = i === len - 1 
 				// lets set up glscissor on last
 				// and then read the goddamn pixel
-				if(last){ // set our pickray texture
-					// woo hoo. the layer index is the guid
-					
-				}
-				this.drawpass_list[i].draw(last, true, i)
+				this.drawpass_list[i].drawPick(last, i, x, y, this.debug_pick)
 			}
 			// now lets read the pixel under the mouse
-			var data = this.readPixels(x*this.ratio,this.main_frame.size[1] - y*this.ratio,1,1)
+			if(this.debug_pick){
+				var data = this.readPixels(x*this.ratio,this.main_frame.size[1] - y*this.ratio,1,1)
+			}
+			else{
+				var data = this.readPixels(0,0,1,1)
+			}
+			
 			// decode the pass and drawid
 			var passid = (data[0]*43)%256 - 1
 			var drawid = (((data[2]<<8) | data[1])*60777)%65536 - 1
 
 			// lets find the view.
 			var pass = this.drawpass_list[passid]
-			var view = pass.draw_list[drawid]
+			var view = pass && pass.draw_list[drawid]
 
-			if(view)console.log(view.name)
+			resolve(view)
 		}.bind(this))
 	}
 
-	this.atRedraw = function(time){
+	this.doDraw = function(time){
 
 		// lets layout shit that needs layouting.
 		var screen = this.layout_list[this.layout_list.length - 1]
@@ -180,7 +184,7 @@ define.class(function(require, exports, self){
 
 		// lets draw all the passes
 		for(var i = 0, len = this.drawpass_list.length; i < len; i++){
-			this.drawpass_list[i].draw(i === len - 1, false, i)
+			this.drawpass_list[i].drawColor(i === len - 1)
 		}
 	}
 

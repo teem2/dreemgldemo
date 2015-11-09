@@ -1,5 +1,5 @@
 //Pure JS based composition
-define.class(function(composition, screens, screen, view, text){
+define.class(function(composition, screens, screen, view){
 
 	this.render = function(){ return [
 		screens(
