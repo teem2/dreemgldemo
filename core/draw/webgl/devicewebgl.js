@@ -143,7 +143,7 @@ define.class(function(require, exports, self){
 	this.debug_pick = false
 
 	this.doPick = function(){
-
+		var x = this.pick_x, y = this.pick_y
 		for(var i = 0, len = this.drawpass_list.length; i < len; i++){
 			var last = i === len - 1 
 			// lets set up glscissor on last
@@ -179,8 +179,8 @@ define.class(function(require, exports, self){
 			this.pick_resolve.push(resolve)
 			this.pick_x = x
 			this.pick_y = y
-			this.atPick = this.pickScreenInner
-			this.redraw()
+			//this.redraw()
+			this.doPick()
 		}.bind(this))
 	}
 
