@@ -28,8 +28,27 @@ define.class(function(view, require) {
 		this.bindInputs()
 	}
 
+	this.remapmatrix = mat4();
 	this.remapMouse = function(node){
+
+		var M = node._mode?  node.layoutmatrix: node.totalmatrix;		
+		var P = node.parent;
+		if (!M) return [0,0];
+
+		while(P){
+			if (P._mode || !P.parent)
+			{
+				if (P._mode){
+					console.log("layer!");
+					console.log (node.viewmatrix);
+					M = mat4.mat4_mul_mat4(M, node.viewmatrix);
+				}
+			}
+			P = P.parent;
+		}
 		
+		mat4.invert(M, this.remapmatrix)
+		return [this.mouse._x, this.mouse._y];
 	}
 
 	this.bindInputs = function(){

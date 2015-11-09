@@ -1,7 +1,7 @@
 //Pure JS based composition
 define.class(function(composition, screens, screen, view, label){
 
-	var mousedebug = define.class(function(view){	
+	var mousedebug = define.class(function mousedebug(view){	
 		
 		this.attribute("buttoncolor1", {type: vec4, value: vec4("#9090b0")});		
 		this.attribute("buttoncolor2", {type: vec4, value: vec4("#8080c0")});
@@ -38,7 +38,7 @@ define.class(function(composition, screens, screen, view, label){
 		this.mousemove = function(a){
 			console.log(a);
 			this.bgshader.mousepos = vec2(a[0],a[1]);		
-			this.setDirty(true);
+			this.redraw();
 			//this.screen.addDirtyNode(this);
 			
 			if (this.children.length > 0)
