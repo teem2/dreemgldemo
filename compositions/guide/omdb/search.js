@@ -8,7 +8,7 @@ define.class(function(server, require) {
     this.attribute("keyword", {type:String});
 
     // List of movie objects returned from server
-    this.attribute("found", {type:function A(a){return a;}});
+    this.attribute("found", {type:Array});
 
     this.onkeyword = function (keyword) {
         if (keyword) {

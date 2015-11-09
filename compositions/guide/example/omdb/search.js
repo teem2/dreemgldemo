@@ -1,7 +1,7 @@
 define.class(function(screen, view, button, editor, text, guide$omdb$movie) {
 
     this.attribute('term', {type:String});
-    this.attribute('movies', {type:function A(a){return a;}});
+    this.attribute('movies', {type:Array});
 
     this.renderMovies = function() {
         var mviews = [];
@@ -20,7 +20,6 @@ define.class(function(screen, view, button, editor, text, guide$omdb$movie) {
 
         view(
             {flexdirection:'column'},
-            // TODO this should work | editor({ name:'search', width:300, height:30, text:'Aliens'}),
             text({ name:'search', width:300, height:30, text:'Aliens'}),
             button({text:'Search', width:90, click:function() {
                 // sets the term on our screen, this should fire the server thing

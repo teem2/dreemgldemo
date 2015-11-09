@@ -13,7 +13,7 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	this.postAPI = function(msg, response){
 		if(msg.type == 'attribute'){
 			if (!msg.get) { //setter
-				this.setRpcAttribute(msg)
+				this.setRpcAttribute(msg, response)
 				response.send({type:'return', attribute:msg.attribute, value:'OK'})
 			} 
 			else { //getter
