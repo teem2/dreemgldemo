@@ -26,7 +26,7 @@ define.class(function(require, exports, self){
 		this.animFrame = function(time){
 			this.anim_req = false
 			this.doDraw(time)
-			if(this.pick_resolve.length) this.doPick()
+			//if(this.pick_resolve.length) this.doPick()
 		}.bind(this)
 	
 		if(previous){
@@ -143,6 +143,7 @@ define.class(function(require, exports, self){
 	this.debug_pick = false
 
 	this.doPick = function(){
+		this.pick_timer = 0
 		var x = this.pick_x, y = this.pick_y
 		for(var i = 0, len = this.drawpass_list.length; i < len; i++){
 			var last = i === len - 1 
@@ -153,29 +154,26 @@ define.class(function(require, exports, self){
 		// now lets read the pixel under the mouse
 		var pick_resolve = this.pick_resolve
 		this.pick_resolve = []
-		//setTimeout(function(){
-			//this.bindFramebuffer(this.drawpass_list[this.drawpass_list.length - 1].pick_buffer)
 
-			if(this.debug_pick){
-				var data = this.readPixels(x*this.ratio,this.main_frame.size[1] - y*this.ratio,1,1)
-			}
-			else{
-				var data = this.readPixels(0,0,1,1)
-			}
-			
-			// decode the pass and drawid
-			var passid = (data[0]*43)%256 - 1
-			var drawid = (((data[2]<<8) | data[1])*60777)%65536 - 1
+		if(this.debug_pick){
+			var data = this.readPixels(x*this.ratio,this.main_frame.size[1] - y*this.ratio,1,1)
+		}
+		else{
+			var data = this.readPixels(0,0,1,1)
+		}
+		
+		// decode the pass and drawid
+		var passid = (data[0]*43)%256 - 1
+		var drawid = (((data[2]<<8) | data[1])*60777)%65536 - 1
 
-			// lets find the view.
-			var pass = this.drawpass_list[passid]
-			var view = pass && pass.draw_list[drawid]
-			// lets wait
-			//if(view)console.log(view.name)
-			for(var i = 0; i < pick_resolve.length; i++){
-				pick_resolve[i](view)
-			}
-		//}.bind(this),0)
+		// lets find the view.
+		var pass = this.drawpass_list[passid]
+		var view = pass && pass.draw_list[drawid]
+		// lets wait
+		//if(view)console.log(view.name)
+		for(var i = 0; i < pick_resolve.length; i++){
+			pick_resolve[i](view)
+		}
 	}
 
 	this.pickScreen = function(x, y){
@@ -184,7 +182,9 @@ define.class(function(require, exports, self){
 			this.pick_resolve.push(resolve)
 			this.pick_x = x
 			this.pick_y = y
-			this.redraw()
+			if(!this.pick_timer){
+				this.pick_timer = setTimeout(this.doPick.bind(this), 0)
+			}
 			//this.doPick()
 		}.bind(this))
 	}
