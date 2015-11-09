@@ -152,7 +152,6 @@ define.class(function(require, baseclass){
 			var main_ratio = device.main_frame.ratio, twidth = layout.width * main_ratio, theight = layout.height * main_ratio
 			this.allocDrawTarget(twidth, theight, 'color_buffer')
 		}
-
 		this.device.bindFramebuffer(this.color_buffer)
 
 		if(layout.width === 0 || layout.height === 0) return
@@ -170,6 +169,7 @@ define.class(function(require, baseclass){
 		else if(view._mode === '3D'){
 
 		}
+		console.log(layout)
 
 		// each view has a reference to its layer
 		for(var dl = this.draw_list, i = 0; i < dl.length; i++){

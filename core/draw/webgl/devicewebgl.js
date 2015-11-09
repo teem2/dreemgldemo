@@ -165,6 +165,8 @@ define.class(function(require, exports, self){
 			// lets find the view.
 			var pass = this.drawpass_list[passid]
 			var view = pass && pass.draw_list[drawid]
+			// set it back
+			this.bindFramebuffer()
 
 			resolve(view)
 		}.bind(this))
