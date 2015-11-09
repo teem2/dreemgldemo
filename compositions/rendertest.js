@@ -39,8 +39,7 @@ define.class(function(composition, screens, screen, view, label){
 			this.setDirty(true);
 			//this.screen.addDirtyNode(this);
 			
-			if (this.children.length > 0)
-			{
+			if (this.children.length > 0){
 				this.children[0].text = Math.round(a[0]) + ", " + Math.round(a[1]);
 				this.children[0].pos = vec2(a[0],a[1]);						
 			}
@@ -61,7 +60,7 @@ define.class(function(composition, screens, screen, view, label){
 				
 					bgcolor:'#CBD6D9'
 					} 
-					//,label({text:'hello'})
+					,label({text:'hello'})
 					,view({flex:1,margin:20,bgcolor:'#8FA4A6',name:'view1', borderwidth:4, bordercolor:"#F2E5C9", borderradius:12})
 					,mousedebug({flex:1, margin:20})
 					,view({
