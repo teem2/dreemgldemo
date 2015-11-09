@@ -194,6 +194,7 @@ The composition server will respond to HTTP POSTs requests sending JSON data in 
       "type": "<attribute|method>",
 
       //used only if type=attribute
+      "get":true|false,
       "attribute": "<attribute name>",
       "value": "<attribute value, if setting>",
 
@@ -234,18 +235,19 @@ Which will return:
 
 ##### Getter
 
-Getting attributes is identical to setting, but without a `value` property:
+Getting attributes is identical to setting, but without a `value` property and setting the `get` property:
 
     { 
       "rpcid": "<see above>", 
       "type": "attribute",
+      "get": true,
 
       "attribute": "<attribute name>"
     }
 
 Reading the kework attribute off the omdb search object:
 
-    curl -X POST -d '{"rpcid":"omdb", "type":"attribute", "attribute":"keyword"}' http://localhost:2000/guide
+    curl -X POST -d '{"rpcid":"omdb", "type":"attribute", "attribute":"keyword", "get":true}' http://localhost:2000/guide
     
 If you had set the search term with the previous example, it will now return:    
     
