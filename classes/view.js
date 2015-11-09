@@ -183,7 +183,7 @@ define.class( function(node, require){
 
 		this.mesh = this.vertexstruct.array()
 	
-		this.has_guid = true
+		this.has_pick = true
 		this.depth_test = ""
 
 		// matrix and viewmatrix should be referenced on view
@@ -247,15 +247,15 @@ define.class( function(node, require){
 		this.texture = Shader.prototype.Texture.fromType('rgba_depth_stencil')
 		this.mesh = vec2.array()
 		this.mesh.pushQuad(0,0, 0,1, 1,0, 1,1)
-		this.pos = vec2(0,0)
-		this.size = vec2(0,0)
+		this.width = 0
+		this.height = 0
 
 		this.color = function(){
 			return texture.sample(mesh.xy)
 		}
 
 		this.position = function(){
-			return vec4( mesh.x * size.x, mesh.y * size.y, 0, 1) * view.layermatrix * view.viewmatrix
+			return vec4( mesh.x * width, mesh.y * height, 0, 1) * view.layermatrix * view.viewmatrix
 		}
 	})
 	/*

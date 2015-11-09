@@ -3,6 +3,8 @@
 
 define.class(function(exports){
 
+	var initializing = false
+
 	exports.process = function render(new_version, old_version, globals, wireinits, rerender){
 
 		var init_wires = false
@@ -16,7 +18,7 @@ define.class(function(exports){
 		}
 		
 		// call connect wires before
-		new_version.connectWires(wireinits)
+		if(!rerender) new_version.connectWires(wireinits)
 
 		var old_children = old_version? old_version.children: undefined
 
@@ -38,7 +40,7 @@ define.class(function(exports){
 			//console.log('Rerendering',key)
 			//debugger
 			// we need to call re-render on this
-			render(this, undefined, globals, undefined, true)
+			if(!initializing) render(this, undefined, globals, undefined, true)
 			//this.setDirty(true)
 			//if(this.reLayout) this.reLayout()
 		}
@@ -98,9 +100,11 @@ define.class(function(exports){
 		if(old_version) old_version.emit('deinit')
 
 		if(init_wires){
+			initializing = true
 			for(var i = 0; i < wireinits.length; i++){
 				wireinits[i]()
 			}
+			initializing = false
 
 			// signal to our device we have a newly rendered node
 			if(globals.device){

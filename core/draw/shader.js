@@ -398,7 +398,7 @@ define.class('$base/node', function(require, exports, self){
 		return vec4(0,0,0,0)
 	}
 
-	this.has_guid = false
+	this.has_pick = false
 
 	this.monitorCompiledProperty = function(name, init){
 		var get = '_' + name
@@ -518,7 +518,7 @@ define.class('$base/node', function(require, exports, self){
 		vtx += '\tgl_Position = ' + this.toVec4(vtx_code, vtx_ast) + ';\n'
 		vtx += '}\n'
 
-		var pix_base = '', pix_color = '', pix_guid = '', pix_debug = ''
+		var pix_base = '', pix_color = '', pix_pick = '', pix_debug = ''
 
 		pix_base += this.compileHeader()
 		if(pix_state.debug.type){
@@ -571,23 +571,24 @@ define.class('$base/node', function(require, exports, self){
 		}
 		pix_color += '}\n'
 
-		pix_guid += pix_base
-		pix_guid += 'uniform vec4 _guid;\n'
-		pix_guid += '//------------------- GUID Pixel shader main -------------------\nvoid main(){\n'
-		pix_guid += this.compileUniformRename(pix_state.uniforms)
-		pix_guid += '\t' + this.toVec4(pix_code, pix_ast, alpha_code, alpha_ast) + ';\n'
-		pix_guid += '\tgl_FragColor = _guid;\n'
-		pix_guid += '}\n'
+		pix_pick += pix_base
+		pix_pick += 'uniform vec3 _pick;\n'
+		pix_pick += '//------------------- Pick Pixel shader main -------------------\nvoid main(){\n'
+		pix_pick += this.compileUniformRename(pix_state.uniforms)
+		pix_pick += '\tvec4 col = ' + this.toVec4(pix_code, pix_ast, alpha_code, alpha_ast) + ';\n'
+		pix_pick += ''
+		pix_pick += '\tgl_FragColor = vec4(_pick.xyz, col.a>0.5?1.:0.);\n'
+		pix_pick += '}\n'
 
 		if(this.dump){
 			console.log(vtx)
 			console.log(pix_color)
-			console.log(pix_guid)
+			console.log(pix_pick)
 			console.log(pix_debug)
 		}
 		vtx_state.code = vtx
 		pix_state.code_color = pix_color
-		pix_state.code_guid = pix_guid
+		pix_state.code_pick = pix_pick
 		pix_state.code_debug = pix_debug
 
 		this.pix_state = pix_state

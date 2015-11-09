@@ -13,12 +13,14 @@ define.class('../shader', function(require, exports, self){
 		var vtx_state = this.vtx_state
 		var pix_state = this.pix_state
 		var vtx_code = vtx_state.code
+
 		var pix_color = pix_state.code_color
-		var pix_guid = pix_state.code_guid
+
+		var pix_pick = pix_state.code_pick
 		var pix_debug = pix_state.code_debug
 
 		var gl = gldevice.gl
-		var cache_id = vtx_code + pix_color + this.has_guid
+		var cache_id = vtx_code + pix_color + this.has_pick
 		var shader = gldevice.shadercache[cache_id]
 
 		if(shader) return shader
@@ -52,7 +54,7 @@ define.class('../shader', function(require, exports, self){
 		if(this.compile_use) this.compileUse(shader)
 
 		if(pix_debug){
-			// compile the guid shader
+			// compile the pick shader
 			var pix_debug_shader = gl.createShader(gl.FRAGMENT_SHADER)
 			gl.shaderSource(pix_debug_shader, pix_debug)
 			gl.compileShader(pix_debug_shader)
@@ -66,33 +68,33 @@ define.class('../shader', function(require, exports, self){
 			gl.attachShader(shader.debug, vtx_shader)
 			gl.attachShader(shader.debug, pix_debug_shader)
 			gl.linkProgram(shader.debug)
-			// add our guid uniform
+			// add our pick uniform
 			this.getLocations(gl, shader.debug, vtx_state, pix_state)
 			if(this.compile_use) this.compileUse(shader.debug)
 		}
 
-		if(this.has_guid){
-			// compile the guid shader
-			var pix_guid_shader = gl.createShader(gl.FRAGMENT_SHADER)
-			gl.shaderSource(pix_guid_shader, pix_guid)
-			gl.compileShader(pix_guid_shader)
-			if (!gl.getShaderParameter(pix_guid_shader, gl.COMPILE_STATUS)){
-				var err = gl.getShaderInfoLog(pix_guid_shader)
+		if(this.has_pick){
+			// compile the pick shader
+			var pix_pick_shader = gl.createShader(gl.FRAGMENT_SHADER)
+			gl.shaderSource(pix_pick_shader, pix_pick)
+			gl.compileShader(pix_pick_shader)
+			if (!gl.getShaderParameter(pix_pick_shader, gl.COMPILE_STATUS)){
+				var err = gl.getShaderInfoLog(pix_pick_shader)
 
 				console.log(err.toString(), this.annotateLines(pix))
 				throw new Error(err)
 			}
 
-			shader.guid = gl.createProgram()
-			gl.attachShader(shader.guid, vtx_shader)
-			gl.attachShader(shader.guid, pix_guid_shader)
-			gl.linkProgram(shader.guid)
-			// add our guid uniform
-			pix_state.uniforms['guid'] = vec4
+			shader.pick = gl.createProgram()
+			gl.attachShader(shader.pick, vtx_shader)
+			gl.attachShader(shader.pick, pix_pick_shader)
+			gl.linkProgram(shader.pick)
+			// add our pick uniform
+			pix_state.uniforms['pick'] = vec3
 
-			this.getLocations(gl, shader.guid, vtx_state, pix_state)
+			this.getLocations(gl, shader.pick, vtx_state, pix_state)
 
-			if(this.compile_use) this.compileUse(shader.guid)
+			if(this.compile_use) this.compileUse(shader.pick)
 		}
 
 		return shader		
@@ -344,9 +346,9 @@ define.class('../shader', function(require, exports, self){
 			//if(gen.args == 1){
 
 			var call = gen.call
-			if(call !== 'uniformMatrix4fv' && call !== 'uniformMatrix3fv' && call !== 'uniformMatrix2fv'){
-				out += '\t\tif(loc.value !== uni) loc.value = uni, '
-			}
+			//if(call !== 'uniformMatrix4fv' && call !== 'uniformMatrix3fv' && call !== 'uniformMatrix2fv'){
+			//	out += '\t\tif(loc.value !== uni) loc.value = uni, '
+			//}
 
 			out += 'gl.' + gen.call + '(loc.loc'
 

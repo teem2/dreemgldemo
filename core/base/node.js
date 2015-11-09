@@ -409,7 +409,13 @@ define.class(function(require, constructor){
 				else this[on_key] = init_value
 			}
 			else{
-				this[value_key] = config.type(init_value)
+				var type = config.type
+				if(type && type !== Object && type !== Array){
+					this[value_key] = type(init_value)
+				}
+				else{
+					this[value_key] = init_value
+				}
 			}
 		}
 		this._attributes[key] = this[config_key] = config
@@ -419,7 +425,14 @@ define.class(function(require, constructor){
 		var setter
 		var getter
 		// define attribute gettersetters
-		if(config.storage){
+
+		// block attribute emission on objects with an environment thats (stub it)
+		if(this.environment && this.environment === define.$environment){
+			setter  = function(value){
+				this[set_key] = value
+			}
+		}
+		else if(config.storage){
 			var storage_key = '_' + config.storage
 			
 			setter = function(value){
@@ -471,8 +484,11 @@ define.class(function(require, constructor){
 				if(typeof value === 'object' && value !== null && value.atAttributeAssign) value.atAttributeAssign(this, key)
 				
 				var config = this[config_key]
-
-				if(config.type) value = config.type(value)
+			
+				var type = config.type
+				if(type){
+					if(type !== Object && type !== Array) value = type(value)
+				}
 
 				if(config.motion && this.startMotion(key, value)){
 					// store the end value

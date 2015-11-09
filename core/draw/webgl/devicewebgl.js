@@ -9,7 +9,7 @@ define.class(function(require, exports, self){
 	// require embedded classes	
 	var Shader = this.Shader = require('./shaderwebgl')
 	var Texture = this.Texture = require('./texturewebgl')
-	var Layer =this.Layer = require('./layerwebgl')
+	var DrawPass =this.Layer = require('./drawpasswebgl')
 
 	this.frame = 
 	this.main_frame = this.Texture.fromType('rgb_depth_stencil')
@@ -20,7 +20,7 @@ define.class(function(require, exports, self){
 	this.atConstructor = function(previous){
 		this.extensions = previous && previous.extensions || {}
 		this.shadercache = previous &&  previous.shadercache || {}
-		this.layer_list = previous && previous.layer_list || []
+		this.drawpass_list = previous && previous.layer_list || []
 		this.layout_list = previous && previous.layout_list || []
 
 		this.animFrame = function(time){
@@ -134,9 +134,36 @@ define.class(function(require, exports, self){
 	}
 
 	this.readPixels = function(x, y, w, h){
-		var buf = new Uint8Array(w * this.ratio * h * this.ratio * 4)
-		this.gl.readPixels(x * this.ratio, y * this.ratio, w * this.ratio, h * this.ratio, this.gl.RGBA, this.gl.UNSIGNED_BYTE, buf)
+		var buf = new Uint8Array(w * h * 4)
+		this.gl.readPixels(x , y , w , h, this.gl.RGBA, this.gl.UNSIGNED_BYTE, buf)
 		return buf
+	}
+
+	this.pickScreen = function(x, y){
+		// promise based pickray rendering
+		return new Promise(function(resolve, reject){
+			for(var i = 0, len = this.drawpass_list.length; i < len; i++){
+				var last = i === len - 1 
+				// lets set up glscissor on last
+				// and then read the goddamn pixel
+				if(last){ // set our pickray texture
+					// woo hoo. the layer index is the guid
+					
+				}
+				this.drawpass_list[i].draw(last, true, i)
+			}
+			// now lets read the pixel under the mouse
+			var data = this.readPixels(x*this.ratio,this.main_frame.size[1] - y*this.ratio,1,1)
+			// decode the pass and drawid
+			var passid = (data[0]*43)%256 - 1
+			var drawid = (((data[2]<<8) | data[1])*60777)%65536 - 1
+
+			// lets find the view.
+			var pass = this.drawpass_list[passid]
+			var view = pass.draw_list[drawid]
+
+			if(view)console.log(view.name)
+		}.bind(this))
 	}
 
 	this.atRedraw = function(time){
@@ -151,37 +178,35 @@ define.class(function(require, exports, self){
 			view.doLayout()
 		}
 
-		for(var i = 0, len = this.layer_list.length; i < len; i++){
-			this.layer_list[i].draw(i === len - 1)
+		// lets draw all the passes
+		for(var i = 0, len = this.drawpass_list.length; i < len; i++){
+			this.drawpass_list[i].draw(i === len - 1, false, i)
 		}
 	}
 
 	this.atNewlyRendered = function(view){
-		// hum. so. if we are the root, lets wipe it all.
 		// todo fix this
 		// if view is not a layer we have to find the layer
-		this.regenerateLayers(view)
-		// layout view
-
+		this.regenerateDrawPasses(view)
 	}
 
-	this.regenerateLayers = function(view){
+	this.regenerateDrawPasses = function(view){
 		this.layer_list = []
 		this.layout_list = []
 		// lets walk over the root
-		this.addLayerRecursive(view)
+		this.addDrawPassRecursive(view)
 		this.redraw()
 	}
 
-	this.addLayerRecursive = function(view){
+	this.addDrawPassRecursive = function(view){
 		// lets first walk our children( depth first)
 		var children = view.children
 		for(var i = 0; i < children.length; i++){
-			this.addLayerRecursive(children[i])
+			this.addDrawPassRecursive(children[i])
 		}
 		// lets create a layer
 		if(view._mode){
-			this.layer_list.push(new Layer(this, view))
+			this.drawpass_list.push(new DrawPass(this, view))
 			if(!view._flex){
 				this.layout_list.push(view)
 			}
@@ -193,8 +218,6 @@ define.class(function(require, exports, self){
 		// do stuff
 	}
 	
-	
-	this.disposeRenderTarget = function(texture){
-		this.deleteTexture()
-	}
+
+
 })
