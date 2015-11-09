@@ -16,7 +16,8 @@ define.class(function(require, exports, self){
 	
 	this.preserveDrawingBuffer = true
 	this.antialias = false
-	
+	this.debug_pick = false
+
 	this.atConstructor = function(previous){
 		this.extensions = previous && previous.extensions || {}
 		this.shadercache = previous &&  previous.shadercache || {}
@@ -139,8 +140,6 @@ define.class(function(require, exports, self){
 		this.gl.readPixels(x , y , w , h, this.gl.RGBA, this.gl.UNSIGNED_BYTE, buf)
 		return buf
 	}
-
-	this.debug_pick = true
 
 	this.doPick = function(){
 		this.pick_timer = 0

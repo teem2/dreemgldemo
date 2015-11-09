@@ -34,7 +34,6 @@ define.class(function(view, require) {
 
 		var M = node._mode?  node.layoutmatrix: node.totalmatrix;		
 		var P = node.parent;
-			console.log(node);
 		if (!M)
 		{
 			M = mat4.identity();
