@@ -150,11 +150,16 @@ define.class(function(require, baseclass){
 		}
 
 		this.device.bindFramebuffer(this.color_buffer)
+		console.log(this.color_buffer);
 		device.clear(view._clearcolor)
-
 		// 2d/3d switch
 		if(view._mode === '2D'){
-			mat4.ortho(0, layout.width, 0, layout.height, -100, 100, this.viewmatrix)
+			if (isroot){
+				mat4.ortho(0, layout.width, 0, layout.height, -100, 100, this.viewmatrix)
+			}
+			else{
+				mat4.ortho(0, layout.width, layout.height, 0, 100, -100, this.viewmatrix)
+			}
 		}
 		else if(view._mode === '3D'){
 
