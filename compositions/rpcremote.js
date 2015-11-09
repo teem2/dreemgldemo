@@ -6,6 +6,10 @@ define.class(function(composition, screens, screen, server, view, text, draggabl
 		dosomething: function(){
 			console.log("dosomething called on server")
 			this.test = 40
+			this.test = function(value){
+				console.log("TEST ATTRIBUTE SET ON SERVEr")
+
+			}
 			console.log("Setting attribute on screen")
 			this.rpc.screens.mobile.test1 = {my:'obj'}
 		}

@@ -12,30 +12,36 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 	// ok now what. well we need to build our RPC interface
 	this.postAPI = function(msg, response){
 		if(msg.type == 'attribute'){
-			if (msg.value) { //setter
-				this.setRpcAttribute(msg)
-				response.send({type:'return', value:'OK'})
-			} else { //getter
+			if (!msg.get) { //setter
+				this.setRpcAttribute(msg, response)
+				response.send({type:'return', attribute:msg.attribute, value:'OK'})
+			} 
+			else { //getter
 				var parts = msg.rpcid.split('.');
-				var value;
-				if (parts[0] !== 'screens'){
-					var obj = this.names[parts[0]];
-					if (obj) {
-						value = obj[msg.attribute]
-					}
+				var obj
+				if(parts[0] === 'screens'){
+					obj = this.rpc.screens[parts[1]]
 				}
-				response.send({type:'return', value:value})
+				else{
+					obj = this.names[parts[0]]
+				}
+				if(!obj){
+					response.send({type:'error', message:"Cannot find object"})
+				}
+				else{
+					response.send({type:'return', attribute:msg.attribute, value:obj[msg.attribute]})
+				}
 			}
 		}
 		else if(msg.type == 'method'){
 			this.callRpcMethod(msg).then(function(ret) {
 				var value = ret.value;
-				response.send({type:'return', value:value})
+				response.send({type:'return', method:msg.method, value:value})
 			}, function(ret) {
-				response.send({type:'error', value:ret})
+				response.send({type:'error', message:ret})
 			});
 		}
-		else response.send({type:'error', value:'please set "msg.type" to "attribute" or "method"'})
+		else response.send({type:'error', message:'please set "msg.type" to "attribute" or "method"'})
 	}
 	
 	this.handleRpcMethod = function(msg){
@@ -108,9 +114,17 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		var parts = msg.rpcid.split('.')
 		// keep it around for new joins
 		this.server_attributes[msg.rpcid] = msg
-
+		
 		if (socket) {
-			if(parts[0] !== 'screens'){ // set an attribute on a server local thing
+			//make sure we set it on the rpc object
+			if(parts[0] === 'screens'){
+				var obj = this.rpc.screens[parts[1]]
+				var last_set = obj.atAttributeSet
+				obj.atAttributeSet = undefined
+				obj[msg.attribute] = msg.value
+				obj.atAttributeSet = last_set
+			}
+			else{ // set it on self
 				var obj = this.names[parts[0]]
 				if (obj) {
 					obj[msg.attribute] = msg.value
@@ -123,7 +137,9 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 			var array = this.connected_screens[scrkey]
 			for(var i = 0; i < array.length; i++){
 				var sock = array[i]
-				if(sock === socket) continue
+				if(sock === socket){
+					continue
+				}
 				if(sock.readyState === 1){
 					sock.send(msg)
 				}
@@ -183,12 +199,18 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 
 		this.renderComposition()
 
+		// lets initialize bindings
+
+
 		// call init on the classes which are in our environment
 		for(var i = 0; i < this.children.length; i++){
 			// create child name shortcut
 			var child = this.children[i]
 			child.rpc = this.rpc
 			if(!child.environment || child.environment === define.$environment){
+				var init = []
+				child.connectWires(init)
+				for(var j = 0; j < init.length; j++)init[j]()
 				child.emitRecursive('init')
 			}
 		}		

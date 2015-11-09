@@ -78,7 +78,7 @@ define.class(function(require){
 	}
 
 	this.reload = function(){
-		console.color("~bg~Reloading~~ composition\n")
+		console.color("~bg~Reloading~~ composition (" + this.name + ")\n")
 		this.destroy()
 
 		this.readSystemClasses('$classes', this.system_classes = {})
@@ -179,7 +179,7 @@ define.class(function(require){
 			req.on('data', function(data){buf += data.toString()})
 			req.on('end', function(){
 				try{
-					var json = JSON.parse(buf)
+					var json = JSON.parse(buf);
 					this.composition.postAPI(json, {send:function(msg){
 						res.writeHead(200, {"Content-Type":"text/json"})
 						res.write(JSON.stringify(msg))
@@ -188,7 +188,7 @@ define.class(function(require){
 				}
 				catch(e){
 					res.writeHead(500, {"Content-Type": "text/html"})
-					res.write('FAIL')
+					res.write('FAIL: ' + e.message)
 					res.end()
 					return
 				}

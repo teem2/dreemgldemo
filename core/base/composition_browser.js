@@ -79,8 +79,9 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 		this.bus.send(msg)
 		return prom
 	}
-
+	this.msg_count = 0
 	this.setRpcAttribute = function(msg){
+		//if(this.feedback_block && this.feedback_block.rpcid === msg.rpcid && this.feedback_block.attribute === msg.attribute) return
 		this.bus.send(msg)
 	}
 
@@ -144,13 +145,14 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 					this.bus.send({type:'webrtcOffer', offer:offer, index: this.index})
 				}.bind(this)
 
+				if(!this.rendered) this.doRender()
+
 				for(var key in msg.attributes){
 					var attrmsg = msg.attributes[key]
 					// process it
 					this.bus.atMessage(attrmsg, socket)
 				}
 
-				if(!this.rendered) this.doRender()
 			}
 			else if(msg.type == 'connectScreen'){
 				//var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
@@ -158,7 +160,6 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				//else obj.createIndex(msg.index, msg.rpcid, rpcpromise)
 			}
 			else if(msg.type == 'attribute'){
-
 				var split = msg.rpcid.split('.')
 				var obj
 				// see if its a set attribute on ourself
@@ -174,13 +175,14 @@ define.class('$base/composition_base', function(require, exports, self, baseclas
 				}
 
 				var value =  define.structFromJSON(msg.value)
-
+				// lets block feedback
+				//this.feedback_block = msg
 				// ok, now, key is that we do NOT want to trigger atAttributeSet?..
 				var attrset = obj.atAttributeSet
 				obj.atAttributeSet = undefined
 				obj[msg.attribute] = value
 				obj.atAttributeSet = attrset
-				
+				//this.feedback_block = undefined
 				// so its either 
 				//var obj = RpcProxy.decodeRpcID(this, msg.rpcid)
 				//if(obj) obj[msg.attribute] = msg.value
