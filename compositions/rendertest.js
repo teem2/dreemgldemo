@@ -35,6 +35,7 @@ define.class(function(composition, screens, screen, view, label, button){
 		}
 		
 		this.mousemove = function(a){
+			return
 			this.bgshader.mousepos = vec2(a[0],a[1])
 			this.setDirty(true)
 			//this.screen.addDirtyNode(this);
