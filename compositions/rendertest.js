@@ -15,6 +15,11 @@ define.class(function(composition, screens, screen, view){
 					} 
 					,view({flex:1,margin:20,bgcolor:'blue',name:'view1'})
 					,view({
+						blend:{
+							color:function(){
+								return texture.sample(mesh.xy)
+							}
+						},
 						flex:1,borderradius:20,name:'view2',
 						margin:20,mode:'2D',bgcolor:'purple'
 					})

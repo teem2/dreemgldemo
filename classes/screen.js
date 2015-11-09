@@ -6,6 +6,8 @@ define.class(function(view, require) {
 	
 	this.attribute('locationhash', {type:Object})
 
+	this.bg = undefined
+
 	this.mode = '2D'
 	this.dirty = true
 	this.flex = 0
@@ -95,7 +97,7 @@ define.class(function(view, require) {
 			if (this.mouse_view && this.inModalChain(this.mouse_view)) this.mouse_view.emit('mouseleftup', this.remapMouse(this.mouse_view))
 			this.mouse_capture = false
 		}.bind(this)
-/*
+		/*
 		this.mouse.click = function () {
 			if(this.modal_miss){
 				this.modal_miss = false

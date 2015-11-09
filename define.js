@@ -533,7 +533,7 @@
 			Object.defineProperty(outer_this, classname, {
 				get:function(){
 					var cls = this['_' + classname]
-					cls.outer = this 
+					if(cls) cls.outer = this 
 					return cls
 				},
 				set:function(value){

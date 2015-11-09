@@ -76,7 +76,7 @@ define.class( function(node, require){
 	this.atInit = function(){
 		for(var key in this.shaders){
 			var shader = this[key]
-			this.shader_list.push(this[key+'shader'] = new shader())
+			if(shader) this.shader_list.push(this[key+'shader'] = new shader())
 		}
 		if(this._mode){
 			// give it a blendshader
