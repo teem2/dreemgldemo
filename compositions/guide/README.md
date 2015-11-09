@@ -5,11 +5,19 @@ some explicit conventions to follow.
 
 ## Adding a Simple Web Service
 
-This example will demonstrate how to build a server-side component that has to communicate with an external web service.  
+This guide will demonstrate how to build a server-side component that has to communicate with an external web service.  If
+this is your first time through the guide, besure to install any thirsd party modules needed by the examples:
 
-This component will provide a search object and simple UI for the [OMDB](http://omdbapi.com/) database, but a more generic 
-(and synchronous) example of a bare-bones server-side web-fetching component can be found in the 
-[Dreem GL branch](https://github.com/teem2/teem-sample_component/tree/dreemgl) of the sample component repository.
+    cd ./compositions/guide/
+     
+    npm install
+    
+Once the dependancies have been installed, the example provided by the guide can be found mointed on [/guide](http://localhost:2000/guide).    
+    
+The guide will walk you through building a simple component that talks to a server-side web service. This component will 
+provide a search object and simple UI for the [OMDB](http://omdbapi.com/) database, but a more generic (and synchronous) 
+example of a bare-bones server-side web-fetching component can be found in the [Dreem GL branch](https://github.com/teem2/teem-sample_component/tree/dreemgl) 
+of the sample component repository.
 
 ### Setting up the Component
 
