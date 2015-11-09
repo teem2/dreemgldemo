@@ -293,7 +293,7 @@ define.class( function(node, require){
 		}
 
 		this.position = function(){
-			var pos = mesh.pos.xy
+			pos = mesh.pos.xy
 			var ca = cos(mesh.angle + PI)
 			var sa = sin(mesh.angle + PI)
 			
@@ -399,7 +399,8 @@ define.class( function(node, require){
 			};
 		
 		this.position = function(){
-			var pos = mesh.pos.xy;
+			
+			pos = mesh.pos.xy;
 			var ca = cos(mesh.angle + PI);
 			var sa = sin(mesh.angle+PI);
 			
