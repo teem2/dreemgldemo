@@ -39,8 +39,8 @@ define.class(function(view, require) {
 			if (P._mode || !P.parent)
 			{
 				if (P._mode){
-					console.log("layer!");
-					console.log (node.viewmatrix);
+					//console.log("layer!");
+					//console.log (node.viewmatrix);
 					M = mat4.mat4_mul_mat4(M, node.viewmatrix);
 				}
 			}

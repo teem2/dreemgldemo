@@ -169,7 +169,6 @@ define.class(function(require, baseclass){
 		else if(view._mode === '3D'){
 
 		}
-		console.log(layout)
 
 		// each view has a reference to its layer
 		for(var dl = this.draw_list, i = 0; i < dl.length; i++){
