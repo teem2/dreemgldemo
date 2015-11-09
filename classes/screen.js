@@ -34,28 +34,38 @@ define.class(function(view, require) {
 
 		var M = node._mode?  node.layoutmatrix: node.totalmatrix;		
 		var P = node.parent;
-		if (!M) return [0,0];
+			console.log(node);
+		if (!M)
+		{
+			M = mat4.identity();
+		}
+		console.log("modelview");
+		mat4.debug(M);
 		while(P){
 			if (P._mode || !P.parent)
 			{
 				if (P._mode){
 					//console.log("layer!");
 					//console.log (node.viewmatrix);
-					M = mat4.mat4_mul_mat4(M, P.viewmatrix);
+					console.log("viewmult");			
+					mat4.debug(P.viewmatrix);
+					M = mat4.mat4_mul_mat4(P.viewmatrix, M);
 				}
 			}
 			P = P.parent;
 		}
-		
+		console.log("final")
+		mat4.debug(M);
 		mat4.invert(M, this.remapmatrix)
-		
+		console.log("inverted")
+		mat4.debug(this.remapmatrix);
 		var sx =this.device.main_frame.size[0]  / this.device.ratio;
 		var sy =this.device.main_frame.size[1]  / this.device.ratio;
 		var mx = this.mouse._x/(sx/2) - 1.0
 		var my = -1 * (this.mouse._y/(sy/2) - 1.0)
 		//console.log(mx,my);
-		vec2.mul_mat4([mx*100,my], this.remapmatrix, this.invertedmousecoords)
-		
+		vec2.mul_mat4([mx,my], this.remapmatrix, this.invertedmousecoords)
+		console.log("mouse",[mx,my],"invertedmouse", this.invertedmousecoords);
 		return this.invertedmousecoords;
 	}
 
