@@ -97,9 +97,14 @@ define.class(function(require, baseclass){
 		 // 2d/3d switch
 		if(view._mode === '2D'){
 			if(isroot && !debug)
-				mat4.ortho(mousex, 4 + mousex, mousey, 4 + mousey, -100, 100, this.viewmatrix)
+				mat4.ortho(mousex-3, 2 + mousex, 2 + mousey,  mousey-3, -100, 100, this.viewmatrix)
 			else
-				mat4.ortho(0, layout.width, 0, layout.height, -100, 100, this.viewmatrix)
+				if (isroot){
+					mat4.ortho(0, layout.width, 0, layout.height, -100, 100, this.viewmatrix)
+				}
+				else{
+					mat4.ortho(0, layout.width, layout.height, 0, 100, -100, this.viewmatrix)
+				}
 
 		}
 		else if(view._mode === '3D'){
