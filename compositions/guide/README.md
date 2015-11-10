@@ -31,7 +31,9 @@ The name you choose for `<componentname>` is important as it will be the namespa
 instantiate it's classes later.  For example, this guide is in the `./compositions/guide/` directory, so all of the 
 classes provided by this directory can then be accessed using `guide$<classname>` syntax.  For example, a class in a file 
 `./compositons/guide/foo.js` would be accessible via `guide$foo`.  This syntax acts as a path seperator to traverse
-directories, for example `./compositons/guide/search.js` is accessible via `guide$search`.
+directories, for example `./compositons/guide/search.js` is accessible via `guide$search`.  Inside of a composition
+you can use 'this$' to indicate the current composition, regardless of the directory name.  for example `guide$search` can
+also be access as `this$search` from within the `guide` directory.
 
 Be sure to include a `README.md` with instructions for use and a package.json to help manage dependancies, like so:
 

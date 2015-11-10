@@ -1,4 +1,4 @@
-define.class(function(screen, view, button, editor, text, guide$movie) {
+define.class(function(screen, view, button, editor, text, this$movie) {
 
     this.attribute('term', {type:String});
     this.attribute('movies', {type:Array});
@@ -9,10 +9,9 @@ define.class(function(screen, view, button, editor, text, guide$movie) {
         if (this.movies) {
             for (var i=0;i<this.movies.length;i++) {
                 var movieData = this.movies[i];
-                mviews.push(guide$movie(movieData));
+                mviews.push(this$movie(movieData));
             }
         }
-
         return mviews;
     };
 
@@ -27,7 +26,6 @@ define.class(function(screen, view, button, editor, text, guide$movie) {
             }}),
             view(this.renderMovies())
         )
-
     ] }
 
 });
