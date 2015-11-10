@@ -91,9 +91,9 @@ define.class( function(node, require){
 		this.anims = {}
 		this.layout = {width:0, height:0, left:0, top:0, right:0, bottom:0}
 		this.shader_list = []
-		this.modelmatrix = mat4.identity()
+		this.modelmatrix = mat4()
 		this.totalmatrix = mat4.identity()
-		this.layermatrix = mat4.identity()
+		this.layermatrix = mat4()
 		this.atInit()
 	}
 
@@ -126,7 +126,7 @@ define.class( function(node, require){
 
 	// redraw our view
 	this.redraw = function(){
-		this.device.redraw()
+		if(this.device) this.device.redraw()
 	}
 
 	// when do we call this?..
@@ -309,7 +309,7 @@ define.class( function(node, require){
 			pos.x += ca * rad
 			pos.y += sa * rad
 			
-			uv = vec2(pos.x/view.width,  pos.y/view.height)
+			uv = vec2(pos.x/view.layout.width,  pos.y/view.layout.height)
 			
 			sized = vec2(pos.x, pos.y)
 			return vec4(sized.x, sized.y, 0, 1) * view.totalmatrix * view.viewmatrix

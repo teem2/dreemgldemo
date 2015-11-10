@@ -179,6 +179,8 @@ define.class(function(require, baseclass){
 		for(var dl = this.draw_list, i = 0; i < dl.length; i++){
 			var draw = dl[i]
 			draw.viewmatrix = this.viewmatrix
+			if (!view.colorviewmatrix) view.colorviewmatrix = mat4();
+			for(var j = 0;j<16;j++) view.colorviewmatrix[j] = this.viewmatrix[j];
 			if(draw._mode && draw.layer !== this && draw.layer.color_buffer){
 				// ok so when we are drawing a pick pass, we just need to 1 on 1 forward the color data
 				// lets render the view as a layer

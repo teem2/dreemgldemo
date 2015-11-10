@@ -618,7 +618,20 @@ define.class('$base/node', function(require, exports, self){
 
 	this.atExtend = function(){
 		// forward the view reference
-		if(this.constructor.outer) this.view = this.constructor.outer
-		if(this !== self) this.compile()
+		if(this.constructor.outer){
+			this.view = this.constructor.outer
+			this.compile()
+			// lets put listeners on our view so when a view uniform modifies it redraws the node
+			for(var key in this.pix_state.uniforms){
+				var parts = key.split('_DOT_')
+				if(parts.length === 2 && parts[0] === 'view'){
+					if('_' + parts[1] in this.view){
+						this.view.addListener(parts[1], this.view.redraw)
+					}
+				}
+			}
+		}
+		else if(this !== self) this.compile()
+
 	}
 })

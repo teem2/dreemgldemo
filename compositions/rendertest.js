@@ -64,6 +64,8 @@ define.class(function(composition, screens, screen, view, label, button){
 					,button({text:'i iz button', flex:1})
 					,view({flex:1,margin:20,bgcolor:'#8FA4A6',name:'view1', borderwidth:4, bordercolor:"#F2E5C9", borderradius:12})
 					,mousedebug({flex:1, margin:20})
+					,mousedebug({flex:1, margin:20})
+					,mousedebug({flex:1, margin:20})
 					,view({
 						flex:1,borderradius:vec4(10,20,30,40),name:'view2',
 						margin:20,mode:'2D',bgcolor:'#A39565', bordercolor:"#484230", borderwidth: 20
