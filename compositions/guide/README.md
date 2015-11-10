@@ -112,10 +112,10 @@ is kept at the root for technical reasons (this may be changed soon to example.j
 supporting screens and other views not intended to be used except as examples are typically kept in the 
 `./example` or `./examples` directory.
 
-For this guide one simple screen (see `./compositons/guide/screens/search.js` for complete code) gathers user input 
-and displays the list of movies (as `guide$movie` views):
+For this guide one simple screen (see `./compositons/guide/browser.js` for complete code) gathers user input 
+and displays the list of movies (as `guide$movie` objects):
               
-    define.class(function(screen, view, button, editor, text, guide$movie) {
+    define.class(function(screen, view, button, editor, text, this$movie) {
     
         this.attribute('term', {type:String});
         this.attribute('movies', {type:Array});
@@ -123,7 +123,7 @@ and displays the list of movies (as `guide$movie` views):
         this.renderMovies = function() {
             var mviews = [];
             for (var i=0;i<this.movies.length;i++) {
-                mviews.push(guide$movie(this.movies[i]));
+                mviews.push(this$movie(this.movies[i]));
             }    
             return mviews;
         };
@@ -142,7 +142,7 @@ and displays the list of movies (as `guide$movie` views):
     
 And finally, the `index.js` wires all the components together:
 
-    define.class(function(composition, screens, guide$search, guide$screens$search) {
+    define.class(function(composition, screens, guide$search, guide$browser) {
     
         this.render = function() { return [
             guide$search({
@@ -150,7 +150,7 @@ And finally, the `index.js` wires all the components together:
                 keyword:'${this.rpc.screens.main.term}'
             }),
             screens(
-                guide$screens$search({
+                guide$browser({
                     name:'main',
                     movies:'${this.rpc.omdb.found}'
                 })
