@@ -9,7 +9,7 @@ define.class(function(composition, screens, this$search, this$browser) {
             this$browser({
                 name:'main',
                 term:'Aliens',
-                movies:'${this.rpc.omdb.found}'
+                movies:'${this.rpc.omdb.results}'
             })
         )
     ] }

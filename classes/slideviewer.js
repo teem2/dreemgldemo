@@ -30,7 +30,7 @@ define.class(function(view, require){
 	this.state('page')
 
 	this.constructor.slide = this.slide
-	
+
 	this.slidewidth = 1024
 	this.slidemargin = 10
 	this.slideheight = 1024
@@ -49,11 +49,11 @@ define.class(function(view, require){
 
 	// deny focus loss
 	this.focuslost = function(){
-		this.screen.setFocus(this)
+//		this.screen.setFocus(this)
 	}
 
 	this.init = function(){
-		this.screen.setFocus(this)
+//		this.screen.setFocus(this)
 	}
 
 	this.render = function(){

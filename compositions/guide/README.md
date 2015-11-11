@@ -59,21 +59,21 @@ object that encapsulates a single "search" within the database (see `./composito
 
     define.class(function(server, require) {
 
-        this.attribute("found", {type:Array});
+        this.attribute("results", {type:Array});
         this.attribute("keyword", {type:String});
         this.onkeyword = function (keyword) {
             var request = require('request');
             request("http://www.omdbapi.com/?s=" + keyword.replace(/[^a-z0-9_-]/ig, '+'), (function (error, response, body) {
                 if (!error && response.statusCode == 200) {
-                    this.found = JSON.parse(body)["Search"];
+                    this.results = JSON.parse(body)["Search"];
                 }
             }).bind(this))
         }
     });
 
 The search object has two attributes, the `keyword` to search term used in the search and the resulting list of movie 
-objects `found` by the server.  Setting the `keyword` triggers the `onkeyword` event which fetches the data from the 
-search API and sets it's own found attribute upon return.
+objects `results` from the server.  Setting the `keyword` triggers the `onkeyword` event which fetches the data from the 
+search API and sets it's own results attribute upon return.
 
 #### Screen Side
 
@@ -152,7 +152,7 @@ And finally, the `index.js` wires all the components together:
             screens(
                 guide$browser({
                     name:'main',
-                    movies:'${this.rpc.omdb.found}'
+                    movies:'${this.rpc.omdb.results}'
                 })
             )
         ] }    
