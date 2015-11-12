@@ -6,25 +6,16 @@ define.class(function(composition, require, screens, desktop, devices, guide$sea
 			screens(
 				desktop({
 					name:'desktop',
-					movies:'${this.rpc.search.results}',
+
 					searchCode:guide$search.module.factory.body.toString(),
-					apiCode:  function () {
-						var message = {
-							"rpcid": "<see below>",
-								"type": "<attribute|method>",
+					movies:'${this.rpc.search.results}',
 
-								"get":true|false,
-								"attribute": "<attribute name>",
-								"value": "<attribute value, if setting>",
-
-								"method": "<method name>",
-								"args": ["<array>", "<of>", "<arguments>"]
-						}
-					}.toString()
+					apiCode:devices.module.factory.body.toString(),
+					devices:'${this.rpc.devbus.active}'
 				})
 		    ),
-			guide$search({name:'search', keyword:"Aliens"}),
-			devices({name:'dev'})
+			guide$search({name:'search', keyword:"Cats"}),
+			devices({name:'devbus'})
 		]
 	}
 });
