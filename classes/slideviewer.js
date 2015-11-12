@@ -53,7 +53,7 @@ define.class(function(view, require){
 	}
 
 	this.init = function(){
-//		this.screen.setFocus(this)
+		this.screen.setFocus(this)
 	}
 
 	this.render = function(){

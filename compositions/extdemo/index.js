@@ -1,4 +1,4 @@
-define.class(function(composition, require, screens, desktop, remote, guide$search){
+define.class(function(composition, require, screens, desktop, devices, guide$search){
 
 	this.render = function render() {
 
@@ -6,7 +6,6 @@ define.class(function(composition, require, screens, desktop, remote, guide$sear
 			screens(
 				desktop({
 					name:'desktop',
-					pager:'${this.rpc.screens.remote.pager}',
 					movies:'${this.rpc.search.results}',
 					searchCode:guide$search.module.factory.body.toString(),
 					apiCode:  function () {
@@ -22,10 +21,10 @@ define.class(function(composition, require, screens, desktop, remote, guide$sear
 								"args": ["<array>", "<of>", "<arguments>"]
 						}
 					}.toString()
-				}),
-				remote({name:'remote'})
+				})
 		    ),
-			guide$search({name:'search', keyword:"Cats"})
+			guide$search({name:'search', keyword:"Aliens"}),
+			devices({name:'dev'})
 		]
 	}
 });
