@@ -1,4 +1,4 @@
-define.class(function(composition, require, screens, desktop, devices, guide$search){
+define.class(function(composition, require, screens, desktop, devices, guide$search, syntax){
 
 	this.render = function render() {
 
@@ -6,6 +6,7 @@ define.class(function(composition, require, screens, desktop, devices, guide$sea
 			screens(
 				desktop({
 					name:'desktop',
+					syntaxCode:syntax.module.factory.body.toString(),
 
 					searchCode:guide$search.module.factory.body.toString(),
 					movies:'${this.rpc.search.results}',
